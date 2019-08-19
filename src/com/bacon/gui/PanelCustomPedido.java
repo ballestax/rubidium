@@ -10,6 +10,7 @@ import com.bacon.domain.Product;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.GridLayout;
+import java.awt.Insets;
 import java.beans.PropertyChangeEvent;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -17,6 +18,10 @@ import java.util.ArrayList;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import org.balx.ColorDg;
+import org.balx.SpinnerNumberModelo;
 import org.dz.PanelCapturaMod;
 
 /**
@@ -27,6 +32,7 @@ public class PanelCustomPedido extends PanelCapturaMod {
 
     private final Aplication app;
     private final Product product;
+    private DecimalFormat DCFORM_P;
 
     /**
      * Creates new form PanelCustomPedido
@@ -68,8 +74,34 @@ public class PanelCustomPedido extends PanelCapturaMod {
         lbPrice.setForeground(Color.red.darker());
         lbPrice.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 2, Color.red));
         
+        
+        DCFORM_P = (DecimalFormat) NumberFormat.getInstance();
+        DCFORM_P.applyPattern("$ ###,###,###");
+        
+        lbCant.setText("Cantidad");
+        spCantidad.setModel(new SpinnerNumberModelo(1, 1, 10, 1));
+        spCantidad.setForeground(Color.red.darker());
+        spCantidad.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                int value = (int) spCantidad.getValue();
+                double total = value * product.getPrice();
+                lbInfo.setText(value+ " "+product.getName()+" x "+DCFORM_P.format(total));
+            }
+        });
+        
+        btConfirm.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "success.png", 10, 10)));
+        btConfirm.setBackground(new Color(153, 255, 153));
+        btConfirm.setMargin(new Insets(1, 1, 1, 1));
+        btConfirm.setFont(new Font("Arial", 1, 11));
+//        btConfirm.setActionCommand(AC_CONFIRMAR_PEDIDO);
+//        btConfirm.addActionListener(this);
+        btConfirm.setText("CONFIRMAR");
+        
+        lbInfo.setText(spCantidad.getValue()+ " "+product.getName());
+        
         lbTitle1.setText("Ingredientes");
-        lbTitle1.setBackground(Color.orange.brighter());
+        lbTitle1.setBackground(ColorDg.colorAleatorio().getColor1());
         panel1.setLayout(new GridLayout(3, 3));
         ArrayList<String> ings = new ArrayList<>();
         ings.add("Tomate");
@@ -87,7 +119,7 @@ public class PanelCustomPedido extends PanelCapturaMod {
         }
         
         lbTitle2.setText("Adicionales");
-        lbTitle2.setBackground(Color.ORANGE.brighter());
+        lbTitle2.setBackground(ColorDg.colorAleatorio().getColor1());
         panel2.setLayout(new GridLayout(3, 3));
         ArrayList<String> adds = new ArrayList<>();
         adds.add("Chorizo");
@@ -121,6 +153,12 @@ public class PanelCustomPedido extends PanelCapturaMod {
         panel1 = new javax.swing.JPanel();
         lbTitle2 = new javax.swing.JLabel();
         panel2 = new javax.swing.JPanel();
+        spCantidad = new javax.swing.JSpinner();
+        lbCant = new javax.swing.JLabel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        taObs = new javax.swing.JTextArea();
+        lbInfo = new javax.swing.JLabel();
+        btConfirm = new javax.swing.JButton();
 
         lbName.setFont(new java.awt.Font("Ubuntu", 1, 17)); // NOI18N
         lbName.setText("jLabel1");
@@ -167,6 +205,21 @@ public class PanelCustomPedido extends PanelCapturaMod {
             .addGap(0, 104, Short.MAX_VALUE)
         );
 
+        spCantidad.setFont(new java.awt.Font("Ubuntu", 0, 36)); // NOI18N
+
+        lbCant.setFont(new java.awt.Font("Ubuntu", 0, 12)); // NOI18N
+        lbCant.setText("jLabel1");
+        lbCant.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 0, 0), 1, true));
+
+        taObs.setColumns(20);
+        taObs.setRows(5);
+        jScrollPane1.setViewportView(taObs);
+
+        lbInfo.setText("jLabel1");
+        lbInfo.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+
+        btConfirm.setText("jButton1");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -179,14 +232,21 @@ public class PanelCustomPedido extends PanelCapturaMod {
                         .addComponent(lbImage, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(lbName, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(lbPrice, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(lbDescription, javax.swing.GroupLayout.PREFERRED_SIZE, 430, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addComponent(lbName, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(lbDescription, javax.swing.GroupLayout.PREFERRED_SIZE, 329, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(spCantidad, javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(lbPrice, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 89, Short.MAX_VALUE)
+                            .addComponent(lbCant, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                     .addComponent(panel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(lbTitle2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(panel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(panel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(lbInfo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btConfirm, javax.swing.GroupLayout.PREFERRED_SIZE, 159, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -196,11 +256,16 @@ public class PanelCustomPedido extends PanelCapturaMod {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(lbImage, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(lbName, javax.swing.GroupLayout.DEFAULT_SIZE, 26, Short.MAX_VALUE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(lbName, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(lbPrice, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(lbDescription, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lbDescription, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(lbCant)
+                                .addGap(0, 0, 0)
+                                .addComponent(spCantidad)))))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(lbTitle1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -209,20 +274,32 @@ public class PanelCustomPedido extends PanelCapturaMod {
                 .addComponent(lbTitle2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(panel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(18, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 40, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lbInfo, javax.swing.GroupLayout.DEFAULT_SIZE, 41, Short.MAX_VALUE)
+                    .addComponent(btConfirm))
+                .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btConfirm;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JLabel lbCant;
     private javax.swing.JLabel lbDescription;
     private javax.swing.JLabel lbImage;
+    private javax.swing.JLabel lbInfo;
     private javax.swing.JLabel lbName;
     private javax.swing.JLabel lbPrice;
     private javax.swing.JLabel lbTitle1;
     private javax.swing.JLabel lbTitle2;
     private javax.swing.JPanel panel1;
     private javax.swing.JPanel panel2;
+    private javax.swing.JSpinner spCantidad;
+    private javax.swing.JTextArea taObs;
     // End of variables declaration//GEN-END:variables
 
     @Override
