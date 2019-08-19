@@ -1,0 +1,615 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE DAOConfiguration [
+
+	<!ELEMENT DAOConfiguration (DAOStatements+)>
+
+	<!ELEMENT DAOStatements (SQLStatement+)>
+	<!ATTLIST DAOStatements
+		database CDATA #REQUIRED
+	>
+ 
+	<!ELEMENT SQLStatement (SQLFragment+)>
+	<!ATTLIST SQLStatement
+		method (COUNT_TABLE|GET_ITEMS_REFERENCE|CHECK_TABLE|CHECK_TABLE_USERS|GET_MAX_ITEMID
+                    |CREATE_USERS_TABLE|INSERT_USER|INSERT_USER_FULL|UPDATE_USER_USERNAME
+                    |UPDATE_USER_ACCESS|UPDATE_USER_PASSWORD|DELETE_USER|GET_USER
+                    |GET_USER_LIMIT|CHECK_USER_PASSWORD|DROP_TABLE|TRUNCATE_TABLE
+                    |CREATE_ROLES_TABLE|INSERT_ROL|UPDATE_ROL|DELETE_ROL|GET_ROLES_LIST
+                    |CREATE_PERMISSIONS_TABLE|INSERT_PERMISSION|UPDATE_PERMISSION|DELETE_PERMISSION|GET_PERMISSIONS_LIST
+                    |CREATE_PERMISSION_ROLE_TABLE|GET_PERMISSION_ROLE_LIST|DELETE_PERMISSION_ROLE|INSERT_PERMISSION_ROLE
+                    |GET_PERMISSION_BY_ROLE_LIST|GET_ROLE|CREATE_ROLE_USER_TABLE|INSERT_ROLE_USER|GET_ROLE_USER_LIST
+                    |DELETE_ROLE_USER|HAS_PERMISSION|GET_USER_ROLE
+                    |CREATE_PERSONS_TABLE
+                    |GET_PERSON|GET_PERSON_LIMIT|INSERT_PERSON|UPDATE_PERSON|GET_ID_PERSON|DELETE_PERSON|DELETE_PERSON_WHERE
+                    |CREATE_CONFIG_TABLE|GET_CONFIG|DELETE_CONFIG|UPDATE_CONFIG|EXIST_CONFIG
+                    |ADD_CONFIG
+                    |EXIST_CLAVE|GET_MAX_ID|COUNT_TABLE2) #REQUIRED
+                    
+	>
+
+	<!ELEMENT SQLFragment (#PCDATA)>
+	<!ATTLIST SQLFragment
+		excludeIfNamedParamEmpty (TRUE|FALSE) "FALSE"
+	>
+]>
+
+
+
+<DAOConfiguration>	
+    <!-- MYSQL -->
+    <DAOStatements database="mysql">
+        <SQLStatement method="COUNT_TABLE">
+            <SQLFragment>
+                SELECT count(*) FROM ({query}) AS counted
+            </SQLFragment>
+        </SQLStatement>
+
+        <SQLStatement method="CHECK_TABLE">
+            <SQLFragment>
+                SELECT count(*) FROM {table}
+            </SQLFragment>
+        </SQLStatement>
+		
+        <SQLStatement method="CREATE_USERS_TABLE">
+            <SQLFragment>
+                CREATE TABLE users (
+                id INTEGER NOT NULL AUTO_INCREMENT,
+                username VARCHAR(100),
+                password VARCHAR(100),
+                access_level VARCHAR(100),
+                createdTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                UNIQUE (username),
+                PRIMARY KEY (id)
+                );
+            </SQLFragment>
+        </SQLStatement>
+		
+        <SQLStatement method="INSERT_USER">
+            <SQLFragment>
+                INSERT INTO users (username,password,access_level) VALUES (?, ?, ?);
+            </SQLFragment>
+        </SQLStatement>
+		
+        <SQLStatement method="INSERT_USER_FULL">
+            <SQLFragment>
+                INSERT INTO users VALUES (?, ?, ?, ?);
+            </SQLFragment>
+        </SQLStatement>
+		
+        <SQLStatement method="UPDATE_USER_USERNAME">
+            <SQLFragment>
+                UPDATE users SET username = ? WHERE id = ?;
+            </SQLFragment>
+        </SQLStatement>
+		
+        <SQLStatement method="UPDATE_USER_ACCESS">
+            <SQLFragment>
+                UPDATE users SET access_level = ? WHERE id = ?;
+            </SQLFragment>
+        </SQLStatement>
+		
+        <SQLStatement method="UPDATE_USER_PASSWORD">
+            <SQLFragment>
+                UPDATE users SET password = ? WHERE id = ?;
+            </SQLFragment>
+        </SQLStatement>
+		
+        <SQLStatement method="DELETE_USER">
+            <SQLFragment>
+                DELETE FROM users WHERE username = ?;
+            </SQLFragment>
+        </SQLStatement>
+		
+        <SQLStatement method="GET_USER_LIMIT">
+            <SQLFragment>
+                SELECT
+            </SQLFragment>
+            <SQLFragment>
+                id, username, access_level
+                FROM users
+            </SQLFragment>
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                WHERE {where}
+            </SQLFragment>
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                ORDER BY {orderby}
+            </SQLFragment>
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                LIMIT ?, ?
+            </SQLFragment>
+        </SQLStatement>
+		
+        <SQLStatement method="GET_USER">
+            <SQLFragment>
+                SELECT
+            </SQLFragment>
+            <SQLFragment>
+                id, username, access_level
+                FROM users
+            </SQLFragment>
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                WHERE {where}
+            </SQLFragment>
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                ORDER BY {orderby}
+            </SQLFragment>
+        </SQLStatement>
+		
+        <SQLStatement method="CHECK_USER_PASSWORD">
+            <SQLFragment>
+                SELECT password, id, access_level FROM users WHERE username = ? AND STRCMP(BINARY password, ?) = 0;
+            </SQLFragment>
+        </SQLStatement>		
+        
+        <SQLStatement method="CREATE_ROLES_TABLE">
+            <SQLFragment>
+                CREATE TABLE roles (
+                id INTEGER NOT NULL AUTO_INCREMENT,
+                name VARCHAR(100),
+                display_name VARCHAR(255),
+                description VARCHAR(255),
+                createdTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                UNIQUE (name),
+                PRIMARY KEY (id)
+                );
+            </SQLFragment>
+        </SQLStatement>
+        
+         <SQLStatement method="GET_ROLES_LIST">
+            <SQLFragment>
+                SELECT
+            </SQLFragment>
+            <SQLFragment>
+                *
+                FROM roles
+            </SQLFragment>
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                WHERE {where}
+            </SQLFragment>    
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                ORDER BY {orderby} 
+            </SQLFragment>
+            
+        </SQLStatement>
+        
+        <SQLStatement method="GET_ROLE">
+            <SQLFragment>
+                SELECT
+            </SQLFragment>
+            <SQLFragment>
+                id, name
+                FROM roles
+            </SQLFragment>
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                WHERE {where}
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="INSERT_ROL">
+            <SQLFragment>
+                INSERT INTO roles (name,display_name,description ) VALUES (?, ?, ?);
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="UPDATE_ROL">
+            <SQLFragment>
+                UPDATE roles SET 
+                name= ?,
+                display_name= ?,
+                description= ?
+                WHERE id = ?;
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="DELETE_ROL">
+            <SQLFragment>
+                DELETE FROM roles WHERE name = ?;
+            </SQLFragment>
+        </SQLStatement>
+        
+        
+        <SQLStatement method="CREATE_PERMISSIONS_TABLE">
+            <SQLFragment>
+                CREATE TABLE permissions (
+                id INTEGER NOT NULL AUTO_INCREMENT,
+                name VARCHAR(100),
+                display_name VARCHAR(255),
+                description VARCHAR(255),
+                UNIQUE (name),
+                PRIMARY KEY (id)
+                );
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="INSERT_PERMISSION">
+            <SQLFragment>
+                INSERT INTO permissions (name,display_name,description) VALUES (?, ?, ?);
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="UPDATE_PERMISSION">
+            <SQLFragment>
+                UPDATE permissions SET 
+                name= ?,
+                display_name= ?,
+                description= ?
+                WHERE id = ?;
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="DELETE_PERMISSION">
+            <SQLFragment>
+                DELETE FROM permissions WHERE id = ?;
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="GET_PERMISSIONS_LIST">
+            <SQLFragment>
+                SELECT
+            </SQLFragment>
+            <SQLFragment>
+                *
+                FROM permissions
+            </SQLFragment>            
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                WHERE {where}
+            </SQLFragment>    
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                ORDER BY {orderby} 
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="CREATE_PERMISSION_ROLE_TABLE">
+            <SQLFragment>
+                CREATE TABLE permission_role (
+                permission_id INTEGER NOT NULL,
+                role_id INTEGER NOT NULL,
+                FOREIGN KEY (permission_id) REFERENCES permissions(id) ON DELETE CASCADE ON UPDATE CASCADE,
+                FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE CASCADE ON UPDATE CASCADE
+                );
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="INSERT_PERMISSION_ROLE">
+            <SQLFragment>
+                INSERT INTO permission_role VALUES (?, ?);
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="GET_PERMISSION_ROLE_LIST">
+            <SQLFragment>
+                SELECT
+            </SQLFragment>
+            <SQLFragment>
+                *
+                FROM permission_role
+            </SQLFragment>            
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                WHERE {where}
+            </SQLFragment>    
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                ORDER BY {orderby} 
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="GET_PERMISSION_BY_ROLE_LIST">
+            <SQLFragment>
+                SELECT
+            </SQLFragment>
+            <SQLFragment>
+                p.id, 
+                p.name,
+                p.display_name,
+                p.description
+                FROM permissions p, roles r, permission_role pr
+            </SQLFragment>            
+            <SQLFragment>
+                WHERE pr.permission_id=p.id and r.id=pr.role_id and r.id=?
+            </SQLFragment>    
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                ORDER BY {orderby} 
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="DELETE_PERMISSION_ROLE">
+            <SQLFragment>
+                DELETE FROM permission_role WHERE role_id = ?;
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="CREATE_ROLE_USER_TABLE">
+            <SQLFragment>
+                CREATE TABLE role_user (
+                user_id INTEGER NOT NULL,
+                role_id INTEGER NOT NULL,
+                UNIQUE(user_id),
+                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
+                FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE CASCADE ON UPDATE CASCADE
+                );
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="INSERT_ROLE_USER">
+            <SQLFragment>
+                INSERT INTO role_user VALUES (?, ?);
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="GET_ROLE_USER_LIST">
+            <SQLFragment>
+                SELECT
+            </SQLFragment>
+            <SQLFragment>
+                *
+                FROM role_user
+            </SQLFragment>            
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                WHERE {where}
+            </SQLFragment>    
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                ORDER BY {orderby} 
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="DELETE_ROLE_USER">
+            <SQLFragment>
+                DELETE FROM role_user WHERE user_id = ?;
+            </SQLFragment>
+        </SQLStatement>
+        
+         <SQLStatement method="HAS_PERMISSION">
+            <SQLFragment>
+                SELECT count(*) 
+                FROM permission_role pr, role_user ru
+                WHERE pr.role_id = ru.role_id AND ru.user_id=? AND pr.permission_id=?
+            </SQLFragment>
+        </SQLStatement>
+        
+        
+        <SQLStatement method="GET_USER_ROLE">
+            <SQLFragment>
+                SELECT r.name 
+                FROM role_user ru, roles r, users u 
+                WHERE ru.role_id = r.id AND u.id=ru.user_id AND u.id=?
+            </SQLFragment>
+        </SQLStatement>
+        
+          
+                	
+        <SQLStatement method="CREATE_PERSONS_TABLE">
+            <SQLFragment>
+                CREATE TABLE persons (
+                id INTEGER AUTO_INCREMENT,
+                identification INTEGER NOT NULL UNIQUE,
+                firstName1 VARCHAR(255),
+                firstName2 VARCHAR(255),
+                lastName1 VARCHAR(255),
+                lastName2 VARCHAR(255),
+                lider INTEGER,					
+                cellphone VARCHAR(15),
+                profession VARCHAR(255),
+                address VARCHAR(255),
+                place1 VARCHAR(255),
+                typePlace VARCHAR(255),
+                neighborhood VARCHAR(255),                
+                birthday DATE,
+                email VARCHAR(255),
+                votingPlace VARCHAR(255),
+                votingTable INTEGER,
+                witness TINYINT(1) DEFAULT '0',
+                jury TINYINT(1) DEFAULT '0',
+                volunteer TINYINT(1) DEFAULT '0',
+                hardvote TINYINT(1) DEFAULT '0',
+                giveVehicle TINYINT(1) DEFAULT '0',
+                typeVehicle VARCHAR(255),
+                compromise VARCHAR(255),
+                photo BLOB DEFAULT NULL,
+                createdTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                lastUpdatedTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                PRIMARY KEY (id));
+            </SQLFragment>
+        </SQLStatement>		
+        
+        <SQLStatement method="GET_PERSON">
+            <SQLFragment>
+                SELECT
+            </SQLFragment>
+            <SQLFragment>
+                *
+                FROM persons
+            </SQLFragment>
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                WHERE {where}
+            </SQLFragment>    
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                ORDER BY {orderby} 
+            </SQLFragment>
+            
+        </SQLStatement>
+        
+        <SQLStatement method="GET_ID_PERSON">
+            <SQLFragment>
+                SELECT
+            </SQLFragment>
+            <SQLFragment>
+                identification
+                FROM persons
+            </SQLFragment>
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                WHERE {where}
+            </SQLFragment>    
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                ORDER BY {orderby} 
+            </SQLFragment>
+            
+        </SQLStatement>
+        
+        <SQLStatement method="GET_PERSON_LIMIT">
+            <SQLFragment>
+                SELECT
+            </SQLFragment>
+            <SQLFragment>
+                *
+                FROM persons
+            </SQLFragment>
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                WHERE {where}
+            </SQLFragment>    
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                ORDER BY {orderby} 
+            </SQLFragment>
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                LIMIT {start}, {num}
+            </SQLFragment>
+        </SQLStatement>
+        
+        
+        <SQLStatement method="UPDATE_PERSON">
+            <SQLFragment>
+                UPDATE persons SET 
+                firstName1=?,
+                firstName2=?,
+                lastName1=?,
+                lastName2=?,
+                lider=?,
+                cellphone=?,
+                profession=?,
+                address=?,
+                place1=?,
+                typePlace=?,
+                neighborhood=?,                
+                birthday=?,
+                email=?,
+                votingPlace=?,
+                votingTable=?,
+                witness=?,
+                jury=?,
+                volunteer=?,
+                hardvote=?,
+                giveVehicle=?,
+                typeVehicle=?,
+                compromise=?,
+                photo=? 
+                WHERE identification = ?
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="INSERT_PERSON">
+            <SQLFragment>
+                INSERT INTO persons (identification,firstName1,firstName2,
+                lastName1,lastName2,lider,cellphone,profession,
+                address,place1,typePlace,neighborhood,birthday,email,votingPlace,
+                votingTable,witness,jury,volunteer,hardvote,giveVehicle,typeVehicle,
+                compromise,photo) 
+                VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);
+            </SQLFragment>
+        </SQLStatement>	
+                
+        <SQLStatement method="DELETE_PERSON">
+            <SQLFragment>
+                DELETE FROM persons WHERE identification = ?;
+            </SQLFragment>
+        </SQLStatement>		
+        
+        <SQLStatement method="DELETE_PERSON_WHERE">
+            <SQLFragment>
+                DELETE FROM persons
+            </SQLFragment>
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                WHERE {where}
+            </SQLFragment>
+        </SQLStatement>		
+                       
+        <SQLStatement method="DROP_TABLE">
+            <SQLFragment>
+                DROP TABLE {table};
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="TRUNCATE_TABLE">
+            <SQLFragment>
+                TRUNCATE TABLE {table};
+            </SQLFragment>
+        </SQLStatement>
+       
+        <SQLStatement method="CHECK_TABLE_USERS">
+            <SQLFragment>
+                SELECT count(*) FROM users WHERE 1=1
+            </SQLFragment>
+        </SQLStatement> 
+        
+        <SQLStatement method="COUNT_TABLE2">
+            <SQLFragment>
+                SELECT count(*) FROM ? WHERE 1=1;
+            </SQLFragment>
+        </SQLStatement>  
+        
+        <SQLStatement method="CREATE_CONFIG_TABLE">
+            <SQLFragment>
+                CREATE TABLE config (
+                id INTEGER AUTO_INCREMENT,
+                code VARCHAR(100) NOT NULL UNIQUE,
+                value VARCHAR(255),
+                type VARCHAR(255),
+                PRIMARY KEY (id));
+            </SQLFragment>
+        </SQLStatement>	
+        
+        <SQLStatement method="GET_CONFIG">
+            <SQLFragment>
+                SELECT
+            </SQLFragment>
+            <SQLFragment>
+                *
+                FROM config
+            </SQLFragment>
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                WHERE {where}
+            </SQLFragment>            
+        </SQLStatement>
+        
+        <SQLStatement method="ADD_CONFIG">
+            <SQLFragment>
+                INSERT INTO config (code,value, type) VALUES (?,?,?)
+            </SQLFragment>
+            <SQLFragment>
+                ON DUPLICATE KEY UPDATE value= VALUES(value), type=VALUES(type)
+            </SQLFragment>
+        </SQLStatement>        
+        
+        <SQLStatement method="DELETE_CONFIG">
+            <SQLFragment>
+                DELETE FROM config WHERE code  = ?;
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="UPDATE_CONFIG">
+            <SQLFragment>
+                UPDATE config SET 
+                value=?,
+                type=? 
+                WHERE code = ?
+            </SQLFragment>
+        </SQLStatement>    
+        
+        <SQLStatement method="EXIST_CONFIG">
+            <SQLFragment>
+                SELECT count(code) FROM config WHERE code=?;
+            </SQLFragment>
+        </SQLStatement>    
+        
+        <SQLStatement method="EXIST_CLAVE">
+            <SQLFragment>
+                SELECT count({query}) FROM {table} WHERE {query}={key};
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="GET_MAX_ID">
+            <SQLFragment>
+                SELECT max(id) FROM {table};
+            </SQLFragment>
+        </SQLStatement>
+                           
+    </DAOStatements>
+</DAOConfiguration>

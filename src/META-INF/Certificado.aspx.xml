@@ -1,0 +1,218 @@
+
+
+<!DOCTYPE html>
+<!-- 
+    Desarrollador: Robert Pineda
+    www.robertpineda.com
+    admin@robertpineda.com
+    Empresa: CDI Software
+    www.cdi.com.co
+    rdiaz@cdi.com.co
+    Año: 2013    
+-->
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head id="Head1"><title>
+	Expedición de antecedentes disciplinarios - Procuraduria General de la Nación
+</title><link href="Media/Style/Certificado.css" rel="stylesheet" /><link href="Media/Style/jquery.realperson.css" rel="stylesheet" />
+    <script src="Media/Scripts/jquery-1.7.1.min.js"></script>
+    <script src="Media/Scripts/jquery.realperson.js"></script>
+    <script type="text/javascript">
+        function Show(id) {
+            document.getElementById(id).style["display"] = '';
+            document.getElementById(id).style.display = '';
+        }
+
+        function Hide(id) {
+            document.getElementById(id).style["display"] = 'none';
+            document.getElementById(id).style.display = 'none';
+        }
+
+        $(function () {
+            $('#txtCaptcha').realperson();
+        });
+
+        function validarDatos(source, arguments) {
+            var TipoId = document.getElementById("ddlTipoID");
+            var valTipoId = TipoId[TipoId.selectedIndex].value;
+            var ddlCarg = document.getElementById("ddlCargo");
+
+            var bresultado = true;
+
+            if (valTipoId == '1' || valTipoId == '2') {
+                var NumId = document.getElementById("txtNumID").value;
+
+                if (!NumId.match(/^\d+$/) || NumId == '') {
+                    if (isNaN(NumId)) {
+                        bresultado = false;
+                        source.errormessage = 'El campo número de identificación debe ser numérico.';
+                    }
+                    else {
+                        bresultado = true;
+                    }                    
+                }
+            }
+
+            if (ddlCarg != null && bresultado) {
+                if (valTipoId == '1' || valTipoId == '5') {
+                    bresultado = true;
+                }
+                else {
+                    bresultado = false;
+                    source.errormessage = 'No se pueden expedir certificados especiales para el tipo de identificación ' + TipoId[TipoId.selectedIndex].text;
+                }
+            }
+            arguments.IsValid = bresultado;
+            return;
+        }
+
+
+    </script>
+</head>
+<body>
+    <form name="form1" method="post" action="Certificado.aspx?tpo=1" id="form1">
+<input type="hidden" name="__VIEWSTATE" id="__VIEWSTATE" value="/wEPDwUKMTEzNzY0ODEyMw9kFgICAw9kFggCAQ8PFgIeBFRleHQFGENvbnN1bHRhIGRlIGFudGVjZWRlbnRlc2RkAg0PFgIeB1Zpc2libGVoFgQCAQ9kFgICAQ8QZGQWAWZkAgMPZBYCAgEPEGRkFgBkAhUPDxYCHwFoFgIeB29uY2xpY2sFHiQoJyN0eHRDYXB0Y2hhJykucmVhbHBlcnNvbigpO2QCHw8PFgIfAAUHVi4wLjAuNGRkZAqEHerh4BOFB8qdoPmpeeGfkqsk" />
+
+<input type="hidden" name="__EVENTVALIDATION" id="__EVENTVALIDATION" value="/wEWCgL24oSlBQL8kK+TAQLwkOOQAQLxkOOQAQLykOOQAQLzkOOQAQL0kOOQAQK8zP8SAu+Z0b0FApWrsq8IPjx8KeLzexNyIqCHFrf3WMvYaSI=" />
+        <div class="divContenedorPGN">
+            <div class="divEncabezadoPGN">
+                <h1 class="titulo_principal">Procuraduría General de la Nación</h1>
+                <h2 class="titulo_principal_rep">República de Colombia</h2>
+            </div>
+
+            <br />
+            <br />
+            <br />
+            <br />
+
+            <div class="divContenidoPGN">
+                <p class="titulo1">
+                    <span id="lblTitulo">Consulta de antecedentes</span>
+
+                </p>
+                <p class="titulo2">
+                    Permite consultar los antecedentes disciplinarios, penales, contractuales, fiscales y de pérdida de investidura con solo digitar el número de identificación de la persona natural o jurídica.
+                </p>
+                <table>
+                    <tr>
+                        <td class="celda_fondo">Tipo de Identificación:</td>
+                        <td class="celda_fondo">
+                            <select name="ddlTipoID" id="ddlTipoID" class="ComboBox">
+	<option selected="selected" value="-1">Seleccione...</option>
+	<option value="1">C&#233;dula de ciudadan&#237;a</option>
+	<option value="2">Nit</option>
+	<option value="3">Pasaporte</option>
+	<option value="4">Tarjeta de identidad</option>
+	<option value="5">C&#233;dula extranjeria</option>
+
+</select>
+                            &nbsp;
+                        </td>
+                        <td class="celda_fondo">Número Identificación:</td>
+                        <td class="celda_fondo">
+                            <input name="txtNumID" type="text" maxlength="15" id="txtNumID" class="TextBox" />
+                            &nbsp;
+                            &nbsp;
+                        </td>
+                    </tr>
+                    
+
+                    <tr>
+                        <td colspan="4" align="center">
+                            <p style="font-size: 14px;">Ingrese el código de verificaciòn que ve en la imagen</p>
+                            <p style="border: solid; border-width: 2px; width: 30%; padding: 5px;">
+                                <input name="txtCaptcha" type="text" maxlength="15" id="txtCaptcha" class="TextBox" />
+                                &nbsp;
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="4" align="center" class="celda_fondo">
+                            <input type="submit" name="btnConsultar" value="Consultar" onclick="javascript:WebForm_DoPostBackWithOptions(new WebForm_PostBackOptions(&quot;btnConsultar&quot;, &quot;&quot;, true, &quot;1&quot;, &quot;&quot;, false, false))" id="btnConsultar" class="Botones" />
+                            
+                            <br />
+                            
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <br />
+            <div id="divSec" class="divSecundario">
+                
+            </div>
+            <br />
+            <br />
+            <div id="divSinIdent" style="display: none;" class="divNotaPGN">
+                <h1>¿Qué debo hacer cuándo el documento ingresado no aparezca registrado en el sistema de información SIRI? </h1>
+                <p>
+                    Cuando se presente error o no exista la información del interesado en la base de datos de la Procuraduría , referida a: nombres, apellidos o razón social, deberá solicitar personalmente o por escrito a la División Centro de Atención al Público de la entidad para que se tramiten las correcciones de rigor; en la ciudad de Bogotá, D.C., y en nuestras sedes en las capitales de departamento en el nivel territorial, con copia simple del: Documento de identificación, o Certificado de existencia y representación legal, o Acto administrativo que autoriza su funcionamiento, observando los siguientes pasos:
+                </p>
+                <p>
+                    • En caso de correcciones de nombres o apellidos, el interesado deberá previamente solicitar a la Registraduría Nacional del Estado Civil, certificación donde aparezca su número de identificación, nombres y apellidos actualizados. 
+                </p>
+                <p>
+                    • En el evento que una persona solicite el certificado vía página Web y el sistema envíe el mensaje: EL NÚMERO DE IDENTIFICACIÓN INGRESADO NO SE ENCUENTRA REGISTRADO EN EL SISTEMA; debe tramitar ante la Procuraduría el registro de su cédula, tarjeta de identidad, pasaporte, cédula de extranjería o NIT de empresa en la base de datos de la entidad, debiendo presentar su documento original para la diligencia pertinente.  
+                </p>
+                <br />
+                <br />
+            </div>
+            <div class="divNotaPGN">
+                Señor(a) ciudadano(a): la expedición del certificado de antecedentes disciplinarios de la Procuraduría General de la Nación es gratuita en todo el país.
+                <br />
+                <span id="lblFechaHora"></span>
+            </div>
+            <br />
+            <div class="divNotaPGN">
+                <hr />
+                <b>El certificado de antecedentes ordinario</b>, refleja las anotaciones de las sanciones impuestas en los últimos cinco (5) años, al cabo de los cuales, el sistema inactiva automáticamente el registro salvo que la sanción supere dicho término, caso en el cual el antecedente se reflejará hasta que dicho término expire. 
+ <hr />
+                <b>El certificado de antecedente especial</b>, refleja todas las anotaciones que figuren en la base de datos, y se expide para acreditar requisitos de cuya elección, designación o nombramiento y posesión exige ausencia total o parcial de antecedentes. 
+ <hr />
+                Para ver este documento necesita Acrobat Reader. Si no lo tiene, haga  <a href="http://www.adobe.com/es/products/acrobat/readstep2.html">clic aquí</a> para descargarlo gratis.  
+
+            </div>
+
+
+            <br />
+            <br />
+            <div class="divPiePGN">
+
+                <br />
+                <table>
+                    <tr>
+                        <td width="18%">
+                            <div align="right">
+                                <a href="http://www.gobiernoenlinea.gov.co/" target="_blank">
+                                    <img src="Media/Image/banner_gobiernolinea.jpg" alt="gobierno en línea" width="82" height="59" border="0" /></a>
+                            </div>
+                        </td>
+                        <td width="82%">
+                            <div align="center" class="textopeq">
+                                Centro de Atención al Público (CAP): Carrera 5ª nro. 15 - 60 (Bogotá) / Lunes a viernes de 8 a.m. a 5:00pm. jornada contínua.<br />
+                                Recibo de Correspondencia: Lunes a viernes de 8 a.m. a  4:00pm. jornada contínua.<br />
+                                Línea gratuita para todo el país: 018000 910 315 - Línea reducida: 142 - PBX: (571) 5878750<br />
+                                Email: <a href="mailto:quejas@procuraduria.gov.co">quejas@procuraduria.gov.co</a> / 
+							<a href="mailto:dcap@procuraduria.gov.co">dcap@procuraduria.gov.co</a> / 
+							<a href="mailto:webmaster@procuraduria.gov.co">webmaster@procuraduria.gov.co</a><br />
+                                Copyright © 2013. Procuraduría General de la Nación / Todos los derechos reservados
+                                <br />
+                                Desarrollado por: <a href="www.cdi.com.co">CDI Software</a>  Colombia
+                                <br />
+                                <span id="Lblvr">V.0.0.4</span>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>
+                            <!-- No borrar  -->
+                            <div align="center" style="font-family: Arial; font-size: xx-small; font-weight: normal; color: #F8F8F8; vertical-align: bottom; text-align: right;">Por <a style="font-family: Arial; font-size: xx-small; font-weight: normal; color: #F8F8F8; vertical-align: bottom; text-align: right;" href="http://www.robertpineda.com">Robert Pineda</a>, para CDI Software. 2013</div>
+                            <!-- No borrar  -->
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </form>
+</body>
+
+</html>
