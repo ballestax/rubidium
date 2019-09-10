@@ -14,13 +14,22 @@ import java.util.Objects;
  */
 public class Product {
 
+    private long id;
+
+    private String code;
     private String name;
     private double price;
     private String image;
     private String description;
+    private String category;
     private List<Ingredient> ingredients;
 
-    public Product(String name, double price, String image) {
+    public Product(long id) {
+        this.id = id;
+    }
+
+    public Product(long id, String name, double price, String image) {
+        this.id = id;
         this.name = name;
         this.price = price;
         this.image = image;
@@ -29,12 +38,28 @@ public class Product {
     public Product() {
     }
 
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
     public String getName() {
         return name;
     }
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
     }
 
     public double getPrice() {
@@ -61,6 +86,14 @@ public class Product {
         this.description = description;
     }
 
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
     public List getIngredients() {
         return ingredients;
     }
@@ -78,9 +111,9 @@ public class Product {
             return false;
         }
         Product prod = (Product) obj;
-        if (!name.equals(prod.getName())) {
+        if (!name.equalsIgnoreCase(prod.getName())) {
             return false;
-        }   
+        }
 //        if (!nombre.equals(prod.getNombre())) {
 //            return false;
 //        }

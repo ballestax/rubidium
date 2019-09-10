@@ -7,6 +7,8 @@ package com.bacon.gui;
 
 import com.bacon.Aplication;
 import com.bacon.domain.Product;
+import com.bacon.domain.ProductoPed;
+import com.bacon.gui.util.MyPopupListener;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Insets;
@@ -14,6 +16,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.math.BigDecimal;
@@ -23,11 +27,15 @@ import java.util.ArrayList;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPopupMenu;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingWorker;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
+import org.apache.log4j.Logger;
 import org.bx.gui.MyDefaultTableModel;
 import org.dz.PanelCapturaMod;
 import org.dz.TextFormatter;
@@ -46,12 +54,17 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Tabl
     private BigDecimal totalFact;
     private String[] entregas;
     private String[] tiempos;
+    private ArrayList<ProductoPed> productos;
+    public static final Logger logger = Logger.getLogger(PanelPedido.class.getCanonicalName());
+    private JPopupMenu popupTabla;
+    private MyPopupListener popupListenerTabla;
 
     /**
      * Creates new form PanelPedido
      */
     public PanelPedido(Aplication app) {
         this.app = app;
+        productos = new ArrayList<>();
         initComponents();
         createComponents();
     }
@@ -137,22 +150,41 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Tabl
         btConfirm.addActionListener(this);
         btConfirm.setText("CONFIRMAR");
 
-        ArrayList<String[]> datos = new ArrayList<>();
-        datos.add(new String[]{"1", "Tradicional de carne", "+cebollas caramelizadas", "Poca salsa", "12000"});
-        datos.add(new String[]{"2", "Doble Carne", "+", "-", "34000"});
-        datos.add(new String[]{"1", "RIB 57", "+", "-", "18000"});
-//        datos.add(new String[]{"1", "Chicken Special", "+", "-", "15000"});
-//        datos.add(new String[]{"1", "Tradicional de carne", "+Queso americano", "-", "13000"});
-//        datos.add(new String[]{"2", "Perros", "+", "-Sin verduras", "14000"});
-
         String[] cols = {"Cant", "Producto", "Unidad", "Valor"};
 
         modeloTb = new MyDefaultTableModel(cols, 1);
 
         tbListado.setModel(modeloTb);
-        tbListado.setRowHeight(44);
+        tbListado.setRowHeight(60);
         tbListado.setFont(new Font("Tahoma", 0, 14));
         modeloTb.addTableModelListener(this);
+
+        popupTabla = new JPopupMenu();
+        popupListenerTabla = new MyPopupListener(popupTabla, true);
+        JMenuItem item1 = new JMenuItem("Eliminar...");
+        item1.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int r = tbListado.getSelectedRow();
+                String tb = tbListado.getValueAt(r, 0).toString();
+                modeloTb.removeRow(r);
+                productos.remove(r);
+
+            }
+        });
+        popupTabla.add(item1);
+
+        tbListado.addMouseListener(popupListenerTabla);
+
+        tbListado.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() >= 2) {
+                    int rowAtPoint = tbListado.rowAtPoint(e.getPoint());
+                    JOptionPane.showMessageDialog(tbListado, "Info");
+                }
+            }
+        });
 
         Font fontTabla = new Font("Sans", 1, 16);
 
@@ -162,9 +194,7 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Tabl
         ProductRenderer prodRenderer = new ProductRenderer(BoxLayout.Y_AXIS);
 
         int[] colW = new int[]{40, 220, 70, 80};
-        for (int i = 0;
-                i < colW.length;
-                i++) {
+        for (int i = 0; i < colW.length; i++) {
             tbListado.getColumnModel().getColumn(i).setMinWidth(colW[i]);
             tbListado.getColumnModel().getColumn(i).setPreferredWidth(colW[i]);
         }
@@ -219,17 +249,28 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Tabl
 
     @Override
     public void tableChanged(TableModelEvent e) {
-        if (e.getColumn() == 0) {
+        if (e.getType() == TableModelEvent.UPDATE) {
+            if (e.getColumn() == 0) {
+                tbListado.setValueAt(calculatePrecio(e.getLastRow()), e.getLastRow(), 3);
+            }
+        } else if (e.getType() == TableModelEvent.INSERT) {
             tbListado.setValueAt(calculatePrecio(e.getLastRow()), e.getLastRow(), 3);
         }
+
         calcularValores();
     }
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
+        logger.debug("last:" + evt.getPropertyName() + ":" + evt.getPropagationId());
         if (PanelProduct2.AC_ADD_QUICK.equals(evt.getPropertyName())) {
             Product prod = (Product) evt.getNewValue();
             addProduct(prod);
+        } else if (PanelCustomPedido.AC_CUSTOM_ADD.equals(evt.getPropertyName())) {
+            ProductoPed prodPed = (ProductoPed) evt.getNewValue();
+            int cant = (int) evt.getOldValue();
+            addProductPed(prodPed, cant);
+
         }
     }
 
@@ -241,11 +282,14 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Tabl
                 for (int i = 0; i < list.size(); i++) {
                     try {
                         Object[] data = list.get(i);
+                        int cant = Integer.parseInt(data[1].toString());
+                        Product prd = (Product) data[0];
+
                         modeloTb.addRow(new Object[]{
-                            data[0],
-                            data[1],
-                            data[2],
-                            data[3]
+                            cant,
+                            prd.getName(),
+                            prd.getPrice(),
+                            prd.getPrice() * cant
                         });
 
                         modeloTb.setRowEditable(modeloTb.getRowCount() - 1, false);
@@ -261,22 +305,60 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Tabl
     }
 
     public void addProduct(Product producto) {
-        try {
-            modeloTb.addRow(new Object[]{
-                1,
-                new String[]{producto.getName(), "", ""},
-                producto.getPrice(),
-                producto.getPrice()
-            });
+        ProductoPed productoPed = new ProductoPed(producto);
+        if (productos.contains(productoPed)) {
+            int row = productos.indexOf(productoPed);
+            int cant = Integer.valueOf(modeloTb.getValueAt(row, 0).toString());
+            modeloTb.setValueAt(cant + 1, row, 0);
+        } else {
+            try {
+                productos.add(productoPed);
+                modeloTb.addRow(new Object[]{
+                    1,
+                    productoPed,
+                    producto.getPrice(),
+                    producto.getPrice()
+                });
 
-            modeloTb.setRowEditable(modeloTb.getRowCount() - 1, false);
-            modeloTb.setCellEditable(modeloTb.getRowCount() - 1, 0, true);
-        } catch (Exception ex) {
-            System.out.println(ex.getMessage());
+                modeloTb.setRowEditable(modeloTb.getRowCount() - 1, false);
+                modeloTb.setCellEditable(modeloTb.getRowCount() - 1, 0, true);
+            } catch (Exception ex) {
+                System.out.println(ex.getMessage());
+            }
+        }
+    }
+
+    public void addProductPed(ProductoPed productPed, int cantidad) {
+        Product producto = productPed.getProduct();
+        if (productos.contains(productPed)) {
+            try {
+                int row = productos.indexOf(productPed);
+                int cant = Integer.valueOf(modeloTb.getValueAt(row, 0).toString());
+                modeloTb.setValueAt(cant + cantidad, row, 0);
+            } catch (Exception e) {
+            }
+
+        } else {
+            try {
+                productos.add(productPed);
+                double totalProd = producto.getPrice() + productPed.getValueAdicionales();
+                modeloTb.addRow(new Object[]{
+                    cantidad,
+                    productPed,
+                    totalProd,
+                    totalProd
+                });
+
+                modeloTb.setRowEditable(modeloTb.getRowCount() - 1, false);
+                modeloTb.setCellEditable(modeloTb.getRowCount() - 1, 0, true);
+            } catch (Exception ex) {
+                System.out.println(ex.getMessage());
+            }
         }
     }
 
     private void clearPedido() {
+        productos.clear();
         modeloTb.setRowCount(0);
         regDomicilio.setSelected(0);
         regCelular.setText("");

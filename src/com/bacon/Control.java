@@ -5,12 +5,18 @@
  */
 package com.bacon;
 
+import com.bacon.domain.Additional;
 import com.bacon.domain.ConfigDB;
+import com.bacon.domain.Ingredient;
 import com.bacon.domain.Permission;
+import com.bacon.domain.Product;
 import com.bacon.domain.Rol;
 import com.bacon.domain.User;
+import com.bacon.persistence.JDBC.JDBCAdditionalDAO;
 import com.bacon.persistence.JDBC.JDBCConfigDAO;
 import com.bacon.persistence.JDBC.JDBCDAOFactory;
+import com.bacon.persistence.JDBC.JDBCIngredientDAO;
+import com.bacon.persistence.JDBC.JDBCProductDAO;
 import com.bacon.persistence.JDBC.JDBCUserDAO;
 import com.bacon.persistence.JDBC.JDBCUtilDAO;
 import com.bacon.persistence.dao.DAOException;
@@ -46,17 +52,23 @@ public class Control {
                 //crea la database from properties pass
                 new JDBCDAOFactory().createDatabaseFromProperties();
             }*/
-            
-            
             JDBCUserDAO userDAO = (JDBCUserDAO) DAOFactory.getInstance().getUserDAO();
             userDAO.init();
 
             JDBCConfigDAO configDAO = (JDBCConfigDAO) DAOFactory.getInstance().getConfigDAO();
             configDAO.init();
 
+            JDBCProductDAO prodDAO = (JDBCProductDAO) DAOFactory.getInstance().getProductDAO();
+            prodDAO.init();
+
+            JDBCIngredientDAO ingDAO = (JDBCIngredientDAO) DAOFactory.getInstance().getIngredientDAO();
+            ingDAO.init();
+
+            JDBCAdditionalDAO addDAO = (JDBCAdditionalDAO) DAOFactory.getInstance().getAdditionalDAO();
+            addDAO.init();
+
             JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
             utilDAO.init();
-            
 
         } catch (Exception e) {
             logger.error("Error initializing database", e);
@@ -191,8 +203,8 @@ public class Control {
             return false;
         }
     }
-    
-     public ArrayList<Permission> getPermissionList() {
+
+    public ArrayList<Permission> getPermissionList() {
         try {
             JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
             return utilDAO.getPermissionList("1");
@@ -227,7 +239,6 @@ public class Control {
             return null;
         }
     }
-
 
     public Rol getRol(String name) {
         try {
@@ -357,6 +368,46 @@ public class Control {
             logger.error("Error getting permissions.", ex);
         }
         return null;
+    }
+
+    public ArrayList<Product> getProductsList(String where) {
+        try {
+            JDBCProductDAO prodDAO = (JDBCProductDAO) DAOFactory.getInstance().getProductDAO();
+            return prodDAO.getProductList(where, "");
+        } catch (DAOException ex) {
+            logger.error("Error getting Products list.", ex);
+            return null;
+        }
+    }
+
+    public ArrayList<Ingredient> getIngredientList(String where) {
+        try {
+            JDBCIngredientDAO ingDAO = (JDBCIngredientDAO) DAOFactory.getInstance().getIngredientDAO();
+            return ingDAO.getIngredientList(where, "");
+        } catch (DAOException ex) {
+            logger.error("Error getting Ingredients list.", ex);
+            return null;
+        }
+    }
+
+    public ArrayList<Ingredient> getIngredientsByProduct(String code) {
+        try {
+            JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
+            return utilDAO.getIngredientsByProduct(code);
+        } catch (DAOException ex) {
+            logger.error("Error getting Ingredients list.", ex);
+            return null;
+        }
+    }
+
+    public ArrayList<Additional> getAdditionalList(String where) {
+        try {
+            JDBCAdditionalDAO addDAO = (JDBCAdditionalDAO) DAOFactory.getInstance().getAdditionalDAO();
+            return addDAO.getAdditionalList(where, "");
+        } catch (DAOException ex) {
+            logger.error("Error getting Additional list.", ex);
+            return null;
+        }
     }
 
 }

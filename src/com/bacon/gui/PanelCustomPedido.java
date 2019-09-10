@@ -6,11 +6,17 @@
 package com.bacon.gui;
 
 import com.bacon.Aplication;
+import com.bacon.domain.Additional;
+import com.bacon.domain.Ingredient;
 import com.bacon.domain.Product;
+import com.bacon.domain.ProductoPed;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -28,15 +34,18 @@ import org.dz.PanelCapturaMod;
  *
  * @author lrod
  */
-public class PanelCustomPedido extends PanelCapturaMod {
+public class PanelCustomPedido extends PanelCapturaMod implements ActionListener {
 
     private final Aplication app;
     private final Product product;
     private DecimalFormat DCFORM_P;
+    private SpinnerNumberModelo spModel;
 
     /**
      * Creates new form PanelCustomPedido
+     *
      * @param app
+     * @param product
      */
     public PanelCustomPedido(Aplication app, Product product) {
         this.app = app;
@@ -46,6 +55,9 @@ public class PanelCustomPedido extends PanelCapturaMod {
     }
 
     private void createComponents() {
+
+        spModel = new SpinnerNumberModelo(1, 1, null, 1);
+        
         String image = product.getImage();
 
         ImageIcon icon = new ImageIcon(app.getImgManager().getImagen(image, 100, 100));
@@ -73,67 +85,125 @@ public class PanelCustomPedido extends PanelCapturaMod {
         lbPrice.setOpaque(true);
         lbPrice.setForeground(Color.red.darker());
         lbPrice.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 2, Color.red));
-        
-        
+
         DCFORM_P = (DecimalFormat) NumberFormat.getInstance();
         DCFORM_P.applyPattern("$ ###,###,###");
-        
+
         lbCant.setText("Cantidad");
-        spCantidad.setModel(new SpinnerNumberModelo(1, 1, 10, 1));
+        spCantidad.setModel(spModel);
         spCantidad.setForeground(Color.red.darker());
+
         spCantidad.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
-                int value = (int) spCantidad.getValue();
-                double total = value * product.getPrice();
-                lbInfo.setText(value+ " "+product.getName()+" x "+DCFORM_P.format(total));
+                mostrarTotal();
             }
+
         });
-        
+
         btConfirm.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "success.png", 10, 10)));
         btConfirm.setBackground(new Color(153, 255, 153));
         btConfirm.setMargin(new Insets(1, 1, 1, 1));
         btConfirm.setFont(new Font("Arial", 1, 11));
-//        btConfirm.setActionCommand(AC_CONFIRMAR_PEDIDO);
-//        btConfirm.addActionListener(this);
+        btConfirm.setActionCommand(AC_CONFIRMAR_PEDIDO);
+        btConfirm.addActionListener(this);
         btConfirm.setText("CONFIRMAR");
-        
-        lbInfo.setText(spCantidad.getValue()+ " "+product.getName());
-        
+
+        lbInfo.setText(spCantidad.getValue() + " " + product.getName());
+
         lbTitle1.setText("Ingredientes");
         lbTitle1.setBackground(ColorDg.colorAleatorio().getColor1());
-        panel1.setLayout(new GridLayout(3, 3));
-        ArrayList<String> ings = new ArrayList<>();
-        ings.add("Tomate");
-        ings.add("Lechuga");
-        ings.add("Salsa de tomate");
-        ings.add("Salsa de la casa");
-        ings.add("Tocineta");
-        ings.add("Queso americano");
-        ings.add("Queso mozarella");
-        
+        panel1.setLayout(new GridLayout(3, 3, 5, 5));
+        ArrayList<Ingredient> ings = app.getControl().getIngredientsByProduct(product.getCode());
+
         for (int i = 0; i < ings.size(); i++) {
-            String ing = ings.get(i);
-            JCheckBox check = new JCheckBox("sin "+ing);
-            panel1.add(check);
+            Ingredient ing = ings.get(i);
+            if (ing.isOpcional()) {
+                JCheckBox check = new JCheckBox("Sin " + ing.getName());
+                check.setActionCommand(ing.getCode());
+                panel1.add(check);
+            }
         }
-        
+
         lbTitle2.setText("Adicionales");
         lbTitle2.setBackground(ColorDg.colorAleatorio().getColor1());
-        panel2.setLayout(new GridLayout(3, 3));
-        ArrayList<String> adds = new ArrayList<>();
-        adds.add("Chorizo");
-        adds.add("Queso");
-        adds.add("Tocineta");
-        adds.add("Pepinillos");
-        
-        
+        panel2.setLayout(new GridLayout(3, 3, 5, 5));
+        ArrayList<Additional> adds = app.getControl().getAdditionalList("");
+//        adds.add(new Additional("a01", "Chorizo", 2000));
+//        adds.add(new Additional("a02", "Pepinillos", 1000));
+//        adds.add(new Additional("a03", "Queso Mozarella", 1000));
+//        adds.add(new Additional("a04", "Queso Americano", 1000));
+//        adds.add(new Additional("a05", "Carne extra", 2000));
+
         for (int i = 0; i < adds.size(); i++) {
-            String add = adds.get(i);
-            JCheckBox check = new JCheckBox(add);
-            panel2.add(check);
+            Additional add = adds.get(i);
+            PanelAddition panAdd = new PanelAddition(app, add);
+//            panAdd.setActionCommand(add.getCode());
+            panel2.add(panAdd);
         }
-        
+
+        mostrarTotal();
+
+    }
+
+    public static final String AC_CONFIRMAR_PEDIDO = "AC_CONFIRMAR_PEDIDO";
+
+    public void mostrarTotal() {
+        int value = (int) spCantidad.getValue();
+        double total = value * product.getPrice();
+        lbInfo.setText(value + " " + product.getName() + " x " + DCFORM_P.format(total));
+    }
+
+    public ProductoPed parseProduct() {
+
+        ProductoPed prodPed = new ProductoPed(product);
+
+        Component[] componentes = panel1.getComponents();
+        for (int i = 0; i < componentes.length; i++) {
+            Component componente = componentes[i];
+            if (componente instanceof JCheckBox) {
+                String text = ((JCheckBox) componente).getText();
+
+                boolean sel = ((JCheckBox) componente).isSelected();
+                if (sel) {
+                    prodPed.addExclusion(new Ingredient("i0" + i, text));
+                }
+            }
+        }
+
+        componentes = panel2.getComponents();
+        for (int i = 0; i < componentes.length; i++) {
+            Component componente = componentes[i];
+            if (componente instanceof PanelAddition) {
+//                String cod = ((JCheckBox) componente).getActionCommand();
+
+                Additional add = ((PanelAddition) componente).getAddition();
+                int cant = ((PanelAddition) componente).getQuantity();
+
+                boolean sel = ((PanelAddition) componente).isSelected();
+                if (sel) {
+                    prodPed.addAdicional(add, cant);
+                }
+            }
+        }
+        prodPed.setEspecificaciones(taObs.getText());
+        return prodPed;
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (AC_CONFIRMAR_PEDIDO.equals(e.getActionCommand())) {
+            ProductoPed pProd = parseProduct();
+            if (pProd != null) {
+                pcs.firePropertyChange(AC_CUSTOM_ADD, spModel.getNumber().intValue(), pProd);
+            }
+        }
+    }
+    public static final String AC_CUSTOM_ADD = "AC_CUSTOM_ADD";
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     /**
@@ -218,6 +288,7 @@ public class PanelCustomPedido extends PanelCapturaMod {
         lbInfo.setText("jLabel1");
         lbInfo.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
+        btConfirm.setFont(new java.awt.Font("Ubuntu", 0, 17)); // NOI18N
         btConfirm.setText("jButton1");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -277,9 +348,11 @@ public class PanelCustomPedido extends PanelCapturaMod {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 40, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(lbInfo, javax.swing.GroupLayout.DEFAULT_SIZE, 41, Short.MAX_VALUE)
-                    .addComponent(btConfirm))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(5, 5, 5)
+                        .addComponent(btConfirm, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -302,8 +375,4 @@ public class PanelCustomPedido extends PanelCapturaMod {
     private javax.swing.JTextArea taObs;
     // End of variables declaration//GEN-END:variables
 
-    @Override
-    public void propertyChange(PropertyChangeEvent evt) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
 }

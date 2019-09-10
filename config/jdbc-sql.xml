@@ -24,7 +24,12 @@
                     |GET_PERSON|GET_PERSON_LIMIT|INSERT_PERSON|UPDATE_PERSON|GET_ID_PERSON|DELETE_PERSON|DELETE_PERSON_WHERE
                     |CREATE_CONFIG_TABLE|GET_CONFIG|DELETE_CONFIG|UPDATE_CONFIG|EXIST_CONFIG
                     |ADD_CONFIG
-                    |EXIST_CLAVE|GET_MAX_ID|COUNT_TABLE2) #REQUIRED
+                    |EXIST_CLAVE|GET_MAX_ID|COUNT_TABLE2
+                    |CREATE_PRODUCTS_TABLE|ADD_PRODUCT|GET_PRODUCT|DELETE_PRODUCT|UPDATE_PRODUCT
+                    |CREATE_INGREDIENTS_TABLE|ADD_INGREDIENT|GET_INGREDIENT|DELETE_INGREDIENT|UPDATE_INGREDIENT
+                    |CREATE_PRODUCT_INGREDIENT_TABLE|GET_INGREDIENTS_BY_PRODUCT
+                    |CREATE_ADDITIONALS_TABLE|ADD_ADDITIONAL|GET_ADDITIONAL|DELETE_ADDITIONAL|UPDATE_ADDITIONAL
+                    ) #REQUIRED
                     
 	>
 
@@ -156,7 +161,7 @@
             </SQLFragment>
         </SQLStatement>
         
-         <SQLStatement method="GET_ROLES_LIST">
+        <SQLStatement method="GET_ROLES_LIST">
             <SQLFragment>
                 SELECT
             </SQLFragment>
@@ -358,7 +363,7 @@
             </SQLFragment>
         </SQLStatement>
         
-         <SQLStatement method="HAS_PERMISSION">
+        <SQLStatement method="HAS_PERMISSION">
             <SQLFragment>
                 SELECT count(*) 
                 FROM permission_role pr, role_user ru
@@ -610,6 +615,183 @@
                 SELECT max(id) FROM {table};
             </SQLFragment>
         </SQLStatement>
+        
+        
+        
+        <SQLStatement method="CREATE_PRODUCTS_TABLE">
+            <SQLFragment>
+                CREATE TABLE products(
+                id INTEGER AUTO_INCREMENT,
+                name VARCHAR(255) NOT NULL UNIQUE,
+                code VARCHAR(255) NOT NULL UNIQUE,      
+                description VARCHAR(500),
+                price DECIMAL(20,2),
+                image VARCHAR(255),
+                category VARCHAR(25),                
+                PRIMARY KEY (id)
+                )ENGINE=InnoDB DEFAULT CHARSET=latin1;
+            </SQLFragment>
+        </SQLStatement>	
+        
+        <SQLStatement method="ADD_PRODUCT">
+            <SQLFragment>
+                INSERT INTO products (name,code, description, price, image, category) VALUES (?,?,?,?,?,?);
+            </SQLFragment>
+        </SQLStatement>        
+        
+        <SQLStatement method="GET_PRODUCT">
+            <SQLFragment>
+                SELECT
+            </SQLFragment>
+            <SQLFragment>
+                * FROM products
+            </SQLFragment>
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                WHERE {where}
+            </SQLFragment>    
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                ORDER BY {orderby}
+            </SQLFragment>        
+        </SQLStatement>
+        
+        <SQLStatement method="DELETE_PRODUCT">
+            <SQLFragment>
+                DELETE FROM products WHERE code = ?;
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="UPDATE_PRODUCT">
+            <SQLFragment>
+                UPDATE products SET 
+                name=?,                
+                category=?,
+                description=?,
+                price=?,
+                image=?
+                WHERE code = ?
+            </SQLFragment>
+        </SQLStatement> 
+        
+        <SQLStatement method="CREATE_INGREDIENTS_TABLE">
+            <SQLFragment>
+                CREATE TABLE ingredients(
+                id INTEGER AUTO_INCREMENT,
+                name VARCHAR(255) NOT NULL UNIQUE,
+                code VARCHAR(255) NOT NULL UNIQUE,      
+                medida VARCHAR(25),                
+                PRIMARY KEY (id)
+                )ENGINE=InnoDB DEFAULT CHARSET=latin1;
+            </SQLFragment>
+        </SQLStatement>	
+        
+        <SQLStatement method="ADD_INGREDIENT">
+            <SQLFragment>
+                INSERT INTO ingredients (name,code,medida) VALUES (?,?,?);
+            </SQLFragment>
+        </SQLStatement>        
+        
+        <SQLStatement method="GET_INGREDIENT">
+            <SQLFragment>
+                SELECT
+            </SQLFragment>
+            <SQLFragment>
+                * FROM ingredients
+            </SQLFragment>
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                WHERE {where}
+            </SQLFragment>    
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                ORDER BY {orderby}
+            </SQLFragment>        
+        </SQLStatement>
+        
+        <SQLStatement method="DELETE_INGREDIENT">
+            <SQLFragment>
+                DELETE FROM ingredients WHERE code = ?;
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="UPDATE_INGREDIENT">
+            <SQLFragment>
+                UPDATE ingredients SET 
+                name=?,                
+                medida=? 
+                WHERE code = ?
+            </SQLFragment>
+        </SQLStatement> 
+        
+        
+        
+        <SQLStatement method="CREATE_PRODUCT_INGREDIENT_TABLE">
+            <SQLFragment>
+                CREATE TABLE product_ingredient (
+                product_id INTEGER NOT NULL,
+                ingredient_id INTEGER NOT NULL,
+                cantidad INTEGER,
+                opcional TINYINT(1) DEFAULT '0',
+                FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE ON UPDATE CASCADE,
+                FOREIGN KEY (ingredient_id) REFERENCES ingredients(id) ON DELETE CASCADE ON UPDATE CASCADE
+                );
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="GET_INGREDIENTS_BY_PRODUCT">
+            <SQLFragment>
+                SELECT i.id, i.code,i.name,i.medida, pi.cantidad, pi.opcional 
+                FROM product_ingredient pi, ingredients i, products p  
+                WHERE 
+                pi.ingredient_id=i.id 
+                and pi.product_id=p.id 
+                and p.code = ?
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="CREATE_ADDITIONALS_TABLE">
+            <SQLFragment>
+                CREATE TABLE additionals(
+                id INTEGER AUTO_INCREMENT,
+                ingredient_id INTEGER NOT NULL,
+                precio DECIMAL(20,2),                
+                PRIMARY KEY (id)
+                )ENGINE=InnoDB DEFAULT CHARSET=latin1;
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="ADD_ADDITIONAL">
+            <SQLFragment>
+                INSERT INTO additionals (producto_id,precio) VALUES (?,?);
+            </SQLFragment>
+        </SQLStatement>        
+        
+        <SQLStatement method="GET_ADDITIONAL">
+            <SQLFragment>
+                SELECT
+            </SQLFragment>
+            <SQLFragment>                
+                a.id, i.name,i.code,i.medida,a.precio
+            </SQLFragment>
+            <SQLFragment>
+                FROM ingredients i, additionals a                
+            </SQLFragment>
+            <SQLFragment>
+                where i.id=a.ingredient_id
+            </SQLFragment>    
+            
+        </SQLStatement>
+        
+        <SQLStatement method="DELETE_ADDITIONAL">
+            <SQLFragment>
+                DELETE FROM additionals WHERE id = ?;
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="UPDATE_ADDITIONAL">
+            <SQLFragment>
+                UPDATE additionals SET                 
+                precio=?
+                WHERE id = ?
+            </SQLFragment>
+        </SQLStatement> 
                            
     </DAOStatements>
 </DAOConfiguration>

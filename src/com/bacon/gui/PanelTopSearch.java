@@ -5,16 +5,21 @@
  */
 package com.bacon.gui;
 
+import com.bacon.MyConstants;
 import com.bacon.Aplication;
+import com.bacon.domain.Product;
+import java.util.ArrayList;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
-
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import org.dz.PanelCaptura;
 
 /**
  *
  * @author lrod
  */
-public class PanelTopSearch extends javax.swing.JPanel {
+public class PanelTopSearch extends PanelCaptura {
 
     private final Aplication app;
 
@@ -24,11 +29,39 @@ public class PanelTopSearch extends javax.swing.JPanel {
     public PanelTopSearch(Aplication app) {
         this.app = app;
         initComponents();
-        
-        
+
         btBuscar.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "search.png", 18, 18)));
 
+        regSearch.getDocument().addDocumentListener(new DocumentListener() {
+
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                filtrar(regSearch.getText().toUpperCase(), MyConstants.FILTER_TEXT_INT_CONTAINS);
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                filtrar(regSearch.getText().toUpperCase(), MyConstants.FILTER_TEXT_INT_CONTAINS);
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                filtrar(regSearch.getText().toUpperCase(), MyConstants.FILTER_TEXT_INT_CONTAINS);
+            }
+        });
+
     }
+
+    private void filtrar(String text, int filter) {
+        if (text.trim().length() > 2) {
+            String SCAPE = "LIKE \'%" + text + "%\'";
+            ArrayList<Product> productsList = app.getControl().getProductsList("name " + SCAPE + " or description " + SCAPE);
+            System.out.println("filtrando:" + productsList.size());
+            pcs.firePropertyChange(AC_FILTER_PRODUCTS, null, productsList);
+        }
+
+    }
+    public static final String AC_FILTER_PRODUCTS = "AC_FILTER_PRODUCTS";
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -71,4 +104,8 @@ public class PanelTopSearch extends javax.swing.JPanel {
     private javax.swing.JButton btBuscar;
     private com.celectoral.Registro regSearch;
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    public void reset() {
+    }
 }

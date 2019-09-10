@@ -8,8 +8,8 @@ package com.bacon.persistence.JDBC;
 
 import com.bacon.DBManager;
 import com.bacon.domain.ConfigDB;
-import com.bacon.persistenc.SQLExtractor;
-import com.bacon.persistenc.SQLLoader;
+import com.bacon.persistence.SQLExtractor;
+import com.bacon.persistence.SQLLoader;
 import com.bacon.persistence.dao.ConfigDAO;
 import com.bacon.persistence.dao.DAOException;
 import java.io.IOException;

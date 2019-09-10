@@ -7,7 +7,7 @@ package com.bacon;
 
 import com.bacon.persistence.JDBC.JDBCDAOFactory;
 import com.bacon.persistence.dao.DAOException;
-import com.bacon.persistenc.SQLLoader;
+import com.bacon.persistence.SQLLoader;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;

@@ -9,9 +9,12 @@ import com.bacon.DBManager;
 import com.bacon.GUIManager;
 import com.bacon.TimeWaste;
 import com.bacon.persistence.dao.DAOException;
-import com.bacon.persistenc.SQLLoader;
+import com.bacon.persistence.SQLLoader;
+import com.bacon.persistence.dao.AdditionalDAO;
 import com.bacon.persistence.dao.ConfigDAO;
 import com.bacon.persistence.dao.DAOFactory;
+import com.bacon.persistence.dao.IngredientDAO;
+import com.bacon.persistence.dao.ProductDAO;
 import com.bacon.persistence.dao.UserDAO;
 import com.bacon.persistence.dao.UtilDAO;
 import java.beans.PropertyVetoException;
@@ -268,6 +271,21 @@ public class JDBCDAOFactory extends DAOFactory {
     @Override
     public ConfigDAO getConfigDAO() throws DAOException {
         return new JDBCConfigDAO(getDataSource(), sqlStatements);
+    }
+
+    @Override
+    public ProductDAO getProductDAO() throws DAOException {
+        return new JDBCProductDAO(getDataSource(), sqlStatements);
+    }
+
+    @Override
+    public IngredientDAO getIngredientDAO() throws DAOException {
+        return new JDBCIngredientDAO(getDataSource(), sqlStatements);
+    }
+
+    @Override
+    public AdditionalDAO getAdditionalDAO() throws DAOException {
+        return new JDBCAdditionalDAO(getDataSource(), sqlStatements);
     }
 
 }

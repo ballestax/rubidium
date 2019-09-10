@@ -5,13 +5,13 @@
  */
 package com.bacon.persistence.JDBC;
 
-
 import com.bacon.DBManager;
+import com.bacon.domain.Ingredient;
 import com.bacon.domain.Permission;
 import com.bacon.domain.Rol;
 import com.bacon.domain.User;
-import com.bacon.persistenc.SQLExtractor;
-import com.bacon.persistenc.SQLLoader;
+import com.bacon.persistence.SQLExtractor;
+import com.bacon.persistence.SQLLoader;
 import com.bacon.persistence.dao.DAOException;
 import com.bacon.persistence.dao.UtilDAO;
 import java.io.IOException;
@@ -31,10 +31,10 @@ import org.apache.log4j.Logger;
  * @author ballestax
  */
 public class JDBCUtilDAO implements UtilDAO {
-
+    
     private DataSource dataSource;
     private SQLLoader sqlStatements;
-
+    
     public static final String NAMED_PARAM_WHERE = "{where}";
     public static final String NAMED_PARAM_ORDER_BY = "{orderby}";
     public static final String COUNT_TABLE_KEY = "CHECK_TABLE";
@@ -55,38 +55,44 @@ public class JDBCUtilDAO implements UtilDAO {
     public static final String GET_PERMISSION_ROLE_LIST_KEY = "GET_PERMISSION_ROLE_LIST";
     public static final String GET_PERMISSION_BY_ROLE_LIST_KEY = "GET_PERMISSION_BY_ROLE_LIST";
     public static final String DELETE_PERMISSION_ROLE_KEY = "DELETE_PERMISSION_ROLE";
+    public static final String CREATE_PRODUCT_INGREDIENT_TABLE_KEY = "CREATE_PRODUCT_INGREDIENT_TABLE";
+    public static final String GET_INGREDIENTS_BY_PRODUCT_KEY = "GET_INGREDIENTS_BY_PRODUCT";
+    
     protected static final String CHECK_TABLE_EMPTY_KEY = "CHECK_TABLE";
     protected static final String INSERT_ROLE_USER_KEY = "INSERT_ROLE_USER";
     protected static final String HAS_PERMISSION_KEY = "HAS_PERMISSION";
     protected static final String GET_USER_ROLE_KEY = "GET_USER_ROLE";
-
+    
     private static final Logger logger = Logger.getLogger(JDBCUtilDAO.class.getCanonicalName());
-
+    
     public static final String NAMED_PARAM_KEY = "{key}";
     public static final String GET_MAX_ID_KEY = "GET_MAX_ID";
     public static final String EXIST_CLAVE_KEY = "EXIST_CLAVE";
-
+    
     public JDBCUtilDAO(DataSource dataSource, SQLLoader sqlStatements) {
         this.dataSource = dataSource;
         this.sqlStatements = sqlStatements;
     }
-
+    
     public void init() throws DAOException {
-
+        
         String TABLE_NAME = "roles";
         createTable(TABLE_NAME, CREATE_ROLES_TABLE_KEY);
-
+        
         TABLE_NAME = "permissions";
         createTable(TABLE_NAME, CREATE_PERMISSIONS_TABLE_KEY);
-
+        
         TABLE_NAME = "permission_role";
         createTable(TABLE_NAME, CREATE_PERMISSION_ROLE_TABLE_KEY);
-
+        
         TABLE_NAME = "role_user";
         createTable(TABLE_NAME, CREATE_ROLE_USER_TABLE_KEY);
-
+        
+        TABLE_NAME = "product_ingredient";
+        createTable(TABLE_NAME, CREATE_PRODUCT_INGREDIENT_TABLE_KEY);
+        
     }
-
+    
     private void createTable(String tableName, String JDBC_KEY) throws DAOException {
         Connection conn = null;
         PreparedStatement ps = null;
@@ -107,22 +113,22 @@ public class JDBCUtilDAO implements UtilDAO {
             DBManager.closeConnection(conn);
         }
     }
-
+    
     public int countTableRows(String sql) throws DAOException {
         Connection conn = null;
         int count = 0;
         try {
             conn = dataSource.getConnection();
-            count = DBManager.countTable(sql, conn, sqlStatements);            
+            count = DBManager.countTable(sql, conn, sqlStatements);
         } catch (SQLException e) {
             DBManager.rollbackConn(conn);
             throw new DAOException("Could not properly retrieve the current TaskID", e);
         } finally {
-            DBManager.closeConnection(conn);    
+            DBManager.closeConnection(conn);
         }
         return count;
     }
-
+    
     public int existClave(String table, String column, String code) throws DAOException {
         String retrieve;
         try {
@@ -156,7 +162,7 @@ public class JDBCUtilDAO implements UtilDAO {
         }
         return count;
     }
-
+    
     public int getMaxID(String table) throws DAOException {
         Connection conn = null;
         PreparedStatement ps = null;
@@ -183,7 +189,7 @@ public class JDBCUtilDAO implements UtilDAO {
         }
         return maxID;
     }
-
+    
     public ArrayList<Rol> getRolesList() throws DAOException {
         String retrieveList;
         try {
@@ -216,7 +222,7 @@ public class JDBCUtilDAO implements UtilDAO {
         }
         return roles;
     }
-
+    
     public void addRole(Rol role) throws DAOException {
         if (role == null) {
             throw new IllegalArgumentException("Null rol");
@@ -225,7 +231,7 @@ public class JDBCUtilDAO implements UtilDAO {
         PreparedStatement ps = null;
         try {
             conn = dataSource.getConnection();
-
+            
             conn.setAutoCommit(false);
             Object[] parameters = {
                 role.getName(),
@@ -233,9 +239,9 @@ public class JDBCUtilDAO implements UtilDAO {
                 role.getDescription()
             };
             ps = sqlStatements.buildSQLStatement(conn, INSERT_ROL_KEY, parameters);
-
+            
             ps.executeUpdate();
-
+            
             conn.commit();
             logger.log(Level.INFO, "Added rol:" + role.getName());
         } catch (SQLException | IOException e) {
@@ -246,7 +252,7 @@ public class JDBCUtilDAO implements UtilDAO {
             DBManager.closeConnection(conn);
         }
     }
-
+    
     public void addPermissionRole(Rol role, ArrayList<Permission> permissions) throws DAOException {
         if (role == null) {
             throw new IllegalArgumentException("Null rol");
@@ -258,7 +264,7 @@ public class JDBCUtilDAO implements UtilDAO {
             conn.setAutoCommit(false);
             for (int i = 0; i < permissions.size(); i++) {
                 Permission perm = permissions.get(i);
-                System.out.println("adding:"+ perm +" to role:"+role);
+                System.out.println("adding:" + perm + " to role:" + role);
                 Object[] parameters = {
                     perm.getId(),
                     role.getId(),};
@@ -275,7 +281,7 @@ public class JDBCUtilDAO implements UtilDAO {
             DBManager.closeConnection(conn);
         }
     }
-
+    
     public Rol getRole(String name) throws DAOException {
         String retrieveList = null;
         try {
@@ -311,7 +317,7 @@ public class JDBCUtilDAO implements UtilDAO {
         }
         return rol;
     }
-
+    
     public Object[] getRole(String field, String value) throws DAOException {
         String retrieveList = null;
         try {
@@ -345,7 +351,7 @@ public class JDBCUtilDAO implements UtilDAO {
         }
         return data;
     }
-
+    
     public void deleteRole(String name) throws DAOException {
         Connection conn = null;
         PreparedStatement ps = null;
@@ -365,7 +371,7 @@ public class JDBCUtilDAO implements UtilDAO {
             DBManager.closeStatement(ps);
         }
     }
-
+    
     public ArrayList<Permission> getPermissionList(String where) throws DAOException {
         String retrieveList;
         try {
@@ -403,7 +409,7 @@ public class JDBCUtilDAO implements UtilDAO {
         }
         return permissions;
     }
-
+    
     public ArrayList<Permission> getPermissionByRole(Rol rol) throws DAOException {
         String retrieveList;
         ArrayList<Permission> permissions = new ArrayList<>();
@@ -434,7 +440,7 @@ public class JDBCUtilDAO implements UtilDAO {
         }
         return permissions;
     }
-
+    
     public void addPermission(Permission permission) throws DAOException {
         if (permission == null) {
             throw new IllegalArgumentException("Null permission");
@@ -460,7 +466,7 @@ public class JDBCUtilDAO implements UtilDAO {
             DBManager.closeConnection(conn);
         }
     }
-
+    
     public void updateRol(Rol rol) throws DAOException {
         Connection conn = null;
         PreparedStatement update = null;
@@ -487,7 +493,7 @@ public class JDBCUtilDAO implements UtilDAO {
             DBManager.closeConnection(conn);
         }
     }
-
+    
     public void deletePermissionsByRole(int id) throws DAOException {
         Connection conn = null;
         PreparedStatement ps = null;
@@ -507,24 +513,24 @@ public class JDBCUtilDAO implements UtilDAO {
             DBManager.closeStatement(ps);
         }
     }
-
+    
     public boolean checkTableEmpty(String table) throws DAOException {
-
+        
         Connection conn = null;
         PreparedStatement ps = null;
         ResultSet rs;
-
+        
         try {
             Map<String, String> namedParams = new HashMap<>();
             namedParams.put(JDBCDAOFactory.NAMED_PARAM_TABLE, table);
             conn = dataSource.getConnection();
             ps = sqlStatements.buildSQLStatement(conn, CHECK_TABLE_EMPTY_KEY, namedParams);
             rs = ps.executeQuery();
-
+            
             if (rs.next()) {
                 return rs.getInt(1) == 0;
             }
-
+            
         } catch (SQLException e) {
             DBManager.rollbackConn(conn);
             throw new DAOException("Cannot add User", e);
@@ -537,7 +543,7 @@ public class JDBCUtilDAO implements UtilDAO {
         }
         return false;
     }
-
+    
     public void assignRoleToUser(User user, Rol role) throws DAOException {
         if (role == null) {
             throw new IllegalArgumentException("Null rol");
@@ -562,7 +568,7 @@ public class JDBCUtilDAO implements UtilDAO {
             DBManager.closeConnection(conn);
         }
     }
-
+    
     public int hasPermission(int userID, int permissionID) throws DAOException {
         int result = -1;
         Connection conn = null;
@@ -587,7 +593,7 @@ public class JDBCUtilDAO implements UtilDAO {
         }
         return result;
     }
-
+    
     public String getUserRole(int userID) throws DAOException {
         String result = null;
         Connection conn = null;
@@ -611,6 +617,39 @@ public class JDBCUtilDAO implements UtilDAO {
             DBManager.closeConnection(conn);
         }
         return result;
+    }
+    
+    public ArrayList<Ingredient> getIngredientsByProduct(String code) throws DAOException {
+        String retrieveList;
+        ArrayList<Ingredient> ingredients = new ArrayList<>();
+        Connection conn = null;
+        PreparedStatement retrieve = null;
+        ResultSet rs = null;
+        Object[] parameters = {code};
+        try {
+            conn = dataSource.getConnection();
+            retrieve = sqlStatements.buildSQLStatement(conn, GET_INGREDIENTS_BY_PRODUCT_KEY, parameters);
+            rs = retrieve.executeQuery();
+            while (rs.next()) {
+                Ingredient ing = new Ingredient();
+                ing.setId(rs.getInt(1));
+                ing.setCode(rs.getString(2));
+                ing.setName(rs.getString(3));
+                ing.setMeasure(rs.getString(4));
+                ing.setQuantity(rs.getInt(5));
+                ing.setOpcional(rs.getBoolean(6));
+                ingredients.add(ing);
+            }
+        } catch (SQLException e) {
+            throw new DAOException("Could not properly retrieve the ingredients list: " + e);
+        } catch (IOException e) {
+            throw new DAOException("Could not properly retrieve the ingredients list: " + e);
+        } finally {
+            DBManager.closeResultSet(rs);
+            DBManager.closeStatement(retrieve);
+            DBManager.closeConnection(conn);
+        }
+        return ingredients;
     }
     
 }

@@ -9,7 +9,7 @@ package com.bacon;
 import com.bacon.persistence.JDBC.JDBCDAOFactory;
 import static com.bacon.persistence.JDBC.JDBCDAOFactory.NAMED_PARAM_TABLE;
 import static com.bacon.persistence.JDBC.JDBCDAOFactory.TRUNCATE_TABLE_KEY;
-import com.bacon.persistenc.SQLLoader;
+import com.bacon.persistence.SQLLoader;
 import com.bacon.persistence.dao.DAOException;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;

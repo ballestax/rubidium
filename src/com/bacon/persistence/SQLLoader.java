@@ -34,7 +34,7 @@
  * for use in the design, construction, operation or maintenance of
  * any nuclear facility.
  */
-package com.bacon.persistenc;
+package com.bacon.persistence;
 
 import java.io.IOException;
 import java.sql.Connection;

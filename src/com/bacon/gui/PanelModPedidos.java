@@ -5,6 +5,7 @@
  */
 package com.bacon.gui;
 
+import com.bacon.domain.Category;
 import com.bacon.Aplication;
 import com.bacon.domain.Product;
 import java.awt.BorderLayout;
@@ -29,6 +30,7 @@ public class PanelModPedidos extends PanelCapturaMod
 
     /**
      * Creates new form PanelPedidos
+     * @param app
      */
     public PanelModPedidos(Aplication app) {
         this.app = app;
@@ -38,40 +40,49 @@ public class PanelModPedidos extends PanelCapturaMod
 
     private void createComponents() {
 
+        
+        ArrayList<Product> productsList = app.getControl().getProductsList("");
+        
+        
         String stImg = "gui/img/tradicional.png";
 
-        Product p1 = new Product("Tradicional de carne", 12000, stImg);
-        p1.setDescription("160 gr de carne, queso americano"
-                + "lechuga rizada, tomate, tocineta cronch y salsas.");
-        Product p2 = new Product("Chicken Burger", 12000, stImg);
-        p2.setDescription("140 gr de pechuga de pollo, queso Mozzarela, "
-                + "lechuga rizada, tomate, tocineta cronch y salsas");
-        Product p3 = new Product("RIB 57", 18000, stImg);
-        p3.setDescription("160 gr de carne, trocitos crocante piel de cerdo"
-                + "costilla desmenuzada en salsa BBQ,  queso americano,"
-                + "una costilla ahumada en salsa BBQ, "
-                + "tocineta cronch, lechuga rizada, tomate y salsas.");
-        Product p4 = new Product("Doble carne", 17000, stImg);
-        p4.setDescription("Dos porciones de 160 gr de carne, doble queso,"
-                + "cebollas caramelizadas, tocineta cronch, "
-                + "lechuga rizada, tomate y salsas.");
-        Product p5 = new Product("Bacon 57", 14000, stImg);
-        p5.setDescription("160 gr de carne, queso americano,"
-                + "cebollas grillé con tocineta, jamon, tocineta cronch,"
-                + "lechuga rizada, tomate y salsas.");
-//        Product p6 = new Product("Rellenita", 20000, stImg);
+//        Product p1 = new Product(1,"Tradicional de carne", 12000, stImg);
+//        p1.setDescription("160 gr de carne, queso americano"
+//                + "lechuga rizada, tomate, tocineta cronch y salsas.");
+//        Product p2 = new Product(2,"Chicken Burger", 12000, stImg);
+//        p2.setDescription("140 gr de pechuga de pollo, queso Mozzarela,"
+//                + "lechuga rizada, tomate, tocineta cronch y salsas");
+//        Product p3 = new Product(3,"RIB 57", 18000, stImg);
+//        p3.setDescription("160 gr de carne, trocitos crocante piel de cerdo"
+//                + "costilla desmenuzada en salsa BBQ,  queso americano,"
+//                + "una costilla ahumada en salsa BBQ, "
+//                + "tocineta cronch, lechuga rizada, tomate y salsas.");
+//        Product p4 = new Product(4,"Doble carne", 17000, stImg);
+//        p4.setDescription("Dos porciones de 160 gr de carne, doble queso,"
+//                + "cebollas caramelizadas, tocineta cronch, "
+//                + "lechuga rizada, tomate y salsas.");
+//        Product p5 = new Product(5,"Bacon 57", 14000, stImg);
+//        p5.setDescription("160 gr de carne, queso americano,"
+//                + "cebollas grillé con tocineta, jamon, tocineta cronch,"
+//                + "lechuga rizada, tomate y salsas.");
+////        Product p6 = new Product("Rellenita", 20000, stImg);
 
-        ArrayList<Product> products = new ArrayList<>();
-        products.add(p1);
-        products.add(p2);
-        products.add(p3);
-        products.add(p4);
+//        ArrayList<Product> products = new ArrayList<>();
+//        products.add(p1);
+//        products.add(p2);
+//        products.add(p3);
+//        products.add(p4);
 //        products.add(p5);
 //        products.add(p6);
 
+        for (int i = 0; i < productsList.size(); i++) {
+            Product get = productsList.get(i);
+            
+        }
+
         ArrayList<Category> categorys = new ArrayList<>();
         categorys.add(new Category("Hamburguesas"));
-        categorys.add(new Category("Extras"));
+//        categorys.add(new Category("Extras"));
         categorys.add(new Category("Adicionales"));
 //        categorys.add(new Category("Perros"));
 //        categorys.add(new Category("Otros"));
@@ -95,7 +106,7 @@ public class PanelModPedidos extends PanelCapturaMod
 
         for (int i = 0; i < categorys.size(); i++) {
             Category cat = categorys.get(i);
-            PanelCategory panelCategory = new PanelCategory(cat, products, app);
+            PanelCategory panelCategory = new PanelCategory(cat, productsList, app);
             panelCategory.addPropertyChangeListener(pnPedido);
             panelLeft.add(panelCategory);
         }
@@ -118,6 +129,7 @@ public class PanelModPedidos extends PanelCapturaMod
     }// </editor-fold>//GEN-END:initComponents
 
     @Override
+    
     public void actionPerformed(ActionEvent e) {
     }
 

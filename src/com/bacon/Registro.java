@@ -363,7 +363,7 @@ public class Registro extends JComponent implements Reseteable, CaretListener {
         JComboBox combo = new JComboBox(opcs);
         inicializar(combo);
     }
-    
+
     public Registro(int axis, String stLabel, String[] opcs, int widthlabel) {
         super();
         box = new Box(axis);
@@ -467,7 +467,7 @@ public class Registro extends JComponent implements Reseteable, CaretListener {
     }
 
     public Object getObject() {
-        
+
         if (campo instanceof JTextField) {
             return ((JTextField) campo).getText();
         }
@@ -477,7 +477,7 @@ public class Registro extends JComponent implements Reseteable, CaretListener {
                 return ((JComboBox) campo).getSelectedItem();
             } else {
                 return "";
-            }   
+            }
         }
         if (campo instanceof MyDatePickerImp) {
             return ((MyDatePickerImp) campo).getText();
@@ -489,16 +489,14 @@ public class Registro extends JComponent implements Reseteable, CaretListener {
     public String getText() {
         if (campo instanceof JTextField) {
             return ((JTextField) campo).getText();
-        }
-        else if (campo instanceof JComboBox) {
+        } else if (campo instanceof JComboBox) {
             JComboBox cb = ((JComboBox) campo);
             if (cb.getSelectedItem() != null) {
                 return ((JComboBox) campo).getSelectedItem().toString();
             } else {
                 return "";
             }
-        }
-        else if (campo instanceof MyDatePickerImp) {
+        } else if (campo instanceof MyDatePickerImp) {
             return ((MyDatePickerImp) campo).getText();
         } else {
             return "";
@@ -516,7 +514,7 @@ public class Registro extends JComponent implements Reseteable, CaretListener {
             ((MyDatePickerImp) campo).setText(text);
         }
     }
-    
+
     public void setTextAligment(int align) {
         if (campo instanceof JTextField) {
             ((JTextField) campo).setHorizontalAlignment(align);
@@ -567,7 +565,7 @@ public class Registro extends JComponent implements Reseteable, CaretListener {
         this.fontLabel = fontLabel;
         label.setFont(fontLabel);
     }
-    
+
     public void setLabelFontSize(float size) {
         this.fontLabel = fontLabel.deriveFont(size);
         label.setFont(fontLabel);
@@ -639,7 +637,7 @@ public class Registro extends JComponent implements Reseteable, CaretListener {
             ((JTextField) campo).setForeground(fg);
         } else if (campo instanceof JComboBox) {
             ((JComboBox) campo).setForeground(fg);
-        } else if(campo instanceof MyDatePickerImp){
+        } else if (campo instanceof MyDatePickerImp) {
             ((MyDatePickerImp) campo).setFieldForeground(fg);
         }
     }
@@ -746,6 +744,13 @@ public class Registro extends JComponent implements Reseteable, CaretListener {
         if (campo instanceof JTextField || campo instanceof UpperCaseTextField) {
             ((JTextField) campo).setMargin(new Insets(top, left, botton, right));
         }
+    }
+
+    public Document getDocument() {
+        if (campo instanceof JTextField) {
+            return ((JTextField) campo).getDocument();
+        }
+        return null;
     }
 
     protected Border bordeError;

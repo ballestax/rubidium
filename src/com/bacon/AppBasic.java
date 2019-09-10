@@ -4,6 +4,7 @@
  */
 package com.bacon;
 
+import com.bacon.domain.Product;
 import java.util.prefs.BackingStoreException;
 import javafx.scene.web.WebEngine;
 
@@ -15,16 +16,17 @@ import org.w3c.dom.Document;
  */
 public class AppBasic {
 
-    static Document document;
-    static WebEngine engine;
 
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
 
+        
+        
+        
         // TODO code application logic here
-        // /* 
+//         /* 
         java.awt.EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
