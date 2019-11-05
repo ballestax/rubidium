@@ -78,6 +78,16 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Tabl
         DCFORM_P.applyPattern("$ ###,###,###");
 
         lbTitle.setText("Pedido");
+        
+        
+        btTogle1.setText("Local");
+        btTogle1.setActionCommand(AC_SELECT_LOCAL);
+        btTogle1.addActionListener(this);
+        btTogle1.setSelected(true);
+        
+        btTogle2.setText("Domicilio");
+        btTogle2.setActionCommand(AC_SELECT_DELIVERY);        
+        btTogle2.addActionListener(this);
 
         btDelete.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "trash.png", 18, 18)));
         btDelete.setActionCommand(AC_DELETE_PEDIDO);
@@ -225,6 +235,9 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Tabl
 
         calcularValores();
     }
+    public static final String AC_SELECT_DELIVERY = "AC_SELECT_DELIVERY";
+    public static final String AC_SELECT_LOCAL1 = "AC_SELECT_LOCAL";
+    public static final String AC_SELECT_LOCAL = "AC_SELECT_LOCAL";
     public static final String AC_DELETE_PEDIDO = "AC_DELETE_PEDIDO";
     public static final String AC_CHANGE_DOMICILIO = "AC_CHANGE_DOMICILIO";
     public static final String AC_CONFIRMAR_PEDIDO = "AC_CONFIRMAR_PEDIDO";
@@ -431,6 +444,7 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Tabl
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        buttonGroup1 = new javax.swing.ButtonGroup();
         lbTitle = new javax.swing.JLabel();
         regCelular = new com.celectoral.Registro(BoxLayout.X_AXIS,"","", 100);
         regDireccion = new com.celectoral.Registro(BoxLayout.X_AXIS,"","",100);
@@ -446,6 +460,9 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Tabl
         lbEntregas = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
         tbListado = new javax.swing.JTable();
+        jPanel1 = new javax.swing.JPanel();
+        btTogle2 = new javax.swing.JToggleButton();
+        btTogle1 = new javax.swing.JToggleButton();
 
         lbTitle.setFont(new java.awt.Font("Ubuntu", 1, 18)); // NOI18N
         lbTitle.setText("jLabel1");
@@ -460,6 +477,30 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Tabl
             }
         ));
         jScrollPane2.setViewportView(tbListado);
+
+        buttonGroup1.add(btTogle2);
+
+        buttonGroup1.add(btTogle1);
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(1, 1, 1)
+                .addComponent(btTogle1, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(1, 1, 1)
+                .addComponent(btTogle2, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(1, 1, 1))
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(0, 0, 0)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btTogle1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btTogle2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+        );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -494,26 +535,31 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Tabl
                         .addGap(12, 12, 12))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(regCelular, javax.swing.GroupLayout.PREFERRED_SIZE, 232, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(lbTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 411, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(regCelular, javax.swing.GroupLayout.PREFERRED_SIZE, 232, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 0, Short.MAX_VALUE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(lbTitle)
+                                .addGap(1, 1, 1)
+                                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addGap(139, 139, 139)
                                 .addComponent(btDelete, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                        .addContainerGap())))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(btDelete, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lbTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(btDelete, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE)
+                    .addComponent(lbTitle, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(regCelular, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(regDireccion, javax.swing.GroupLayout.DEFAULT_SIZE, 31, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 92, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
                     .addComponent(regSubtotal, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -542,6 +588,10 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Tabl
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btConfirm;
     private javax.swing.JButton btDelete;
+    private javax.swing.JToggleButton btTogle1;
+    private javax.swing.JToggleButton btTogle2;
+    private javax.swing.ButtonGroup buttonGroup1;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JLabel lbDescuento1;
     private javax.swing.JLabel lbEntregas;
