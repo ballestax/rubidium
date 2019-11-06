@@ -1,4 +1,4 @@
-package com.bacon;
+package com.bacon.gui.util;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -507,17 +507,11 @@ public class Registro extends JComponent implements Reseteable, CaretListener {
         if (campo instanceof JTextField) {
             ((JTextField) campo).setText(text);
         } else if (campo instanceof JComboBox) {
-            System.out.println("text = " + text);
+//            System.out.println("text = " + text);
             ((JComboBox) campo).setSelectedItem(text);
-            System.out.println("textx = " + ((JComboBox) campo).getModel().getSelectedItem());
+//            System.out.println("textx = " + ((JComboBox) campo).getModel().getSelectedItem());
         } else if (campo instanceof MyDatePickerImp) {
             ((MyDatePickerImp) campo).setText(text);
-        }
-    }
-
-    public void setTextAligment(int align) {
-        if (campo instanceof JTextField) {
-            ((JTextField) campo).setHorizontalAlignment(align);
         }
     }
 
@@ -566,9 +560,11 @@ public class Registro extends JComponent implements Reseteable, CaretListener {
         label.setFont(fontLabel);
     }
 
-    public void setLabelFontSize(float size) {
-        this.fontLabel = fontLabel.deriveFont(size);
-        label.setFont(fontLabel);
+    public void setLabelFontSize(int size) {
+        if (fontLabel != null) {
+            this.fontLabel = fontLabel.deriveFont(size);
+            label.setFont(fontLabel);
+        }
     }
 
     public void setLabelText(String labelText) {
@@ -578,6 +574,13 @@ public class Registro extends JComponent implements Reseteable, CaretListener {
     public void setCampoFont(Font fontCampo) {
         this.fontCampo = fontCampo;
         campo.setFont(fontCampo);
+    }
+
+    public Document getDocument() {
+        if (campo instanceof JTextField) {
+            return ((JTextField) campo).getDocument();
+        }
+        return null;
     }
 
     public void addCaretListener(CaretListener caretListener) {
@@ -630,6 +633,10 @@ public class Registro extends JComponent implements Reseteable, CaretListener {
         setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
     }
 
+    public void setBorderColor(Color color) {
+        setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED, color, color.darker()));
+    }
+
     @Override
     public void setForeground(Color fg) {
         super.setForeground(fg);
@@ -639,6 +646,12 @@ public class Registro extends JComponent implements Reseteable, CaretListener {
             ((JComboBox) campo).setForeground(fg);
         } else if (campo instanceof MyDatePickerImp) {
             ((MyDatePickerImp) campo).setFieldForeground(fg);
+        }
+    }
+
+    public void setTextAligment(int align) {
+        if (campo instanceof JTextField) {
+            ((JTextField) campo).setHorizontalAlignment(align);
         }
     }
 
@@ -744,13 +757,6 @@ public class Registro extends JComponent implements Reseteable, CaretListener {
         if (campo instanceof JTextField || campo instanceof UpperCaseTextField) {
             ((JTextField) campo).setMargin(new Insets(top, left, botton, right));
         }
-    }
-
-    public Document getDocument() {
-        if (campo instanceof JTextField) {
-            return ((JTextField) campo).getDocument();
-        }
-        return null;
     }
 
     protected Border bordeError;

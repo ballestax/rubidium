@@ -79,6 +79,7 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Tabl
 
         lbTitle.setText("Pedido");
         
+        regMesa.setb
         
         btTogle1.setText("Local");
         btTogle1.setActionCommand(AC_SELECT_LOCAL);
@@ -446,16 +447,16 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Tabl
 
         buttonGroup1 = new javax.swing.ButtonGroup();
         lbTitle = new javax.swing.JLabel();
-        regCelular = new com.celectoral.Registro(BoxLayout.X_AXIS,"","", 100);
-        regDireccion = new com.celectoral.Registro(BoxLayout.X_AXIS,"","",100);
+        regCelular = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS,"","", 70);
+        regDireccion = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS,"","",70);
         btConfirm = new javax.swing.JButton();
         btDelete = new javax.swing.JButton();
-        regDescuento = new com.celectoral.Registro(BoxLayout.X_AXIS,"","");
-        regTotal = new com.celectoral.Registro(BoxLayout.X_AXIS,"","",60);
-        regSubtotal = new com.celectoral.Registro(BoxLayout.X_AXIS, "","",60);
+        regDescuento = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS,"","");
+        regTotal = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS,"","",60);
+        regSubtotal = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "","",60);
         lbTiempos = new javax.swing.JLabel();
-        regTiempo = new com.celectoral.Registro(BoxLayout.X_AXIS, "Tiempo",new String[1],60);
-        regDomicilio = new com.celectoral.Registro(BoxLayout.X_AXIS, "Entrega",new String[1],60);
+        regTiempo = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Tiempo",new String[1],60);
+        regDomicilio = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Entrega",new String[1],60);
         lbDescuento1 = new javax.swing.JLabel();
         lbEntregas = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
@@ -463,6 +464,8 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Tabl
         jPanel1 = new javax.swing.JPanel();
         btTogle2 = new javax.swing.JToggleButton();
         btTogle1 = new javax.swing.JToggleButton();
+        regMesa = new com.bacon.Registro(BoxLayout.X_AXIS, "Mesa",new String[1], 70);
+        regMesera = new com.bacon.Registro(BoxLayout.X_AXIS, "Mesero",new String[1],70);
 
         lbTitle.setFont(new java.awt.Font("Ubuntu", 1, 18)); // NOI18N
         lbTitle.setText("jLabel1");
@@ -544,7 +547,12 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Tabl
                                 .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addGap(139, 139, 139)
                                 .addComponent(btDelete, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addContainerGap())))
+                        .addContainerGap())
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(regMesa, javax.swing.GroupLayout.PREFERRED_SIZE, 232, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(regMesera, javax.swing.GroupLayout.PREFERRED_SIZE, 232, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -556,6 +564,10 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Tabl
                     .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(regCelular, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(regMesa, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(regMesera, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(regDireccion, javax.swing.GroupLayout.DEFAULT_SIZE, 31, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -597,13 +609,15 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Tabl
     private javax.swing.JLabel lbEntregas;
     private javax.swing.JLabel lbTiempos;
     private javax.swing.JLabel lbTitle;
-    private com.celectoral.Registro regCelular;
-    private com.celectoral.Registro regDescuento;
-    private com.celectoral.Registro regDireccion;
-    private com.celectoral.Registro regDomicilio;
-    private com.celectoral.Registro regSubtotal;
-    private com.celectoral.Registro regTiempo;
-    private com.celectoral.Registro regTotal;
+    private com.bacon.gui.util.Registro regCelular;
+    private com.bacon.gui.util.Registro regDescuento;
+    private com.bacon.gui.util.Registro regDireccion;
+    private com.bacon.gui.util.Registro regDomicilio;
+    private com.bacon.Registro regMesa;
+    private com.bacon.gui.util.Registro regMesera;
+    private com.bacon.gui.util.Registro regSubtotal;
+    private com.bacon.gui.util.Registro regTiempo;
+    private com.bacon.gui.util.Registro regTotal;
     private javax.swing.JTable tbListado;
     // End of variables declaration//GEN-END:variables
 }

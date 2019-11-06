@@ -1,4 +1,4 @@
-package com.bacon;
+package com.bacon.gui.util;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -123,7 +123,7 @@ public class MyDatePickerImp extends JComponent implements ActionListener, Caret
     }
 
     public String getText() {
-        System.out.println(dateField.getText());
+//        System.out.println(dateField.getText());
         return dateField.getText();
     }
 

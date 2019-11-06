@@ -20,7 +20,7 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Group type="102" alignment="0" attributes="0">
+          <Group type="102" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" attributes="0">
@@ -71,6 +71,12 @@
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
+                  <Group type="102" alignment="0" attributes="0">
+                      <Component id="regMesa" min="-2" pref="232" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="regMesera" min="-2" pref="232" max="-2" attributes="0"/>
+                      <EmptySpace max="32767" attributes="0"/>
+                  </Group>
               </Group>
           </Group>
       </Group>
@@ -86,7 +92,12 @@
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="regCelular" linkSize="2" min="-2" pref="31" max="-2" attributes="0"/>
-              <EmptySpace min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="1" attributes="0">
+                  <Component id="regMesa" min="-2" pref="30" max="-2" attributes="0"/>
+                  <Component id="regMesera" min="-2" pref="30" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
               <Component id="regDireccion" linkSize="2" pref="31" max="32767" attributes="0"/>
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Component id="jScrollPane2" pref="92" max="32767" attributes="0"/>
@@ -127,45 +138,45 @@
         </Property>
       </Properties>
     </Component>
-    <Component class="com.celectoral.Registro" name="regCelular">
+    <Component class="com.bacon.gui.util.Registro" name="regCelular">
       <AuxValues>
-        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.celectoral.Registro(BoxLayout.X_AXIS,&quot;&quot;,&quot;&quot;, 100)"/>
+        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.bacon.gui.util.Registro(BoxLayout.X_AXIS,&quot;&quot;,&quot;&quot;, 70)"/>
       </AuxValues>
     </Component>
-    <Component class="com.celectoral.Registro" name="regDireccion">
+    <Component class="com.bacon.gui.util.Registro" name="regDireccion">
       <AuxValues>
-        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.celectoral.Registro(BoxLayout.X_AXIS,&quot;&quot;,&quot;&quot;,100)"/>
+        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.bacon.gui.util.Registro(BoxLayout.X_AXIS,&quot;&quot;,&quot;&quot;,70)"/>
       </AuxValues>
     </Component>
     <Component class="javax.swing.JButton" name="btConfirm">
     </Component>
     <Component class="javax.swing.JButton" name="btDelete">
     </Component>
-    <Component class="com.celectoral.Registro" name="regDescuento">
+    <Component class="com.bacon.gui.util.Registro" name="regDescuento">
       <AuxValues>
-        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.celectoral.Registro(BoxLayout.X_AXIS,&quot;&quot;,&quot;&quot;)"/>
+        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.bacon.gui.util.Registro(BoxLayout.X_AXIS,&quot;&quot;,&quot;&quot;)"/>
       </AuxValues>
     </Component>
-    <Component class="com.celectoral.Registro" name="regTotal">
+    <Component class="com.bacon.gui.util.Registro" name="regTotal">
       <AuxValues>
-        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.celectoral.Registro(BoxLayout.X_AXIS,&quot;&quot;,&quot;&quot;,60)"/>
+        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.bacon.gui.util.Registro(BoxLayout.X_AXIS,&quot;&quot;,&quot;&quot;,60)"/>
       </AuxValues>
     </Component>
-    <Component class="com.celectoral.Registro" name="regSubtotal">
+    <Component class="com.bacon.gui.util.Registro" name="regSubtotal">
       <AuxValues>
-        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.celectoral.Registro(BoxLayout.X_AXIS, &quot;&quot;,&quot;&quot;,60)"/>
+        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, &quot;&quot;,&quot;&quot;,60)"/>
       </AuxValues>
     </Component>
     <Component class="javax.swing.JLabel" name="lbTiempos">
     </Component>
-    <Component class="com.celectoral.Registro" name="regTiempo">
+    <Component class="com.bacon.gui.util.Registro" name="regTiempo">
       <AuxValues>
-        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.celectoral.Registro(BoxLayout.X_AXIS, &quot;Tiempo&quot;,new String[1],60)"/>
+        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, &quot;Tiempo&quot;,new String[1],60)"/>
       </AuxValues>
     </Component>
-    <Component class="com.celectoral.Registro" name="regDomicilio">
+    <Component class="com.bacon.gui.util.Registro" name="regDomicilio">
       <AuxValues>
-        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.celectoral.Registro(BoxLayout.X_AXIS, &quot;Entrega&quot;,new String[1],60)"/>
+        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, &quot;Entrega&quot;,new String[1],60)"/>
       </AuxValues>
     </Component>
     <Component class="javax.swing.JLabel" name="lbDescuento1">
@@ -237,5 +248,15 @@
         </Component>
       </SubComponents>
     </Container>
+    <Component class="com.bacon.Registro" name="regMesa">
+      <AuxValues>
+        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.bacon.Registro(BoxLayout.X_AXIS, &quot;Mesa&quot;,new String[1], 70)"/>
+      </AuxValues>
+    </Component>
+    <Component class="com.bacon.Registro" name="regMesera">
+      <AuxValues>
+        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.bacon.Registro(BoxLayout.X_AXIS, &quot;Mesero&quot;,new String[1],70)"/>
+      </AuxValues>
+    </Component>
   </SubComponents>
 </Form>
