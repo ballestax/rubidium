@@ -46,9 +46,9 @@
     </DimensionLayout>
   </Layout>
   <SubComponents>
-    <Component class="com.celectoral.Registro" name="regSearch">
+    <Component class="com.bacon.gui.util.Registro" name="regSearch">
       <AuxValues>
-        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.celectoral.Registro(BoxLayout.X_AXIS, &quot;Buscar&quot;, &quot;&quot;)"/>
+        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, &quot;Buscar&quot;, &quot;&quot;)"/>
       </AuxValues>
     </Component>
     <Component class="javax.swing.JButton" name="btBuscar">

@@ -16,9 +16,9 @@ import java.util.prefs.Preferences;
 public final class Install {
 
     private Preferences registro;
-    private final transient String REG = "/DerroCElectoral/soft";
+    private final transient String REG = "/BaconApp/soft";
     private static final String CLAVE = "ahbabcbgcd";
-    private final transient String REG1 = "/derocelectoral/inst";
+    private final transient String REG1 = "/baconapp/inst";
     private static final String CLAVE1 = "vinst";
     private Date TWST;
 
@@ -31,6 +31,8 @@ public final class Install {
         cld.set(2019, 12, 31, 23, 59, 59);
 
         TWST = cld.getTime();
+        
+        writeHash();
     }
 
     public Date getTWST() {

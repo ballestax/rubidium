@@ -67,5 +67,7 @@ public abstract class DAOFactory {
     public abstract IngredientDAO getIngredientDAO() throws DAOException;
     
     public abstract AdditionalDAO getAdditionalDAO() throws DAOException;
+    
+    public abstract InvoiceDAO getInvoiceDAO() throws DAOException;
 
 }

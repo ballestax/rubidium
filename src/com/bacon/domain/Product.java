@@ -22,6 +22,7 @@ public class Product {
     private String image;
     private String description;
     private String category;
+    private boolean variablePrice;
     private List<Ingredient> ingredients;
 
     public Product(long id) {
@@ -94,6 +95,14 @@ public class Product {
         this.category = category;
     }
 
+    public boolean isVariablePrice() {
+        return variablePrice;
+    }
+
+    public void setVariablePrice(boolean variablePrice) {
+        this.variablePrice = variablePrice;
+    }
+
     public List getIngredients() {
         return ingredients;
     }
@@ -107,23 +116,22 @@ public class Product {
         if (obj == this) {
             return true;
         }
-        if (!(obj instanceof Product)) {
+        if (obj == null || obj.getClass() != this.getClass()) {
             return false;
         }
         Product prod = (Product) obj;
         if (!name.equalsIgnoreCase(prod.getName())) {
             return false;
         }
-//        if (!nombre.equals(prod.getNombre())) {
-//            return false;
-//        }
-        return true;
+        
+        return price == prod.getPrice();
     }
 
     @Override
     public int hashCode() {
-        int hash = 3;
-        hash = 37 * hash + Objects.hashCode(this.name);
+        int hash = 5;
+        hash = 97 * hash + Objects.hashCode(this.name);
+        hash = 97 * hash + (int) (Double.doubleToLongBits(this.price) ^ (Double.doubleToLongBits(this.price) >>> 32));
         return hash;
     }
 

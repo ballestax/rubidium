@@ -363,6 +363,20 @@ public class Registro extends JComponent implements Reseteable, CaretListener {
         JComboBox combo = new JComboBox(opcs);
         inicializar(combo);
     }
+    
+    public Registro(int axis, String stLabel, Object[] opcs) {
+        super();
+        box = new Box(axis);
+        this.bordered = true;
+        docLim = null;
+        fontCampoDefault = new Font("Tahoma", 1, 14);
+        fontLabelDefault = new Font("Arial", 0, 11);
+        this.axis = axis;
+        this.stLabel = stLabel;
+        stCampo = "";
+        JComboBox combo = new JComboBox(opcs);
+        inicializar(combo);
+    }
 
     public Registro(int axis, String stLabel, String[] opcs, int widthlabel) {
         super();
@@ -375,7 +389,7 @@ public class Registro extends JComponent implements Reseteable, CaretListener {
         this.widthLabel = widthlabel;
         this.stLabel = stLabel;
         stCampo = "";
-        JComboBox combo = new JComboBox(opcs);
+        JComboBox combo = new JComboBox<>(opcs);
         inicializar(combo);
     }
 
@@ -634,7 +648,30 @@ public class Registro extends JComponent implements Reseteable, CaretListener {
     }
 
     public void setBorderColor(Color color) {
-        setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED, color, color.darker()));
+        setBorder(BorderFactory.createLineBorder(color, 1, true));
+        
+    }
+    
+    public void setTint(Color color){
+        setBorder(BorderFactory.createLineBorder(color, 1, true));
+        if (axis == 0) {
+            campo.setBorder(BorderFactory.createMatteBorder(0, 1, 0, 0, color));
+        } else {
+            campo.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, color));
+        }
+        label.setBackground(color.brighter());
+        label.setForeground(color.darker());        
+    }
+    
+    public void setTint(Color color, int thicks){
+        setBorder(BorderFactory.createLineBorder(color, thicks, true));
+        if (axis == 0) {
+            campo.setBorder(BorderFactory.createMatteBorder(0, 1, 0, 0, color));
+        } else {
+            campo.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, color));
+        }
+        label.setBackground(color.brighter());
+        label.setForeground(color.darker());        
     }
 
     @Override

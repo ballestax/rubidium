@@ -6,8 +6,11 @@
 package com.bacon.gui;
 
 import com.bacon.Aplication;
+import com.bacon.GUIManager;
 import com.bacon.domain.Additional;
+import com.bacon.domain.AdditionalPed;
 import com.bacon.domain.Ingredient;
+import com.bacon.domain.Presentation;
 import com.bacon.domain.Product;
 import com.bacon.domain.ProductoPed;
 import java.awt.Color;
@@ -17,15 +20,26 @@ import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.beans.PropertyChangeEvent;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
+import javax.swing.ButtonModel;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
+import javax.swing.JRadioButton;
+import javax.swing.JSpinner;
+import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.text.Document;
 import org.balx.ColorDg;
 import org.balx.SpinnerNumberModelo;
 import org.dz.PanelCapturaMod;
@@ -40,6 +54,11 @@ public class PanelCustomPedido extends PanelCapturaMod implements ActionListener
     private final Product product;
     private DecimalFormat DCFORM_P;
     private SpinnerNumberModelo spModel;
+    private ArrayList<Ingredient> ingredients;
+    private Document document;
+    private SpinnerNumberModelo spPriceModel;
+    private NumberFormat NF;
+    private ButtonGroup bgPres;
 
     /**
      * Creates new form PanelCustomPedido
@@ -50,6 +69,7 @@ public class PanelCustomPedido extends PanelCapturaMod implements ActionListener
     public PanelCustomPedido(Aplication app, Product product) {
         this.app = app;
         this.product = product;
+        System.out.println("getting product: " + product.getPrice());
         initComponents();
         createComponents();
     }
@@ -57,7 +77,8 @@ public class PanelCustomPedido extends PanelCapturaMod implements ActionListener
     private void createComponents() {
 
         spModel = new SpinnerNumberModelo(1, 1, null, 1);
-        
+        spPriceModel = new SpinnerNumberModelo(product.getPrice(), product.getPrice(), null, 1000d);
+
         String image = product.getImage();
 
         ImageIcon icon = new ImageIcon(app.getImgManager().getImagen(image, 100, 100));
@@ -66,7 +87,7 @@ public class PanelCustomPedido extends PanelCapturaMod implements ActionListener
         Font font2 = new Font("Serif", 2, 12);
         Font font3 = new Font("Sans", 1, 16);
 
-        NumberFormat NF = DecimalFormat.getCurrencyInstance();
+        NF = DecimalFormat.getCurrencyInstance();
         NF.setMaximumFractionDigits(0);
 
         lbImage.setIcon(icon);
@@ -86,6 +107,15 @@ public class PanelCustomPedido extends PanelCapturaMod implements ActionListener
         lbPrice.setForeground(Color.red.darker());
         lbPrice.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 2, Color.red));
 
+        spPrice.setValue((product.getPrice()));
+        spPrice.setFont(font3);
+        spPrice.setOpaque(true);
+        spPrice.setForeground(Color.red.darker());
+        spPrice.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 2, Color.red));
+//        spPrice.setHorizontalAlignment(SwingConstants.RIGHT);
+
+        spPrice.setModel(spPriceModel);
+
         DCFORM_P = (DecimalFormat) NumberFormat.getInstance();
         DCFORM_P.applyPattern("$ ###,###,###");
 
@@ -101,6 +131,16 @@ public class PanelCustomPedido extends PanelCapturaMod implements ActionListener
 
         });
 
+        spPrice.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                mostrarTotal();
+            }
+
+        });
+
+        spCantidad.requestFocus();
+
         btConfirm.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "success.png", 10, 10)));
         btConfirm.setBackground(new Color(153, 255, 153));
         btConfirm.setMargin(new Insets(1, 1, 1, 1));
@@ -114,10 +154,10 @@ public class PanelCustomPedido extends PanelCapturaMod implements ActionListener
         lbTitle1.setText("Ingredientes");
         lbTitle1.setBackground(ColorDg.colorAleatorio().getColor1());
         panel1.setLayout(new GridLayout(3, 3, 5, 5));
-        ArrayList<Ingredient> ings = app.getControl().getIngredientsByProduct(product.getCode());
+        ingredients = app.getControl().getIngredientsByProduct(product.getCode());
 
-        for (int i = 0; i < ings.size(); i++) {
-            Ingredient ing = ings.get(i);
+        for (int i = 0; i < ingredients.size(); i++) {
+            Ingredient ing = ingredients.get(i);
             if (ing.isOpcional()) {
                 JCheckBox check = new JCheckBox("Sin " + ing.getName());
                 check.setActionCommand(ing.getCode());
@@ -142,19 +182,65 @@ public class PanelCustomPedido extends PanelCapturaMod implements ActionListener
             panel2.add(panAdd);
         }
 
+        lbTitle3.setText("Elige la carne");
+        lbTitle3.setBackground(ColorDg.colorAleatorio().getColor1());
+        panel3.setLayout(new GridLayout(1, 3, 5, 5));
+        bgPres = new ButtonGroup();
+        ArrayList<Presentation> presList = app.getControl().getPresentationsByProduct(product.getId());
+        if (!presList.isEmpty()) {
+            for (int i = 0; i < presList.size(); i++) {
+                Presentation pres = presList.get(i);
+                PanelPresentation panPres = new PanelPresentation(app, pres);
+                bgPres.add(panPres.getSelector());
+                panPres.setSelected(i == 0);
+                panPres.setActionCommand(AC_SEL_PRES);
+                panPres.addActionListener(this);
+                panel3.add(panPres);
+            }
+
+        } else {
+            lbTitle3.setVisible(false);
+            panel3.setVisible(false);
+
+        }
+
+        if (product.isVariablePrice()) {
+            spPrice.setVisible(true);
+            lbPrice.setVisible(false);
+        } else {
+            lbPrice.setVisible(true);
+            spPrice.setVisible(false);
+        }
+
         mostrarTotal();
 
     }
+    public static final String AC_SEL_PRES = "AC_SEL_PRES";
 
     public static final String AC_CONFIRMAR_PEDIDO = "AC_CONFIRMAR_PEDIDO";
 
     public void mostrarTotal() {
-        int value = (int) spCantidad.getValue();
-        double total = value * product.getPrice();
-        lbInfo.setText(value + " " + product.getName() + " x " + DCFORM_P.format(total));
+        int cant = (int) spCantidad.getValue();
+        double price = 0;
+
+        if (product.isVariablePrice()) {
+            price = spPriceModel.getNumber().doubleValue();
+        } else {
+            price = product.getPrice();
+        }
+
+        ArrayList<AdditionalPed> additionals = getArrayAdditionals();
+
+        boolean adds = !additionals.isEmpty();
+        double valAdds = getValueAdicionales(additionals);
+
+        double total = cant * (price + valAdds);
+        String stValAdds = adds ? " + " + String.valueOf(valAdds) : "";
+        lbInfo.setText(cant + " " + product.getName() + " (" + product.getPrice() + stValAdds + ") x " + DCFORM_P.format(total));
     }
 
     public ProductoPed parseProduct() {
+        double price = 0;
 
         ProductoPed prodPed = new ProductoPed(product);
 
@@ -163,31 +249,61 @@ public class PanelCustomPedido extends PanelCapturaMod implements ActionListener
             Component componente = componentes[i];
             if (componente instanceof JCheckBox) {
                 String text = ((JCheckBox) componente).getText();
-
+                String code = ((JCheckBox) componente).getActionCommand();
                 boolean sel = ((JCheckBox) componente).isSelected();
                 if (sel) {
-                    prodPed.addExclusion(new Ingredient("i0" + i, text));
+                    prodPed.addExclusion(app.getControl().getIngredient(code));
                 }
             }
         }
 
-        componentes = panel2.getComponents();
-        for (int i = 0; i < componentes.length; i++) {
-            Component componente = componentes[i];
-            if (componente instanceof PanelAddition) {
-//                String cod = ((JCheckBox) componente).getActionCommand();
+        prodPed.setPresentation(getPresentation());
 
-                Additional add = ((PanelAddition) componente).getAddition();
-                int cant = ((PanelAddition) componente).getQuantity();
+        prodPed.setAdicionales(getArrayAdditionals());
 
-                boolean sel = ((PanelAddition) componente).isSelected();
-                if (sel) {
-                    prodPed.addAdicional(add, cant);
-                }
-            }
-        }
         prodPed.setEspecificaciones(taObs.getText());
         return prodPed;
+    }
+
+    public ArrayList<AdditionalPed> getArrayAdditionals() {
+        ArrayList<AdditionalPed> adicionales = new ArrayList<>();
+        Component[] componentes;
+        componentes = panel2.getComponents();
+        for (Component componente : componentes) {
+            if (componente instanceof PanelAddition) {
+                Additional add = ((PanelAddition) componente).getAddition();
+                int cant = ((PanelAddition) componente).getQuantity();
+                boolean sel = ((PanelAddition) componente).isSelected();
+                if (sel) {
+                    adicionales.add(new AdditionalPed(add, cant));
+                }
+            }
+        }
+        return adicionales;
+    }
+
+    public Presentation getPresentation() {
+        Component[] componentes;
+        componentes = panel3.getComponents();
+        for (Component componente : componentes) {
+            if (componente instanceof PanelPresentation) {
+                PanelPresentation pPres = (PanelPresentation) componente;
+                if (pPres.isSelected()) {
+                    return pPres.getPresentation();
+                }
+            }
+        }
+        return null;
+    }
+
+    public double getValueAdicionales(ArrayList<AdditionalPed> adicionales) {
+        double value = 0;
+        for (int i = 0; i < adicionales.size(); i++) {
+            Additional adic = adicionales.get(i).getAdditional();
+            int cant = adicionales.get(i).getCantidad();
+            value += adic.getPrecio() * cant;
+        }
+        return value;
     }
 
     @Override
@@ -195,7 +311,26 @@ public class PanelCustomPedido extends PanelCapturaMod implements ActionListener
         if (AC_CONFIRMAR_PEDIDO.equals(e.getActionCommand())) {
             ProductoPed pProd = parseProduct();
             if (pProd != null) {
-                pcs.firePropertyChange(AC_CUSTOM_ADD, spModel.getNumber().intValue(), pProd);
+                int cant = spModel.getNumber().intValue();
+                double value = 0;
+                if (product.isVariablePrice()) {
+                    value = spPriceModel.getNumber().doubleValue();
+                } else if (pProd.getPresentation() != null) {
+                    System.out.println("here");
+                    value = pProd.getPresentation().getPrice();
+                } else {
+                    value = product.getPrice();
+                }
+
+                pProd.setPrecio(value);
+                pcs.firePropertyChange(AC_CUSTOM_ADD, new Object[]{cant, value}, pProd);
+
+                getRootPane().getParent().setVisible(false);
+            }
+        } else if (AC_SEL_PRES.equals(e.getActionCommand())) {
+            Presentation presentation = getPresentation();
+            if (presentation != null) {
+                lbPrice.setText(NF.format(presentation.getPrice()));
             }
         }
     }
@@ -229,6 +364,9 @@ public class PanelCustomPedido extends PanelCapturaMod implements ActionListener
         taObs = new javax.swing.JTextArea();
         lbInfo = new javax.swing.JLabel();
         btConfirm = new javax.swing.JButton();
+        lbTitle3 = new javax.swing.JLabel();
+        panel3 = new javax.swing.JPanel();
+        spPrice = new javax.swing.JSpinner();
 
         lbName.setFont(new java.awt.Font("Ubuntu", 1, 17)); // NOI18N
         lbName.setText("jLabel1");
@@ -255,7 +393,7 @@ public class PanelCustomPedido extends PanelCapturaMod implements ActionListener
         );
         panel1Layout.setVerticalGroup(
             panel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 95, Short.MAX_VALUE)
+            .addGap(0, 150, Short.MAX_VALUE)
         );
 
         lbTitle2.setText("jLabel1");
@@ -291,6 +429,25 @@ public class PanelCustomPedido extends PanelCapturaMod implements ActionListener
         btConfirm.setFont(new java.awt.Font("Ubuntu", 0, 17)); // NOI18N
         btConfirm.setText("jButton1");
 
+        lbTitle3.setText("jLabel1");
+        lbTitle3.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        lbTitle3.setOpaque(true);
+
+        panel3.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+
+        javax.swing.GroupLayout panel3Layout = new javax.swing.GroupLayout(panel3);
+        panel3.setLayout(panel3Layout);
+        panel3Layout.setHorizontalGroup(
+            panel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+        panel3Layout.setVerticalGroup(
+            panel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 95, Short.MAX_VALUE)
+        );
+
+        spPrice.setModel(new javax.swing.SpinnerNumberModel(0.0d, null, null, 1.0d));
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -306,10 +463,13 @@ public class PanelCustomPedido extends PanelCapturaMod implements ActionListener
                             .addComponent(lbName, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(lbDescription, javax.swing.GroupLayout.PREFERRED_SIZE, 329, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(spCantidad, javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(lbPrice, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 89, Short.MAX_VALUE)
-                            .addComponent(lbCant, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(spCantidad, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 132, Short.MAX_VALUE)
+                            .addComponent(lbCant, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(spPrice)
+                                .addGap(3, 3, 3)
+                                .addComponent(lbPrice, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))))
                     .addComponent(panel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(lbTitle2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(panel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -317,7 +477,9 @@ public class PanelCustomPedido extends PanelCapturaMod implements ActionListener
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(lbInfo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btConfirm, javax.swing.GroupLayout.PREFERRED_SIZE, 159, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(btConfirm, javax.swing.GroupLayout.PREFERRED_SIZE, 159, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(lbTitle3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(panel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -327,9 +489,10 @@ public class PanelCustomPedido extends PanelCapturaMod implements ActionListener
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(lbImage, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(lbName, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(lbPrice, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                            .addComponent(lbPrice, javax.swing.GroupLayout.DEFAULT_SIZE, 29, Short.MAX_VALUE)
+                            .addComponent(spPrice, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lbName, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(lbDescription, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -337,6 +500,10 @@ public class PanelCustomPedido extends PanelCapturaMod implements ActionListener
                                 .addComponent(lbCant)
                                 .addGap(0, 0, 0)
                                 .addComponent(spCantidad)))))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(lbTitle3)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(panel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(lbTitle1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -346,15 +513,18 @@ public class PanelCustomPedido extends PanelCapturaMod implements ActionListener
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(panel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 40, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 46, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lbInfo, javax.swing.GroupLayout.DEFAULT_SIZE, 41, Short.MAX_VALUE)
+                    .addComponent(lbInfo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addGap(5, 5, 5)
                         .addComponent(btConfirm, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addContainerGap())
         );
+
+        layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {lbName, lbPrice, spPrice});
+
     }// </editor-fold>//GEN-END:initComponents
 
 
@@ -369,9 +539,12 @@ public class PanelCustomPedido extends PanelCapturaMod implements ActionListener
     private javax.swing.JLabel lbPrice;
     private javax.swing.JLabel lbTitle1;
     private javax.swing.JLabel lbTitle2;
+    private javax.swing.JLabel lbTitle3;
     private javax.swing.JPanel panel1;
     private javax.swing.JPanel panel2;
+    private javax.swing.JPanel panel3;
     private javax.swing.JSpinner spCantidad;
+    private javax.swing.JSpinner spPrice;
     private javax.swing.JTextArea taObs;
     // End of variables declaration//GEN-END:variables
 

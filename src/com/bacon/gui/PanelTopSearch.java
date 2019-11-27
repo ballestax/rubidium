@@ -25,6 +25,7 @@ public class PanelTopSearch extends PanelCaptura {
 
     /**
      * Creates new form PanelTopSearch
+     * @param app
      */
     public PanelTopSearch(Aplication app) {
         this.app = app;
@@ -53,11 +54,13 @@ public class PanelTopSearch extends PanelCaptura {
     }
 
     private void filtrar(String text, int filter) {
-        if (text.trim().length() > 2) {
+        if (text.trim().length() > 1) {
             String SCAPE = "LIKE \'%" + text + "%\'";
             ArrayList<Product> productsList = app.getControl().getProductsList("name " + SCAPE + " or description " + SCAPE);
             System.out.println("filtrando:" + productsList.size());
             pcs.firePropertyChange(AC_FILTER_PRODUCTS, null, productsList);
+        }else{
+            pcs.firePropertyChange(AC_FILTER_PRODUCTS, null, null);
         }
 
     }
@@ -72,7 +75,7 @@ public class PanelTopSearch extends PanelCaptura {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        regSearch = new com.celectoral.Registro(BoxLayout.X_AXIS, "Buscar", "");
+        regSearch = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Buscar", "");
         btBuscar = new javax.swing.JButton();
 
         setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -102,7 +105,7 @@ public class PanelTopSearch extends PanelCaptura {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btBuscar;
-    private com.celectoral.Registro regSearch;
+    private com.bacon.gui.util.Registro regSearch;
     // End of variables declaration//GEN-END:variables
 
     @Override

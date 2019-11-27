@@ -24,12 +24,18 @@ import org.dz.PanelCapturaMod;
  * @author lrod
  */
 public class PanelModPedidos extends PanelCapturaMod
-        implements ActionListener{
+        implements ActionListener {
 
     private final Aplication app;
+    private JPanel pnCont;
+    private Box panelLeft;
+    private PanelPedido pnPedido;
+    private ArrayList<Category> categorys;
+    private ArrayList<Product> productsList;
 
     /**
      * Creates new form PanelPedidos
+     *
      * @param app
      */
     public PanelModPedidos(Aplication app) {
@@ -40,10 +46,8 @@ public class PanelModPedidos extends PanelCapturaMod
 
     private void createComponents() {
 
-        
-        ArrayList<Product> productsList = app.getControl().getProductsList("");
-        
-        
+        productsList = app.getControl().getProductsList("");
+
         String stImg = "gui/img/tradicional.png";
 
 //        Product p1 = new Product(1,"Tradicional de carne", 12000, stImg);
@@ -66,7 +70,6 @@ public class PanelModPedidos extends PanelCapturaMod
 //                + "cebollas grillé con tocineta, jamon, tocineta cronch,"
 //                + "lechuga rizada, tomate y salsas.");
 ////        Product p6 = new Product("Rellenita", 20000, stImg);
-
 //        ArrayList<Product> products = new ArrayList<>();
 //        products.add(p1);
 //        products.add(p2);
@@ -74,43 +77,47 @@ public class PanelModPedidos extends PanelCapturaMod
 //        products.add(p4);
 //        products.add(p5);
 //        products.add(p6);
-
         for (int i = 0; i < productsList.size(); i++) {
             Product get = productsList.get(i);
-            
+
         }
 
-        ArrayList<Category> categorys = new ArrayList<>();
-        categorys.add(new Category("Hamburguesas"));
+        categorys = new ArrayList<>();
+        categorys.add(new Category("Productos"));
 //        categorys.add(new Category("Extras"));
-        categorys.add(new Category("Adicionales"));
+        
 //        categorys.add(new Category("Perros"));
 //        categorys.add(new Category("Otros"));
-        JPanel pnCont = new JPanel(new BorderLayout());
+        pnCont = new JPanel(new BorderLayout());
 //        Box box = new Box(BoxLayout.LINE_AXIS);
 //        Registro regSearch = new Registro(BoxLayout.X_AXIS, "Buscar", "", 100);
 //        box.add(regSearch);
 //        box.add(Box.createHorizontalGlue());
 //        box.add(Box.createHorizontalStrut(300));
-        pnCont.add(new PanelTopSearch(app), BorderLayout.NORTH);
+        PanelTopSearch panelTopSearch = new PanelTopSearch(app);
+        panelTopSearch.addPropertyChangeListener(this);
+        pnCont.add(panelTopSearch, BorderLayout.NORTH);
 
-        Box panelLeft = new Box(BoxLayout.Y_AXIS);
+        panelLeft = new Box(BoxLayout.Y_AXIS);
         JScrollPane scp = new JScrollPane(panelLeft);
         pnCont.add(scp, BorderLayout.CENTER);
         splitPane.setLeftComponent(pnCont);
-        
-        
-        PanelPedido pnPedido = app.getGuiManager().getPanelPedido();
-        
+
+        pnPedido = app.getGuiManager().getPanelPedido();
+
         splitPane.setRightComponent(pnPedido);
 
+        loadAllProducts();
+
+    }
+
+    private void loadAllProducts() {
         for (int i = 0; i < categorys.size(); i++) {
             Category cat = categorys.get(i);
             PanelCategory panelCategory = new PanelCategory(cat, productsList, app);
             panelCategory.addPropertyChangeListener(pnPedido);
             panelLeft.add(panelCategory);
         }
-
     }
 
     /**
@@ -129,12 +136,29 @@ public class PanelModPedidos extends PanelCapturaMod
     }// </editor-fold>//GEN-END:initComponents
 
     @Override
-    
+
     public void actionPerformed(ActionEvent e) {
     }
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
+        System.out.println("evt:" + evt.getPropertyName());
+        if (PanelTopSearch.AC_FILTER_PRODUCTS.equals(evt.getPropertyName())) {
+            ArrayList<Product> productsList = (ArrayList<Product>) evt.getNewValue();
+
+            if (productsList == null) {
+                panelLeft.removeAll();
+                loadAllProducts();
+            } else {
+                panelLeft.removeAll();
+                PanelCategory panelCategory = new PanelCategory(new Category("Productos"), productsList, app);
+                panelCategory.addPropertyChangeListener(pnPedido);
+                panelLeft.add(panelCategory);
+                panelLeft.updateUI();
+            }
+            this.updateUI();
+        }
+
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

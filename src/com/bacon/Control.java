@@ -8,14 +8,19 @@ package com.bacon;
 import com.bacon.domain.Additional;
 import com.bacon.domain.ConfigDB;
 import com.bacon.domain.Ingredient;
+import com.bacon.domain.Invoice;
 import com.bacon.domain.Permission;
+import com.bacon.domain.Presentation;
 import com.bacon.domain.Product;
 import com.bacon.domain.Rol;
+import com.bacon.domain.Table;
 import com.bacon.domain.User;
+import com.bacon.domain.Waiter;
 import com.bacon.persistence.JDBC.JDBCAdditionalDAO;
 import com.bacon.persistence.JDBC.JDBCConfigDAO;
 import com.bacon.persistence.JDBC.JDBCDAOFactory;
 import com.bacon.persistence.JDBC.JDBCIngredientDAO;
+import com.bacon.persistence.JDBC.JDBCInvoiceDAO;
 import com.bacon.persistence.JDBC.JDBCProductDAO;
 import com.bacon.persistence.JDBC.JDBCUserDAO;
 import com.bacon.persistence.JDBC.JDBCUtilDAO;
@@ -25,6 +30,7 @@ import com.bacon.persistence.dao.RemoteUserResultsInterface;
 import com.bacon.persistence.dao.UserRetrieveException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import org.apache.log4j.Logger;
@@ -66,6 +72,9 @@ public class Control {
 
             JDBCAdditionalDAO addDAO = (JDBCAdditionalDAO) DAOFactory.getInstance().getAdditionalDAO();
             addDAO.init();
+
+            JDBCInvoiceDAO invoiceDAO = (JDBCInvoiceDAO) DAOFactory.getInstance().getInvoiceDAO();
+            invoiceDAO.init();
 
             JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
             utilDAO.init();
@@ -333,6 +342,9 @@ public class Control {
     }
 
     public boolean hasPermission(User user, Permission perm) {
+//        if (perm == null) {
+//            return false;
+//        }
         try {
             JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
             int val = utilDAO.hasPermission(user.getId(), perm.getId());
@@ -390,6 +402,16 @@ public class Control {
         }
     }
 
+    public Ingredient getIngredient(String code) {
+        try {
+            JDBCIngredientDAO ingDAO = (JDBCIngredientDAO) DAOFactory.getInstance().getIngredientDAO();
+            return ingDAO.getIngredientBy("code='" + code + "'");
+        } catch (DAOException ex) {
+            logger.error("Error getting Ingredients list.", ex);
+            return null;
+        }
+    }
+
     public ArrayList<Ingredient> getIngredientsByProduct(String code) {
         try {
             JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
@@ -406,6 +428,81 @@ public class Control {
             return addDAO.getAdditionalList(where, "");
         } catch (DAOException ex) {
             logger.error("Error getting Additional list.", ex);
+            return null;
+        }
+    }
+
+    public ArrayList<Table> getTableslList(String where, String order) {
+        try {
+            JDBCUtilDAO addDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
+            return addDAO.getTablesList(where, order);
+        } catch (DAOException ex) {
+            logger.error("Error getting Tables list.", ex);
+            return null;
+        }
+    }
+
+    public ArrayList<Waiter> getWaiterslList(String where, String order) {
+        try {
+            JDBCUtilDAO addDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
+            return addDAO.getWaitersList(where, order);
+        } catch (DAOException ex) {
+            logger.error("Error getting Waiters list.", ex);
+            return null;
+        }
+    }
+
+    public int contarRows(String sql) {
+        try {
+            JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
+            return utilDAO.countTableRows(sql);
+        } catch (DAOException ex) {
+            logger.error("Error couting rows.", ex);
+            GUIManager.showErrorMessage(null, "Error consultando numero de registros", "Error");
+            return -1;
+        }
+    }
+    
+    public ArrayList<Invoice> getInvoiceslList(String where, String order) {
+        try {
+            JDBCInvoiceDAO invoiceDAO = (JDBCInvoiceDAO) DAOFactory.getInstance().getInvoiceDAO();
+            return invoiceDAO.getInvoiceList(where, order);
+        } catch (DAOException ex) {
+            logger.error("Error getting Invoices list.", ex);
+            return null;
+        }
+    }
+
+    public boolean addInvoice(Invoice invoice) {
+        try {
+            JDBCInvoiceDAO invoiceDAO = (JDBCInvoiceDAO) DAOFactory.getInstance().getInvoiceDAO();
+            invoiceDAO.addInvoice(invoice);
+            return true;
+        } catch (DAOException ex) {
+            String msg = "Error adding invoice";
+            logger.error(msg, ex);
+            GUIManager.showErrorMessage(null, msg, "Error");
+            return false;
+        }
+    }
+    
+    public Date getPrimerRegistro(String tabla, String field) {
+        try {
+            JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
+            return utilDAO.getFirstEntrada(tabla, field);
+        } catch (DAOException ex) {
+            logger.error("Error getting Salida.", ex);
+            GUIManager.showErrorMessage(null, "Error consultando registro", "Error");
+            return null;
+        }
+    }
+    
+    public ArrayList<Presentation> getPresentationsByProduct(long idProduct) {
+        try {
+            JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
+            return utilDAO.getPresentationsByProduct(idProduct);
+        } catch (DAOException ex) {
+            logger.error("Error getting Presentations list.", ex);
             return null;
         }
     }

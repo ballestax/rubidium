@@ -44,7 +44,11 @@
                                   <Component id="lbEntregas" max="32767" attributes="0"/>
                               </Group>
                           </Group>
-                          <Component id="btConfirm" alignment="0" min="-2" pref="100" max="-2" attributes="0"/>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="btConfirm" min="-2" pref="100" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="btPrint" min="-2" pref="100" max="-2" attributes="0"/>
+                          </Group>
                       </Group>
                       <EmptySpace max="32767" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
@@ -56,19 +60,13 @@
                       <EmptySpace min="-2" pref="12" max="-2" attributes="0"/>
                   </Group>
                   <Group type="102" attributes="0">
-                      <Group type="103" groupAlignment="0" attributes="0">
-                          <Group type="102" attributes="0">
-                              <Component id="regCelular" min="-2" pref="232" max="-2" attributes="0"/>
-                              <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
-                          </Group>
-                          <Group type="102" attributes="0">
-                              <Component id="lbTitle" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace min="-2" pref="1" max="-2" attributes="0"/>
-                              <Component id="jPanel1" max="32767" attributes="0"/>
-                              <EmptySpace min="-2" pref="139" max="-2" attributes="0"/>
-                              <Component id="btDelete" min="-2" pref="31" max="-2" attributes="0"/>
-                          </Group>
-                      </Group>
+                      <Component id="regCelular" min="-2" pref="232" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="2" max="-2" attributes="0"/>
+                      <Component id="btSearch" min="-2" pref="31" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="lbCliente" max="32767" attributes="0"/>
+                      <EmptySpace min="-2" pref="2" max="-2" attributes="0"/>
+                      <Component id="lbStatus" min="-2" pref="31" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
@@ -76,6 +74,16 @@
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="regMesera" min="-2" pref="232" max="-2" attributes="0"/>
                       <EmptySpace max="32767" attributes="0"/>
+                  </Group>
+                  <Group type="102" attributes="0">
+                      <Component id="lbTitle" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="1" max="-2" attributes="0"/>
+                      <Component id="lbFactura" min="-2" pref="100" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="jPanel1" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="32767" attributes="0"/>
+                      <Component id="btDelete" min="-2" pref="31" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
                   </Group>
               </Group>
           </Group>
@@ -86,21 +94,27 @@
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                  <Component id="btDelete" alignment="0" pref="30" max="32767" attributes="0"/>
-                  <Component id="lbTitle" pref="30" max="32767" attributes="0"/>
+                  <Component id="btDelete" alignment="0" max="32767" attributes="0"/>
+                  <Component id="lbTitle" max="32767" attributes="0"/>
                   <Component id="jPanel1" max="32767" attributes="0"/>
+                  <Component id="lbFactura" alignment="1" max="32767" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="regCelular" linkSize="2" min="-2" pref="31" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                  <Component id="lbCliente" max="32767" attributes="0"/>
+                  <Component id="regCelular" linkSize="2" pref="31" max="32767" attributes="0"/>
+                  <Component id="btSearch" linkSize="2" pref="31" max="32767" attributes="0"/>
+                  <Component id="lbStatus" alignment="1" max="32767" attributes="0"/>
+              </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="1" attributes="0">
                   <Component id="regMesa" min="-2" pref="30" max="-2" attributes="0"/>
                   <Component id="regMesera" min="-2" pref="30" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="regDireccion" linkSize="2" pref="31" max="32767" attributes="0"/>
+              <Component id="regDireccion" linkSize="2" pref="23" max="32767" attributes="0"/>
               <EmptySpace min="-2" max="-2" attributes="0"/>
-              <Component id="jScrollPane2" pref="92" max="32767" attributes="0"/>
+              <Component id="jScrollPane2" pref="87" max="32767" attributes="0"/>
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="2" attributes="0">
                   <Component id="regSubtotal" linkSize="3" alignment="1" min="-2" pref="30" max="-2" attributes="0"/>
@@ -118,6 +132,7 @@
               <Group type="103" groupAlignment="1" attributes="0">
                   <Component id="regTotal" linkSize="3" pref="30" max="32767" attributes="0"/>
                   <Component id="btConfirm" min="-2" pref="33" max="-2" attributes="0"/>
+                  <Component id="btPrint" min="-2" pref="33" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -132,8 +147,15 @@
         </Property>
         <Property name="text" type="java.lang.String" value="jLabel1"/>
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
-          <Border info="org.netbeans.modules.form.compat2.border.EtchedBorderInfo">
-            <EtchetBorder/>
+          <Border info="org.netbeans.modules.form.compat2.border.CompoundBorderInfo">
+            <CompoundBorder>
+              <Border PropertyName="outside" info="org.netbeans.modules.form.compat2.border.EtchedBorderInfo">
+                <EtchetBorder/>
+              </Border>
+              <Border PropertyName="inside" info="org.netbeans.modules.form.compat2.border.EmptyBorderInfo">
+                <EmptyBorder bottom="1" left="5" right="5" top="1"/>
+              </Border>
+            </CompoundBorder>
           </Border>
         </Property>
       </Properties>
@@ -248,15 +270,46 @@
         </Component>
       </SubComponents>
     </Container>
-    <Component class="com.bacon.Registro" name="regMesa">
+    <Component class="com.bacon.gui.util.Registro" name="regMesa">
       <AuxValues>
-        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.bacon.Registro(BoxLayout.X_AXIS, &quot;Mesa&quot;,new String[1], 70)"/>
+        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, &quot;Mesa&quot;,new String[1], 70)"/>
       </AuxValues>
     </Component>
-    <Component class="com.bacon.Registro" name="regMesera">
+    <Component class="com.bacon.gui.util.Registro" name="regMesera">
       <AuxValues>
-        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.bacon.Registro(BoxLayout.X_AXIS, &quot;Mesero&quot;,new String[1],70)"/>
+        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, &quot;Mesero&quot;,new String[1],70)"/>
       </AuxValues>
+    </Component>
+    <Component class="javax.swing.JButton" name="btSearch">
+    </Component>
+    <Component class="javax.swing.JLabel" name="lbCliente">
+    </Component>
+    <Component class="javax.swing.JLabel" name="lbStatus">
+    </Component>
+    <Component class="javax.swing.JLabel" name="lbFactura">
+      <Properties>
+        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+          <Font name="Ubuntu" size="18" style="1"/>
+        </Property>
+        <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+          <Color blue="67" green="29" red="1" type="rgb"/>
+        </Property>
+        <Property name="horizontalAlignment" type="int" value="4"/>
+        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+          <Border info="org.netbeans.modules.form.compat2.border.CompoundBorderInfo">
+            <CompoundBorder>
+              <Border PropertyName="outside" info="org.netbeans.modules.form.compat2.border.EtchedBorderInfo">
+                <EtchetBorder/>
+              </Border>
+              <Border PropertyName="inside" info="org.netbeans.modules.form.compat2.border.EmptyBorderInfo">
+                <EmptyBorder bottom="1" left="5" right="5" top="1"/>
+              </Border>
+            </CompoundBorder>
+          </Border>
+        </Property>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JButton" name="btPrint">
     </Component>
   </SubComponents>
 </Form>

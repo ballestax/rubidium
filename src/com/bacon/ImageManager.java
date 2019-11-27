@@ -63,7 +63,7 @@ public class ImageManager {
             try {
                 img = org.balx.Resources.getImagen(key, this.getClass());
             } catch (Exception e) {
-                img = org.balx.Imagenes.centrarTexto(w, h, "img", new Font("Arial", 1, 12), Color.red, Color.gray);
+                img = org.balx.Imagenes.centrarTexto(w, h, "No Image", new Font("Arial", 1, 12), Color.lightGray, Color.darkGray);
             }
 
             images.put(key, img);

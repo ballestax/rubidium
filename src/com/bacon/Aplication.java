@@ -27,6 +27,7 @@ import java.nio.file.LinkOption;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
@@ -59,7 +60,8 @@ public final class Aplication implements ActionListener, PropertyChangeListener,
     public static final String ACTION_SHOW_PREFERENCES = "acShowPreferences";
 
     public static final String ACTION_SHOW_ADMIN = "acShowAdmin";
-    public static final String ACTION_SHOW_PEDIDOS = "acShowPedidos";
+    public static final String ACTION_SHOW_ORDER = "acShowOrder";
+    public static final String ACTION_SHOW_ORDER_LIST = "acShowOrderList";
 
     public static final String ACTION_RETURN_TO_MENU = "acReturnToMenu";
     public static final String ACTION_CLOSE_SESION = "acCLoseSesion";
@@ -67,8 +69,8 @@ public final class Aplication implements ActionListener, PropertyChangeListener,
     public static final String CONFIG_LASTUPDATE = "lastUpdate";
 
     public static final String PREFERENCES = "";
-    public static final String DATABASE = "appbasic";
-    public static final String WORK_FOLDER = "appbasic";
+    public static final String DATABASE = "baconapp";
+    public static final String WORK_FOLDER = "baconapp";
     public static final String DB_USER = "lrod";
     protected static final boolean INSTALL_DB = false;
     private static final boolean messaged = true;
@@ -76,6 +78,12 @@ public final class Aplication implements ActionListener, PropertyChangeListener,
 
     //Correr la aplicacion con configuracion de servidor local
     private static boolean local = true;
+
+    public DateFormat DF = new SimpleDateFormat("dd-MM-yyyy");
+    public DateFormat DF_FULL = new SimpleDateFormat("dd MMMM yyyy hh:mm");
+    public DateFormat DF_FULL2 = new SimpleDateFormat("dd-MM-yyyy hh:mm");
+    public DateFormat DF_SL = new SimpleDateFormat("dd MMMM yyyy");
+    public DateFormat DF_SQL = new SimpleDateFormat("yyyy-MM-dd");
 
     private boolean tserver;
     private final Configuration configuration;
@@ -98,7 +106,10 @@ public final class Aplication implements ActionListener, PropertyChangeListener,
     private SimpleDateFormat sdfExport;
     private PropertyChangeSupport pcs;
     private String folderIcons = "gui/img/icons/";
-    private ProgAction acShowPedidos;
+    private ProgAction acShowOrders;
+    public final DecimalFormat DCFORM_W;
+    public final DecimalFormat DCFORM_P;
+    private ProgAction acShowOrderList;
 
     public Aplication() {
 
@@ -128,6 +139,12 @@ public final class Aplication implements ActionListener, PropertyChangeListener,
         Utiles.crearDirectorio(Paths.get(getDirPics(), ""));
         configuration.setPath(getDirTrabajo());
         configuration.load();
+
+        DCFORM_W = (DecimalFormat) NumberFormat.getInstance();
+        DCFORM_W.applyPattern("###############");
+
+        DCFORM_P = (DecimalFormat) NumberFormat.getInstance();
+        DCFORM_P.applyPattern("###,###,###.##");
 
         String path = Aplication.getDirTrabajo() + File.separator;
 
@@ -227,6 +244,14 @@ public final class Aplication implements ActionListener, PropertyChangeListener,
             }
         });
         //hilo.start();
+    }
+
+    public DecimalFormat getDCFORM_P() {
+        return DCFORM_P;
+    }
+
+    public DecimalFormat getDCFORM_W() {
+        return DCFORM_W;
     }
 
     public void verifyLicTime() {
@@ -375,15 +400,25 @@ public final class Aplication implements ActionListener, PropertyChangeListener,
         acShowAdmin.setSmallIcon(new ImageIcon(imgManager.getImagen(getFolderIcons() + "admin.png", 25, 25)));
         acShowAdmin.setLargeIcon(new ImageIcon(imgManager.getImagen(getFolderIcons() + "admin.png", 32, 32)));
 
-        acShowPedidos = new ProgAction("Pedidos",
+        acShowOrders = new ProgAction("Pedidos",
                 null, "Ver modulo de pedidos", 'a') {
             public void actionPerformed(ActionEvent e) {
                 Permission perm = getControl().getPermissionByName("show-pedidos-module");
                 getGuiManager().showBasicPanel(getGuiManager().getPanelBasicPedidos(), perm);
             }
         };
-        acShowPedidos.setSmallIcon(new ImageIcon(imgManager.getImagen(getFolderIcons() + "shop.png", 25, 25)));
-        acShowPedidos.setLargeIcon(new ImageIcon(imgManager.getImagen(getFolderIcons() + "shop.png", 32, 32)));
+        acShowOrders.setSmallIcon(new ImageIcon(imgManager.getImagen(getFolderIcons() + "shop.png", 25, 25)));
+        acShowOrders.setLargeIcon(new ImageIcon(imgManager.getImagen(getFolderIcons() + "shop.png", 32, 32)));
+
+        acShowOrderList = new ProgAction("Lista de pedidos",
+                null, "Ver Lista de pedidos", 'a') {
+            public void actionPerformed(ActionEvent e) {
+                Permission perm = getControl().getPermissionByName("show-orderlist-module");
+                getGuiManager().showBasicPanel(getGuiManager().getPanelBasicListPedidos(), perm);
+            }
+        };
+        acShowOrderList.setSmallIcon(new ImageIcon(imgManager.getImagen(getFolderIcons() + "ordering.png", 25, 25)));
+        acShowOrderList.setLargeIcon(new ImageIcon(imgManager.getImagen(getFolderIcons() + "ordering.png", 32, 32)));
 
         acCerrarSesion = new ProgAction("Cerrar secion",
                 null, "Cerrar la sesion del usuario actual", 'x') {
@@ -411,8 +446,11 @@ public final class Aplication implements ActionListener, PropertyChangeListener,
             case ACTION_SHOW_ADMIN:
                 return acShowAdmin;
 
-            case ACTION_SHOW_PEDIDOS:
-                return acShowPedidos;
+            case ACTION_SHOW_ORDER:
+                return acShowOrders;
+
+            case ACTION_SHOW_ORDER_LIST:
+                return acShowOrderList;
             default:
                 return null;
         }

@@ -100,8 +100,10 @@ public class JDBCProductDAO implements ProductDAO {
                 producto.setName(rs.getString(2));
                 producto.setCode(rs.getString(3));                
                 producto.setDescription(rs.getString(4));
-                producto.setImage(rs.getString(5));
-                producto.setCategory(rs.getString(6));
+                producto.setPrice(rs.getBigDecimal(5).doubleValue());
+                producto.setImage(rs.getString(6));
+                producto.setCategory(rs.getString(7));
+                producto.setVariablePrice(rs.getBoolean(8));
             }
         } catch (SQLException e) {
             throw new DAOException("Could not properly retrieve the Product: " + e);
@@ -156,9 +158,11 @@ public class JDBCProductDAO implements ProductDAO {
                 producto.setCode(rs.getString(3));                
                 producto.setDescription(rs.getString(4));
                 producto.setPrice(rs.getBigDecimal(5).doubleValue());
-                producto.setImage(rs.getString(6));
-                producto.setCategory(rs.getString(7));
+                producto.setVariablePrice(rs.getBoolean(6));
+                producto.setImage(rs.getString(7));
+                producto.setCategory(rs.getString(8));
                 
+                System.out.println(producto.getName()+"::"+producto.isVariablePrice());
                 productos.add(producto);
             }
         } catch (SQLException e) {
@@ -185,7 +189,10 @@ public class JDBCProductDAO implements ProductDAO {
                 producto.getName(),
                 producto.getCode(),
                 producto.getDescription(),
-                producto.getCategory()};
+                producto.getPrice(),
+                producto.getImage(),
+                producto.getCategory(),
+                producto.isVariablePrice()};
             ps = sqlStatements.buildSQLStatement(conn, ADD_PRODUCT_KEY, parameters);
             
             ps.executeUpdate();
@@ -233,9 +240,12 @@ public class JDBCProductDAO implements ProductDAO {
             conn.setAutoCommit(false);
             Object[] parameters = {
                 producto.getName(),
+                producto.getCode(),
                 producto.getDescription(),
-                producto.getImage(),                
-                producto.getCode()
+                producto.getPrice(),
+                producto.getImage(),
+                producto.getCategory(),
+                producto.isVariablePrice()
             };
             update = sqlStatements.buildSQLStatement(conn, UPDATE_PRODUCT_KEY, parameters);
             update.executeUpdate();
@@ -269,7 +279,10 @@ public class JDBCProductDAO implements ProductDAO {
                 producto.setName(rs.getString(2));
                 producto.setCode(rs.getString(3));                
                 producto.setDescription(rs.getString(4));
-                producto.setCategory(rs.getString(5));
+                producto.setPrice(rs.getBigDecimal(5).doubleValue());
+                producto.setVariablePrice(rs.getBoolean(6));
+                producto.setImage(rs.getString(7));
+                producto.setCategory(rs.getString(8));                
                 productos.add(producto);
             }
         } catch (SQLException e) {
@@ -283,3 +296,4 @@ public class JDBCProductDAO implements ProductDAO {
     }
     
 }
+

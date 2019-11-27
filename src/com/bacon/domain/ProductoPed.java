@@ -14,7 +14,10 @@ public class ProductoPed {
     protected Product producto;
     protected ArrayList<AdditionalPed> adicionales;
     protected ArrayList<Ingredient> exclusiones;
+    protected Presentation presentation;
     protected String especificaciones;
+    protected int cantidad;
+    protected double precio;
 
     public ProductoPed() {
         this(new Product());
@@ -42,22 +45,34 @@ public class ProductoPed {
     public String getStAdicionales() {
         StringBuilder stb = new StringBuilder();
         for (int i = 0; i < adicionales.size(); i++) {
-            Additional adic = adicionales.get(i).additional;
-            int cant = adicionales.get(i).cantidad;
+            Additional adic = adicionales.get(i).getAdditional();
+            int cant = adicionales.get(i).getCantidad();
             stb.append("+").append(adic.getName()).append("<font color=blue>(x").append(cant).append(")</font>,");
         }
         if (!stb.toString().isEmpty()) {
             stb.delete(stb.length() - 1, stb.length());
         }
         return stb.toString();
+    }
 
+    public String getStAdicionales2() {
+        StringBuilder stb = new StringBuilder();
+        for (int i = 0; i < adicionales.size(); i++) {
+            Additional adic = adicionales.get(i).getAdditional();
+            int cant = adicionales.get(i).getCantidad();
+            stb.append("+").append(adic.getName()).append("(x").append(cant).append(")\n");
+        }
+        if (!stb.toString().isEmpty()) {
+            stb.delete(stb.length() - 1, stb.length());
+        }
+        return stb.toString();
     }
 
     public double getValueAdicionales() {
         double value = 0;
         for (int i = 0; i < adicionales.size(); i++) {
-            Additional adic = adicionales.get(i).additional;
-            int cant = adicionales.get(i).cantidad;
+            Additional adic = adicionales.get(i).getAdditional();
+            int cant = adicionales.get(i).getCantidad();
             value += adic.getPrecio() * cant;
         }
         return value;
@@ -83,6 +98,30 @@ public class ProductoPed {
         return exclusiones;
     }
 
+    public int getCantidad() {
+        return cantidad;
+    }
+
+    public void setCantidad(int cantidad) {
+        this.cantidad = cantidad;
+    }
+
+    public double getPrecio() {
+        return precio;
+    }
+
+    public void setPrecio(double precio) {
+        this.precio = precio;
+    }
+
+    public Presentation getPresentation() {
+        return presentation;
+    }
+
+    public void setPresentation(Presentation presentation) {
+        this.presentation = presentation;
+    }
+        
     public String getStExclusiones() {
         StringBuilder stb = new StringBuilder();
         for (int i = 0; i < exclusiones.size(); i++) {
@@ -106,30 +145,29 @@ public class ProductoPed {
     @Override
     public boolean equals(Object obj) {
         if (obj == this) {
-            System.out.println("obj diff");
             return true;
         }
-        if (!(obj instanceof ProductoPed)) {
-            System.out.println("instance diff");
+        if (obj == null || obj.getClass() != this.getClass()) {
             return false;
         }
         ProductoPed prod = (ProductoPed) obj;
         if (!producto.equals(prod.getProduct())) {
-            System.out.println("prod diff");
+            return false;
+        }
+        
+        if(presentation !=null && !presentation.equals(prod.getPresentation())){
             return false;
         }
 
-        System.out.println(Arrays.toString(adicionales.toArray()));
-        System.out.println(Arrays.toString(prod.getAdicionales().toArray()));
+        if (precio != prod.getPrecio()) {
+            return false;
+        }
 
         if (!CollectionUtils.isEqualCollection(adicionales, prod.getAdicionales())) {
             System.out.println("add diff");
             return false;
         }
 
-        
-        System.out.println(Arrays.toString(exclusiones.toArray()));
-        System.out.println(Arrays.toString(prod.getExclusiones().toArray()));
         if (!CollectionUtils.isEqualCollection(exclusiones, prod.getExclusiones())) {
             System.out.println("exc diff");
             return false;
@@ -142,6 +180,7 @@ public class ProductoPed {
     public int hashCode() {
         int hash = 3;
         hash = 53 * hash + Objects.hashCode(this.producto);
+        hash = 53 * hash + Objects.hashCode(this.precio);
         hash = 53 * hash + Objects.hashCode(this.adicionales);
         hash = 53 * hash + Objects.hashCode(this.exclusiones);
         return hash;

@@ -14,6 +14,7 @@ import com.bacon.persistence.dao.AdditionalDAO;
 import com.bacon.persistence.dao.ConfigDAO;
 import com.bacon.persistence.dao.DAOFactory;
 import com.bacon.persistence.dao.IngredientDAO;
+import com.bacon.persistence.dao.InvoiceDAO;
 import com.bacon.persistence.dao.ProductDAO;
 import com.bacon.persistence.dao.UserDAO;
 import com.bacon.persistence.dao.UtilDAO;
@@ -75,7 +76,7 @@ public class JDBCDAOFactory extends DAOFactory {
             encryptor.setPassword(String.valueOf(new TimeWaste().cst()));
             EncryptableProperties properties = new EncryptableProperties(encryptor);
 //            Properties properties = new Properties();
-//                System.out.println(encryptor.encrypt("dero"));
+                System.out.println(encryptor.encrypt("baconapp"));
             if (Aplication.isLocal()) {
                 properties.load(new FileInputStream(CONFIG_FILE_LOCAL));
             } else {
@@ -286,6 +287,11 @@ public class JDBCDAOFactory extends DAOFactory {
     @Override
     public AdditionalDAO getAdditionalDAO() throws DAOException {
         return new JDBCAdditionalDAO(getDataSource(), sqlStatements);
+    }
+    
+    @Override
+    public InvoiceDAO getInvoiceDAO() throws DAOException {
+        return new JDBCInvoiceDAO(getDataSource(), sqlStatements);
     }
 
 }

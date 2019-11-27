@@ -5,6 +5,8 @@
  */
 package com.bacon;
 
+import com.bacon.domain.Client;
+import com.bacon.domain.Invoice;
 import com.bacon.domain.Permission;
 import com.bacon.domain.Product;
 import com.bacon.domain.Rol;
@@ -18,12 +20,15 @@ import com.bacon.gui.PanelModAdmin;
 import com.bacon.gui.PanelAdminUsers;
 import com.bacon.gui.util.PanelBasic;
 import com.bacon.gui.PanelChangePassword;
+import com.bacon.gui.PanelClientCard;
+import com.bacon.gui.PanelConfirmPedido;
 import com.bacon.gui.PanelCustomPedido;
+import com.bacon.gui.PanelListPedidos;
 import com.bacon.gui.PanelModPedidos;
 import com.bacon.gui.PanelNewRol;
 import com.bacon.gui.PanelNewUser;
 import com.bacon.gui.PanelPedido;
-import com.bacon.gui.PanelPresentation;
+import com.bacon.gui.PanelDash;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -88,6 +93,8 @@ public class GUIManager {
     private PanelModPedidos panelModPedidos;
     private JPanel contPane;
     private PanelPedido pnPedido;
+    private PanelBasic panelBasicListPedidos;
+    private PanelListPedidos panelListPedidos;
 
     private GUIManager() {
 
@@ -188,6 +195,13 @@ public class GUIManager {
         }
         return panelModPedidos;
     }
+    
+    private PanelListPedidos getPanelListPedidos() {
+        if (panelListPedidos == null) {
+            panelListPedidos = new PanelListPedidos(app);
+        }
+        return panelListPedidos;
+    }
 
     public PanelBasic getPanelBasicAdminModule() {
         if (panelBasicAdminModule == null) {
@@ -199,15 +213,23 @@ public class GUIManager {
 
     public PanelBasic getPanelBasicPedidos() {
         if (panelBasicPedidos == null) {
-            ImageIcon icon = new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "admin.png", 30, 30));
+            ImageIcon icon = new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "shop.png", 30, 30));
             panelBasicPedidos = new PanelBasic(app, "Pedidos", icon, getPanelModPedidos());
         }
         return panelBasicPedidos;
     }
+    
+    public PanelBasic getPanelBasicListPedidos() {
+        if (panelBasicListPedidos == null) {
+            ImageIcon icon = new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "ordering.png", 30, 30));
+            panelBasicListPedidos = new PanelBasic(app, "Lista Pedidos", icon, getPanelListPedidos());
+        }
+        return panelBasicListPedidos;
+    }
 
     private Component getPanelPresentation() {
         if (panelPresentation == null) {
-            panelPresentation = new PanelPresentation(app);
+            panelPresentation = new PanelDash(app);
         }
         return panelPresentation;
     }
@@ -363,7 +385,12 @@ public class GUIManager {
 
             Permission perm = app.getControl().getPermissionByName("show-pedidos-module");
             if (user != null && app.getControl().hasPermission(user, perm)) {
-                toolbar.add((app.getAction(Aplication.ACTION_SHOW_PEDIDOS)));
+                toolbar.add((app.getAction(Aplication.ACTION_SHOW_ORDER)));
+            }
+            
+            perm = app.getControl().getPermissionByName("show-orderlist-module");
+            if (user != null && app.getControl().hasPermission(user, perm)) {
+                toolbar.add((app.getAction(Aplication.ACTION_SHOW_ORDER_LIST)));
             }
 
             perm = app.getControl().getPermissionByName("show-admin-module");
@@ -698,6 +725,39 @@ public class GUIManager {
         dialog.add(pnCustomPed);
         dialog.setResizable(false);
         dialog.setTitle(product.getName());
+        dialog.pack();
+        dialog.setLocationRelativeTo(getFrame());
+        setDefaultCursor();
+        dialog.setVisible(true);
+    }
+
+    public void reviewFacture(Invoice invoice) {
+        System.out.println("showing invoice");
+        PanelConfirmPedido confirmPedido = new PanelConfirmPedido(app, invoice);
+
+        setWaitCursor();
+        JDialog dialog = getDialog(true);
+
+        dialog.add(confirmPedido);
+        dialog.setResizable(false);
+        dialog.setTitle("Confirmar Pedido");
+        dialog.pack();
+        dialog.setLocationRelativeTo(getFrame());
+        setDefaultCursor();
+        dialog.setVisible(true);
+
+    }
+    
+    public void showClientCard(Client client) {
+        setWaitCursor();
+        JDialog dialog = getDialog(true);
+//        dialog.setUndecorated(true);
+//        int w = 360;
+//        int h = 200;
+//        dialog.setPreferredSize(new Dimension(w, h));
+        dialog.add(new PanelClientCard(app, client));
+//        dialog.setResizable(false);
+//        dialog.setTitle();
         dialog.pack();
         dialog.setLocationRelativeTo(getFrame());
         setDefaultCursor();

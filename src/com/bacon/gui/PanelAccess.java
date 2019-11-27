@@ -43,7 +43,7 @@ public class PanelAccess extends JPanel{
     private Font fnt2 = new Font("arial", 0, 20);
     private Aplication app;
     private JLabel labelImg;
-    private com.bacon.Registro regHost;
+    private com.bacon.gui.util.Registro regHost;
     private ActionListener listener;
     private JTextField host;
     private org.bx.Registro regUser;
@@ -116,7 +116,7 @@ public class PanelAccess extends JPanel{
         host = new JTextField();
         host.setSize(170, 21);
         host.setFont(fnt);
-        regHost = new com.bacon.Registro(BoxLayout.Y_AXIS, "Host:", host);
+        regHost = new com.bacon.gui.util.Registro(BoxLayout.Y_AXIS, "Host:", host);
 
         labelImg = new JLabel(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "security.png", 90, 90)));
 
@@ -202,8 +202,5 @@ public class PanelAccess extends JPanel{
         if(pcs !=null &&listener!=null)
         pcs.removePropertyChangeListener(listener);
     }
-    
-    
-    
-    
+        
 }
