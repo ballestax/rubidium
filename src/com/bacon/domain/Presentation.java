@@ -12,6 +12,7 @@ public class Presentation {
     private long idProduct;
     private String name;
     private double price;
+    private boolean _default;
 
     public Presentation() {
     }
@@ -52,8 +53,8 @@ public class Presentation {
     public String toString() {
         return name + ":(" + price + ")";
     }
-    
-     @Override
+
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -62,17 +63,25 @@ public class Presentation {
             return false;
         }
         Presentation pres = (Presentation) obj;
-        if (idProduct  != pres.getIDProd()) {
+        if (idProduct != pres.getIDProd()) {
             return false;
         }
         if (serie != pres.getSerie()) {
             return false;
         }
-        if(!name.equals(pres.getName())){
+        if (!name.equals(pres.getName())) {
             return false;
         }
         return true;
-        
+
+    }
+
+    public void setDefault(boolean _default) {
+        this._default = _default;
+    }
+
+    public boolean isDefault() {
+        return _default;
     }
 
     @Override
@@ -83,6 +92,5 @@ public class Presentation {
         hash = 53 * hash + Objects.hashCode(this.name);
         return hash;
     }
-    
-    
+
 }

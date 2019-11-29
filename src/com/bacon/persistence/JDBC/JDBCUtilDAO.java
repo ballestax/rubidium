@@ -68,7 +68,7 @@ public class JDBCUtilDAO implements UtilDAO {
 
     public static final String GET_TABLES_LIST_KEY = "GET_TABLES";
     public static final String GET_WAITERS_LIST_KEY = "GET_WAITERS";
-    
+
     public static final String CREATE_INVOICE_PRODUCT_TABLE_KEY = "CREATE_INVOICE_PRODUCT_TABLE";
     public static final String CREATE_ADDITIONAL_PRODUCT_TABLE_KEY = "CREATE_ADDITIONAL_PRODUCT_TABLE";
     public static final String ADD_ADDITIONAL_PRODUCT_KEY = "ADD_ADDITIONAL_PRODUCT";
@@ -76,14 +76,13 @@ public class JDBCUtilDAO implements UtilDAO {
     public static final String ADD_EXCLUSION_PRODUCT_KEY = "ADD_EXCLUSION_PRODUCT";
     public static final String CREATE_PRESENTATION_PRODUCT_TABLE_KEY = "CREATE_PRESENTATION_PRODUCT_TABLE";
     public static final String ADD_PRESENTATION_PRODUCT_KEY = "ADD_PRESENTATION_PRODUCT";
-    
-
+    public static final String GET_PRESENTATION_BY_DEFAULT_KEY = "GET_PRESENTATION_BY_DEFAULT";
 
     protected static final String CHECK_TABLE_EMPTY_KEY = "CHECK_TABLE";
     protected static final String INSERT_ROLE_USER_KEY = "INSERT_ROLE_USER";
     protected static final String HAS_PERMISSION_KEY = "HAS_PERMISSION";
     protected static final String GET_USER_ROLE_KEY = "GET_USER_ROLE";
-    
+
     public static final String GET_FIRST_REGISTRO_KEY = "GET_FIRST_REGISTRO";
 
     private static final Logger logger = Logger.getLogger(JDBCUtilDAO.class.getCanonicalName());
@@ -119,16 +118,16 @@ public class JDBCUtilDAO implements UtilDAO {
 
         TABLE_NAME = "tables";
         createTable(TABLE_NAME, CREATE_TABLES_TABLE_KEY);
-        
+
         TABLE_NAME = "invoice_product";
         createTable(TABLE_NAME, CREATE_INVOICE_PRODUCT_TABLE_KEY);
-        
+
         TABLE_NAME = "additional_product";
         createTable(TABLE_NAME, CREATE_ADDITIONAL_PRODUCT_TABLE_KEY);
-        
+
         TABLE_NAME = "exclusion_product";
         createTable(TABLE_NAME, CREATE_EXCLUSION_PRODUCT_TABLE_KEY);
-        
+
         TABLE_NAME = "presentation_product";
         createTable(TABLE_NAME, CREATE_PRESENTATION_PRODUCT_TABLE_KEY);
 
@@ -770,14 +769,14 @@ public class JDBCUtilDAO implements UtilDAO {
         }
         return waiters;
     }
-    
+
     public Date getFirstEntrada(String tabla, String field) throws DAOException {
         String retrieve;
         try {
             Map<String, String> namedParams = new HashMap<String, String>();
             namedParams.put(JDBCDAOFactory.NAMED_PARAM_TABLE, tabla);
             namedParams.put(JDBCDAOFactory.NAMED_PARAM_QUERY, field);
-            retrieve = sqlStatements.getSQLString(EXIST_CLAVE_KEY, namedParams);        
+            retrieve = sqlStatements.getSQLString(EXIST_CLAVE_KEY, namedParams);
             retrieve = sqlStatements.getSQLString(GET_FIRST_REGISTRO_KEY, namedParams);
         } catch (IOException e) {
             throw new DAOException("Could not properly retrieve registrp date", e);
@@ -802,7 +801,7 @@ public class JDBCUtilDAO implements UtilDAO {
         }
         return fecha;
     }
-    
+
     public ArrayList<Presentation> getPresentationsByProduct(long id) throws DAOException {
         String retrieveList;
         ArrayList<Presentation> presentations = new ArrayList<>();
@@ -813,7 +812,7 @@ public class JDBCUtilDAO implements UtilDAO {
         try {
             conn = dataSource.getConnection();
             retrieve = sqlStatements.buildSQLStatement(conn, GET_PRESENTATIONS_BY_PRODUCT_KEY, parameters);
-            
+
             rs = retrieve.executeQuery();
             while (rs.next()) {
                 Presentation pres = new Presentation();
@@ -821,7 +820,7 @@ public class JDBCUtilDAO implements UtilDAO {
                 pres.setSerie(rs.getInt(2));
                 pres.setName(rs.getString(3));
                 pres.setPrice(rs.getDouble(4));
-                System.out.println("pres:"+pres);
+                pres.setDefault(rs.getBoolean(5));
                 presentations.add(pres);
             }
         } catch (SQLException e) {
@@ -834,6 +833,38 @@ public class JDBCUtilDAO implements UtilDAO {
             DBManager.closeConnection(conn);
         }
         return presentations;
+    }
+
+    public Presentation getPresentationDefault(long id) throws DAOException {        
+        Presentation pres = null;
+        Connection conn = null;
+        PreparedStatement retrieve = null;
+        ResultSet rs = null;
+        Object[] parameters = {id, 1};
+        try {
+            conn = dataSource.getConnection();
+            retrieve = sqlStatements.buildSQLStatement(conn, GET_PRESENTATION_BY_DEFAULT_KEY, parameters);
+
+            rs = retrieve.executeQuery();
+            while (rs.next()) {
+                pres = new Presentation();
+                pres.setIDProd(rs.getInt(1));
+                pres.setSerie(rs.getInt(2));
+                pres.setName(rs.getString(3));
+                pres.setPrice(rs.getDouble(4));
+                pres.setDefault(rs.getBoolean(5));
+
+            }
+        } catch (SQLException e) {
+            throw new DAOException("Could not properly retrieve the presentations list: " + e);
+        } catch (IOException e) {
+            throw new DAOException("Could not properly retrieve the presentations list: " + e);
+        } finally {
+            DBManager.closeResultSet(rs);
+            DBManager.closeStatement(retrieve);
+            DBManager.closeConnection(conn);
+        }
+        return pres;
     }
 
 }

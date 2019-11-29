@@ -182,11 +182,12 @@ public class PanelCustomPedido extends PanelCapturaMod implements ActionListener
             panel2.add(panAdd);
         }
 
-        lbTitle3.setText("Elige la carne");
+        lbTitle3.setText("Elige la presentación");
         lbTitle3.setBackground(ColorDg.colorAleatorio().getColor1());
-        panel3.setLayout(new GridLayout(1, 3, 5, 5));
-        bgPres = new ButtonGroup();
         ArrayList<Presentation> presList = app.getControl().getPresentationsByProduct(product.getId());
+        int rows = presList.isEmpty() ? 1 : (3 % presList.size());
+        panel3.setLayout(new GridLayout(rows, 4, 5, 5));
+        bgPres = new ButtonGroup();
         if (!presList.isEmpty()) {
             for (int i = 0; i < presList.size(); i++) {
                 Presentation pres = presList.get(i);

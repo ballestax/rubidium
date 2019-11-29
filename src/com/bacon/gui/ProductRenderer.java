@@ -5,6 +5,7 @@
  */
 package com.bacon.gui;
 
+import com.bacon.domain.Presentation;
 import com.bacon.domain.ProductoPed;
 import java.awt.Color;
 import java.awt.Component;
@@ -61,10 +62,17 @@ public class ProductRenderer extends Box implements TableCellRenderer {
         if (value != null) {
             try {
                 ProductoPed prodPed = (ProductoPed) value;
-                
-                labelName.setText(prodPed.getProduct().getName().toUpperCase());
-                labelAdicion.setText("<html>"+prodPed.getStAdicionales()+"</html>");
-                labelNotas.setText(prodPed.getStExclusiones());
+
+                Presentation presentation = prodPed.getPresentation();
+                String stPres = "";
+                if (presentation != null) {
+                    stPres = " (" + presentation.getName() + ")";
+                }
+                String stExclusion = prodPed.getStExclusiones();
+
+                labelName.setText(("<html><p>" + prodPed.getProduct().getName() + "</p><font size=2>" + stPres + "</font></html>").toUpperCase());
+                labelAdicion.setText("<html>" + prodPed.getStAdicionales() + "</html>");
+                labelNotas.setText(stExclusion.isEmpty() ? "" : "Sin: " + stExclusion);
                 labelEsp.setText(prodPed.getEspecificaciones());
 
                 StringBuilder stb = new StringBuilder();
@@ -73,9 +81,8 @@ public class ProductRenderer extends Box implements TableCellRenderer {
                 stb.append("<p>").append(prodPed.getStAdicionales()).append("</p>");
                 stb.append("<p>").append(prodPed.getStExclusiones()).append("</p>");
                 stb.append("<p>").append(prodPed.getEspecificaciones()).append("</p></html>");
-                
-//                System.err.println(stb.toString());
 
+//                System.err.println(stb.toString());
                 setToolTipText(stb.toString());
             } catch (Exception e) {
             }

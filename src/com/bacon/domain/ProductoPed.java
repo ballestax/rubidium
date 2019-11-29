@@ -121,7 +121,11 @@ public class ProductoPed {
     public void setPresentation(Presentation presentation) {
         this.presentation = presentation;
     }
-        
+
+    public boolean hasPresentation() {
+        return presentation != null;
+    }
+
     public String getStExclusiones() {
         StringBuilder stb = new StringBuilder();
         for (int i = 0; i < exclusiones.size(); i++) {
@@ -154,8 +158,8 @@ public class ProductoPed {
         if (!producto.equals(prod.getProduct())) {
             return false;
         }
-        
-        if(presentation !=null && !presentation.equals(prod.getPresentation())){
+
+        if (presentation != null && !presentation.equals(prod.getPresentation())) {
             return false;
         }
 

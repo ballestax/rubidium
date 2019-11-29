@@ -462,7 +462,7 @@ public class Control {
             return -1;
         }
     }
-    
+
     public ArrayList<Invoice> getInvoiceslList(String where, String order) {
         try {
             JDBCInvoiceDAO invoiceDAO = (JDBCInvoiceDAO) DAOFactory.getInstance().getInvoiceDAO();
@@ -485,7 +485,7 @@ public class Control {
             return false;
         }
     }
-    
+
     public Date getPrimerRegistro(String tabla, String field) {
         try {
             JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
@@ -496,11 +496,21 @@ public class Control {
             return null;
         }
     }
-    
+
     public ArrayList<Presentation> getPresentationsByProduct(long idProduct) {
         try {
             JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
             return utilDAO.getPresentationsByProduct(idProduct);
+        } catch (DAOException ex) {
+            logger.error("Error getting Presentations list.", ex);
+            return null;
+        }
+    }
+
+    public Presentation getPresentationsByDefault(long idProduct) {
+        try {
+            JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
+            return utilDAO.getPresentationDefault(idProduct);
         } catch (DAOException ex) {
             logger.error("Error getting Presentations list.", ex);
             return null;

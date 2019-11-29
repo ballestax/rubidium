@@ -10,6 +10,7 @@ import com.bacon.GUIManager;
 import com.bacon.domain.Additional;
 import com.bacon.domain.Client;
 import com.bacon.domain.Invoice;
+import com.bacon.domain.Presentation;
 import com.bacon.domain.Product;
 import com.bacon.domain.ProductoPed;
 import com.bacon.domain.Table;
@@ -41,6 +42,7 @@ import java.math.BigDecimal;
 import java.net.URL;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -99,6 +101,8 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Tabl
 
     /**
      * Creates new form PanelPedido
+     *
+     * @param app
      */
     public PanelPedido(Aplication app) {
         this.app = app;
@@ -316,7 +320,11 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Tabl
     public void actionPerformed(ActionEvent e) {
         if (AC_CONFIRMAR_PEDIDO.equals(e.getActionCommand())) {
             calcularValores();
-            verificarDatosFactura();
+            try {
+                verificarDatosFactura();
+            } catch (Exception ex) {
+            }
+
         } else if (AC_CHANGE_DOMICILIO.equals(e.getActionCommand())) {
             String dom = regDomicilio.getText();
             if (entregasDom[0].equals(dom)) {
@@ -387,7 +395,9 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Tabl
         logger.debug("last:" + evt.getPropertyName() + ":" + evt.getPropagationId());
         if (PanelProduct2.AC_ADD_QUICK.equals(evt.getPropertyName())) {
             Product prod = (Product) evt.getNewValue();
-            addProduct(prod, prod.getPrice());
+            Presentation pres = app.getControl().getPresentationsByDefault(prod.getId());
+
+            addProduct(prod, prod.getPrice(), pres);
         } else if (PanelCustomPedido.AC_CUSTOM_ADD.equals(evt.getPropertyName())) {
             ProductoPed prodPed = (ProductoPed) evt.getNewValue();
             System.out.println("received:" + prodPed.getProduct().getPrice());
@@ -431,10 +441,13 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Tabl
         sw.execute();
     }
 
-    public void addProduct(Product producto, double precio) {
+    public void addProduct(Product producto, double precio, Presentation pres) {
         ProductoPed productoPed = new ProductoPed(producto);
+        productoPed.setPresentation(pres);
         productoPed.setPrecio(precio);
-        if (productos.contains(productoPed)) {
+
+        addProductPed(productoPed, 1, precio);
+        /*if (productos.contains(productoPed)) {
             int row = productos.indexOf(productoPed);
             int cant = Integer.valueOf(modeloTb.getValueAt(row, 0).toString());
             modeloTb.setValueAt(cant + 1, row, 0);
@@ -456,7 +469,7 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Tabl
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());
             }
-        }
+        }*/
     }
 
     public void addProductPed(ProductoPed productPed, int cantidad, double price) {
@@ -477,7 +490,8 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Tabl
             try {
                 productPed.setCantidad(cantidad);
                 productos.add(productPed);
-                double totalProd = (producto.isVariablePrice() ? price : producto.getPrice()) + productPed.getValueAdicionales();
+
+                double totalProd = (producto.isVariablePrice() || productPed.hasPresentation() ? price : producto.getPrice()) + productPed.getValueAdicionales();
                 modeloTb.addRow(new Object[]{
                     cantidad,
                     productPed,
@@ -518,7 +532,7 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Tabl
         regTotal.setText(DCFORM_P.format(subtotal + domicilio - descuento));
     }
 
-    private void verificarDatosFactura() {
+    private void verificarDatosFactura() throws ParseException {
 
         String mesa = "";
         String mesero = "";
@@ -571,8 +585,12 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Tabl
         invoice.setIdCliente(1L);
         invoice.setDescuento(Double.parseDouble(regDescuento.getText()));
 
-        invoice.setIdWaitress(waitres.getId());
-        invoice.setTable(table.getId());
+        if (waitres != null) {
+            invoice.setIdWaitress(waitres.getId());
+        }
+        if (table != null) {
+            invoice.setTable(table.getId());
+        }
 
         System.out.println("invoice:" + invoice);
 
@@ -581,7 +599,7 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Tabl
         switch (tipoEntrega) {
             case ENTREGA_DOMICILIO:
                 invoice.setTipoEntrega(1);
-                invoice.setValorDelivery(new BigDecimal(lbEntregas.getText()));
+                invoice.setValorDelivery(new BigDecimal(DCFORM_P.parse(lbEntregas.getText()).doubleValue()));
                 break;
             case ENTREGA_LOCAL:
                 invoice.setTipoEntrega(2);
@@ -739,8 +757,13 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Tabl
             List<ProductoPed> products = invoice.getProducts();
             for (int i = 0; i < products.size(); i++) {
                 ProductoPed product = products.get(i);
+                Presentation presentation = product.getPresentation();
+                String stPres = "";
+                if (presentation != null) {
+                    stPres = " (" + presentation.getName() + ")";
+                }
                 double priceFinal = product.getProduct().getPrice() + product.getValueAdicionales();
-                escpos.writeLF(String.format(formatInfo, product.getCantidad(), product.getProduct().getName().toUpperCase(),
+                escpos.writeLF(String.format(formatInfo, product.getCantidad(), (product.getProduct().getName() + stPres).toUpperCase(),
                         app.DCFORM_P.format(priceFinal), app.DCFORM_P.format(product.getCantidad() * priceFinal)));
 
                 for (int j = 0; j < product.getAdicionales().size(); j++) {

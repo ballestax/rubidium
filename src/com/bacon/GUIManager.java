@@ -21,6 +21,7 @@ import com.bacon.gui.PanelAdminUsers;
 import com.bacon.gui.util.PanelBasic;
 import com.bacon.gui.PanelChangePassword;
 import com.bacon.gui.PanelClientCard;
+import com.bacon.gui.PanelConfigPrint;
 import com.bacon.gui.PanelConfirmPedido;
 import com.bacon.gui.PanelCustomPedido;
 import com.bacon.gui.PanelListPedidos;
@@ -95,6 +96,7 @@ public class GUIManager {
     private PanelPedido pnPedido;
     private PanelBasic panelBasicListPedidos;
     private PanelListPedidos panelListPedidos;
+    private PanelConfigPrint pnConfigPrint;
 
     private GUIManager() {
 
@@ -762,6 +764,13 @@ public class GUIManager {
         dialog.setLocationRelativeTo(getFrame());
         setDefaultCursor();
         dialog.setVisible(true);
+    }
+    
+    public PanelConfigPrint getPanelConfigPrint() {
+        if (pnConfigPrint == null) {
+            pnConfigPrint = new PanelConfigPrint(app);
+        }
+        return pnConfigPrint;
     }
 
 }

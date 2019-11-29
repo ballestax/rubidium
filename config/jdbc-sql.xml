@@ -36,7 +36,7 @@
                     |CREATE_EXCLUSION_PRODUCT_TABLE|ADD_EXCLUSION_PRODUCT
                     |GET_FIRST_REGISTRO|GET_LAST_REGISTRO
                     |CREATE_CLIENTS_TABLE|GET_CLIENT|ADD_CLIENT|DELETE_CLIENT|UPDATE_CLIENT
-                    |CREATE_PRESENTATION_PRODUCT_TABLE|GET_PRESENTATIONS_BY_PRODUCT
+                    |CREATE_PRESENTATION_PRODUCT_TABLE|GET_PRESENTATIONS_BY_PRODUCT|GET_PRESENTATION_BY_DEFAULT
                     ) #REQUIRED
                     
 	>
@@ -1041,10 +1041,13 @@
         <SQLStatement method="CREATE_PRESENTATION_PRODUCT_TABLE">
             <SQLFragment>
                 CREATE TABLE presentation_product (
+                id INTEGER AUTO_INCREMENT,
                 product_id INTEGER NOT NULL,
                 serie INTEGER NOT NULL,
                 name VARCHAR(100),
                 price DECIMAL(20,2),
+                isdefault TINYINT(1) DEFAULT '0',
+                PRIMARY KEY (id),
                 FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE ON UPDATE CASCADE                
                 );
             </SQLFragment>
@@ -1052,10 +1055,19 @@
         
          <SQLStatement method="GET_PRESENTATIONS_BY_PRODUCT">
             <SQLFragment>
-                SELECT ps.product_id, ps.serie,ps.name,ps.price 
+                SELECT ps.product_id, ps.serie,ps.name,ps.price,ps.isdefault
                 FROM presentation_product ps
                 WHERE 
                 ps.product_id = ?
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="GET_PRESENTATION_BY_DEFAULT">
+            <SQLFragment>
+                SELECT ps.product_id, ps.serie,ps.name,ps.price,ps.isdefault
+                FROM presentation_product ps
+                WHERE 
+                ps.product_id = ? AND isdefault = ?
             </SQLFragment>
         </SQLStatement>
                                  
