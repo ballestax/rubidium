@@ -452,6 +452,28 @@ public class Control {
         }
     }
 
+    public Waiter getWaitersByID(int id) {
+        try {
+            JDBCUtilDAO addDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
+            ArrayList<Waiter> waitersList = addDAO.getWaitersList("id=" + id, "");
+            return waitersList.isEmpty() ? null : waitersList.get(0);
+        } catch (DAOException ex) {
+            logger.error("Error getting Waiter.", ex);
+            return null;
+        }
+    }
+
+    public Table getTableByID(int id) {
+        try {
+            JDBCUtilDAO addDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
+            ArrayList<Table> tableList = addDAO.getTablesList("id=" + id, "");
+            return tableList.isEmpty() ? null : tableList.get(0);
+        } catch (DAOException ex) {
+            logger.error("Error getting Table.", ex);
+            return null;
+        }
+    }
+
     public int contarRows(String sql) {
         try {
             JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();

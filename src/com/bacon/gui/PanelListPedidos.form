@@ -56,9 +56,11 @@
                   <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="tfBuscar" min="-2" pref="120" max="-2" attributes="0"/>
-                  <EmptySpace max="-2" attributes="0"/>
+                  <EmptySpace min="-2" pref="1" max="-2" attributes="0"/>
                   <Component id="btBuscar" min="-2" pref="30" max="-2" attributes="0"/>
-                  <EmptySpace type="separate" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="btFilters" min="-2" pref="29" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
                   <Component id="regTipo" min="-2" pref="176" max="-2" attributes="0"/>
                   <EmptySpace min="-2" pref="9" max="-2" attributes="0"/>
                   <Component id="regEstado" min="-2" pref="176" max="-2" attributes="0"/>
@@ -67,7 +69,7 @@
                   <EmptySpace min="-2" max="-2" attributes="0"/>
                   <Component id="regPeriodo" min="-2" pref="176" max="-2" attributes="0"/>
                   <EmptySpace min="-2" max="-2" attributes="0"/>
-                  <Component id="lbPeriodo" pref="78" max="32767" attributes="0"/>
+                  <Component id="lbPeriodo" pref="143" max="32767" attributes="0"/>
                   <EmptySpace min="-2" pref="34" max="-2" attributes="0"/>
                   <Component id="btUpdate" min="-2" pref="30" max="-2" attributes="0"/>
                   <EmptySpace min="-2" max="-2" attributes="0"/>
@@ -78,10 +80,10 @@
         </DimensionLayout>
         <DimensionLayout dim="1">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Group type="102" alignment="0" attributes="0">
+              <Group type="102" attributes="0">
                   <EmptySpace min="-2" pref="19" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="2" attributes="0">
-                      <Component id="btBuscar" alignment="2" min="-2" pref="29" max="-2" attributes="0"/>
+                      <Component id="btBuscar" linkSize="1" alignment="2" min="-2" pref="29" max="-2" attributes="0"/>
                       <Component id="tfBuscar" linkSize="1" alignment="2" min="-2" max="-2" attributes="0"/>
                       <Component id="regTipo" linkSize="1" alignment="2" min="-2" pref="32" max="-2" attributes="0"/>
                       <Component id="regEstado" linkSize="1" alignment="2" min="-2" pref="34" max="-2" attributes="0"/>
@@ -91,6 +93,7 @@
                       <Component id="jLabel1" alignment="2" min="-2" max="-2" attributes="0"/>
                       <Component id="btConfig" alignment="2" min="-2" pref="29" max="-2" attributes="0"/>
                       <Component id="btUpdate" alignment="2" min="-2" pref="29" max="-2" attributes="0"/>
+                      <Component id="btFilters" alignment="2" min="-2" pref="31" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace pref="26" max="32767" attributes="0"/>
               </Group>
@@ -104,6 +107,11 @@
           </Properties>
         </Component>
         <Component class="javax.swing.JTextField" name="tfBuscar">
+          <Properties>
+            <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+              <Font name="Ubuntu" size="18" style="0"/>
+            </Property>
+          </Properties>
         </Component>
         <Component class="javax.swing.JButton" name="btBuscar">
         </Component>
@@ -135,6 +143,8 @@
         <Component class="javax.swing.JButton" name="btConfig">
         </Component>
         <Component class="javax.swing.JButton" name="btUpdate">
+        </Component>
+        <Component class="javax.swing.JToggleButton" name="btFilters">
         </Component>
       </SubComponents>
     </Container>
