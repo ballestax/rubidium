@@ -10,8 +10,11 @@
         </EtchetBorder>
       </Border>
     </Property>
+    <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+      <Dimension value="[32767, 85]"/>
+    </Property>
     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-      <Dimension value="[140, 180]"/>
+      <Dimension value="[140, 80]"/>
     </Property>
   </Properties>
   <AuxValues>
@@ -29,21 +32,37 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Group type="102" alignment="0" attributes="0">
-              <Group type="103" groupAlignment="1" max="-2" attributes="0">
+          <Group type="102" attributes="0">
+              <Component id="lbImage" min="-2" pref="70" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
                   <Component id="lbName" alignment="0" max="32767" attributes="0"/>
-                  <Component id="lbImage" alignment="0" pref="140" max="32767" attributes="0"/>
+                  <Group type="102" attributes="0">
+                      <Component id="lbPrice" min="-2" pref="79" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="btAddCustom" linkSize="1" min="-2" pref="26" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="btAddQuick" linkSize="1" min="-2" pref="29" max="-2" attributes="0"/>
+                      <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                  </Group>
+                  <Component id="lbCategory" alignment="0" max="32767" attributes="0"/>
               </Group>
-              <EmptySpace min="0" pref="0" max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Group type="102" alignment="0" attributes="0">
-              <Component id="lbImage" min="-2" pref="140" max="-2" attributes="0"/>
-              <EmptySpace max="-2" attributes="0"/>
-              <Component id="lbName" pref="30" max="32767" attributes="0"/>
+          <Component id="lbImage" min="-2" pref="71" max="-2" attributes="0"/>
+          <Group type="102" attributes="0">
+              <Component id="lbCategory" min="-2" max="-2" attributes="0"/>
+              <EmptySpace min="-2" pref="1" max="-2" attributes="0"/>
+              <Component id="lbName" min="-2" pref="23" max="-2" attributes="0"/>
+              <EmptySpace min="-2" pref="2" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                  <Component id="lbPrice" linkSize="2" alignment="1" pref="28" max="32767" attributes="0"/>
+                  <Component id="btAddQuick" linkSize="2" alignment="1" max="32767" attributes="0"/>
+                  <Component id="btAddCustom" linkSize="2" alignment="1" max="32767" attributes="0"/>
+              </Group>
           </Group>
       </Group>
     </DimensionLayout>
@@ -59,9 +78,20 @@
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="lbName">
+    </Component>
+    <Component class="javax.swing.JLabel" name="lbCategory">
       <Properties>
-        <Property name="horizontalAlignment" type="int" value="0"/>
+        <Property name="text" type="java.lang.String" value="jLabel1"/>
       </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="lbPrice">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="jLabel2"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JButton" name="btAddCustom">
+    </Component>
+    <Component class="javax.swing.JButton" name="btAddQuick">
     </Component>
   </SubComponents>
 </Form>

@@ -60,6 +60,7 @@ public class JDBCUserDAO implements UserDAO {
         PreparedStatement ps = null;
 
         try {
+            
             conn = dataSource.getConnection();
             conn.setAutoCommit(false);
             if (DBManager.tableExists(TABLE_NAME, conn)) {
@@ -68,10 +69,7 @@ public class JDBCUserDAO implements UserDAO {
             ps = sqlStatements.buildSQLStatement(conn, CREATE_USERS_TABLE_KEY);
             ps.executeUpdate();
             conn.commit();
-        } catch (SQLException e) {
-            DBManager.rollbackConn(conn);
-            throw new DAOException("Cannot create User table", e);
-        } catch (IOException e) {
+        } catch (SQLException | IOException e) {
             DBManager.rollbackConn(conn);
             throw new DAOException("Cannot create User table", e);
         } finally {

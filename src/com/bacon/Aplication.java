@@ -62,6 +62,7 @@ public final class Aplication implements ActionListener, PropertyChangeListener,
     public static final String ACTION_SHOW_ADMIN = "acShowAdmin";
     public static final String ACTION_SHOW_ORDER = "acShowOrder";
     public static final String ACTION_SHOW_ORDER_LIST = "acShowOrderList";
+    public static final String ACTION_SHOW_CASH = "acShowCash";
 
     public static final String ACTION_RETURN_TO_MENU = "acReturnToMenu";
     public static final String ACTION_CLOSE_SESION = "acCLoseSesion";
@@ -71,19 +72,21 @@ public final class Aplication implements ActionListener, PropertyChangeListener,
     public static final String PREFERENCES = "";
     public static final String DATABASE = "baconapp";
     public static final String WORK_FOLDER = "baconapp";
-    public static final String DB_USER = "root";
-    protected static final boolean INSTALL_DB = false;
+    public static final String DB_USER = "lrod";
+    public static boolean INSTALL_DB = false;
     private static final boolean messaged = true;
     public static final String DEFAULT_EXPORT_DIR = "";
 
     //Correr la aplicacion con configuracion de servidor local
-    private static boolean local = !true;
+    private static boolean local = true;
 
     public DateFormat DF = new SimpleDateFormat("dd-MM-yyyy");
     public DateFormat DF_FULL = new SimpleDateFormat("dd MMMM yyyy hh:mm");
-    public DateFormat DF_FULL2 = new SimpleDateFormat("dd-MM-yyyy hh:mm");
+    public DateFormat DF_FULL2 = new SimpleDateFormat("dd-MM-yyyy HH:mm");
+    public DateFormat DF_FULL3 = new SimpleDateFormat("dd-MMM-yyyy HH:mm");
     public DateFormat DF_SL = new SimpleDateFormat("dd MMMM yyyy");
     public DateFormat DF_SQL = new SimpleDateFormat("yyyy-MM-dd");
+    public DateFormat DF_TIME = new SimpleDateFormat("HH:mm");
 
     private boolean tserver;
     private final Configuration configuration;
@@ -91,8 +94,9 @@ public final class Aplication implements ActionListener, PropertyChangeListener,
     private GUIManager guiManager;
     private SQLManager sqlManager;
     private XLSManager xlsManager;
+    private PrinterService printerService;
     private ProgAction acExitApp, acShowPreferences, acReturnToMenu,
-            acShowAdmin, acCerrarSesion;
+            acShowAdmin, acCerrarSesion, acShowCash;
     private final Control control;
     private final ControlFilters ctrlFilters;
     private final BackupsCtrl ctrlBackup;
@@ -110,6 +114,7 @@ public final class Aplication implements ActionListener, PropertyChangeListener,
     public final DecimalFormat DCFORM_W;
     public final DecimalFormat DCFORM_P;
     private ProgAction acShowOrderList;
+    
 
     public Aplication() {
 
@@ -134,6 +139,7 @@ public final class Aplication implements ActionListener, PropertyChangeListener,
         sqlManager = SQLManager.getInstance(this);
         guiManager = GUIManager.getInstance(this);
         xlsManager = XLSManager.getInstance(this);
+        printerService = PrinterService.getInstance(this);
 
         configWorkFolder();
         Utiles.crearDirectorio(Paths.get(getDirPics(), ""));
@@ -161,10 +167,17 @@ public final class Aplication implements ActionListener, PropertyChangeListener,
 
         control = new Control(this);
         String propST = configuration.getProperty(Configuration.DATABASE_STATION, "false");
-        if (!"true".equals(propST)) {
+        
+        boolean station = Boolean.parseBoolean(propST);
+        if (!station) {
+            INSTALL_DB = true;
             control.initDatabase();
             setupPermissionsFromLocal();
+        }else {
+            logger.debug("working as station");
+            INSTALL_DB = false;
         }
+               
 
         configuration.save();
 
@@ -420,6 +433,16 @@ public final class Aplication implements ActionListener, PropertyChangeListener,
         acShowOrderList.setSmallIcon(new ImageIcon(imgManager.getImagen(getFolderIcons() + "ordering.png", 25, 25)));
         acShowOrderList.setLargeIcon(new ImageIcon(imgManager.getImagen(getFolderIcons() + "ordering.png", 32, 32)));
 
+        acShowCash = new ProgAction("Caja",
+                null, "Ver modulo caja", 'c') {
+            public void actionPerformed(ActionEvent e) {
+                Permission perm = getControl().getPermissionByName("show-cash-module");
+                getGuiManager().showBasicPanel(getGuiManager().getPanelBasicCash(), perm);
+            }
+        };
+        acShowCash.setSmallIcon(new ImageIcon(imgManager.getImagen(getFolderIcons() + "cash.png", 25, 25)));
+        acShowCash.setLargeIcon(new ImageIcon(imgManager.getImagen(getFolderIcons() + "cash.png", 32, 32)));
+
         acCerrarSesion = new ProgAction("Cerrar secion",
                 null, "Cerrar la sesion del usuario actual", 'x') {
             public void actionPerformed(ActionEvent e) {
@@ -451,6 +474,9 @@ public final class Aplication implements ActionListener, PropertyChangeListener,
 
             case ACTION_SHOW_ORDER_LIST:
                 return acShowOrderList;
+
+            case ACTION_SHOW_CASH:
+                return acShowCash;
             default:
                 return null;
         }
@@ -486,6 +512,10 @@ public final class Aplication implements ActionListener, PropertyChangeListener,
 
     public XLSManager getXlsManager() {
         return xlsManager;
+    }
+
+    public PrinterService getPrinterService() {
+        return printerService;
     }
 
     public String getUserHome() {
@@ -554,8 +584,7 @@ public final class Aplication implements ActionListener, PropertyChangeListener,
     }
 
     @Override
-    public void propertyChange(final PropertyChangeEvent evt) {
-        System.out.println("event:" + evt);
+    public void propertyChange(final PropertyChangeEvent evt) {        
         if (PanelProduct2.AC_ADD_QUICK.equals(evt.getPropertyName())) {
             Product producto = (Product) evt.getNewValue();
 //            guiManager.getPanelPedido().addProduct(producto);

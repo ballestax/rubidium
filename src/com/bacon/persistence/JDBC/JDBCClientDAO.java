@@ -5,7 +5,6 @@
  */
 package com.bacon.persistence.JDBC;
 
-
 import com.bacon.DBManager;
 import com.bacon.domain.Client;
 import com.bacon.persistence.SQLExtractor;
@@ -36,11 +35,11 @@ public class JDBCClientDAO implements ClientDAO {
     private static final Logger logger = Logger.getLogger(JDBCClientDAO.class.getCanonicalName());
     private final DataSource dataSource;
     private final SQLLoader sqlStatements;
-    protected static final String CREATE_CLIENTE_TABLE_KEY = "CREATE_CLIENTES_TABLE";
-    protected static final String ADD_CLIENTE_KEY = "ADD_CLIENTE";
-    protected static final String UPDATE_CLIENTE_KEY = "UPDATE_CLIENTE";
-    protected static final String GET_CLIENTE_KEY = "GET_CLIENTE";
-    protected static final String DELETE_CLIENTE_KEY = "DELETE_CLIENTE";
+    protected static final String CREATE_CLIENTS_TABLE_KEY = "CREATE_CLIENTS_TABLE";
+    protected static final String ADD_CLIENT_KEY = "ADD_CLIENT";
+    protected static final String UPDATE_CLIENT_KEY = "UPDATE_CLIENT";
+    protected static final String GET_CLIENT_KEY = "GET_CLIENT";
+    protected static final String DELETE_CLIENT_KEY = "DELETE_CLIENT";
 
     public JDBCClientDAO(DataSource dataSource, SQLLoader sqlStatements) {
         this.dataSource = dataSource;
@@ -56,7 +55,7 @@ public class JDBCClientDAO implements ClientDAO {
             if (DBManager.tableExists(TABLE_NAME, conn)) {
                 return;
             }
-            ps = sqlStatements.buildSQLStatement(conn, CREATE_CLIENTE_TABLE_KEY);
+            ps = sqlStatements.buildSQLStatement(conn, CREATE_CLIENTS_TABLE_KEY);
             ps.executeUpdate();
             conn.commit();
         } catch (SQLException e) {
@@ -77,7 +76,7 @@ public class JDBCClientDAO implements ClientDAO {
             SQLExtractor sqlExtractorWhere = new SQLExtractor(query, SQLExtractor.Type.WHERE);;
             Map<String, String> namedParams = new HashMap<String, String>();
             namedParams.put(NAMED_PARAM_WHERE, sqlExtractorWhere.extractWhere());
-            retrieveImporter = sqlStatements.getSQLString(GET_CLIENTE_KEY, namedParams);
+            retrieveImporter = sqlStatements.getSQLString(GET_CLIENT_KEY, namedParams);
 
         } catch (SQLException e) {
             throw new DAOException("Could not properly retrieve the client", e);
@@ -94,9 +93,11 @@ public class JDBCClientDAO implements ClientDAO {
             rs = retrieve.executeQuery();
             while (rs.next()) {
                 client = new Client();
-                client.setCellphone(rs.getString(1));
-                client.setNames(rs.getString(2));
-                client.setLastName(rs.getString(3));
+                client.setId(rs.getInt(1));
+                client.setCellphone(rs.getString(2));
+                client.setNames(rs.getString(3));
+                client.setLastName(rs.getString(4));
+                client.addAddress(rs.getString(5));
             }
         } catch (SQLException e) {
             throw new DAOException("Could not properly retrieve the Client: " + e);
@@ -110,7 +111,11 @@ public class JDBCClientDAO implements ClientDAO {
 
     @Override
     public Client getClient(long id) throws DAOException {
-        return getClientBy("identificacion=" + id);
+        return getClientBy("id=" + id);
+    }
+
+    public Client getClientByCell(String cell) throws DAOException {
+        return getClientBy("cellphone='" + cell + "'");
     }
 
     @Override
@@ -127,7 +132,7 @@ public class JDBCClientDAO implements ClientDAO {
             Map<String, String> namedParams = new HashMap<>();
             namedParams.put(NAMED_PARAM_WHERE, sqlExtractorWhere.extractWhere());
             namedParams.put(NAMED_PARAM_ORDER_BY, sqlExtractorOrderBy.extractOrderBy());
-            retrieveClient = sqlStatements.getSQLString(GET_CLIENTE_KEY, namedParams);
+            retrieveClient = sqlStatements.getSQLString(GET_CLIENT_KEY, namedParams);
 
         } catch (SQLException e) {
             throw new DAOException("Could not properly retrieve the client", e);
@@ -144,9 +149,11 @@ public class JDBCClientDAO implements ClientDAO {
             rs = retrieve.executeQuery();
             while (rs.next()) {
                 client = new Client();
-                client.setCellphone(rs.getString(1));
-                client.setNames(rs.getString(2));                
-                client.setLastName(rs.getString(3));
+                client.setId(rs.getInt(1));
+                client.setCellphone(rs.getString(2));
+                client.setNames(rs.getString(3));
+                client.setLastName(rs.getString(4));
+                client.addAddress(rs.getString(5));                
                 lista.add(client);
             }
         } catch (SQLException e) {
@@ -167,15 +174,20 @@ public class JDBCClientDAO implements ClientDAO {
         Connection conn = null;
         PreparedStatement ps = null;
         try {
+            String address = "";
+            if (!client.getAddresses().isEmpty()) {
+                address = client.getAddresses().get(0).toString();
+            }
+
             conn = dataSource.getConnection();
             conn.setAutoCommit(false);
             Object[] parameters = {
                 client.getCellphone(),
                 client.getNames(),
-                client.getLastName()
+                client.getLastName(),
+                address
             };
-            ps = sqlStatements.buildSQLStatement(conn, ADD_CLIENTE_KEY, parameters);
-
+            ps = sqlStatements.buildSQLStatement(conn, ADD_CLIENT_KEY, parameters);
             ps.executeUpdate();
             conn.commit();
         } catch (SQLException e) {
@@ -198,7 +210,7 @@ public class JDBCClientDAO implements ClientDAO {
             conn = dataSource.getConnection();
             conn.setAutoCommit(false);
             Object[] parameters = {id};
-            ps = sqlStatements.buildSQLStatement(conn, DELETE_CLIENTE_KEY, parameters);
+            ps = sqlStatements.buildSQLStatement(conn, DELETE_CLIENT_KEY, parameters);
             ps.executeUpdate();
             conn.commit();
         } catch (SQLException e) {
@@ -216,15 +228,16 @@ public class JDBCClientDAO implements ClientDAO {
     public void updateClient(Client client) throws DAOException {
         Connection conn = null;
         PreparedStatement update = null;
-        try {
+        try {            
             conn = dataSource.getConnection();
             conn.setAutoCommit(false);
             Object[] parameters = {
-                client.getCellphone(),
                 client.getNames(),
-                client.getLastName()
+                client.getLastName(),
+                client.getAddresses().get(0),
+                client.getCellphone()
             };
-            update = sqlStatements.buildSQLStatement(conn, UPDATE_CLIENTE_KEY, parameters);
+            update = sqlStatements.buildSQLStatement(conn, UPDATE_CLIENT_KEY, parameters);
             update.executeUpdate();
             conn.commit();
         } catch (SQLException e) {

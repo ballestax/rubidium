@@ -363,7 +363,7 @@ public class Registro extends JComponent implements Reseteable, CaretListener {
         JComboBox combo = new JComboBox(opcs);
         inicializar(combo);
     }
-    
+
     public Registro(int axis, String stLabel, Object[] opcs) {
         super();
         box = new Box(axis);
@@ -512,6 +512,8 @@ public class Registro extends JComponent implements Reseteable, CaretListener {
             }
         } else if (campo instanceof MyDatePickerImp) {
             return ((MyDatePickerImp) campo).getText();
+        } else if (campo instanceof JTextArea) {
+            return ((JTextArea) campo).getText();
         } else {
             return "";
         }
@@ -521,9 +523,7 @@ public class Registro extends JComponent implements Reseteable, CaretListener {
         if (campo instanceof JTextField) {
             ((JTextField) campo).setText(text);
         } else if (campo instanceof JComboBox) {
-//            System.out.println("text = " + text);
             ((JComboBox) campo).setSelectedItem(text);
-//            System.out.println("textx = " + ((JComboBox) campo).getModel().getSelectedItem());
         } else if (campo instanceof MyDatePickerImp) {
             ((MyDatePickerImp) campo).setText(text);
         }
@@ -649,10 +649,10 @@ public class Registro extends JComponent implements Reseteable, CaretListener {
 
     public void setBorderColor(Color color) {
         setBorder(BorderFactory.createLineBorder(color, 1, true));
-        
+
     }
-    
-    public void setTint(Color color){
+
+    public void setTint(Color color) {
         setBorder(BorderFactory.createLineBorder(color, 1, true));
         if (axis == 0) {
             campo.setBorder(BorderFactory.createMatteBorder(0, 1, 0, 0, color));
@@ -660,10 +660,10 @@ public class Registro extends JComponent implements Reseteable, CaretListener {
             campo.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, color));
         }
         label.setBackground(color.brighter());
-        label.setForeground(color.darker());        
+        label.setForeground(color.darker());
     }
-    
-    public void setTint(Color color, int thicks){
+
+    public void setTint(Color color, int thicks) {
         setBorder(BorderFactory.createLineBorder(color, thicks, true));
         if (axis == 0) {
             campo.setBorder(BorderFactory.createMatteBorder(0, 1, 0, 0, color));
@@ -671,7 +671,7 @@ public class Registro extends JComponent implements Reseteable, CaretListener {
             campo.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, color));
         }
         label.setBackground(color.brighter());
-        label.setForeground(color.darker());        
+        label.setForeground(color.darker());
     }
 
     @Override

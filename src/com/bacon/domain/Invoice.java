@@ -1,6 +1,7 @@
 package com.bacon.domain;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -23,9 +24,13 @@ public class Invoice {
     private int idWaitress;
     private int table;
     private List<ProductoPed> products;
+    private List<ProductoPed> otherProducts;
+    private boolean service;
+    private double porcService;
 
     public Invoice() {
-
+        products = new ArrayList<>();
+        otherProducts = new ArrayList<>();
     }
 
     public Long getId() {
@@ -104,6 +109,10 @@ public class Invoice {
         return products;
     }
 
+    public void addProduct(ProductoPed product) {
+        this.products.add(product);
+    }
+
     public void setProducts(List<ProductoPed> products) {
         this.products = products;
     }
@@ -130,6 +139,38 @@ public class Invoice {
 
     public void setTable(int table) {
         this.table = table;
+    }
+
+    public boolean isService() {
+        return service;
+    }
+
+    public void setService(boolean service) {
+        this.service = service;
+    }
+
+    public double getPorcService() {
+        return porcService;
+    }
+
+    public void setPorcService(double porcService) {
+        this.porcService = porcService;
+    }
+
+    public double getValueService() {
+        return isService() ? getPorcService() * getValor().doubleValue() / 100 : 0;
+    }
+
+    public List<ProductoPed> getOtherProducts() {
+        return otherProducts;
+    }
+
+    public void addOtherProduct(ProductoPed product) {
+        this.otherProducts.add(product);
+    }
+
+    public void setOtherProducts(List<ProductoPed> products) {
+        this.otherProducts = products;
     }
 
 }

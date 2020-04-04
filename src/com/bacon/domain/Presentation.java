@@ -8,6 +8,7 @@ import java.util.Objects;
  */
 public class Presentation {
 
+    private int id;
     private int serie;
     private long idProduct;
     private String name;
@@ -15,6 +16,14 @@ public class Presentation {
     private boolean _default;
 
     public Presentation() {
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public int getSerie() {
@@ -92,5 +101,7 @@ public class Presentation {
         hash = 53 * hash + Objects.hashCode(this.name);
         return hash;
     }
+    
+    
 
 }

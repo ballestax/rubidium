@@ -6,6 +6,7 @@
 package com.bacon.gui;
 
 import com.bacon.Aplication;
+import com.bacon.Configuration;
 import com.bacon.domain.Product;
 import java.awt.Color;
 import java.awt.Font;
@@ -19,7 +20,6 @@ import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
-import org.balx.ColorDg;
 import org.dz.PanelCapturaMod;
 
 /**
@@ -49,7 +49,16 @@ public class PanelProduct2 extends PanelCapturaMod implements ActionListener {
 
         String image = product.getImage();
 
-        ImageIcon icon = new ImageIcon(app.getImgManager().getImagen(image, 100, 100));
+        String path = app.getConfiguration().getProperty(Configuration.PATH_IMG, "img");
+
+        path = Aplication.getDirPics();
+
+        ImageIcon icon = null;
+        try {
+            icon = new ImageIcon(app.getImgManager().getBufImagen(path + "/" + image, 100, 100));
+        } catch (Exception e) {
+            icon = new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons()+"no-photo.png", 100, 100));
+        }
 
         Font font1 = new Font("Tahoma", 1, 16);
         Font font2 = new Font("Serif", 2, 11);
@@ -90,6 +99,7 @@ public class PanelProduct2 extends PanelCapturaMod implements ActionListener {
         lbPrice.setOpaque(true);
         lbPrice.setForeground(Color.red.darker());
         lbPrice.setBorder(BorderFactory.createMatteBorder(1, 0, 1, 0, Color.RED));
+
         btAdd.setActionCommand(AC_ADD_QUICK);
         btAdd.setMargin(new Insets(1, 1, 1, 1));
         btAdd.setFocusPainted(false);
@@ -142,6 +152,7 @@ public class PanelProduct2 extends PanelCapturaMod implements ActionListener {
         btAdd = new javax.swing.JButton();
         btAddCustom = new javax.swing.JButton();
         lbCategory = new javax.swing.JLabel();
+        filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 32767));
 
         setBorder(javax.swing.BorderFactory.createEtchedBorder(new java.awt.Color(255, 128, 0), new java.awt.Color(164, 62, 1)));
         setMaximumSize(new java.awt.Dimension(264, 110));
@@ -164,7 +175,7 @@ public class PanelProduct2 extends PanelCapturaMod implements ActionListener {
                     .addComponent(lbDescription, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(lbPrice, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 48, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(btAddCustom, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btAdd, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -173,8 +184,11 @@ public class PanelProduct2 extends PanelCapturaMod implements ActionListener {
                         .addComponent(lbCategory, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addGap(6, 6, 6)
-                .addComponent(lbImage, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(6, 6, 6))
+                .addComponent(lbImage, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(filler1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -193,7 +207,9 @@ public class PanelProduct2 extends PanelCapturaMod implements ActionListener {
                             .addComponent(lbPrice, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(btAdd, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(btAddCustom, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addContainerGap())
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(filler1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(2, 2, 2))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -201,6 +217,7 @@ public class PanelProduct2 extends PanelCapturaMod implements ActionListener {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btAdd;
     private javax.swing.JButton btAddCustom;
+    private javax.swing.Box.Filler filler1;
     private javax.swing.JLabel lbCategory;
     private javax.swing.JLabel lbDescription;
     private javax.swing.JLabel lbImage;

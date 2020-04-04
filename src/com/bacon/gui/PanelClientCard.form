@@ -23,20 +23,15 @@
           <Group type="102" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="icClient" alignment="2" max="32767" attributes="0"/>
-                  <Group type="102" attributes="0">
-                      <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="jToggleButton1" alignment="0" min="-2" pref="93" max="-2" attributes="0"/>
-                          <Component id="jToggleButton2" alignment="0" min="-2" pref="93" max="-2" attributes="0"/>
-                          <Component id="jToggleButton3" alignment="0" min="-2" pref="93" max="-2" attributes="0"/>
-                      </Group>
-                      <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
-                  </Group>
+                  <Component id="icClient" alignment="2" min="-2" pref="93" max="-2" attributes="0"/>
+                  <Component id="jToggleButton1" alignment="0" min="-2" pref="93" max="-2" attributes="0"/>
+                  <Component id="jToggleButton2" alignment="0" min="-2" pref="93" max="-2" attributes="0"/>
+                  <Component id="jToggleButton3" alignment="0" min="-2" pref="93" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace max="-2" attributes="0"/>
+              <EmptySpace min="0" pref="1" max="32767" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
                   <Component id="pnContainer" max="32767" attributes="0"/>
-                  <Component id="lbTitle" pref="271" max="32767" attributes="0"/>
+                  <Component id="lbTitle" pref="282" max="32767" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -55,7 +50,7 @@
                       <Component id="jToggleButton2" min="-2" pref="28" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="jToggleButton3" min="-2" pref="28" max="-2" attributes="0"/>
-                      <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                      <EmptySpace min="0" pref="119" max="32767" attributes="0"/>
                   </Group>
                   <Group type="102" attributes="0">
                       <Component id="lbTitle" min="-2" pref="17" max="-2" attributes="0"/>
@@ -90,8 +85,15 @@
                       <Component id="regApellidos" max="32767" attributes="0"/>
                       <Group type="102" alignment="0" attributes="0">
                           <Component id="regCelular" min="-2" pref="180" max="-2" attributes="0"/>
-                          <EmptySpace min="0" pref="63" max="32767" attributes="0"/>
+                          <EmptySpace min="0" pref="74" max="32767" attributes="0"/>
                       </Group>
+                      <Component id="regAddress" alignment="0" max="32767" attributes="0"/>
+                      <Group type="102" alignment="1" attributes="0">
+                          <Component id="chSaveAndExit" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="32767" attributes="0"/>
+                          <Component id="jButton1" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <Component id="lbStatus" alignment="0" max="32767" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
@@ -103,10 +105,19 @@
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="regCelular" linkSize="1" min="-2" pref="30" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
+                  <Component id="regAddress" min="-2" pref="60" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
                   <Component id="regNombres" linkSize="1" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="regApellidos" linkSize="1" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace pref="134" max="32767" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="lbStatus" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace max="32767" attributes="0"/>
+                  <Group type="103" groupAlignment="3" attributes="0">
+                      <Component id="jButton1" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="chSaveAndExit" alignment="3" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <EmptySpace max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -126,6 +137,23 @@
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, &quot;Apellidos&quot;, &quot;&quot;,wLabel)"/>
           </AuxValues>
+        </Component>
+        <Component class="com.bacon.gui.util.Registro" name="regAddress">
+          <AuxValues>
+            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, &quot;Nombres&quot;, new JTextArea(),wLabel)"/>
+          </AuxValues>
+        </Component>
+        <Component class="javax.swing.JButton" name="jButton1">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="jButton1"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JLabel" name="lbStatus">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="jLabel1"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JCheckBox" name="chSaveAndExit">
         </Component>
       </SubComponents>
     </Container>

@@ -6,21 +6,26 @@
 package com.bacon;
 
 import com.bacon.domain.Client;
+import com.bacon.domain.Cycle;
 import com.bacon.domain.Invoice;
 import com.bacon.domain.Permission;
 import com.bacon.domain.Product;
 import com.bacon.domain.Rol;
 import com.bacon.domain.User;
 import com.bacon.gui.GuiPanelNewUser;
+import com.bacon.gui.GuiPanelSelProduct;
 import com.bacon.gui.util.JStatusbar;
 import com.bacon.gui.PanelAccess;
+import com.bacon.gui.PanelAddProduct;
 import com.bacon.gui.PanelAdminBackup;
 import com.bacon.gui.PanelAdminConfig;
 import com.bacon.gui.PanelModAdmin;
 import com.bacon.gui.PanelAdminUsers;
+import com.bacon.gui.PanelCash;
 import com.bacon.gui.util.PanelBasic;
 import com.bacon.gui.PanelChangePassword;
 import com.bacon.gui.PanelClientCard;
+import com.bacon.gui.PanelConfigOthers;
 import com.bacon.gui.PanelConfigPrint;
 import com.bacon.gui.PanelConfirmPedido;
 import com.bacon.gui.PanelCustomPedido;
@@ -30,6 +35,10 @@ import com.bacon.gui.PanelNewRol;
 import com.bacon.gui.PanelNewUser;
 import com.bacon.gui.PanelPedido;
 import com.bacon.gui.PanelDash;
+import com.bacon.gui.PanelNewCycle;
+import com.bacon.gui.PanelOtherProduct;
+import com.bacon.gui.PanelPresentation;
+import com.bacon.gui.PanelSelCategory;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -68,6 +77,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import org.bx.gui.MyDialog;
+import org.dz.MyDialogEsc;
 import static org.dzur.gui.GuiUtil.centrarFrame;
 
 /**
@@ -97,6 +107,13 @@ public class GUIManager {
     private PanelBasic panelBasicListPedidos;
     private PanelListPedidos panelListPedidos;
     private PanelConfigPrint pnConfigPrint;
+    private PanelBasic panelBasicCash;
+    private PanelCash panelCash;
+    private GuiPanelSelProduct panelSelProduct;
+    private PanelAddProduct panelAddProduct;
+    private PanelConfigOthers pnConfigOthers;
+    private PanelOtherProduct panelOtherProduct;
+    private PanelSelCategory panelSelCategory;
 
     private GUIManager() {
 
@@ -197,12 +214,19 @@ public class GUIManager {
         }
         return panelModPedidos;
     }
-    
+
     private PanelListPedidos getPanelListPedidos() {
         if (panelListPedidos == null) {
             panelListPedidos = new PanelListPedidos(app);
         }
         return panelListPedidos;
+    }
+
+    private PanelCash getPanelCash(Cycle cycle) {
+        if (panelCash == null) {
+            panelCash = new PanelCash(app, cycle);
+        }
+        return panelCash;
     }
 
     public PanelBasic getPanelBasicAdminModule() {
@@ -220,13 +244,21 @@ public class GUIManager {
         }
         return panelBasicPedidos;
     }
-    
+
     public PanelBasic getPanelBasicListPedidos() {
         if (panelBasicListPedidos == null) {
             ImageIcon icon = new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "ordering.png", 30, 30));
             panelBasicListPedidos = new PanelBasic(app, "Lista Pedidos", icon, getPanelListPedidos());
         }
         return panelBasicListPedidos;
+    }
+
+    public PanelBasic getPanelBasicCash() {
+        if (panelBasicCash == null) {
+            ImageIcon icon = new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "cash.png", 30, 30));
+            panelBasicCash = new PanelBasic(app, "Caja", icon, getPanelCash(null));
+        }
+        return panelBasicCash;
     }
 
     private Component getPanelPresentation() {
@@ -255,6 +287,34 @@ public class GUIManager {
             pnAdminUsers = new PanelAdminUsers(app);
         }
         return pnAdminUsers;
+    }
+
+    public GuiPanelSelProduct getPanelSelProduct() {
+        if (panelSelProduct == null) {
+            panelSelProduct = new GuiPanelSelProduct(app, null);
+        }
+        return panelSelProduct;
+    }
+
+    public PanelAddProduct getPanelAddProduct() {
+        if (panelAddProduct == null) {
+            panelAddProduct = new PanelAddProduct(app, null);
+        }
+        return panelAddProduct;
+    }
+
+    public PanelOtherProduct getPanelOtherProduct() {
+        if (panelOtherProduct == null) {
+            panelOtherProduct = new PanelOtherProduct(app, null);
+        }
+        return panelOtherProduct;
+    }
+
+    public PanelSelCategory getPanelSelCategory() {
+        if (panelSelCategory == null) {
+            panelSelCategory = new PanelSelCategory(app, null);
+        }
+        return panelSelCategory;
     }
 
     private Color getColor() {
@@ -389,10 +449,15 @@ public class GUIManager {
             if (user != null && app.getControl().hasPermission(user, perm)) {
                 toolbar.add((app.getAction(Aplication.ACTION_SHOW_ORDER)));
             }
-            
+
             perm = app.getControl().getPermissionByName("show-orderlist-module");
             if (user != null && app.getControl().hasPermission(user, perm)) {
                 toolbar.add((app.getAction(Aplication.ACTION_SHOW_ORDER_LIST)));
+            }
+
+            perm = app.getControl().getPermissionByName("show-cash-module");
+            if (user != null && app.getControl().hasPermission(user, perm)) {
+                toolbar.add((app.getAction(Aplication.ACTION_SHOW_CASH)));
             }
 
             perm = app.getControl().getPermissionByName("show-admin-module");
@@ -614,7 +679,9 @@ public class GUIManager {
     public void showMenuPrc() {
         setWaitCursor();
         getContPane().removeAll();
-        getContPane().add(getPanelPresentation());
+        getContPane().add(getPanelPresentation(), BorderLayout.CENTER);
+        reloadToolbar();
+        getContenedor().updateUI();
         setDefaultCursor();
     }
 
@@ -733,23 +800,22 @@ public class GUIManager {
         dialog.setVisible(true);
     }
 
-    public void reviewFacture(Invoice invoice) {
-        System.out.println("showing invoice");
+    public void reviewFacture(Invoice invoice) {        
         PanelConfirmPedido confirmPedido = new PanelConfirmPedido(app, invoice);
 
         setWaitCursor();
         JDialog dialog = getDialog(true);
 
         dialog.add(confirmPedido);
-        dialog.setResizable(false);
-        dialog.setTitle("Confirmar Pedido");
+//        dialog.setResizable(false);
+        dialog.setTitle("Revisar pedido");
         dialog.pack();
         dialog.setLocationRelativeTo(getFrame());
         setDefaultCursor();
         dialog.setVisible(true);
 
     }
-    
+
     public void showClientCard(Client client) {
         setWaitCursor();
         JDialog dialog = getDialog(true);
@@ -757,7 +823,9 @@ public class GUIManager {
 //        int w = 360;
 //        int h = 200;
 //        dialog.setPreferredSize(new Dimension(w, h));
-        dialog.add(new PanelClientCard(app, client));
+        PanelClientCard clientCard = new PanelClientCard(app, client);
+        clientCard.addPropertyChangeListener(getPanelPedido());
+        dialog.add(clientCard);
 //        dialog.setResizable(false);
 //        dialog.setTitle();
         dialog.pack();
@@ -765,12 +833,95 @@ public class GUIManager {
         setDefaultCursor();
         dialog.setVisible(true);
     }
-    
+
+    public void showPanelNewCycle(PropertyChangeListener listener) {
+        setWaitCursor();
+        JDialog dialog = getDialog(true);
+
+        PanelNewCycle panelNewCycle = new PanelNewCycle(app);
+        panelNewCycle.addPropertyChangeListener(listener);
+        dialog.add(panelNewCycle);
+        dialog.setTitle("Nuevo ciclo de caja");
+        dialog.pack();
+        dialog.setLocationRelativeTo(getFrame());
+        setDefaultCursor();
+        dialog.setVisible(true);
+    }
+
+    public void showPanelSelProduct(PropertyChangeListener listener) {
+        setWaitCursor();
+        JDialog dialog = new MyDialogEsc();
+        dialog.setModal(true);
+        int w = 700;
+        int h = 400;
+        dialog.setPreferredSize(new Dimension(w, h));
+
+        if (!getPanelSelProduct().containsListener(listener)) {
+            getPanelSelProduct().addPropertyChangeListener(listener);
+        }
+        getPanelSelProduct().reset();
+        dialog.setResizable(false);
+        dialog.add(getPanelSelProduct());
+        dialog.setTitle("Agregar producto.");
+        dialog.pack();
+        dialog.setLocationRelativeTo(getFrame());
+        setDefaultCursor();
+        dialog.setVisible(true);
+    }
+
+    public void showPanelAddProduct(PropertyChangeListener listener) {
+        setWaitCursor();
+        JDialog dialog = new MyDialogEsc();
+        dialog.setModal(true);
+        int w = 700;
+        int h = 400;
+        dialog.setPreferredSize(new Dimension(w, h));
+
+        if (!getPanelAddProduct().containsListener(listener)) {
+            getPanelAddProduct().addPropertyChangeListener(listener);
+        }
+        getPanelAddProduct().reset();
+        dialog.setResizable(false);
+        dialog.add(getPanelAddProduct());
+        dialog.setTitle("Agregar producto.");
+        dialog.pack();
+        dialog.setLocationRelativeTo(getFrame());
+        setDefaultCursor();
+        dialog.setVisible(true);
+    }
+
+    public void showPanelAddOtherProduct(PropertyChangeListener listener) {
+        setWaitCursor();
+        JDialog dialog = new MyDialogEsc();
+        dialog.setModal(true);
+
+        dialog.pack();
+
+        if (!getPanelOtherProduct().containsListener(listener)) {
+            getPanelOtherProduct().addPropertyChangeListener(listener);
+        }
+        getPanelOtherProduct().reset();
+        dialog.setResizable(false);
+        dialog.add(getPanelOtherProduct());
+        dialog.setTitle("Agregar otro producto.");
+        dialog.pack();
+        dialog.setLocationRelativeTo(getFrame());
+        setDefaultCursor();
+        dialog.setVisible(true);
+    }
+
     public PanelConfigPrint getPanelConfigPrint() {
         if (pnConfigPrint == null) {
             pnConfigPrint = new PanelConfigPrint(app);
         }
         return pnConfigPrint;
+    }
+
+    public PanelConfigOthers getPanelConfigOthers() {
+        if (pnConfigOthers == null) {
+            pnConfigOthers = new PanelConfigOthers(app);
+        }
+        return pnConfigOthers;
     }
 
 }

@@ -162,7 +162,6 @@ public class ImageManager {
         String token = " ";
         do {
             if (calcularLargoTMinimo(s, f, w) < tamFuenteMin) {
-//                System.out.println((new StringBuilder()).append(calcularLargoTMinimo(s, f, w)).append(" <-> ").append(tamFuenteMin).toString());
                 int ind = s.lastIndexOf(token);
                 linea[0] = s.substring(0, ind);
                 temp = linea[1];
@@ -187,22 +186,14 @@ public class ImageManager {
         JTextArea ta = new JTextArea();
         ta.setWrapStyleWord(band);
         do {
-            System.out.println("init it");
+            
             if (calcularLargoTMinimo(s, f, w) < tamFuenteMin) {
-                System.out.println("**************************");
-//                System.out.println((new StringBuilder()).append(calcularLargoTMinimo(s, f, w)).append(" <-> ").append(tamFuenteMin).toString());
                 int ind = s.lastIndexOf(token);
-                System.out.println("ind = " + ind);
                 lineas.add(s.substring(0, ind));
-                System.out.println("adding:"+s.substring(0, ind));
                 temp = linea1;
-                System.out.println("temp = " + temp);
                 linea1 = (new StringBuilder()).append(s.substring(ind + 1)).append(" ").append(temp).toString();
-                System.out.println("linea1:"+linea1);
                 s = linea0;
-                System.out.println("s:"+s);
                 band = true;
-                System.out.println("...................");
             } else {
                 band = false;
             }

@@ -75,7 +75,7 @@ public class JDBCAdditionalDAO implements AdditionalDAO {
     public Additional getAdditionalBy(String query) throws DAOException {
         String retrieveImporter;
         try {
-            SQLExtractor sqlExtractorWhere = new SQLExtractor(query, SQLExtractor.Type.WHERE);;
+            SQLExtractor sqlExtractorWhere = new SQLExtractor(query, SQLExtractor.Type.WHERE);
             Map<String, String> namedParams = new HashMap<String, String>();
             namedParams.put(NAMED_PARAM_WHERE, sqlExtractorWhere.extractWhere());
             retrieveImporter = sqlStatements.getSQLString(GET_ADDITIONAL_KEY, namedParams);
@@ -125,8 +125,8 @@ public class JDBCAdditionalDAO implements AdditionalDAO {
         String retrieveAdditionals;
         ArrayList<Additional> additionals = new ArrayList<>();
         try {
-            SQLExtractor sqlExtractorWhere = new SQLExtractor(where, SQLExtractor.Type.WHERE);;
-            SQLExtractor sqlExtractorOrderBy = new SQLExtractor(orderBy, SQLExtractor.Type.ORDER_BY);;
+            SQLExtractor sqlExtractorWhere = new SQLExtractor(where, SQLExtractor.Type.WHERE);
+            SQLExtractor sqlExtractorOrderBy = new SQLExtractor(orderBy, SQLExtractor.Type.ORDER_BY);
             Map<String, String> namedParams = new HashMap<>();
             namedParams.put(NAMED_PARAM_WHERE, sqlExtractorWhere.extractWhere());
             namedParams.put(NAMED_PARAM_ORDER_BY, sqlExtractorOrderBy.extractOrderBy());

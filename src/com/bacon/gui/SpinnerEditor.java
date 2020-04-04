@@ -19,7 +19,6 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.SpinnerModel;
 import javax.swing.SwingUtilities;
-import javax.swing.table.TableCellRenderer;
 import org.balx.TextFormato;
 
 /**

@@ -15,6 +15,7 @@ import java.beans.PropertyChangeEvent;
 import java.util.ArrayList;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import org.dz.PanelCapturaMod;
@@ -29,9 +30,13 @@ public class PanelModPedidos extends PanelCapturaMod
     private final Aplication app;
     private JPanel pnCont;
     private Box panelLeft;
+    private Box panelTop;
     private PanelPedido pnPedido;
     private ArrayList<Category> categorys;
     private ArrayList<Product> productsList;
+    private PanelTopSearch panelTopSearch;
+    private PanelCategory panelCategory;
+    private PanelSelCategory panelSelCategory;
 
     /**
      * Creates new form PanelPedidos
@@ -46,57 +51,28 @@ public class PanelModPedidos extends PanelCapturaMod
 
     private void createComponents() {
 
-        productsList = app.getControl().getProductsList("");
-
-        String stImg = "gui/img/tradicional.png";
-
-//        Product p1 = new Product(1,"Tradicional de carne", 12000, stImg);
-//        p1.setDescription("160 gr de carne, queso americano"
-//                + "lechuga rizada, tomate, tocineta cronch y salsas.");
-//        Product p2 = new Product(2,"Chicken Burger", 12000, stImg);
-//        p2.setDescription("140 gr de pechuga de pollo, queso Mozzarela,"
-//                + "lechuga rizada, tomate, tocineta cronch y salsas");
-//        Product p3 = new Product(3,"RIB 57", 18000, stImg);
-//        p3.setDescription("160 gr de carne, trocitos crocante piel de cerdo"
-//                + "costilla desmenuzada en salsa BBQ,  queso americano,"
-//                + "una costilla ahumada en salsa BBQ, "
-//                + "tocineta cronch, lechuga rizada, tomate y salsas.");
-//        Product p4 = new Product(4,"Doble carne", 17000, stImg);
-//        p4.setDescription("Dos porciones de 160 gr de carne, doble queso,"
-//                + "cebollas caramelizadas, tocineta cronch, "
-//                + "lechuga rizada, tomate y salsas.");
-//        Product p5 = new Product(5,"Bacon 57", 14000, stImg);
-//        p5.setDescription("160 gr de carne, queso americano,"
-//                + "cebollas grillé con tocineta, jamon, tocineta cronch,"
-//                + "lechuga rizada, tomate y salsas.");
-////        Product p6 = new Product("Rellenita", 20000, stImg);
-//        ArrayList<Product> products = new ArrayList<>();
-//        products.add(p1);
-//        products.add(p2);
-//        products.add(p3);
-//        products.add(p4);
-//        products.add(p5);
-//        products.add(p6);
-        for (int i = 0; i < productsList.size(); i++) {
-            Product get = productsList.get(i);
-
-        }
-
         categorys = new ArrayList<>();
         categorys.add(new Category("Productos"));
-//        categorys.add(new Category("Extras"));
-        
-//        categorys.add(new Category("Perros"));
-//        categorys.add(new Category("Otros"));
         pnCont = new JPanel(new BorderLayout());
-//        Box box = new Box(BoxLayout.LINE_AXIS);
-//        Registro regSearch = new Registro(BoxLayout.X_AXIS, "Buscar", "", 100);
-//        box.add(regSearch);
-//        box.add(Box.createHorizontalGlue());
-//        box.add(Box.createHorizontalStrut(300));
-        PanelTopSearch panelTopSearch = new PanelTopSearch(app);
+
+        panelTop = new Box(BoxLayout.Y_AXIS);
+
+        panelTopSearch = new PanelTopSearch(app);
         panelTopSearch.addPropertyChangeListener(this);
-        pnCont.add(panelTopSearch, BorderLayout.NORTH);
+
+        panelTop.add(panelTopSearch);
+
+        panelSelCategory = app.getGuiManager().getPanelSelCategory();
+        panelSelCategory.addPropertyChangeListener(this);
+
+        categorys = app.getControl().getCategorieslList();
+        categorys.add(0, new Category("TODO"));
+
+        panelSelCategory.setCategories(categorys);
+
+        panelTop.add(panelSelCategory);
+
+        pnCont.add(panelTop, BorderLayout.NORTH);
 
         panelLeft = new Box(BoxLayout.Y_AXIS);
         JScrollPane scp = new JScrollPane(panelLeft);
@@ -109,15 +85,15 @@ public class PanelModPedidos extends PanelCapturaMod
 
         loadAllProducts();
 
+        panelCategory = new PanelCategory(categorys.get(0), productsList, app);
+        panelCategory.addPropertyChangeListener(pnPedido);
+        panelTopSearch.addPropertyChangeListener(panelCategory);
+
+        panelLeft.add(panelCategory);
     }
 
     private void loadAllProducts() {
-        for (int i = 0; i < categorys.size(); i++) {
-            Category cat = categorys.get(i);
-            PanelCategory panelCategory = new PanelCategory(cat, productsList, app);
-            panelCategory.addPropertyChangeListener(pnPedido);
-            panelLeft.add(panelCategory);
-        }
+        productsList = app.getControl().getProductsList("", "");
     }
 
     /**
@@ -142,21 +118,29 @@ public class PanelModPedidos extends PanelCapturaMod
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        System.out.println("evt:" + evt.getPropertyName());
         if (PanelTopSearch.AC_FILTER_PRODUCTS.equals(evt.getPropertyName())) {
             ArrayList<Product> productsList = (ArrayList<Product>) evt.getNewValue();
 
             if (productsList == null) {
-                panelLeft.removeAll();
-                loadAllProducts();
+//                panelLeft.removeAll();
+                productsList = this.productsList;
+                panelCategory.setProducts(productsList);
+//                loadAllProducts();
             } else {
-                panelLeft.removeAll();
-                PanelCategory panelCategory = new PanelCategory(new Category("Productos"), productsList, app);
-                panelCategory.addPropertyChangeListener(pnPedido);
-                panelLeft.add(panelCategory);
+//                panelLeft.removeAll();
+                panelCategory.setProducts(productsList);
                 panelLeft.updateUI();
             }
             this.updateUI();
+        } else if (evt.getPropertyName().startsWith(PanelSelCategory.SEL_CAT_)) {
+            String cat = evt.getPropertyName().substring(8).toLowerCase();
+            ArrayList<Product> productsList = this.productsList;;
+            System.out.println("cat = " + cat);
+            if (!"TODO".equalsIgnoreCase(cat)) {
+                productsList = app.getControl().getProductsList("category='" + cat + "'", "");
+            }
+            panelCategory.setProducts(productsList);
+            panelLeft.updateUI();
         }
 
     }

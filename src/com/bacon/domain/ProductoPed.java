@@ -97,6 +97,14 @@ public class ProductoPed {
     public ArrayList<Ingredient> getExclusiones() {
         return exclusiones;
     }
+    
+    public boolean hasAdditionals(){
+        return !adicionales.isEmpty();
+    }
+    
+    public boolean hasExcluisones(){
+        return !exclusiones.isEmpty();
+    }
 
     public int getCantidad() {
         return cantidad;
@@ -167,13 +175,11 @@ public class ProductoPed {
             return false;
         }
 
-        if (!CollectionUtils.isEqualCollection(adicionales, prod.getAdicionales())) {
-            System.out.println("add diff");
+        if (!CollectionUtils.isEqualCollection(adicionales, prod.getAdicionales())) {            
             return false;
         }
 
-        if (!CollectionUtils.isEqualCollection(exclusiones, prod.getExclusiones())) {
-            System.out.println("exc diff");
+        if (!CollectionUtils.isEqualCollection(exclusiones, prod.getExclusiones())) {            
             return false;
         }
 

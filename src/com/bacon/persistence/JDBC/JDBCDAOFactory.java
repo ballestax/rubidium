@@ -11,6 +11,7 @@ import com.bacon.TimeWaste;
 import com.bacon.persistence.dao.DAOException;
 import com.bacon.persistence.SQLLoader;
 import com.bacon.persistence.dao.AdditionalDAO;
+import com.bacon.persistence.dao.ClientDAO;
 import com.bacon.persistence.dao.ConfigDAO;
 import com.bacon.persistence.dao.DAOFactory;
 import com.bacon.persistence.dao.IngredientDAO;
@@ -76,7 +77,7 @@ public class JDBCDAOFactory extends DAOFactory {
             encryptor.setPassword(String.valueOf(new TimeWaste().cst()));
             EncryptableProperties properties = new EncryptableProperties(encryptor);
 //            Properties properties = new Properties();
-                System.out.println(encryptor.encrypt("baconapp"));
+
             if (Aplication.isLocal()) {
                 properties.load(new FileInputStream(CONFIG_FILE_LOCAL));
             } else {
@@ -229,8 +230,9 @@ public class JDBCDAOFactory extends DAOFactory {
     }
 
     public final void createDatabaseFromProperties() {
-
-        createDatabase(pass.toCharArray());
+        if (Aplication.INSTALL_DB) {
+            createDatabase(pass.toCharArray());
+        }
     }
 
     public final void createDatabase(char[] pass) {
@@ -255,7 +257,7 @@ public class JDBCDAOFactory extends DAOFactory {
         } catch (ClassNotFoundException | SQLException e) {
             logger.error("Error creating database", e);
             GUIManager.showErrorMessage(null, "Error creando la  base de datos.", "Error");
-            System.exit(1);
+//            System.exit(1);
         }
     }
 
@@ -288,10 +290,15 @@ public class JDBCDAOFactory extends DAOFactory {
     public AdditionalDAO getAdditionalDAO() throws DAOException {
         return new JDBCAdditionalDAO(getDataSource(), sqlStatements);
     }
-    
+
     @Override
     public InvoiceDAO getInvoiceDAO() throws DAOException {
         return new JDBCInvoiceDAO(getDataSource(), sqlStatements);
+    }
+
+    @Override
+    public ClientDAO getClientDAO() throws DAOException {
+        return new JDBCClientDAO(getDataSource(), sqlStatements);
     }
 
 }

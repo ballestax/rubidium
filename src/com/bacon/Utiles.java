@@ -362,7 +362,7 @@ public class Utiles {
         if (!Files.exists(path, LinkOption.NOFOLLOW_LINKS)) {
             try {
                 Files.createDirectory(path);
-                path = path.toAbsolutePath();
+                path = path.toAbsolutePath();                
                 System.out.println("\n" + path + " directorio creado.");
                 return true;
             } catch (NoSuchFileException e) {

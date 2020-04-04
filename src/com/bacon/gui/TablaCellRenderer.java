@@ -26,6 +26,15 @@ public class TablaCellRenderer extends DefaultTableCellRenderer {
     private boolean agotado;
     private Format format;
 
+    public TablaCellRenderer(boolean isBordered) {
+        super();
+        this.isBordered = isBordered;
+        agotado = false;
+        setOpaque(true);
+        setHorizontalAlignment(SwingConstants.LEFT);
+        format = null;
+    }
+
     public TablaCellRenderer(boolean isBordered, Font f) {
         super();
         this.isBordered = isBordered;
@@ -44,8 +53,8 @@ public class TablaCellRenderer extends DefaultTableCellRenderer {
         setHorizontalAlignment(align);
         this.format = format;
     }
-    
-    public TablaCellRenderer(boolean isBordered,Font f, int align, Format format) {
+
+    public TablaCellRenderer(boolean isBordered, Font f, int align, Format format) {
         super();
         this.isBordered = isBordered;
         setFont(f != null ? f : new Font("Tahoma", 0, 12));

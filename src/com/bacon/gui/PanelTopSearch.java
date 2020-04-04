@@ -8,6 +8,9 @@ package com.bacon.gui;
 import com.bacon.MyConstants;
 import com.bacon.Aplication;
 import com.bacon.domain.Product;
+import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -19,19 +22,31 @@ import org.dz.PanelCaptura;
  *
  * @author lrod
  */
-public class PanelTopSearch extends PanelCaptura {
+public class PanelTopSearch extends PanelCaptura implements ActionListener {
 
     private final Aplication app;
+    public static final String AC_CLEAR_FIELD = "AC_CLEAR_FIELD";
 
     /**
      * Creates new form PanelTopSearch
+     *
      * @param app
      */
     public PanelTopSearch(Aplication app) {
         this.app = app;
         initComponents();
 
-        btBuscar.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "search.png", 18, 18)));
+        Font font1 = new Font("Sans", 1, 14);
+
+        btBuscar.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "cancel.png", 18, 18)));
+        btBuscar.setActionCommand(AC_CLEAR_FIELD);
+        btBuscar.addActionListener(this);
+
+        btCustomProduct.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "add1.png", 18, 18)));
+        btCustomProduct.setActionCommand(AC_ADD_CUSTOM_PRODUCT);
+        btCustomProduct.addActionListener(this);
+
+        regSearch.setFontCampo(font1);
 
         regSearch.getDocument().addDocumentListener(new DocumentListener() {
 
@@ -51,15 +66,29 @@ public class PanelTopSearch extends PanelCaptura {
             }
         });
 
+        btView1.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "packing1.png", 20, 20)));
+        btView1.setActionCommand(AC_SELECT_VIEW1);
+        btView1.addActionListener(this);
+        btView1.setSelected(true);
+//        btView1.setForeground(colorLocal);
+
+        btView2.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "packing2.png", 20, 20)));
+        btView2.setActionCommand(AC_SELECT_VIEW2);
+        btView2.addActionListener(this);
+//        btView2.setForeground(colorDelivery);
+
     }
+    public static final String AC_SELECT_VIEW2 = "AC_SELECT_VIEW2";
+    public static final String AC_SELECT_VIEW1 = "AC_SELECT_VIEW1";
+    public static final String AC_ADD_CUSTOM_PRODUCT = "AC_ADD_CUSTOM_PRODUCT";
 
     private void filtrar(String text, int filter) {
         if (text.trim().length() > 1) {
-            String SCAPE = "LIKE \'%" + text + "%\'";
-            ArrayList<Product> productsList = app.getControl().getProductsList("name " + SCAPE + " or description " + SCAPE);
-            System.out.println("filtrando:" + productsList.size());
+            String SCAPE = "LIKE \'%" + text.toLowerCase() + "%\'";
+            ArrayList<Product> productsList = app.getControl().getProductsList("name " + SCAPE + " or category " + SCAPE, "");
+//            ArrayList<Product> productsList = app.getControl().getProductsList("name " + SCAPE);
             pcs.firePropertyChange(AC_FILTER_PRODUCTS, null, productsList);
-        }else{
+        } else {
             pcs.firePropertyChange(AC_FILTER_PRODUCTS, null, null);
         }
 
@@ -75,10 +104,18 @@ public class PanelTopSearch extends PanelCaptura {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        buttonGroup1 = new javax.swing.ButtonGroup();
         regSearch = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Buscar", "");
         btBuscar = new javax.swing.JButton();
+        btCustomProduct = new javax.swing.JButton();
+        btView2 = new javax.swing.JToggleButton();
+        btView1 = new javax.swing.JToggleButton();
 
         setBorder(javax.swing.BorderFactory.createEtchedBorder());
+
+        buttonGroup1.add(btView2);
+
+        buttonGroup1.add(btView1);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -87,28 +124,64 @@ public class PanelTopSearch extends PanelCaptura {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(regSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 190, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGap(0, 0, 0)
                 .addComponent(btBuscar, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(330, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 223, Short.MAX_VALUE)
+                .addComponent(btCustomProduct, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btView1, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, 0)
+                .addComponent(btView2, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(4, 4, 4)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addComponent(btBuscar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(regSearch, javax.swing.GroupLayout.DEFAULT_SIZE, 32, Short.MAX_VALUE))
-                .addGap(4, 4, 4))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btView1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                .addComponent(btBuscar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(regSearch, javax.swing.GroupLayout.DEFAULT_SIZE, 32, Short.MAX_VALUE))
+                            .addComponent(btView2, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(btCustomProduct, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
         );
     }// </editor-fold>//GEN-END:initComponents
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btBuscar;
+    private javax.swing.JButton btCustomProduct;
+    private javax.swing.JToggleButton btView1;
+    private javax.swing.JToggleButton btView2;
+    private javax.swing.ButtonGroup buttonGroup1;
     private com.bacon.gui.util.Registro regSearch;
     // End of variables declaration//GEN-END:variables
 
     @Override
     public void reset() {
     }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (AC_CLEAR_FIELD.equals(e.getActionCommand())) {
+            regSearch.setText("");
+            regSearch.getComponent().requestFocus();
+            
+        } else if (AC_SELECT_VIEW1.equals(e.getActionCommand())) {
+            pcs.firePropertyChange(AC_SELECT_VIEW1, null, null);
+
+        } else if (AC_SELECT_VIEW2.equals(e.getActionCommand())) {
+            pcs.firePropertyChange(AC_SELECT_VIEW2, null, null);
+        } else if(AC_ADD_CUSTOM_PRODUCT.equals(e.getActionCommand())){
+            
+            PanelPedido panelPedido = app.getGuiManager().getPanelPedido();
+            app.getGuiManager().showPanelAddOtherProduct(panelPedido);
+        }
+
+    }
+
 }

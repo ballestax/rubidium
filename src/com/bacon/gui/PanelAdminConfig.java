@@ -36,7 +36,8 @@ public class PanelAdminConfig extends javax.swing.JPanel {
         setLayout(new BorderLayout());
         add(tabPane, BorderLayout.CENTER);
 
-        tabPane.addTab("Importar", app.getGuiManager().getPanelConfigPrint());
+        tabPane.addTab("Impresoras", app.getGuiManager().getPanelConfigPrint());
+        tabPane.addTab("Otros", app.getGuiManager().getPanelConfigOthers());
 //        tabPane.addTab("Barrios", app.getGuiManager().getPanelConfigNeigbors());
         
     }

@@ -14,7 +14,6 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.Enumeration;
 import java.util.Vector;
-
 import javax.swing.JComponent;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
@@ -27,9 +26,10 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 
 /**
- * @version 1.0 11/26/98
+ *
+ * @author ballestax
  */
-class MultiSpanCellTable extends JTable {
+public class MultiSpanCellTable extends JTable {
 
     public MultiSpanCellTable(TableModel model) {
         super(model);
@@ -183,7 +183,7 @@ class AttributiveCellTableModel extends DefaultTableModel {
             throw new IllegalArgumentException("setDataVector() - Null parameter");
         }
         dataVector = new Vector(0);
-        setColumnIdentifiers(columnNames);
+        columnIdentifiers = columnNames;
         dataVector = newData;
 
         //
@@ -283,7 +283,7 @@ class DefaultCellAttribute
         //    implements CellAttribute ,CellSpan  {
         implements CellAttribute, CellSpan, ColoredCell, CellFont {
 
-    //
+  //
     // !!!! CAUTION !!!!!
     // these values must be synchronized to Table data
     //
@@ -311,7 +311,7 @@ class DefaultCellAttribute
         }
     }
 
-    //
+  //
     // CellSpan
     //
     public int[] getSpan(int row, int column) {
@@ -383,7 +383,7 @@ class DefaultCellAttribute
         }
     }
 
-    //
+  //
     // ColoredCell
     //
     public Color getForeground(int row, int column) {
@@ -429,7 +429,7 @@ class DefaultCellAttribute
     }
   //
 
-    //
+  //
     // CellFont
     //
     public Font getFont(int row, int column) {
@@ -454,7 +454,7 @@ class DefaultCellAttribute
     }
   //
 
-    //
+  //
     // CellAttribute
     //
     public void addColumn() {
@@ -621,7 +621,7 @@ class MultiSpanCellTableUI extends BasicTableUI {
 
         for (int index = firstIndex; index <= lastIndex; index++) {
             if (rowRect.intersects(clipBounds)) {
-                //System.out.println();                  // debug
+        //System.out.println();                  // debug
                 //System.out.print("" + index +": ");    // row
                 paintRow(g, index);
             }
@@ -717,3 +717,4 @@ interface ColoredCell {
     public void setBackground(Color color, int[] rows, int[] columns);
 
 }
+

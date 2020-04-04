@@ -160,9 +160,8 @@ public class JDBCProductDAO implements ProductDAO {
                 producto.setPrice(rs.getBigDecimal(5).doubleValue());
                 producto.setVariablePrice(rs.getBoolean(6));
                 producto.setImage(rs.getString(7));
-                producto.setCategory(rs.getString(8));
+                producto.setCategory(rs.getString(8));                
                 
-                System.out.println(producto.getName()+"::"+producto.isVariablePrice());
                 productos.add(producto);
             }
         } catch (SQLException e) {

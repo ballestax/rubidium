@@ -6,6 +6,8 @@
 package com.bacon.persistence.JDBC;
 
 import com.bacon.DBManager;
+import com.bacon.domain.Category;
+import com.bacon.domain.Cycle;
 import com.bacon.domain.Ingredient;
 import com.bacon.domain.Permission;
 import com.bacon.domain.Presentation;
@@ -18,6 +20,7 @@ import com.bacon.persistence.SQLLoader;
 import com.bacon.persistence.dao.DAOException;
 import com.bacon.persistence.dao.UtilDAO;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -69,6 +72,11 @@ public class JDBCUtilDAO implements UtilDAO {
     public static final String GET_TABLES_LIST_KEY = "GET_TABLES";
     public static final String GET_WAITERS_LIST_KEY = "GET_WAITERS";
 
+    public static final String CREATE_CYCLES_TABLE_KEY = "CREATE_CYCLES_TABLE";
+    public static final String ADD_CYCLE_KEY = "ADD_CYCLE";
+    public static final String GET_CYCLE_KEY = "GET_CYCLE";
+    public static final String UPDATE_CYCLE_KEY = "UPDATE_CYCLE";
+
     public static final String CREATE_INVOICE_PRODUCT_TABLE_KEY = "CREATE_INVOICE_PRODUCT_TABLE";
     public static final String CREATE_ADDITIONAL_PRODUCT_TABLE_KEY = "CREATE_ADDITIONAL_PRODUCT_TABLE";
     public static final String ADD_ADDITIONAL_PRODUCT_KEY = "ADD_ADDITIONAL_PRODUCT";
@@ -78,12 +86,20 @@ public class JDBCUtilDAO implements UtilDAO {
     public static final String ADD_PRESENTATION_PRODUCT_KEY = "ADD_PRESENTATION_PRODUCT";
     public static final String GET_PRESENTATION_BY_DEFAULT_KEY = "GET_PRESENTATION_BY_DEFAULT";
 
+    public static final String CREATE_OTHER_PRODUCTS_TABLE_KEY = "CREATE_OTHER_PRODUCTS_TABLE";
+    public static final String ADD_OTHER_PRODUCT_KEY = "ADD_OTHER_PRODUCT";
+
+    public static final String CREATE_INVOICE_OTHER_PRODUCT_TABLE_KEY = "CREATE_INVOICE_OTHER_PRODUCT_TABLE";
+    public static final String ADD_INVOICE_OTHER_PRODUCT_key = "ADD_INVOICE_OTHER_PRODUCT";
+
     protected static final String CHECK_TABLE_EMPTY_KEY = "CHECK_TABLE";
     protected static final String INSERT_ROLE_USER_KEY = "INSERT_ROLE_USER";
     protected static final String HAS_PERMISSION_KEY = "HAS_PERMISSION";
     protected static final String GET_USER_ROLE_KEY = "GET_USER_ROLE";
 
     public static final String GET_FIRST_REGISTRO_KEY = "GET_FIRST_REGISTRO";
+
+    public static final String GET_CATEGORIES_SORTED_KEY = "GET_CATEGORIES_SORTED";
 
     private static final Logger logger = Logger.getLogger(JDBCUtilDAO.class.getCanonicalName());
 
@@ -119,6 +135,9 @@ public class JDBCUtilDAO implements UtilDAO {
         TABLE_NAME = "tables";
         createTable(TABLE_NAME, CREATE_TABLES_TABLE_KEY);
 
+        TABLE_NAME = "cycles";
+        createTable(TABLE_NAME, CREATE_CYCLES_TABLE_KEY);
+
         TABLE_NAME = "invoice_product";
         createTable(TABLE_NAME, CREATE_INVOICE_PRODUCT_TABLE_KEY);
 
@@ -130,6 +149,12 @@ public class JDBCUtilDAO implements UtilDAO {
 
         TABLE_NAME = "presentation_product";
         createTable(TABLE_NAME, CREATE_PRESENTATION_PRODUCT_TABLE_KEY);
+
+        TABLE_NAME = "other_products";
+        createTable(TABLE_NAME, CREATE_OTHER_PRODUCTS_TABLE_KEY);
+
+        TABLE_NAME = "invoice_otherproduct";
+        createTable(TABLE_NAME, CREATE_INVOICE_OTHER_PRODUCT_TABLE_KEY);
 
     }
 
@@ -190,6 +215,7 @@ public class JDBCUtilDAO implements UtilDAO {
 //            Object[] parameters = {code};
 //            pSt = sqlStatements.buildSQLStatement(conn, EXIST_CLAVE_KEY, parameters);
             rs = pSt.executeQuery();
+            
             while (rs.next()) {
                 count = rs.getInt(1);
             }
@@ -304,7 +330,7 @@ public class JDBCUtilDAO implements UtilDAO {
             conn.setAutoCommit(false);
             for (int i = 0; i < permissions.size(); i++) {
                 Permission perm = permissions.get(i);
-                System.out.println("adding:" + perm + " to role:" + role);
+                
                 Object[] parameters = {
                     perm.getId(),
                     role.getId(),};
@@ -816,11 +842,12 @@ public class JDBCUtilDAO implements UtilDAO {
             rs = retrieve.executeQuery();
             while (rs.next()) {
                 Presentation pres = new Presentation();
-                pres.setIDProd(rs.getInt(1));
-                pres.setSerie(rs.getInt(2));
-                pres.setName(rs.getString(3));
-                pres.setPrice(rs.getDouble(4));
-                pres.setDefault(rs.getBoolean(5));
+                pres.setId(rs.getInt(1));
+                pres.setIDProd(rs.getInt(2));
+                pres.setSerie(rs.getInt(3));
+                pres.setName(rs.getString(4));
+                pres.setPrice(rs.getDouble(5));
+                pres.setDefault(rs.getBoolean(6));
                 presentations.add(pres);
             }
         } catch (SQLException e) {
@@ -835,7 +862,7 @@ public class JDBCUtilDAO implements UtilDAO {
         return presentations;
     }
 
-    public Presentation getPresentationDefault(long id) throws DAOException {        
+    public Presentation getPresentationDefault(long id) throws DAOException {
         Presentation pres = null;
         Connection conn = null;
         PreparedStatement retrieve = null;
@@ -848,12 +875,12 @@ public class JDBCUtilDAO implements UtilDAO {
             rs = retrieve.executeQuery();
             while (rs.next()) {
                 pres = new Presentation();
-                pres.setIDProd(rs.getInt(1));
-                pres.setSerie(rs.getInt(2));
-                pres.setName(rs.getString(3));
-                pres.setPrice(rs.getDouble(4));
-                pres.setDefault(rs.getBoolean(5));
-
+                pres.setId(rs.getInt(1));
+                pres.setIDProd(rs.getInt(2));
+                pres.setSerie(rs.getInt(3));
+                pres.setName(rs.getString(4));
+                pres.setPrice(rs.getDouble(5));
+                pres.setDefault(rs.getBoolean(6));
             }
         } catch (SQLException e) {
             throw new DAOException("Could not properly retrieve the presentations list: " + e);
@@ -865,6 +892,150 @@ public class JDBCUtilDAO implements UtilDAO {
             DBManager.closeConnection(conn);
         }
         return pres;
+    }
+
+    public void addCycle(Cycle cycle) throws DAOException {
+        if (cycle == null) {
+            throw new IllegalArgumentException("Null Cycle");
+        }
+        Connection conn = null;
+        PreparedStatement ps = null;
+        try {
+            conn = dataSource.getConnection();
+            conn.setAutoCommit(false);
+            Object[] parameters = {
+                cycle.getInitialBalance()
+            };
+            ps = sqlStatements.buildSQLStatement(conn, ADD_CYCLE_KEY, parameters);
+            ps.executeUpdate();
+            conn.commit();
+        } catch (SQLException | IOException e) {
+            DBManager.rollbackConn(conn);
+            throw new DAOException("Cannot add Cycle", e);
+        } finally {
+            DBManager.closeStatement(ps);
+            DBManager.closeConnection(conn);
+        }
+    }
+
+    public ArrayList<Cycle> getCyclesList(String where, String order) throws DAOException {
+        String retrieveList;
+        ArrayList<Cycle> cycles = new ArrayList<>();
+        try {
+            SQLExtractor sqlExtractorWhere = new SQLExtractor(where, SQLExtractor.Type.WHERE);
+            SQLExtractor sqlExtractorOrder = new SQLExtractor(order, SQLExtractor.Type.ORDER_BY);
+            Map<String, String> namedParams = new HashMap<>();
+            namedParams.put(NAMED_PARAM_WHERE, sqlExtractorWhere.extractWhere());
+            namedParams.put(NAMED_PARAM_ORDER_BY, sqlExtractorOrder.extractOrderBy());
+            retrieveList = sqlStatements.getSQLString(GET_CYCLE_KEY, namedParams);
+        } catch (SQLException e) {
+            throw new DAOException("Could not properly retrieve the Cycles list", e);
+        } catch (IOException e) {
+            throw new DAOException("Could not properly retrieve the Cycles list", e);
+        }
+
+        Cycle cycle = null;
+        Connection conn = null;
+        PreparedStatement retrieve = null;
+        ResultSet rs = null;
+
+        try {
+            conn = dataSource.getConnection();
+            retrieve = conn.prepareStatement(retrieveList);
+            rs = retrieve.executeQuery();
+            while (rs.next()) {
+                cycle = new Cycle();
+                cycle.setId(rs.getInt(1));
+                cycle.setInit(rs.getDate(2));
+                cycle.setEnd(rs.getDate(3));
+                cycle.setInitialBalance(rs.getBigDecimal(4));
+                cycle.setStatus(rs.getInt(5));
+                cycles.add(cycle);
+            }
+        } catch (SQLException e) {
+            throw new DAOException("Could not properly retrieve the cycle: " + e);
+        } finally {
+            DBManager.closeResultSet(rs);
+            DBManager.closeStatement(retrieve);
+            DBManager.closeConnection(conn);
+        }
+        return cycles;
+    }
+
+    public void updateCycle(Cycle cycle) throws DAOException {
+        Connection conn = null;
+        PreparedStatement update = null;
+        try {
+            conn = dataSource.getConnection();
+            conn.setAutoCommit(false);
+            Object[] parameters = {
+                cycle.getEnd(),
+                cycle.getStatus(),
+                cycle.getId()
+            };
+            update = sqlStatements.buildSQLStatement(conn, UPDATE_CYCLE_KEY, parameters);
+            update.executeUpdate();
+            conn.commit();
+        } catch (SQLException e) {
+            DBManager.rollbackConn(conn);
+            throw new DAOException("Could not properly update the cycle", e);
+        } catch (IOException e) {
+            DBManager.rollbackConn(conn);
+            throw new DAOException("Could not properly update the cycle", e);
+        } finally {
+            DBManager.closeStatement(update);
+            DBManager.closeConnection(conn);
+        }
+    }
+
+    public void addOtherProduct(String name, String desc, double price) throws DAOException {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        try {
+            conn = dataSource.getConnection();
+            conn.setAutoCommit(false);
+            Object[] parameters = {
+                name, desc, price
+            };
+            ps = sqlStatements.buildSQLStatement(conn, ADD_OTHER_PRODUCT_KEY, parameters);
+            ps.executeUpdate();
+            conn.commit();
+        } catch (SQLException | IOException e) {
+            DBManager.rollbackConn(conn);
+            throw new DAOException("Cannot add other product", e);
+        } finally {
+            DBManager.closeStatement(ps);
+            DBManager.closeConnection(conn);
+        }
+    }
+
+    public ArrayList<Category> getCategoriesSorted() throws DAOException {
+        String retrieveList;
+        try {
+            retrieveList = sqlStatements.getSQLString(GET_CATEGORIES_SORTED_KEY);
+        } catch (IOException e) {
+            throw new DAOException("Could not properly retrieve the categories list", e);
+        }
+        Connection conn = null;
+        PreparedStatement retrieve = null;
+        ResultSet rs = null;
+        ArrayList<Category> categories = new ArrayList<>();
+        try {
+            conn = dataSource.getConnection();
+            retrieve = conn.prepareStatement(retrieveList);
+            rs = retrieve.executeQuery();
+            while (rs.next()) {
+                Category category = new Category(rs.getString(1));
+                categories.add(category);
+            }
+        } catch (SQLException e) {
+            throw new DAOException("Could not properly retrieve the categories list: " + e);
+        } finally {
+            DBManager.closeResultSet(rs);
+            DBManager.closeStatement(retrieve);
+            DBManager.closeConnection(conn);
+        }
+        return categories;
     }
 
 }

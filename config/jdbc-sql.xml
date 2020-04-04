@@ -31,12 +31,18 @@
                     |CREATE_ADDITIONALS_TABLE|ADD_ADDITIONAL|GET_ADDITIONAL|DELETE_ADDITIONAL|UPDATE_ADDITIONAL
                     |CREATE_INVOICES_TABLE|ADD_INVOICE|GET_INVOICE|DELETE_INVOICE|UPDATE_INVOICE
                     |CREATE_WAITERS_TABLE|CREATE_TABLES_TABLE|CREATE_INVOICE_PRODUCT_TABLE
-                    |GET_WAITERS|GET_TABLES|ADD_INVOICE_PRODUCT
-                    |CREATE_ADDITIONAL_PRODUCT_TABLE|ADD_ADDITIONAL_PRODUCT
-                    |CREATE_EXCLUSION_PRODUCT_TABLE|ADD_EXCLUSION_PRODUCT
+                    |GET_WAITERS|GET_TABLES|ADD_INVOICE_PRODUCT|GET_INVOICE_PRODUCT
+                    |CREATE_ADDITIONAL_PRODUCT_TABLE|ADD_ADDITIONAL_PRODUCT|GET_ADDITIONAL_PRODUCT
+                    |CREATE_EXCLUSION_PRODUCT_TABLE|ADD_EXCLUSION_PRODUCT|GET_EXCLUSION_PRODUCT
                     |GET_FIRST_REGISTRO|GET_LAST_REGISTRO
                     |CREATE_CLIENTS_TABLE|GET_CLIENT|ADD_CLIENT|DELETE_CLIENT|UPDATE_CLIENT
-                    |CREATE_PRESENTATION_PRODUCT_TABLE|GET_PRESENTATIONS_BY_PRODUCT|GET_PRESENTATION_BY_DEFAULT
+                    |CREATE_PRESENTATION_PRODUCT_TABLE|GET_PRESENTATIONS_BY_PRODUCT|GET_PRESENTATION_BY_DEFAULT|GET_PRESENTATION
+                    |CREATE_CYCLES_TABLE|GET_CYCLE|ADD_CYCLE|DELETE_CYCLE|UPDATE_CYCLE
+                    |CREATE_OTHER_PRODUCTS_TABLE|GET_OTHER_PRODUCT|ADD_OTHER_PRODUCT|DELETE_OTHER_PRODUCT
+                    |CREATE_INVOICE_OTHER_PRODUCT_TABLE|ADD_INVOICE_OTHER_PRODUCT
+                    |GET_CATEGORIES_SORTED
+                    
+                    
                     ) #REQUIRED
                     
 	>
@@ -811,16 +817,18 @@
                 CREATE TABLE invoices(
                 id INTEGER AUTO_INCREMENT,
                 code VARCHAR(255) NOT NULL UNIQUE,
-                date TIMESTAMP,                
+                sale_date DATETIME,                
                 deliveryType INTEGER, 
                 value DECIMAL(20,2),
                 valueDelivery DECIMAL(20,2),
                 discount DECIMAL,                               
-                idClient INTEGER,
+                idClient VARCHAR(11),
                 idMesero INTEGER,
                 mesa INTEGER,
                 ciclo INTEGER,
                 notes VARCHAR(500),
+                isservice TINYINT(1) NOT NULL DEFAULT '0',
+                service_porc DECIMAL(3,1) NOT NULL DEFAULT '0',
                 PRIMARY KEY (id)
                 )ENGINE=InnoDB DEFAULT CHARSET=latin1;
             </SQLFragment>
@@ -828,7 +836,7 @@
         
         <SQLStatement method="ADD_INVOICE">
             <SQLFragment>
-                INSERT INTO invoices (code,date,deliveryType,value,valueDelivery,discount,idClient,idMesero,mesa,ciclo,notes) VALUES (?,?,?,?,?,?,?,?,?,?,?);
+                INSERT INTO invoices (code,sale_date,deliveryType,value,valueDelivery,discount,idClient,idMesero,mesa,ciclo,notes, isservice, service_porc) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?);
             </SQLFragment>
         </SQLStatement>        
         
@@ -856,7 +864,7 @@
         <SQLStatement method="UPDATE_INVOICE">
             <SQLFragment>
                 UPDATE invoices SET 
-                date=?,                
+                sale_date=?,                
                 deliveryType=?,
                 value=?,
                 valueDelivery=?,
@@ -864,7 +872,9 @@
                 idClient=?,
                 idMesero=?,
                 mesa=?,
-                ciclo=?
+                ciclo=?,
+                isservice=?,
+                service_porc=?
                 WHERE code = ?
             </SQLFragment>
         </SQLStatement> 
@@ -927,6 +937,7 @@
                 id INTEGER AUTO_INCREMENT,
                 id_invoice INTEGER NOT NULL,
                 id_product INTEGER NOT NULL,
+                id_presentation INTEGER NOT NULL,
                 price DECIMAL(20,2),
                 cantidad INTEGER,
                 PRIMARY KEY (id)                
@@ -936,7 +947,15 @@
         
         <SQLStatement method="ADD_INVOICE_PRODUCT">
             <SQLFragment>
-                INSERT INTO invoice_product (id_invoice, id_product, price, cantidad) VALUES (?,?,?,?);
+                INSERT INTO invoice_product (id_invoice, id_product, id_presentation, price, cantidad) VALUES (?,?,?,?,?);
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="GET_INVOICE_PRODUCT">
+            <SQLFragment>
+                SELECT p.id, p.name, p.code, p.description, p.price, p.variable, p.image, p.category, ip.price, ip.cantidad, ip.id, ip.id_presentation
+                FROM products p, invoice_product ip, invoices i 
+                WHERE p.id = ip.id_product AND ip.id_invoice = i.id  AND i.code=?
             </SQLFragment>
         </SQLStatement>
         
@@ -958,6 +977,14 @@
                 INSERT INTO additional_product (id_product, id_additional, price, cantidad) VALUES (?,?,?,?);
             </SQLFragment>
         </SQLStatement>
+     
+        <SQLStatement method="GET_ADDITIONAL_PRODUCT">
+            <SQLFragment>
+                SELECT a.id, i.name, i.code, i.medida, a.precio, ap.cantidad
+                FROM ingredients i, additionals a, additional_product ap
+                WHERE ap.id_additional=a.id AND a.ingredient_id=i.id AND ap.id_product=?
+            </SQLFragment>
+        </SQLStatement>
         
         <SQLStatement method="CREATE_EXCLUSION_PRODUCT_TABLE">
             <SQLFragment>
@@ -976,6 +1003,14 @@
             </SQLFragment>
         </SQLStatement>
         
+        <SQLStatement method="GET_EXCLUSION_PRODUCT">
+            <SQLFragment>
+                SELECT i.id, i.name, i.code, i.medida
+                FROM ingredients i, exclusion_product ep
+                WHERE i.id= ep.id_ingredient AND ep.id_product=?
+            </SQLFragment>
+        </SQLStatement>
+        
         <SQLStatement method="GET_FIRST_REGISTRO">
             <SQLFragment>
                 SELECT min({query}) FROM {table} ORDER BY {query};
@@ -991,10 +1026,11 @@
         <SQLStatement method="CREATE_CLIENTS_TABLE">
             <SQLFragment>
                 CREATE TABLE clients (
-                id INTEGER(10) NOT NULL,
-                cellphone VARCHAR(15),                
+                id INTEGER(10) NOT NULL AUTO_INCREMENT,
+                cellphone VARCHAR(15) UNIQUE,                
                 names VARCHAR(255),
-                lastname VARCHAR(255)                
+                lastname VARCHAR(255),
+                address VARCHAR(255),
                 lastUpdatedTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,                
                 PRIMARY KEY (id)
                 )ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -1018,8 +1054,8 @@
         
         <SQLStatement method="ADD_CLIENT">
             <SQLFragment>
-                INSERT INTO clients (cellphone,names,lastname) 
-                VALUES (?,?,?) ON DUPLICATE KEY UPDATE cellphone=cellphone;
+                INSERT INTO clients (cellphone,names,lastname, address) 
+                VALUES (?,?,?,?) ON DUPLICATE KEY UPDATE cellphone=cellphone;
             </SQLFragment>
         </SQLStatement>	
         
@@ -1033,7 +1069,8 @@
             <SQLFragment>
                 UPDATE clients SET         
                 names=?,        
-                lastname=?
+                lastname=?,
+                address=?
                 WHERE cellphone = ?
             </SQLFragment>
         </SQLStatement>
@@ -1053,9 +1090,9 @@
             </SQLFragment>
         </SQLStatement>
         
-         <SQLStatement method="GET_PRESENTATIONS_BY_PRODUCT">
+        <SQLStatement method="GET_PRESENTATIONS_BY_PRODUCT">
             <SQLFragment>
-                SELECT ps.product_id, ps.serie,ps.name,ps.price,ps.isdefault
+                SELECT ps.id, ps.product_id, ps.serie,ps.name,ps.price,ps.isdefault
                 FROM presentation_product ps
                 WHERE 
                 ps.product_id = ?
@@ -1064,12 +1101,144 @@
         
         <SQLStatement method="GET_PRESENTATION_BY_DEFAULT">
             <SQLFragment>
-                SELECT ps.product_id, ps.serie,ps.name,ps.price,ps.isdefault
+                SELECT ps.id, ps.product_id, ps.serie,ps.name,ps.price,ps.isdefault
                 FROM presentation_product ps
                 WHERE 
                 ps.product_id = ? AND isdefault = ?
             </SQLFragment>
         </SQLStatement>
+        
+        <SQLStatement method="GET_PRESENTATION">
+            <SQLFragment>
+                SELECT ps.id, ps.product_id, ps.serie,ps.name,ps.price,ps.isdefault
+                FROM presentation_product ps
+                WHERE ps.id = ?
+            </SQLFragment>
+        </SQLStatement>
+        
+        
+        <SQLStatement method="CREATE_CYCLES_TABLE">
+            <SQLFragment>
+                CREATE TABLE cycles (
+                id INTEGER AUTO_INCREMENT,
+                init TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                end TIMESTAMP,
+                saldo DECIMAL(20,2),
+                status TINYINT(2) DEFAULT 1,                                
+                lastUpdatedTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,                
+                PRIMARY KEY (id)
+                )ENGINE=InnoDB DEFAULT CHARSET=latin1;
+            </SQLFragment>
+        </SQLStatement>		
+        
+        <SQLStatement method="GET_CYCLE">
+            <SQLFragment>
+                SELECT
+            </SQLFragment>
+            <SQLFragment>
+                * FROM cycles
+            </SQLFragment>
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                WHERE {where}
+            </SQLFragment>
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                ORDER BY {orderby}
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="ADD_CYCLE">
+            <SQLFragment>
+                INSERT INTO cycles (saldo) 
+                VALUES (?)
+            </SQLFragment>
+        </SQLStatement>	
+        
+        <SQLStatement method="DELETE_CYCLE">
+            <SQLFragment>
+                DELETE FROM cycles WHERE id = ?;
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="UPDATE_CYCLE">
+            <SQLFragment>
+                UPDATE cycles SET         
+                end=?,
+                status=?
+                WHERE id = ?
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="CREATE_OTHER_PRODUCTS_TABLE">
+            <SQLFragment>
+                CREATE TABLE other_products(
+                id INTEGER AUTO_INCREMENT,
+                name VARCHAR(255) NOT NULL UNIQUE,                
+                description VARCHAR(500),
+                price DECIMAL(20,2),                
+                PRIMARY KEY (id)
+                )ENGINE=InnoDB DEFAULT CHARSET=latin1;
+            </SQLFragment>
+        </SQLStatement>	
+        
+        <SQLStatement method="ADD_OTHER_PRODUCT">
+            <SQLFragment>
+                INSERT INTO other_products (name, description, price) VALUES (?,?,?)
+            </SQLFragment>
+            <SQLFragment>
+                ON DUPLICATE KEY UPDATE description=VALUES(description), price=VALUES(price)                
+            </SQLFragment>
+        </SQLStatement>        
+        
+        <SQLStatement method="GET_OTHER_PRODUCT">
+            <SQLFragment>
+                SELECT
+            </SQLFragment>
+            <SQLFragment>
+                * FROM other_products
+            </SQLFragment>
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                WHERE {where}
+            </SQLFragment>    
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                ORDER BY {orderby}
+            </SQLFragment>        
+        </SQLStatement>
+        
+        <SQLStatement method="DELETE_OTHER_PRODUCT">
+            <SQLFragment>
+                DELETE FROM other_products WHERE id = ?;
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="CREATE_INVOICE_OTHER_PRODUCT_TABLE">
+            <SQLFragment>
+                CREATE TABLE invoice_otherproduct(
+                id INTEGER AUTO_INCREMENT,
+                id_invoice INTEGER NOT NULL,
+                id_otherproduct INTEGER NOT NULL,
+                cantidad INTEGER,
+                PRIMARY KEY (id)                
+                )ENGINE=InnoDB DEFAULT CHARSET=latin1;
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="ADD_INVOICE_OTHER_PRODUCT">
+            <SQLFragment>
+                INSERT INTO invoice_otherproduct (id_invoice, id_otherproduct, cantidad) VALUES (?,?,?);
+            </SQLFragment>
+        </SQLStatement>
+                
+        <SQLStatement method="GET_CATEGORIES_SORTED">
+            <SQLFragment>
+                SELECT p.category, sum(ip.cantidad) as cantidad
+                FROM invoice_product ip, products p
+                WHERE ip.id_product = p.id
+                GROUP BY p.category
+                ORDER BY cantidad DESC                
+            </SQLFragment>
+        </SQLStatement>
+
+        
                                  
     </DAOStatements>
 </DAOConfiguration>

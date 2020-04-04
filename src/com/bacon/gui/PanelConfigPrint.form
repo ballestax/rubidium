@@ -21,19 +21,16 @@
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
           <Component id="lbTitle" alignment="0" max="32767" attributes="0"/>
-          <Group type="102" alignment="0" attributes="0">
+          <Group type="102" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
+                  <Component id="lbInfo" pref="376" max="32767" attributes="0"/>
+                  <Component id="lbPrinter" max="32767" attributes="0"/>
                   <Group type="102" attributes="0">
                       <Component id="btApply" min="-2" pref="94" max="-2" attributes="0"/>
                       <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                   </Group>
-                  <Component id="lbInfo" pref="376" max="32767" attributes="0"/>
-                  <Group type="102" attributes="0">
-                      <Component id="regDir" max="32767" attributes="0"/>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Component id="btBrowse" min="-2" max="-2" attributes="0"/>
-                  </Group>
+                  <Component id="regPrinter" max="32767" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -46,14 +43,13 @@
               <Component id="lbTitle" min="-2" pref="21" max="-2" attributes="0"/>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Component id="lbInfo" min="-2" pref="25" max="-2" attributes="0"/>
-              <EmptySpace type="unrelated" max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="btBrowse" linkSize="1" min="-2" max="-2" attributes="0"/>
-                  <Component id="regDir" linkSize="1" min="-2" max="-2" attributes="0"/>
-              </Group>
-              <EmptySpace type="separate" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="regPrinter" min="-2" pref="28" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="lbPrinter" min="-2" pref="45" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
               <Component id="btApply" min="-2" pref="22" max="-2" attributes="0"/>
-              <EmptySpace pref="149" max="32767" attributes="0"/>
+              <EmptySpace pref="119" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -77,17 +73,22 @@
         </Property>
       </Properties>
     </Component>
-    <Component class="javax.swing.JButton" name="btBrowse">
+    <Component class="javax.swing.JButton" name="btApply">
+    </Component>
+    <Component class="javax.swing.JLabel" name="lbPrinter">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Guardar"/>
+        <Property name="text" type="java.lang.String" value="jLabel1"/>
+        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+          <Border info="org.netbeans.modules.form.compat2.border.EtchedBorderInfo">
+            <EtchetBorder/>
+          </Border>
+        </Property>
       </Properties>
     </Component>
-    <Component class="org.dz.Registro" name="regDir">
+    <Component class="com.bacon.gui.util.Registro" name="regPrinter">
       <AuxValues>
-        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new org.dz.Registro(BoxLayout.X_AXIS, &quot;Directorio&quot;,&quot;&quot;)"/>
+        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, &quot;Impresora&quot;, new String[0])"/>
       </AuxValues>
-    </Component>
-    <Component class="javax.swing.JButton" name="btApply">
     </Component>
   </SubComponents>
 </Form>

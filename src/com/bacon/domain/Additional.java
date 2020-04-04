@@ -5,8 +5,6 @@
  */
 package com.bacon.domain;
 
-import java.util.Objects;
-
 /**
  *
  * @author lrod

@@ -6,7 +6,6 @@
 package com.bacon.gui;
 
 import com.bacon.Aplication;
-import com.bacon.GUIManager;
 import com.bacon.domain.Additional;
 import com.bacon.domain.AdditionalPed;
 import com.bacon.domain.Ingredient;
@@ -20,23 +19,14 @@ import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.beans.PropertyChangeEvent;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
-import javax.swing.ButtonModel;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
-import javax.swing.JRadioButton;
-import javax.swing.JSpinner;
-import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.text.Document;
@@ -68,8 +58,7 @@ public class PanelCustomPedido extends PanelCapturaMod implements ActionListener
      */
     public PanelCustomPedido(Aplication app, Product product) {
         this.app = app;
-        this.product = product;
-        System.out.println("getting product: " + product.getPrice());
+        this.product = product;        
         initComponents();
         createComponents();
     }
@@ -310,21 +299,20 @@ public class PanelCustomPedido extends PanelCapturaMod implements ActionListener
     @Override
     public void actionPerformed(ActionEvent e) {
         if (AC_CONFIRMAR_PEDIDO.equals(e.getActionCommand())) {
-            ProductoPed pProd = parseProduct();
-            if (pProd != null) {
+            ProductoPed prodPed = parseProduct();
+            if (prodPed != null) {
                 int cant = spModel.getNumber().intValue();
                 double value = 0;
                 if (product.isVariablePrice()) {
                     value = spPriceModel.getNumber().doubleValue();
-                } else if (pProd.getPresentation() != null) {
-                    System.out.println("here");
-                    value = pProd.getPresentation().getPrice();
+                } else if (prodPed.getPresentation() != null) {                    
+                    value = prodPed.getPresentation().getPrice();
                 } else {
                     value = product.getPrice();
                 }
 
-                pProd.setPrecio(value);
-                pcs.firePropertyChange(AC_CUSTOM_ADD, new Object[]{cant, value}, pProd);
+                prodPed.setPrecio(value);
+                pcs.firePropertyChange(AC_CUSTOM_ADD, new Object[]{cant, value}, prodPed);
 
                 getRootPane().getParent().setVisible(false);
             }
@@ -517,14 +505,14 @@ public class PanelCustomPedido extends PanelCapturaMod implements ActionListener
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 46, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lbInfo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(5, 5, 5)
-                        .addComponent(btConfirm, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addComponent(lbInfo, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btConfirm, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
 
         layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {lbName, lbPrice, spPrice});
+
+        layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {btConfirm, lbInfo});
 
     }// </editor-fold>//GEN-END:initComponents
 

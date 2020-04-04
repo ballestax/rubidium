@@ -16,9 +16,10 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Group type="102" attributes="0">
+          <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
+                  <Component id="lbStatus" max="32767" attributes="0"/>
                   <Component id="pnFilters" max="32767" attributes="0"/>
                   <Component id="jScrollPane1" max="32767" attributes="0"/>
               </Group>
@@ -29,11 +30,12 @@
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
-              <EmptySpace max="-2" attributes="0"/>
+              <EmptySpace min="-2" max="-2" attributes="0"/>
               <Component id="pnFilters" min="-2" max="-2" attributes="0"/>
+              <EmptySpace min="-2" max="-2" attributes="0"/>
+              <Component id="jScrollPane1" pref="286" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="jScrollPane1" pref="292" max="32767" attributes="0"/>
-              <EmptySpace max="-2" attributes="0"/>
+              <Component id="lbStatus" min="-2" pref="29" max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -63,7 +65,7 @@
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="regTipo" min="-2" pref="176" max="-2" attributes="0"/>
                   <EmptySpace min="-2" pref="9" max="-2" attributes="0"/>
-                  <Component id="regEstado" min="-2" pref="176" max="-2" attributes="0"/>
+                  <Component id="regMesero" min="-2" pref="176" max="-2" attributes="0"/>
                   <EmptySpace min="-2" max="-2" attributes="0"/>
                   <Component id="regCliente" min="-2" pref="176" max="-2" attributes="0"/>
                   <EmptySpace min="-2" max="-2" attributes="0"/>
@@ -86,7 +88,7 @@
                       <Component id="btBuscar" linkSize="1" alignment="2" min="-2" pref="29" max="-2" attributes="0"/>
                       <Component id="tfBuscar" linkSize="1" alignment="2" min="-2" max="-2" attributes="0"/>
                       <Component id="regTipo" linkSize="1" alignment="2" min="-2" pref="32" max="-2" attributes="0"/>
-                      <Component id="regEstado" linkSize="1" alignment="2" min="-2" pref="34" max="-2" attributes="0"/>
+                      <Component id="regMesero" linkSize="1" alignment="2" min="-2" pref="34" max="-2" attributes="0"/>
                       <Component id="regCliente" linkSize="1" alignment="2" min="-2" pref="29" max="-2" attributes="0"/>
                       <Component id="regPeriodo" linkSize="1" alignment="2" min="-2" pref="29" max="-2" attributes="0"/>
                       <Component id="lbPeriodo" alignment="2" max="32767" attributes="0"/>
@@ -130,7 +132,7 @@
             <Property name="text" type="java.lang.String" value="jLabel2"/>
           </Properties>
         </Component>
-        <Component class="com.bacon.gui.util.Registro" name="regEstado">
+        <Component class="com.bacon.gui.util.Registro" name="regMesero">
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.bacon.gui.util.Registro(BoxLayout.Y_AXIS, &quot;Estado&quot;, new String[0])"/>
           </AuxValues>
@@ -170,5 +172,19 @@
         </Component>
       </SubComponents>
     </Container>
+    <Component class="javax.swing.JLabel" name="lbStatus">
+      <Properties>
+        <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+          <Color blue="a5" green="99" red="93" type="rgb"/>
+        </Property>
+        <Property name="horizontalAlignment" type="int" value="11"/>
+        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+          <Border info="org.netbeans.modules.form.compat2.border.EtchedBorderInfo">
+            <EtchetBorder/>
+          </Border>
+        </Property>
+        <Property name="opaque" type="boolean" value="true"/>
+      </Properties>
+    </Component>
   </SubComponents>
 </Form>

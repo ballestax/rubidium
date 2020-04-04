@@ -123,7 +123,7 @@ public class Product {
         if (!name.equalsIgnoreCase(prod.getName())) {
             return false;
         }
-        
+
         return price == prod.getPrice();
     }
 
@@ -133,6 +133,17 @@ public class Product {
         hash = 97 * hash + Objects.hashCode(this.name);
         hash = 97 * hash + (int) (Double.doubleToLongBits(this.price) ^ (Double.doubleToLongBits(this.price) >>> 32));
         return hash;
+    }
+
+    @Override
+    public String toString() {
+        return "Product ["
+                + "\nid:" + id
+                + "\nname:" + name
+                + "\ncode:" + code
+                + "\nprice:" + price
+                + "\ncategory:" + category
+                +"\n]";
     }
 
 }

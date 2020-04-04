@@ -70,8 +70,7 @@ public class DBManager {
             Connection con = getDatasource().getConnection();
             con.prepareStatement("select 1").executeQuery();
         } catch (SQLException ex) {
-            Logger.getLogger(DBManager.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println("ex = " + ex);
+            Logger.getLogger(DBManager.class.getName()).log(Level.SEVERE, null, ex);            
             return false;
         }
         return true;

@@ -31,18 +31,25 @@ public class Configuration {
     public static final String DATABASE_URL = "db.url";
     public static final String DATABASE_USER = "db.user";
     public static final String DATABASE_PASSWORD = "db.pass";
-    public static final String CLICKS_EDITAR = "gui.clicks.editar";
     
-    public static final String INTENTOS_CONSULTA = "cs.intentos";
-    public static final String TIMEOUT = "cs.timeout";
     public static final String DINST = "cf.dinst";
     public static final String CUS = "cf.cus";
     public static final String BACKUP_LAST_DIR = "bck.lastdir";
     public static final String BACKUP_LIST = "bck.list";
-    public static final String DATABASE_STATION = "db.station";
+    public static final String DATABASE_STATION = "db.station";    
+    public static final String PRINTER_SELECTED = "cf.printer";
+    public static final String DELIVERY_VALUE = "cf.delivery";
+    public static final String MAX_SERVICE_PORC = "cf.maxservice";
+    public static final String DEF_SERVICE_PORC = "cf.defservice";
+    public static final String IS_SERVICE_DEF = "cf.isservice";
+    public static final String PATH_IMG = "cf.pathimg";
+    public static final String PRINT_PREV_DELIVERY = "cf.printprevius";
+    public static final String MAX_CATEGORIES_LIST = "cf.maxcategorieslist";
+    public static final String PN_ENTRADA_PERIODO = "cf.listperiodo";
     
     
     private StandardPBEStringEncryptor encryptor;
+    
     private static final Logger logger = Logger.getLogger(Configuration.class.getCanonicalName());
 
     private Configuration() {
@@ -63,10 +70,7 @@ public class Configuration {
 
     private void loadDefault() {
         logger.debug("Loading default configuration..");
-        setProperty(DATABASE_DRIVER, "org.sqlite.JDBC");
-        setProperty(DATABASE_PREFIJO, "jdbc:sqlite");
-        setProperty(DATABASE_URL, "dbelect");
-        setProperty(CLICKS_EDITAR, "2");
+        
         save();
     }
 

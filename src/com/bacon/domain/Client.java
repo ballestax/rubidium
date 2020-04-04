@@ -1,5 +1,6 @@
 package com.bacon.domain;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -15,13 +16,16 @@ public class Client {
     private List addresses;
 
     public Client() {
+        addresses = new ArrayList();
     }
 
     public Client(int id) {
+        addresses = new ArrayList();
         this.id = id;
     }
 
     public Client(String cellphone) {
+        addresses = new ArrayList();
         this.cellphone = cellphone;
     }
 
@@ -63,6 +67,24 @@ public class Client {
 
     public void setAddresses(List addresses) {
         this.addresses = addresses;
+    }
+
+    public void addAddress(String address) {
+        this.addresses.add(address);
+    }
+
+    @Override
+    public String toString() {
+        return cellphone;
+    }
+
+    public String toStringFull() {
+        return "Client:+"
+                + "\nid:" + id
+                + "\ncellphone:" + cellphone
+                + "\nname:" + names
+                + "\nlastname:" + lastName
+                + "\naddress:" + (!addresses.isEmpty() ? addresses.get(0) : "---");
     }
 
 }

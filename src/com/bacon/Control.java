@@ -6,7 +6,10 @@
 package com.bacon;
 
 import com.bacon.domain.Additional;
+import com.bacon.domain.Category;
+import com.bacon.domain.Client;
 import com.bacon.domain.ConfigDB;
+import com.bacon.domain.Cycle;
 import com.bacon.domain.Ingredient;
 import com.bacon.domain.Invoice;
 import com.bacon.domain.Permission;
@@ -17,6 +20,7 @@ import com.bacon.domain.Table;
 import com.bacon.domain.User;
 import com.bacon.domain.Waiter;
 import com.bacon.persistence.JDBC.JDBCAdditionalDAO;
+import com.bacon.persistence.JDBC.JDBCClientDAO;
 import com.bacon.persistence.JDBC.JDBCConfigDAO;
 import com.bacon.persistence.JDBC.JDBCDAOFactory;
 import com.bacon.persistence.JDBC.JDBCIngredientDAO;
@@ -51,6 +55,8 @@ public class Control {
     public void initDatabase() {
         try {
 
+            logger.debug("Init database...");
+            
             /*if (Aplication.INSTALL_DB) {
                 //preguntas la contraseña y crea la database
                 new JDBCDAOFactory().createDatabase();
@@ -75,6 +81,9 @@ public class Control {
 
             JDBCInvoiceDAO invoiceDAO = (JDBCInvoiceDAO) DAOFactory.getInstance().getInvoiceDAO();
             invoiceDAO.init();
+
+            JDBCClientDAO clientDAO = (JDBCClientDAO) DAOFactory.getInstance().getClientDAO();
+            clientDAO.init();
 
             JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
             utilDAO.init();
@@ -382,10 +391,20 @@ public class Control {
         return null;
     }
 
-    public ArrayList<Product> getProductsList(String where) {
+    public ArrayList<Product> getProductsList(String where, String order) {
         try {
             JDBCProductDAO prodDAO = (JDBCProductDAO) DAOFactory.getInstance().getProductDAO();
-            return prodDAO.getProductList(where, "");
+            return prodDAO.getProductList(where, order);
+        } catch (DAOException ex) {
+            logger.error("Error getting Products list.", ex);
+            return null;
+        }
+    }
+
+    public Product getProductByCode(String code) {
+        try {
+            JDBCProductDAO prodDAO = (JDBCProductDAO) DAOFactory.getInstance().getProductDAO();
+            return prodDAO.getProductBy("code='" + code + "'");
         } catch (DAOException ex) {
             logger.error("Error getting Products list.", ex);
             return null;
@@ -474,6 +493,26 @@ public class Control {
         }
     }
 
+    public Client getClient(String cell) {
+        try {
+            JDBCClientDAO clientDAO = (JDBCClientDAO) DAOFactory.getInstance().getClientDAO();
+            return clientDAO.getClientByCell(cell);
+        } catch (DAOException ex) {
+            logger.error("Error getting Table.", ex);
+            return null;
+        }
+    }
+
+    public ArrayList<Client> getClientList(String where, String order) {
+        try {
+            JDBCClientDAO clientDAO = (JDBCClientDAO) DAOFactory.getInstance().getClientDAO();
+            return clientDAO.getClientListBy(where, order);
+        } catch (DAOException ex) {
+            logger.error("Error getting Table.", ex);
+            return null;
+        }
+    }
+
     public int contarRows(String sql) {
         try {
             JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
@@ -489,6 +528,16 @@ public class Control {
         try {
             JDBCInvoiceDAO invoiceDAO = (JDBCInvoiceDAO) DAOFactory.getInstance().getInvoiceDAO();
             return invoiceDAO.getInvoiceList(where, order);
+        } catch (DAOException ex) {
+            logger.error("Error getting Invoices list.", ex);
+            return null;
+        }
+    }
+
+    public Invoice getInvoiceByCode(String code) {
+        try {
+            JDBCInvoiceDAO invoiceDAO = (JDBCInvoiceDAO) DAOFactory.getInstance().getInvoiceDAO();
+            return invoiceDAO.getInvoiceBy("code='" + code + "'");
         } catch (DAOException ex) {
             logger.error("Error getting Invoices list.", ex);
             return null;
@@ -519,6 +568,32 @@ public class Control {
         }
     }
 
+    public boolean addClient(Client client) {
+        try {
+            JDBCClientDAO clientDAO = (JDBCClientDAO) DAOFactory.getInstance().getClientDAO();
+            clientDAO.addClient(client);
+            return true;
+        } catch (DAOException ex) {
+            String msg = "Error adding client";
+            logger.error(msg, ex);
+            GUIManager.showErrorMessage(null, msg, "Error");
+            return false;
+        }
+    }
+
+    public boolean updateClient(Client client) {
+        try {
+            JDBCClientDAO clientDAO = (JDBCClientDAO) DAOFactory.getInstance().getClientDAO();
+            clientDAO.updateClient(client);
+            return true;
+        } catch (DAOException ex) {
+            String msg = "Error updating client";
+            logger.error(msg, ex);
+            GUIManager.showErrorMessage(null, msg, "Error");
+            return false;
+        }
+    }
+
     public ArrayList<Presentation> getPresentationsByProduct(long idProduct) {
         try {
             JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
@@ -535,6 +610,79 @@ public class Control {
             return utilDAO.getPresentationDefault(idProduct);
         } catch (DAOException ex) {
             logger.error("Error getting Presentations list.", ex);
+            return null;
+        }
+    }
+
+    public boolean addCycle(Cycle cycle) {
+        try {
+            JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
+            utilDAO.addCycle(cycle);
+            return true;
+        } catch (DAOException ex) {
+            String msg = "Error adding cycle";
+            logger.error(msg, ex);
+            GUIManager.showErrorMessage(null, msg, "Error");
+            return false;
+        }
+    }
+
+    public Cycle getCycle(int id) {
+        try {
+            JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
+            return utilDAO.getCyclesList("id=" + id, "").get(0);
+        } catch (DAOException ex) {
+            String msg = "Error getting cycle";
+            logger.error(msg, ex);
+            GUIManager.showErrorMessage(null, msg, "Error");
+            return null;
+        }
+    }
+
+    public Cycle getLastCycle() {
+        try {
+            JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
+            return utilDAO.getCyclesList("", "init DESC").get(0);
+        } catch (DAOException ex) {
+            String msg = "Error getting cycle";
+            logger.error(msg, ex);
+            GUIManager.showErrorMessage(null, msg, "Error");
+            return null;
+        }
+    }
+
+    public boolean updateCycle(Cycle cycle) {
+        try {
+            JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
+            utilDAO.updateCycle(cycle);
+            return true;
+        } catch (DAOException ex) {
+            String msg = "Error getting cycle";
+            logger.error(msg, ex);
+            GUIManager.showErrorMessage(null, msg, "Error");
+            return false;
+        }
+    }
+
+    public boolean addOtherProduct(String name, String desc, double price) {
+        try {
+            JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
+            utilDAO.addOtherProduct(name, desc, price);
+            return true;
+        } catch (DAOException ex) {
+            String msg = "Error adding other product";
+            logger.error(msg, ex);
+            GUIManager.showErrorMessage(null, msg, "Error");
+            return false;
+        }
+    }
+
+    public ArrayList<Category> getCategorieslList() {
+        try {
+            JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
+            return utilDAO.getCategoriesSorted();
+        } catch (DAOException ex) {
+            logger.error("Error getting Categories list.", ex);
             return null;
         }
     }

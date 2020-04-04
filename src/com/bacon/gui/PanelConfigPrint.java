@@ -5,18 +5,17 @@
  */
 package com.bacon.gui;
 
+
 import com.bacon.Aplication;
-import com.bacon.Configuration;
 import com.bacon.GUIManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Paths;
+import javax.print.PrintService;
+import javax.print.PrintServiceLookup;
 import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
-import javax.swing.JFileChooser;
 
 /**
  *
@@ -27,7 +26,8 @@ public class PanelConfigPrint extends javax.swing.JPanel implements ActionListen
     public static final String ACTION_APPLY = "ACTION_SAVE";
 
     private final Aplication app;
-    private String exportDIR;
+    private String selectedPrinter;
+    private String printerName;
 
     /**
      * Creates new form PanelConfigMotor
@@ -46,37 +46,23 @@ public class PanelConfigPrint extends javax.swing.JPanel implements ActionListen
 
         lbInfo.setText("Selecccione la impresora POS");
 
-//        String property = app.getConfiguration().getProperty(Configuration.EXPORT_DIR, Aplication.DEFAULT_EXPORT_DIR);
+        printerName = app.getConfiguration().getProperty(com.bacon.Configuration.PRINTER_SELECTED, "");
+        lbPrinter.setText("<html>Impresora seleccionada: <font color=blue>" + printerName + "</font></html>");
+
 //        exportDIR = property;
-
-        regDir.setText(exportDIR);
-
-        btBrowse.setText("");
-        btBrowse.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "folder-open.png", 18, 18)));
-        btBrowse.addActionListener(this);
+        PrintService[] listPrinters = listPrinters();
+        regPrinter.setText(listPrinters);
+        regPrinter.setActionCommand(AC_SEL_PRINTER);
+        regPrinter.addActionListener(this);
 
         btApply.setText("Aplicar");
         btApply.setActionCommand(ACTION_APPLY);
         btApply.addActionListener(this);
     }
-
-    private void openDir(String dir) {
-
-        JFileChooser fc = new JFileChooser();
-        fc.setCurrentDirectory(new File(dir));
-        fc.setMultiSelectionEnabled(false);
-        fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-
-        if (fc.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
-            File selectedFile = fc.getSelectedFile();
-            regDir.setText(selectedFile.getPath());
-            exportDIR = selectedFile.getPath();
-
-        }
-    }
+    public static final String AC_SEL_PRINTER = "AC_SEL_PRINTER";
 
     private boolean getProperties() {
-        String dir = regDir.getText();
+        String dir = regPrinter.getText();
         if (Files.exists(Paths.get(dir, ""), LinkOption.NOFOLLOW_LINKS)) {
 //            app.getConfiguration().setProperty(Configuration.EXPORT_DIR, dir);
             return true;
@@ -85,6 +71,11 @@ public class PanelConfigPrint extends javax.swing.JPanel implements ActionListen
             GUIManager.showErrorMessage(null, msg, "Advertencia");
             return false;
         }
+    }
+
+    private PrintService[] listPrinters() {
+        PrintService[] printServices = PrintServiceLookup.lookupPrintServices(null, null);        
+        return printServices;
     }
 
     /**
@@ -99,9 +90,9 @@ public class PanelConfigPrint extends javax.swing.JPanel implements ActionListen
         buttonGroup1 = new javax.swing.ButtonGroup();
         lbTitle = new javax.swing.JLabel();
         lbInfo = new javax.swing.JLabel();
-        btBrowse = new javax.swing.JButton();
-        regDir = new org.dz.Registro(BoxLayout.X_AXIS, "Directorio","");
         btApply = new javax.swing.JButton();
+        lbPrinter = new javax.swing.JLabel();
+        regPrinter = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Impresora", new String[0]);
 
         lbTitle.setBackground(java.awt.Color.lightGray);
         lbTitle.setOpaque(true);
@@ -109,7 +100,8 @@ public class PanelConfigPrint extends javax.swing.JPanel implements ActionListen
         lbInfo.setText("jLabel2");
         lbInfo.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
-        btBrowse.setText("Guardar");
+        lbPrinter.setText("jLabel1");
+        lbPrinter.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -119,14 +111,12 @@ public class PanelConfigPrint extends javax.swing.JPanel implements ActionListen
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lbInfo, javax.swing.GroupLayout.DEFAULT_SIZE, 376, Short.MAX_VALUE)
+                    .addComponent(lbPrinter, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(btApply, javax.swing.GroupLayout.PREFERRED_SIZE, 94, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(lbInfo, javax.swing.GroupLayout.DEFAULT_SIZE, 376, Short.MAX_VALUE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(regDir, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btBrowse)))
+                    .addComponent(regPrinter, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -136,35 +126,38 @@ public class PanelConfigPrint extends javax.swing.JPanel implements ActionListen
                 .addComponent(lbTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(lbInfo, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(btBrowse)
-                    .addComponent(regDir, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(regPrinter, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(lbPrinter, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btApply, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(149, Short.MAX_VALUE))
+                .addContainerGap(119, Short.MAX_VALUE))
         );
-
-        layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {btBrowse, regDir});
-
     }// </editor-fold>//GEN-END:initComponents
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btApply;
-    private javax.swing.JButton btBrowse;
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JLabel lbInfo;
+    private javax.swing.JLabel lbPrinter;
     private javax.swing.JLabel lbTitle;
-    private org.dz.Registro regDir;
+    private com.bacon.gui.util.Registro regPrinter;
     // End of variables declaration//GEN-END:variables
 
     @Override
     public void actionPerformed(ActionEvent e) {
         if (ACTION_APPLY.equals(e.getActionCommand())) {
-            if (getProperties()) {
-                app.getConfiguration().save();
-            }
+//            if (getProperties()) {
+
+            app.getConfiguration().save();
+//            }
+        } else if (AC_SEL_PRINTER.equals(e.getActionCommand())) {
+            PrintService printer = (PrintService) regPrinter.getSelectedItem();
+            lbPrinter.setText("<html>Impresora seleccionada: <font color=blue>" + printer.getName() + "</font></html>");
+
+            app.getConfiguration().setProperty(com.bacon.Configuration.PRINTER_SELECTED, printer.getName());
         }
     }
 }

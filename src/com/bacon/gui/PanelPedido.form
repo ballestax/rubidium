@@ -20,78 +20,85 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Group type="102" attributes="0">
-              <EmptySpace max="-2" attributes="0"/>
+          <Group type="102" alignment="0" attributes="0">
+              <EmptySpace min="-2" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" attributes="0">
-                      <Component id="jScrollPane2" max="32767" attributes="0"/>
-                      <EmptySpace max="-2" attributes="0"/>
-                  </Group>
-                  <Group type="102" attributes="0">
-                      <Component id="regDireccion" max="32767" attributes="0"/>
-                      <EmptySpace max="-2" attributes="0"/>
-                  </Group>
                   <Group type="102" alignment="1" attributes="0">
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" attributes="0">
-                              <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                                  <Component id="regTiempo" alignment="0" pref="159" max="32767" attributes="0"/>
-                                  <Component id="regDomicilio" alignment="0" max="32767" attributes="0"/>
+                              <Component id="btConfirm" min="-2" pref="100" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="btPrint" min="-2" pref="80" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="btPrint1" min="-2" pref="80" max="-2" attributes="0"/>
+                              <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                          </Group>
+                          <Group type="102" alignment="1" attributes="0">
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Group type="102" attributes="0">
+                                      <Component id="chServ" min="-2" pref="21" max="-2" attributes="0"/>
+                                      <EmptySpace min="0" pref="0" max="-2" attributes="0"/>
+                                      <Component id="regService" max="32767" attributes="0"/>
+                                  </Group>
+                                  <Component id="regDomicilio" max="32767" attributes="0"/>
                               </Group>
                               <EmptySpace min="-2" pref="1" max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                                  <Component id="lbTiempos" pref="80" max="32767" attributes="0"/>
                                   <Component id="lbEntregas" max="32767" attributes="0"/>
+                                  <Component id="tfService" pref="117" max="32767" attributes="0"/>
                               </Group>
                           </Group>
-                          <Group type="102" alignment="0" attributes="0">
-                              <Component id="btConfirm" min="-2" pref="100" max="-2" attributes="0"/>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Component id="btPrint" min="-2" pref="100" max="-2" attributes="0"/>
-                          </Group>
                       </Group>
-                      <EmptySpace max="32767" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="regDescuento" alignment="0" min="-2" pref="60" max="-2" attributes="0"/>
-                          <Component id="regSubtotal" alignment="0" min="-2" pref="171" max="-2" attributes="0"/>
-                          <Component id="lbDescuento1" alignment="1" min="-2" pref="107" max="-2" attributes="0"/>
-                          <Component id="regTotal" alignment="0" min="-2" pref="171" max="-2" attributes="0"/>
+                          <Group type="102" attributes="0">
+                              <Component id="regDescuento" min="-2" pref="75" max="-2" attributes="0"/>
+                              <EmptySpace min="0" pref="0" max="-2" attributes="0"/>
+                              <Component id="lbDescuento1" max="32767" attributes="0"/>
+                          </Group>
+                          <Component id="regSubtotal" max="32767" attributes="0"/>
+                          <Component id="regTotal" alignment="0" max="32767" attributes="0"/>
                       </Group>
-                      <EmptySpace min="-2" pref="12" max="-2" attributes="0"/>
                   </Group>
-                  <Group type="102" attributes="0">
-                      <Component id="regCelular" min="-2" pref="232" max="-2" attributes="0"/>
-                      <EmptySpace min="-2" pref="2" max="-2" attributes="0"/>
-                      <Component id="btSearch" min="-2" pref="31" max="-2" attributes="0"/>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Component id="lbCliente" max="32767" attributes="0"/>
-                      <EmptySpace min="-2" pref="2" max="-2" attributes="0"/>
-                      <Component id="lbStatus" min="-2" pref="31" max="-2" attributes="0"/>
-                      <EmptySpace max="-2" attributes="0"/>
-                  </Group>
+                  <Component id="jScrollPane2" alignment="0" max="32767" attributes="0"/>
                   <Group type="102" alignment="0" attributes="0">
-                      <Component id="regMesa" min="-2" pref="232" max="-2" attributes="0"/>
+                      <Component id="regDireccion" max="32767" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="regMesera" min="-2" pref="232" max="-2" attributes="0"/>
-                      <EmptySpace max="32767" attributes="0"/>
+                      <Component id="chRecogido" min="-2" pref="83" max="-2" attributes="0"/>
                   </Group>
-                  <Group type="102" attributes="0">
+                  <Group type="102" alignment="1" attributes="0">
                       <Component id="lbTitle" min="-2" max="-2" attributes="0"/>
                       <EmptySpace min="-2" pref="1" max="-2" attributes="0"/>
                       <Component id="lbFactura" min="-2" pref="100" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="jPanel1" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace max="32767" attributes="0"/>
+                      <EmptySpace min="-2" pref="55" max="-2" attributes="0"/>
                       <Component id="btDelete" min="-2" pref="31" max="-2" attributes="0"/>
+                  </Group>
+                  <Group type="102" alignment="0" attributes="0">
+                      <Component id="regCelular" min="-2" pref="232" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="2" max="-2" attributes="0"/>
+                      <Component id="btSearch" min="-2" pref="31" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" max="-2" attributes="0"/>
+                      <Component id="btClear" min="-2" pref="31" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
+                      <Component id="lbStatus" min="-2" pref="31" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" max="-2" attributes="0"/>
+                      <Component id="lbCliente" max="32767" attributes="0"/>
+                  </Group>
+                  <Group type="102" alignment="0" attributes="0">
+                      <Component id="regMesa" min="-2" pref="232" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
+                      <Component id="regMesera" min="-2" pref="240" max="-2" attributes="0"/>
                   </Group>
               </Group>
+              <EmptySpace min="-2" max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Group type="102" alignment="0" attributes="0">
+          <Group type="102" attributes="0">
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" max="-2" attributes="0">
                   <Component id="btDelete" alignment="0" max="32767" attributes="0"/>
@@ -100,11 +107,14 @@
                   <Component id="lbFactura" alignment="1" max="32767" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                  <Component id="lbCliente" max="32767" attributes="0"/>
-                  <Component id="regCelular" linkSize="2" pref="31" max="32767" attributes="0"/>
-                  <Component id="btSearch" linkSize="2" pref="31" max="32767" attributes="0"/>
-                  <Component id="lbStatus" alignment="1" max="32767" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                      <Component id="lbCliente" max="32767" attributes="0"/>
+                      <Component id="regCelular" linkSize="2" pref="31" max="32767" attributes="0"/>
+                      <Component id="btSearch" linkSize="2" pref="31" max="32767" attributes="0"/>
+                      <Component id="lbStatus" alignment="1" max="32767" attributes="0"/>
+                  </Group>
+                  <Component id="btClear" min="-2" pref="31" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="1" attributes="0">
@@ -112,14 +122,18 @@
                   <Component id="regMesera" min="-2" pref="30" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="regDireccion" linkSize="2" pref="23" max="32767" attributes="0"/>
-              <EmptySpace min="-2" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                  <Component id="regDireccion" linkSize="2" pref="27" max="32767" attributes="0"/>
+                  <Component id="chRecogido" max="32767" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
               <Component id="jScrollPane2" pref="87" max="32767" attributes="0"/>
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="2" attributes="0">
-                  <Component id="regSubtotal" linkSize="3" alignment="1" min="-2" pref="30" max="-2" attributes="0"/>
-                  <Component id="regTiempo" linkSize="3" alignment="2" min="-2" pref="30" max="-2" attributes="0"/>
-                  <Component id="lbTiempos" linkSize="3" alignment="1" min="-2" pref="31" max="-2" attributes="0"/>
+                  <Component id="tfService" linkSize="3" alignment="2" min="-2" max="-2" attributes="0"/>
+                  <Component id="regService" linkSize="3" alignment="2" min="-2" pref="30" max="-2" attributes="0"/>
+                  <Component id="regSubtotal" linkSize="3" alignment="2" min="-2" pref="30" max="-2" attributes="0"/>
+                  <Component id="chServ" alignment="1" min="-2" pref="31" max="-2" attributes="0"/>
               </Group>
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="2" attributes="0">
@@ -133,6 +147,7 @@
                   <Component id="regTotal" linkSize="3" pref="30" max="32767" attributes="0"/>
                   <Component id="btConfirm" min="-2" pref="33" max="-2" attributes="0"/>
                   <Component id="btPrint" min="-2" pref="33" max="-2" attributes="0"/>
+                  <Component id="btPrint1" min="-2" pref="33" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -189,16 +204,14 @@
         <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, &quot;&quot;,&quot;&quot;,60)"/>
       </AuxValues>
     </Component>
-    <Component class="javax.swing.JLabel" name="lbTiempos">
-    </Component>
-    <Component class="com.bacon.gui.util.Registro" name="regTiempo">
+    <Component class="com.bacon.gui.util.Registro" name="regService">
       <AuxValues>
-        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, &quot;Tiempo&quot;,new String[1],60)"/>
+        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, &quot;Servicio&quot;,&quot;&quot;,70)"/>
       </AuxValues>
     </Component>
     <Component class="com.bacon.gui.util.Registro" name="regDomicilio">
       <AuxValues>
-        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, &quot;Entrega&quot;,new String[1],60)"/>
+        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, &quot;Entrega&quot;,new String[1],90)"/>
       </AuxValues>
     </Component>
     <Component class="javax.swing.JLabel" name="lbDescuento1">
@@ -310,6 +323,24 @@
       </Properties>
     </Component>
     <Component class="javax.swing.JButton" name="btPrint">
+    </Component>
+    <Component class="javax.swing.JTextField" name="tfService">
+    </Component>
+    <Component class="javax.swing.JCheckBox" name="chServ">
+      <Properties>
+        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+          <Border info="org.netbeans.modules.form.compat2.border.EtchedBorderInfo">
+            <EtchetBorder/>
+          </Border>
+        </Property>
+        <Property name="opaque" type="boolean" value="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JButton" name="btPrint1">
+    </Component>
+    <Component class="javax.swing.JButton" name="btClear">
+    </Component>
+    <Component class="javax.swing.JCheckBox" name="chRecogido">
     </Component>
   </SubComponents>
 </Form>

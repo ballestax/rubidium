@@ -109,8 +109,7 @@ public class PanelNewRol extends PanelCaptura implements ActionListener, TableMo
         }
 
         ArrayList<Permission> permissionByRole = role != null ? app.getControl().getPermissionByRole(role) : null;
-
-        System.out.println("permissionByRole = " + permissionByRole);
+        
         loadPermissions(permissionByRole);
     }
 
