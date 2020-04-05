@@ -304,7 +304,7 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Tabl
         modeloTb = new MyDefaultTableModel(cols, 1);
 
         tbListado.setModel(modeloTb);
-        tbListado.setRowHeight(60);
+        tbListado.setRowHeight(40);
         tbListado.setFont(new Font("Tahoma", 0, 14));
         modeloTb.addTableModelListener(this);
 
