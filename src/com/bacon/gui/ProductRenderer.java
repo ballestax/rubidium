@@ -50,6 +50,7 @@ public class ProductRenderer extends Box implements TableCellRenderer {
 
         add(labelName);
         add(labelAdicion);
+        
 //        add(labelNotas);
 //        add(labelEsp);
 

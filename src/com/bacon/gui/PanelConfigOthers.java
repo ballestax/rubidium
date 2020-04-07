@@ -53,6 +53,16 @@ public class PanelConfigOthers extends javax.swing.JPanel implements ActionListe
         regPrintPrev.setText("Permitir imprimir el pedido previo");
         regPrintPrev.setSelected(printP);
         
+        lbInfo2.setText("Visualizar exclusiones y notas de producto");
+        String showExclusionsSt = app.getConfiguration().getProperty(com.bacon.Configuration.SHOW_EXCLUSIONS, "false");
+        boolean showExclusions = false;
+        try {
+            showExclusions = Boolean.parseBoolean(showExclusionsSt);
+        } catch (Exception e) {
+        }
+        regShowExclusions.setText("Mostrar exclusiones en panel pedido");
+        regShowExclusions.setSelected(showExclusions);
+        
         
 
         btApply.setText("Aplicar");
@@ -76,6 +86,8 @@ public class PanelConfigOthers extends javax.swing.JPanel implements ActionListe
         regDelivery = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Domicilio", "");
         lbInfo1 = new javax.swing.JLabel();
         regPrintPrev = new javax.swing.JCheckBox();
+        lbInfo2 = new javax.swing.JLabel();
+        regShowExclusions = new javax.swing.JCheckBox();
 
         lbTitle.setBackground(java.awt.Color.lightGray);
         lbTitle.setOpaque(true);
@@ -87,6 +99,11 @@ public class PanelConfigOthers extends javax.swing.JPanel implements ActionListe
         lbInfo1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
         regPrintPrev.setText("jCheckBox1");
+
+        lbInfo2.setText("jLabel2");
+        lbInfo2.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+
+        regShowExclusions.setText("jCheckBox1");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -102,7 +119,9 @@ public class PanelConfigOthers extends javax.swing.JPanel implements ActionListe
                         .addGap(0, 0, Short.MAX_VALUE)
                         .addComponent(btApply, javax.swing.GroupLayout.PREFERRED_SIZE, 94, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(lbInfo1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(regPrintPrev, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(regPrintPrev, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(lbInfo2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(regShowExclusions, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -118,7 +137,11 @@ public class PanelConfigOthers extends javax.swing.JPanel implements ActionListe
                 .addComponent(lbInfo1, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(regPrintPrev)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 98, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(lbInfo2, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(regShowExclusions)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 32, Short.MAX_VALUE)
                 .addComponent(btApply, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
@@ -130,9 +153,11 @@ public class PanelConfigOthers extends javax.swing.JPanel implements ActionListe
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JLabel lbInfo;
     private javax.swing.JLabel lbInfo1;
+    private javax.swing.JLabel lbInfo2;
     private javax.swing.JLabel lbTitle;
     private com.bacon.gui.util.Registro regDelivery;
     private javax.swing.JCheckBox regPrintPrev;
+    private javax.swing.JCheckBox regShowExclusions;
     // End of variables declaration//GEN-END:variables
 
     @Override
@@ -143,6 +168,9 @@ public class PanelConfigOthers extends javax.swing.JPanel implements ActionListe
 
             boolean selected = regPrintPrev.isSelected();
             app.getConfiguration().setProperty(com.bacon.Configuration.PRINT_PREV_DELIVERY, String.valueOf(selected));
+            
+            boolean selected2 = regShowExclusions.isSelected();
+            app.getConfiguration().setProperty(com.bacon.Configuration.SHOW_EXCLUSIONS, String.valueOf(selected2));
 
             app.getConfiguration().save();
         }

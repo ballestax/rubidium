@@ -68,6 +68,18 @@ public class ProductoPed {
         return stb.toString();
     }
 
+    public String[] getStAdicionales3() {
+        ArrayList<String> list = new ArrayList<>();
+        for (int i = 0; i < adicionales.size(); i++) {
+            Additional adic = adicionales.get(i).getAdditional();
+            int cant = adicionales.get(i).getCantidad();
+            StringBuilder stb = new StringBuilder();
+            stb.append("+").append(adic.getName()).append("<font color=blue>(x").append(cant).append(")</font>");
+            list.add(stb.toString());
+        }
+        return list.toArray(new String[0]);
+    }
+
     public double getValueAdicionales() {
         double value = 0;
         for (int i = 0; i < adicionales.size(); i++) {
@@ -97,12 +109,12 @@ public class ProductoPed {
     public ArrayList<Ingredient> getExclusiones() {
         return exclusiones;
     }
-    
-    public boolean hasAdditionals(){
+
+    public boolean hasAdditionals() {
         return !adicionales.isEmpty();
     }
-    
-    public boolean hasExcluisones(){
+
+    public boolean hasExcluisones() {
         return !exclusiones.isEmpty();
     }
 
@@ -175,11 +187,11 @@ public class ProductoPed {
             return false;
         }
 
-        if (!CollectionUtils.isEqualCollection(adicionales, prod.getAdicionales())) {            
+        if (!CollectionUtils.isEqualCollection(adicionales, prod.getAdicionales())) {
             return false;
         }
 
-        if (!CollectionUtils.isEqualCollection(exclusiones, prod.getExclusiones())) {            
+        if (!CollectionUtils.isEqualCollection(exclusiones, prod.getExclusiones())) {
             return false;
         }
 
