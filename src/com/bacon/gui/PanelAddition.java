@@ -6,6 +6,8 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import javax.swing.BorderFactory;
 import javax.swing.SpinnerNumberModel;
 import org.apache.commons.lang3.StringUtils;
@@ -38,11 +40,21 @@ public class PanelAddition extends PanelCaptura implements ActionListener {
     
     private void createComponents() {
         
+        MouseAdapter mouseClick = new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                chSel.setSelected(!chSel.isSelected());
+                activate(chSel.isSelected());
+            }
+        };
+        
         setBorder(BorderFactory.createLineBorder(Color.lightGray, 1, true));
         lbPrice.setForeground(Color.blue.darker());
+        lbPrice.addMouseListener(mouseClick);
         
         lbName.setPreferredSize(new Dimension(160, 20));
         lbName.setMinimumSize(new Dimension(160, 20));
+        lbName.addMouseListener(mouseClick);
         
         lbName.setText(StringUtils.capitalize(addition.getName()));
         lbPrice.setText(app.getCurrencyFormat().format(addition.getPrecio()));
@@ -84,8 +96,10 @@ public class PanelAddition extends PanelCaptura implements ActionListener {
                 .addComponent(chSel)
                 .addGap(6, 6, 6)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lbName)
-                    .addComponent(lbPrice))
+                    .addComponent(lbName, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(lbPrice, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(1, 1, 1)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(spCant, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(2, 2, 2))

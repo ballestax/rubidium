@@ -7,6 +7,8 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import javax.swing.BorderFactory;
 import javax.swing.JRadioButton;
 import org.apache.commons.lang3.StringUtils;
@@ -35,12 +37,23 @@ public class PanelPresentation extends PanelCaptura implements ActionListener {
     }
 
     private void createComponents() {
+        
+        MouseAdapter mouseClick = new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                setSelected(!isSelected());
+            }
+        };
+        
+        this.addMouseListener(mouseClick);
 
         setBorder(BorderFactory.createLineBorder(Color.lightGray, 1, true));
         lbPrice.setForeground(Color.blue.darker());
+//        lbPrice.addMouseListener(mouseClick);
 
         lbName.setPreferredSize(new Dimension(160, 20));
         lbName.setMinimumSize(new Dimension(160, 20));
+//        lbName.addMouseListener(mouseClick);
 
         lbName.setText(StringUtils.capitalize(presentation.getName()));
         lbPrice.setText(app.getCurrencyFormat().format(presentation.getPrice()));
@@ -127,6 +140,10 @@ public class PanelPresentation extends PanelCaptura implements ActionListener {
     private void activate(boolean act) {
         lbName.setEnabled(act);
         lbPrice.setEnabled(act);
+//        if(act)
+//            setBackground(Color.red);
+//        else
+//            setBackground(Color.lightGray);
     }
 
     public Presentation getPresentation() {
@@ -135,7 +152,21 @@ public class PanelPresentation extends PanelCaptura implements ActionListener {
     
     public void setSelected(boolean sel) {
         rbSel.setSelected(sel);
+//        if(!sel){
+//            
+//        }else{
+//            setBackground(Color.red);
+//        }
     }
+
+    @Override
+    public void setBackground(Color bg) {
+        super.setBackground(bg); //To change body of generated methods, choose Tools | Templates.
+        if(rbSel!=null)
+        rbSel.setBackground(bg);
+    }
+    
+    
     
 
     public boolean isSelected() {

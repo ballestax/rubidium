@@ -135,7 +135,6 @@ public class PanelModPedidos extends PanelCapturaMod
         } else if (evt.getPropertyName().startsWith(PanelSelCategory.SEL_CAT_)) {
             String cat = evt.getPropertyName().substring(8).toLowerCase();
             ArrayList<Product> productsList = this.productsList;;
-            System.out.println("cat = " + cat);
             if (!"TODO".equalsIgnoreCase(cat)) {
                 productsList = app.getControl().getProductsList("category='" + cat + "'", "");
             }

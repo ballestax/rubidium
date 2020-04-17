@@ -53,7 +53,7 @@ import org.balx.Imagenes;
  */
 public final class Aplication implements ActionListener, PropertyChangeListener, ListSelectionListener {
 
-    public static final String TITLE = "Bacon 57 Burguer";
+    public static final String TITLE = "Bacon 57 Burger";
     public static final String VERSION = "1.0"; // 16/Enero/2018
     public static final String ACTION_CANCEL_PANEL = "acCancelPanel";
     public static final String ACTION_EXIT_APP = "acExitApp";
@@ -358,7 +358,7 @@ public final class Aplication implements ActionListener, PropertyChangeListener,
 
     private Image createImage() {
         Font f1 = new Font("Agency FB", 1, 16);
-        Image centrarTexto = org.balx.Imagenes.centrarTexto(WC, WC, "Bacon 57 Burguer", f1, Color.white, Color.blue);
+        Image centrarTexto = org.balx.Imagenes.centrarTexto(WC, WC, "Bacon 57 Burger", f1, Color.white, Color.blue);
         return Imagenes.imagenToGray(centrarTexto, "");
     }
 

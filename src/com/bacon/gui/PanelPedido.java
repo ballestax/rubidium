@@ -161,6 +161,7 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Tabl
         
         regCelular.setLabelText("Celular:");
         regCelular.setFontCampo(font2);
+        regCelular.setPopup(true);
         
         regDireccion.setLabelText("Direccion");
         regDireccion.setFontCampo(font2);

@@ -6,6 +6,7 @@ package com.bacon.gui.util;
  * and open the template in the editor.
  */
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusListener;
 import javax.swing.*;
@@ -13,6 +14,7 @@ import javax.swing.border.Border;
 import javax.swing.border.EtchedBorder;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
+import javax.swing.text.DefaultEditorKit;
 import javax.swing.text.Document;
 import org.bx.UpperCaseTextField;
 
@@ -23,6 +25,8 @@ public class Registro extends JComponent implements Reseteable, CaretListener {
     public static final int NORMAL = 1;
     public static final int EDITING = 2;
     public static final int ERROR = 3;
+    public boolean popup = false;
+    private JPopupMenu menu;
 
     public Registro() {
         super();
@@ -465,6 +469,57 @@ public class Registro extends JComponent implements Reseteable, CaretListener {
         }
         box.add(((Component) (conIcono ? ((Component) (boxH)) : ((Component) (campo)))));
         add(box, BorderLayout.CENTER);
+
+        if (popup) {
+
+        }
+    }
+
+    private void makePopup() {
+        if (menu == null) {
+            menu = new JPopupMenu();
+            Action paste = new AbstractAction("Pegar") {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    if (campo instanceof JTextField) {
+                        ((JTextField) campo).paste();
+                    }
+                }
+            };
+//            cut.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("control X"));
+            menu.add(paste);
+
+            Action copy = new AbstractAction("Copiar") {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    if (campo instanceof JTextField) {
+                        ((JTextField) campo).copy();
+                    }
+                }
+            };
+//            cut.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("control X"));
+            menu.add(copy);
+
+            Action cut = new AbstractAction("Cortar") {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    if (campo instanceof JTextField) {
+                        ((JTextField) campo).cut();
+                    }
+                }
+            };
+//            cut.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("control X"));
+            menu.add(cut);
+
+            if (campo instanceof JTextField) {
+                campo.setComponentPopupMenu(menu);
+            }
+        }
+    }
+
+    public void setPopup(boolean popup) {
+        this.popup = popup;
+        makePopup();
     }
 
     @Override
