@@ -146,6 +146,7 @@ public class JDBCAdditionalDAO implements AdditionalDAO {
             conn = dataSource.getConnection();
             retrieve = conn.prepareStatement(retrieveAdditionals);
             rs = retrieve.executeQuery();
+            System.out.println("retrieve = " + retrieve);
 
             while (rs.next()) {
                 additional = new Additional();

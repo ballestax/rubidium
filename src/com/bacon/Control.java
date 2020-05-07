@@ -441,10 +441,10 @@ public class Control {
         }
     }
 
-    public ArrayList<Additional> getAdditionalList(String where) {
+    public ArrayList<Additional> getAdditionalList(String where, String order) {
         try {
             JDBCAdditionalDAO addDAO = (JDBCAdditionalDAO) DAOFactory.getInstance().getAdditionalDAO();
-            return addDAO.getAdditionalList(where, "");
+            return addDAO.getAdditionalList(where, order);
         } catch (DAOException ex) {
             logger.error("Error getting Additional list.", ex);
             return null;
@@ -554,6 +554,17 @@ public class Control {
             logger.error(msg, ex);
             GUIManager.showErrorMessage(null, msg, "Error");
             return false;
+        }
+    }
+    
+    public void updateInvoice(Invoice invoice) {
+        try {
+            JDBCInvoiceDAO invoiceDAO = (JDBCInvoiceDAO) DAOFactory.getInstance().getInvoiceDAO();
+            invoiceDAO.updateInvoice(invoice);            
+        } catch (DAOException ex) {
+            String msg = "Error updating invoice";
+            logger.error(msg, ex);
+            GUIManager.showErrorMessage(null, msg, "Error");            
         }
     }
 

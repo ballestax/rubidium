@@ -25,6 +25,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -124,6 +125,7 @@ public class JDBCInvoiceDAO implements InvoiceDAO {
                 invoice.setNota(rs.getString(12));
                 invoice.setService(rs.getBoolean(13));
                 invoice.setPorcService(rs.getDouble(14));
+                invoice.setStatus(rs.getInt(15));
 
                 Object[] parameters = {invoice.getFactura()};
 
@@ -291,7 +293,8 @@ public class JDBCInvoiceDAO implements InvoiceDAO {
                 invoice.setNota(rs.getString(12));
                 invoice.setService(rs.getBoolean(13));
                 invoice.setPorcService(rs.getDouble(14));
-
+                invoice.setStatus(rs.getInt(15));
+                
                 Object[] parameters = {invoice.getFactura()};
 
                 try {
@@ -432,7 +435,8 @@ public class JDBCInvoiceDAO implements InvoiceDAO {
                 invoice.getCiclo(),
                 invoice.getNota(),
                 invoice.isService(),
-                invoice.getPorcService()
+                invoice.getPorcService(),
+                invoice.getStatus()
             };
             ps = sqlStatements.buildSQLStatement(conn, ADD_INVOICE_KEY, parameters);
 
@@ -557,7 +561,6 @@ public class JDBCInvoiceDAO implements InvoiceDAO {
             conn = dataSource.getConnection();
             conn.setAutoCommit(false);
             Object[] parameters = {
-                invoice.getFecha(),
                 invoice.getTipoEntrega(),
                 invoice.getValor(),
                 invoice.getValorDelivery(),
@@ -565,8 +568,14 @@ public class JDBCInvoiceDAO implements InvoiceDAO {
                 invoice.getIdCliente(),
                 invoice.getIdWaitress(),
                 invoice.getTable(),
-                invoice.getCiclo()
+                invoice.getCiclo(),
+                invoice.isService(),
+                invoice.getPorcService(),
+                invoice.getStatus(),
+                invoice.getFactura()
             };
+            
+            System.out.println(Arrays.toString(parameters));
             update = sqlStatements.buildSQLStatement(conn, UPDATE_INVOICE_KEY, parameters);
             update.executeUpdate();
             conn.commit();
@@ -609,6 +618,7 @@ public class JDBCInvoiceDAO implements InvoiceDAO {
                 invoice.setNota(rs.getString(12));
                 invoice.setService(rs.getBoolean(13));
                 invoice.setPorcService(rs.getDouble(14));
+                invoice.setStatus(rs.getInt(15));
                 invoices.add(invoice);
             }
         } catch (SQLException e) {

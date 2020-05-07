@@ -4,11 +4,7 @@
  */
 package com.bacon;
 
-import com.bacon.domain.Product;
 import java.util.prefs.BackingStoreException;
-import javafx.scene.web.WebEngine;
-
-import org.w3c.dom.Document;
 
 /**
  *

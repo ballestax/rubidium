@@ -5,6 +5,7 @@
  */
 package com.bacon.gui;
 
+import java.awt.Color;
 import java.text.Format;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -16,13 +17,15 @@ import javax.swing.table.DefaultTableCellRenderer;
 public class FormatRenderer extends DefaultTableCellRenderer {
 
     private final Format formatter;
-
+    
+    
     /*
          *   Use the specified formatter to format the Object
      */
     public FormatRenderer(Format formatter) {
         this.formatter = formatter;
         setHorizontalAlignment(SwingConstants.RIGHT);
+        
     }
 
     @Override

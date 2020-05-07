@@ -6,6 +6,9 @@ package com.bacon.gui.util;
  * and open the template in the editor.
  */
 import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusListener;
@@ -14,7 +17,6 @@ import javax.swing.border.Border;
 import javax.swing.border.EtchedBorder;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
-import javax.swing.text.DefaultEditorKit;
 import javax.swing.text.Document;
 import org.bx.UpperCaseTextField;
 
@@ -482,7 +484,33 @@ public class Registro extends JComponent implements Reseteable, CaretListener {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     if (campo instanceof JTextField) {
-                        ((JTextField) campo).paste();
+                        if (docLim != null) {
+                            try {
+                                Clipboard c = Toolkit.getDefaultToolkit().getSystemClipboard();
+
+                                String st = (String) c.getData(DataFlavor.stringFlavor);
+
+                                StringSelection testData;
+
+                                String tmp = st.replaceAll("\\s+","");                                
+                                
+
+                                //  Add some test data
+                                testData = new StringSelection(tmp);
+                                c.setContents(testData, testData);
+
+                                ((JTextField) campo).paste();
+
+                                testData = new StringSelection(st);
+                                c.setContents(testData, testData);
+
+                            } catch (Exception ex) {
+                                ((JTextField) campo).paste();
+                            }
+                        } else {
+                            ((JTextField) campo).paste();
+                        }
+
                     }
                 }
             };

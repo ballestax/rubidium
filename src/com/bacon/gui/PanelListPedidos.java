@@ -10,11 +10,13 @@ import com.bacon.domain.Waiter;
 import com.bacon.gui.util.MyPopupListener;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.math.BigDecimal;
+import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -26,11 +28,14 @@ import static javax.swing.BorderFactory.createLineBorder;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.RowFilter;
+import javax.swing.SwingConstants;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import javax.swing.event.DocumentEvent;
@@ -39,10 +44,8 @@ import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableRowSorter;
 import org.apache.log4j.Logger;
-import org.balx.ColorDg;
 import org.balx.Utiles;
 import org.bx.gui.MyDefaultTableModel;
-import org.dz.MyDatePickerImp;
 import org.dz.PanelCapturaMod;
 
 /**
@@ -75,6 +78,7 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener 
     private MyPopupListener popupListenerTabla;
     private ArrayList<Client> clientList;
     private ArrayList<Waiter> waitersList;
+    private SimpleDateFormat formFecha;
 
 //    private org.dz.MyDatePickerImp dpFinal;
 //    private org.dz.MyDatePickerImp dpInicio;
@@ -90,10 +94,12 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener 
     }
 
     private void createComponents() {
+        
+        formFecha = new SimpleDateFormat("dd MMMM yyyy");
 
         jLabel1.setText("Buscar");
 
-        String[] colNames = {"Factura", "Fecha", "Estado", "Tipo", "Cliente", "Mesa", "Mesero", "Valor", "Servicio", " Accion"};
+        String[] colNames = {"Factura", "Fecha", "Estado", "Ciclo", "Tipo", "Cliente", "Mesa", "Mesero", "Valor", "Servicio", " Accion"};
         model = new MyDefaultTableModel(colNames, 0);
         tableList.setModel(model);
         tableList.setRowHeight(24);
@@ -102,21 +108,44 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener 
 
         tableList.getTableHeader().setBackground(COLOR_BACKG);
 
-        FormatRenderer formatRenderer = new FormatRenderer(app.getDCFORM_P());
+        TablaCellRenderer tRenderer = new TablaCellRenderer(true,app.getDCFORM_P());
 
-        tableList.getColumnModel().getColumn(7).setCellRenderer(formatRenderer);
-        tableList.getColumnModel().getColumn(8).setCellRenderer(formatRenderer);
+        int[] colW = new int[]{50, 50, 40, 15, 50, 60, 30, 50, 60, 60, 30};
+        for (int i = 0; i < colW.length; i++) {
+            tableList.getColumnModel().getColumn(i).setMinWidth(colW[i]);
+            tableList.getColumnModel().getColumn(i).setPreferredWidth(colW[i]);
+            tableList.getColumnModel().getColumn(i).setCellRenderer(new TablaCellRenderer(true, null));
+        }
+
+        tableList.getColumnModel().getColumn(8).setCellRenderer(tRenderer);
+        tableList.getColumnModel().getColumn(9).setCellRenderer(tRenderer);
         tableList.getColumnModel().getColumn(model.getColumnCount() - 1).setCellEditor(new BotonEditor(tableList, this, "AC_MOD_USER"));
         tableList.getColumnModel().getColumn(model.getColumnCount() - 1).setCellRenderer(new ButtonCellRenderer("Ver"));
 
         popupTable = new JPopupMenu();
         popupListenerTabla = new MyPopupListener(popupTable, true);
-        JMenuItem item1 = new JMenuItem("Eliminar");
+        JMenuItem item1 = new JMenuItem("Anular");
         item1.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
                 int r = tableList.getSelectedRow();
+                String fact = tableList.getValueAt(r, 0).toString();
+                System.out.println("fact:" + fact);
+                Invoice inv = app.getControl().getInvoiceByCode(fact);
+                StringBuilder msg = new StringBuilder();
+                msg.append("<html>Esta seguro que desea anular la factura N° ");
+                msg.append("<font color=blue>").append(inv.getFactura());
+                msg.append(" </font> del ");
+                msg.append("<font color=blue>").append(formFecha.format(inv.getFecha())).append("</font>");
+                msg.append("<p>Por valor de: ").append("<font color=blue>").append(app.getDCFORM_P().format(inv.getValor())).append("</font></p></html>");
+                msg.append("</html>");
+                int opt = JOptionPane.showConfirmDialog(null, msg, "Advertencia", JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
+                if (opt == JOptionPane.OK_OPTION) {
+                    inv.setStatus(Invoice.ST_ANULADA);
+                    app.getControl().updateInvoice(inv);   
+                    loadPedidos();
+                }
 
             }
         });
@@ -484,13 +513,13 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener 
 
     private void buscarFacturas(int idMesero, long idClient, int idTipo) {
 //        String date = "( fecha BETWEEN '" + app.DF.format(dIni) + "' AND '" + app.DF.format(dFin) + "')";
-        
+
         String query = "";
-        if (filtroActivado) {        
+        if (filtroActivado) {
             String tipo = idTipo == 0 ? "" : "deliveryType=" + idTipo + "";
             String mesero = idMesero == 0 ? "" : !tipo.isEmpty() ? " AND idMesero=" + idMesero + "" : "idMesero=" + idMesero;
             String cliente = (idClient < 1) ? "" : !mesero.isEmpty() ? " AND " + "idClient=" + idClient : "idClient=" + idClient;
-            query = tipo + mesero + cliente;        
+            query = tipo + mesero + cliente;
         }
 
         query = !queryDate.isEmpty() ? (!query.isEmpty() ? (queryDate + " AND " + query) : queryDate) : !query.isEmpty() ? query : "";
@@ -518,21 +547,27 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener 
             protected Object doInBackground() throws Exception {
                 model.setRowCount(0);
 
-                ArrayList<Invoice> invoiceslList = app.getControl().getInvoiceslList(query, "sale_date DESC");
+                ArrayList<Invoice> invoiceslList = app.getControl().getInvoiceslList(query, "code DESC, sale_date DESC");
                 BigDecimal total = new BigDecimal(0);
                 double servicio = 0;
                 int totalProducts = 0;
+                int anuladas = 0;
                 for (int i = 0; i < invoiceslList.size(); i++) {
                     Invoice invoice = invoiceslList.get(i);
                     Waiter waiter = app.getControl().getWaitersByID(invoice.getIdWaitress());
                     Table table = app.getControl().getTableByID(invoice.getTable());
-                    total = total.add(invoice.getValor());
-                    totalProducts += invoice.getProducts().size();
-                    servicio += invoice.getValueService();
+                    if (invoice.getStatus() != Invoice.ST_ANULADA) {
+                        total = total.add(invoice.getValor());
+                        totalProducts += invoice.getProducts().size();
+                        servicio += invoice.getValueService();
+                    } else {
+                        anuladas++;
+                    }
 
                     model.addRow(new Object[]{
                         invoice.getFactura(),
                         app.DF_FULL2.format(invoice.getFecha()),
+                        Invoice.STATUSES[invoice.getStatus()],
                         invoice.getCiclo(),
                         invoice.getTipoEntrega() + ":" + MyConstants.TIPO_PEDIDO[invoice.getTipoEntrega() - 1],
                         invoice.getIdCliente() == 1 ? "LOCAL" : invoice.getIdCliente(),
@@ -544,9 +579,10 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener 
 
                     model.setRowEditable(model.getRowCount() - 1, false);
                     model.setCellEditable(model.getRowCount() - 1, model.getColumnCount() - 1, true);
+
                 }
 
-                lbStatus.setText("<html><font color=blue>" + invoiceslList.size()
+                lbStatus.setText("<html><font color=blue>" + (invoiceslList.size() - anuladas)
                         + "</font> pedidos - <font color=blue>" + totalProducts
                         + "</font> productos. "
                         + "Servicio: <font color=green>" + app.DCFORM_P.format(servicio)
@@ -747,7 +783,56 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener 
         tableList.setRowSorter(sorter);
 
     }
-    
-    
+
+    public class TablaCellRenderer extends JLabel implements TableCellRenderer {
+
+        boolean isBordered = true;
+        private boolean anulada;
+        private final Format formatter;
+
+        public TablaCellRenderer(boolean isBordered, Format formatter) {
+            super();
+            this.isBordered = isBordered;
+            this.formatter = formatter;
+            anulada = false;
+            setFont(new Font("tahoma", 0, 12));
+            setOpaque(true);
+        }
+
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            int r = table.convertRowIndexToModel(row);
+            if ("ANULADA".equals(table.getModel().getValueAt(r, 2).toString())) {
+                anulada = true;
+            } else {
+                anulada = false;
+            }
+
+            if (value != null) {
+                if (formatter != null) {
+                    try {
+                        setHorizontalAlignment(SwingConstants.RIGHT);
+                        value = formatter.format(value);
+                    } catch (IllegalArgumentException e) {
+                    }
+                }
+                setText(value.toString().toUpperCase());
+            }
+            if (isSelected) {
+                setForeground(!anulada ? Color.black : Color.red);
+                setBackground(tableList.getSelectionBackground());
+                if (hasFocus) {
+                    setBorder(BorderFactory.createLineBorder(Color.darkGray));
+                } else {
+                    setBorder(createLineBorder(Color.lightGray));
+                }
+            } else {
+                setBackground(tableList.getBackground());
+                setForeground(!anulada ? Color.black : Color.red);
+                setBorder(UIManager.getBorder("Table.cellBorder"));
+            }
+            return this;
+        }
+    }
 
 }

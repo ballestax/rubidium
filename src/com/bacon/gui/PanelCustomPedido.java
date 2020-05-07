@@ -27,6 +27,8 @@ import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.text.Document;
@@ -49,6 +51,7 @@ public class PanelCustomPedido extends PanelCapturaMod implements ActionListener
     private SpinnerNumberModelo spPriceModel;
     private NumberFormat NF;
     private ButtonGroup bgPres;
+    private JPanel panel2;
 
     /**
      * Creates new form PanelCustomPedido
@@ -58,7 +61,7 @@ public class PanelCustomPedido extends PanelCapturaMod implements ActionListener
      */
     public PanelCustomPedido(Aplication app, Product product) {
         this.app = app;
-        this.product = product;        
+        this.product = product;
         initComponents();
         createComponents();
     }
@@ -156,14 +159,14 @@ public class PanelCustomPedido extends PanelCapturaMod implements ActionListener
 
         lbTitle2.setText("Adicionales");
         lbTitle2.setBackground(ColorDg.colorAleatorio().getColor1());
-        panel2.setLayout(new GridLayout(3, 3, 5, 5));
-        ArrayList<Additional> adds = app.getControl().getAdditionalList("");
-//        adds.add(new Additional("a01", "Chorizo", 2000));
-//        adds.add(new Additional("a02", "Pepinillos", 1000));
-//        adds.add(new Additional("a03", "Queso Mozarella", 1000));
-//        adds.add(new Additional("a04", "Queso Americano", 1000));
-//        adds.add(new Additional("a05", "Carne extra", 2000));
-
+        panel2 = new JPanel();
+        panel2.setBorder(BorderFactory.createEmptyBorder(5, 2, 5, 15));
+        sPanel1.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        
+        ArrayList<Additional> adds = app.getControl().getAdditionalList("", "i.name");
+        int COLS = 4;        
+        panel2.setLayout(new GridLayout(0, COLS, 5, 5));
+        sPanel1.setViewportView(panel2);
         for (int i = 0; i < adds.size(); i++) {
             Additional add = adds.get(i);
             PanelAddition panAdd = new PanelAddition(app, add);
@@ -305,7 +308,7 @@ public class PanelCustomPedido extends PanelCapturaMod implements ActionListener
                 double value = 0;
                 if (product.isVariablePrice()) {
                     value = spPriceModel.getNumber().doubleValue();
-                } else if (prodPed.getPresentation() != null) {                    
+                } else if (prodPed.getPresentation() != null) {
                     value = prodPed.getPresentation().getPrice();
                 } else {
                     value = product.getPrice();
@@ -346,7 +349,6 @@ public class PanelCustomPedido extends PanelCapturaMod implements ActionListener
         lbTitle1 = new javax.swing.JLabel();
         panel1 = new javax.swing.JPanel();
         lbTitle2 = new javax.swing.JLabel();
-        panel2 = new javax.swing.JPanel();
         spCantidad = new javax.swing.JSpinner();
         lbCant = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -356,6 +358,7 @@ public class PanelCustomPedido extends PanelCapturaMod implements ActionListener
         lbTitle3 = new javax.swing.JLabel();
         panel3 = new javax.swing.JPanel();
         spPrice = new javax.swing.JSpinner();
+        sPanel1 = new javax.swing.JScrollPane();
 
         lbName.setFont(new java.awt.Font("Ubuntu", 1, 17)); // NOI18N
         lbName.setText("jLabel1");
@@ -388,19 +391,6 @@ public class PanelCustomPedido extends PanelCapturaMod implements ActionListener
         lbTitle2.setText("jLabel1");
         lbTitle2.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         lbTitle2.setOpaque(true);
-
-        panel2.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-
-        javax.swing.GroupLayout panel2Layout = new javax.swing.GroupLayout(panel2);
-        panel2.setLayout(panel2Layout);
-        panel2Layout.setHorizontalGroup(
-            panel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
-        );
-        panel2Layout.setVerticalGroup(
-            panel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 104, Short.MAX_VALUE)
-        );
 
         spCantidad.setFont(new java.awt.Font("Ubuntu", 0, 36)); // NOI18N
 
@@ -461,14 +451,14 @@ public class PanelCustomPedido extends PanelCapturaMod implements ActionListener
                                 .addComponent(lbPrice, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))))
                     .addComponent(panel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(lbTitle2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(panel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jScrollPane1)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(lbInfo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btConfirm, javax.swing.GroupLayout.PREFERRED_SIZE, 159, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(lbTitle3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(panel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(panel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(sPanel1))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -500,9 +490,9 @@ public class PanelCustomPedido extends PanelCapturaMod implements ActionListener
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(lbTitle2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(panel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(sPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 46, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 19, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(lbInfo, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -530,8 +520,8 @@ public class PanelCustomPedido extends PanelCapturaMod implements ActionListener
     private javax.swing.JLabel lbTitle2;
     private javax.swing.JLabel lbTitle3;
     private javax.swing.JPanel panel1;
-    private javax.swing.JPanel panel2;
     private javax.swing.JPanel panel3;
+    private javax.swing.JScrollPane sPanel1;
     private javax.swing.JSpinner spCantidad;
     private javax.swing.JSpinner spPrice;
     private javax.swing.JTextArea taObs;

@@ -27,8 +27,13 @@ public class Invoice {
     private List<ProductoPed> otherProducts;
     private boolean service;
     private double porcService;
+    private int status;
+    public static final String[] STATUSES = {"NORMAL", "ANULADA"};
+    public static final int ST_NORMAL = 0;
+    public static final int ST_ANULADA = 1;
 
     public Invoice() {
+        status = ST_NORMAL;
         products = new ArrayList<>();
         otherProducts = new ArrayList<>();
     }
@@ -171,6 +176,14 @@ public class Invoice {
 
     public void setOtherProducts(List<ProductoPed> products) {
         this.otherProducts = products;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
     }
 
 }

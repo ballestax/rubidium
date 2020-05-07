@@ -72,7 +72,7 @@ public final class Aplication implements ActionListener, PropertyChangeListener,
     public static final String PREFERENCES = "";
     public static final String DATABASE = "baconapp";
     public static final String WORK_FOLDER = "baconapp";
-    public static final String DB_USER = "lrod";
+    public static final String DB_USER = "nait";
     public static boolean INSTALL_DB = false;
     private static final boolean messaged = true;
     public static final String DEFAULT_EXPORT_DIR = "";

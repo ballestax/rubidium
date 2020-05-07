@@ -165,6 +165,7 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Tabl
         
         regDireccion.setLabelText("Direccion");
         regDireccion.setFontCampo(font2);
+        regDireccion.setPopup(true);
         
         regDescuento.setLabelText("Des");
         regDescuento.setLabelFontSize(11);

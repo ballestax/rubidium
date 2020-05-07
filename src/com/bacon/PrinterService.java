@@ -80,6 +80,7 @@ public class PrinterService {
             Style font2 = new Style().setFontSize(Style.FontSize._1, Style.FontSize._1).setJustification(EscPosConst.Justification.Center);
             Style font3 = new Style().setFontSize(Style.FontSize._1, Style.FontSize._1);
             Style font4 = new Style().setFontSize(Style.FontSize._1, Style.FontSize._1).setJustification(EscPosConst.Justification.Right);
+            Style font5 = new Style().setFontSize(Style.FontSize._1, Style.FontSize._2).setJustification(EscPosConst.Justification.Center);
 
             escpos = new EscPos(new PrinterOutputStream(printService));
             imageWrapper.setJustification(EscPosConst.Justification.Center);
@@ -162,6 +163,10 @@ public class PrinterService {
             escpos.feed(1);
 
             escpos.writeLF(font2, "Gracias por su compra");
+            
+            
+            escpos.writeLF(font5, "#QuedateEnCasa");
+            
             escpos.feed(5);
 
             escpos.cut(EscPos.CutMode.FULL);

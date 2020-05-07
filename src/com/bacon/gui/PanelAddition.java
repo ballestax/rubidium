@@ -57,6 +57,8 @@ public class PanelAddition extends PanelCaptura implements ActionListener {
         lbName.addMouseListener(mouseClick);
         
         lbName.setText(StringUtils.capitalize(addition.getName()));
+        lbName.setToolTipText(StringUtils.capitalize(addition.getName()));
+        lbPrice.setToolTipText(StringUtils.capitalize(addition.getName()));
         lbPrice.setText(app.getCurrencyFormat().format(addition.getPrecio()));
         
         SpinnerNumberModel spModel = new SpinnerNumberModel(1, 1, 100, 1);
@@ -82,9 +84,12 @@ public class PanelAddition extends PanelCaptura implements ActionListener {
         lbPrice = new javax.swing.JLabel();
         spCant = new javax.swing.JSpinner();
 
+        setToolTipText("");
+
+        lbName.setFont(new java.awt.Font("Ubuntu", 0, 14)); // NOI18N
         lbName.setText("jLabel1");
 
-        lbPrice.setFont(new java.awt.Font("Ubuntu", 1, 14)); // NOI18N
+        lbPrice.setFont(new java.awt.Font("Ubuntu", 1, 13)); // NOI18N
         lbPrice.setText("jLabel2");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -96,10 +101,10 @@ public class PanelAddition extends PanelCaptura implements ActionListener {
                 .addComponent(chSel)
                 .addGap(6, 6, 6)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lbName, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(lbPrice, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(lbPrice, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGap(1, 1, 1)))
+                        .addComponent(lbName, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(spCant, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(2, 2, 2))

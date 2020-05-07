@@ -17,6 +17,7 @@ import java.beans.PropertyChangeListener;
 import java.math.BigDecimal;
 import java.util.List;
 import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -25,7 +26,7 @@ import javax.swing.ImageIcon;
 public class PanelConfirmPedido extends javax.swing.JPanel implements ActionListener, PropertyChangeListener {
 
     private final Aplication app;
-    private final Invoice invoice;
+    private Invoice invoice;
     private Waiter waiter;
     private Table table;
     private Client client;
@@ -65,8 +66,18 @@ public class PanelConfirmPedido extends javax.swing.JPanel implements ActionList
         btAdd.setActionCommand(AC_ADD_PRODUCT);
         btAdd.addActionListener(this);
 
+        btAnulate.setToolTipText("Anular");
+        btAnulate.setMargin(new Insets(2, 2, 2, 2));
+        btAnulate.setFocusPainted(false);
+        btAnulate.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "cancel.png", 32, 32)));
+        btAnulate.setActionCommand(AC_ANULATE_BILL);
+        btAnulate.addActionListener(this);
+        btAnulate.setEnabled(invoice.getStatus() != Invoice.ST_ANULADA);
+            
+
 //        jScrollPane1.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
     }
+    public static final String AC_ANULATE_BILL = "AC_ANULATE_BILL";
     public static final String AC_SAVE_BILL = "AC_SAVE_BILL";
     public static final String AC_PRINT_BILL = "AC_PRINT_BILL";
     public static final String AC_ADD_PRODUCT = "AC_ADD_PRODUCT";
@@ -80,7 +91,8 @@ public class PanelConfirmPedido extends javax.swing.JPanel implements ActionList
             client = app.getControl().getClient(invoice.getIdCliente().toString());
 
 //            System.out.println(client);
-            lbTitle.setText("PEDIDO: " + invoice.getFactura());
+            lbTitle.setText("<html>PEDIDO: <font size=+1 color=" + (invoice.getStatus() == 0 ? "blue" : "red") + ">" + invoice.getFactura() + "</font></html>");
+            lbStatus.setText("<html><font size=+1 color=" + (invoice.getStatus() == 0 ? "blue" : "red") + ">" + Invoice.STATUSES[invoice.getStatus()] + "</font></html>");
 
             StringBuilder textInfo = new StringBuilder("<html>");
             textInfo.append("<table  width=\"100%\" cellspacing=\"10\" border=\"1\">");
@@ -110,14 +122,14 @@ public class PanelConfirmPedido extends javax.swing.JPanel implements ActionList
             List<ProductoPed> productos = invoice.getProducts();
 
             double total = 0;
-            
+
             for (ProductoPed product : productos) {
-            
+
                 int cantidad = product.getCantidad();
                 double price = product.getValueAdicionales() + product.getPrecio();
                 total += cantidad * price;
                 str.append("<tr><td bgcolor=\"#F6FFDB\">").append((product.getPresentation() != null
-                        ? (product.getProduct().getName()+" ("+product.getPresentation().getName()+")") : product.getProduct().getName()).toUpperCase());
+                        ? (product.getProduct().getName() + " (" + product.getPresentation().getName() + ")") : product.getProduct().getName()).toUpperCase());
                 str.append("<br><font size=2>").append(product.getStAdicionales()).append("</font>");
                 str.append("<br>").append(product.hasExcluisones() ? "Sin: " : "").append("<font color=red size=2>").append(product.getStExclusiones()).append("</font></td>");
 //                str.append("<td bgcolor=\"#FFFFFF\">").append(product.getProduct().getCode()).append("</td>");
@@ -135,15 +147,25 @@ public class PanelConfirmPedido extends javax.swing.JPanel implements ActionList
                 lbOthers.setText("<html>Domicilio: <font size=+1 color=blue>" + app.getCurrencyFormat().format(valorDelivery) + "</html>");
                 total = total + valorDelivery.doubleValue();
             }
-            
+
             if (invoice.getTipoEntrega() == PanelPedido.TIPO_LOCAL) {
-                double serv = invoice.getValor().doubleValue()* invoice.getPorcService()/100.0;
+                double serv = invoice.getValor().doubleValue() * invoice.getPorcService() / 100.0;
                 lbOthers.setText("<html>Servicio voluntario: <font size=+1 color=blue>" + app.getCurrencyFormat().format(serv) + "</html>");
                 total = total + serv;
             }
-            
 
             lbTotal.setText("<html>Total<br><font size=+1 color=red>" + app.getCurrencyFormat().format(total) + "</html>");
+            
+            updateUI();
+        }
+    }
+
+    public void updateInvoice() {
+        Invoice inv = app.getControl().getInvoiceByCode(this.invoice.getFactura());
+        if (inv != null) {
+            this.invoice = inv;
+            setupInvoice();
+            btAnulate.setEnabled(invoice.getStatus() != Invoice.ST_ANULADA);
         }
     }
 
@@ -161,8 +183,30 @@ public class PanelConfirmPedido extends javax.swing.JPanel implements ActionList
 //            app.getControl().addInvoice(invoice);
         } else if (AC_ADD_PRODUCT.equals(e.getActionCommand())) {
             app.getGuiManager().showPanelAddProduct(this);
+        } else if (AC_ANULATE_BILL.equals(e.getActionCommand())) {
+            anularFactura();
+
         }
 
+    }
+
+    public void anularFactura() {
+//        String fact = invoice.getFactura();
+//        Invoice inv = app.getControl().getInvoiceByCode(fact);
+        StringBuilder msg = new StringBuilder();
+        msg.append("<html>Esta seguro que desea anular la factura N° ");
+        msg.append("<font color=blue>").append(invoice.getFactura());
+        msg.append(" </font> del ");
+        msg.append("<font color=blue>").append(app.DF_FULL2.format(invoice.getFecha())).append("</font>");
+        msg.append("<p>Por valor de: ").append("<font color=blue>").append(app.getDCFORM_P().format(invoice.getValor())).append("</font></p></html>");
+        msg.append("</html>");
+        int opt = JOptionPane.showConfirmDialog(null, msg, "Advertencia", JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
+        if (opt == JOptionPane.OK_OPTION) {
+            invoice.setStatus(Invoice.ST_ANULADA);
+            app.getControl().updateInvoice(invoice);      
+            updateInvoice();
+            
+        }
     }
 
     /**
@@ -184,6 +228,8 @@ public class PanelConfirmPedido extends javax.swing.JPanel implements ActionList
         lbTable = new javax.swing.JLabel();
         lbOthers = new javax.swing.JLabel();
         lbTipo = new javax.swing.JLabel();
+        lbStatus = new javax.swing.JLabel();
+        btAnulate = new javax.swing.JButton();
 
         lbTitle.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
@@ -199,6 +245,9 @@ public class PanelConfirmPedido extends javax.swing.JPanel implements ActionList
 
         lbTipo.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
+        lbStatus.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        lbStatus.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -206,12 +255,12 @@ public class PanelConfirmPedido extends javax.swing.JPanel implements ActionList
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lbTitle, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(btAdd, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(0, 230, Short.MAX_VALUE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 142, Short.MAX_VALUE)
+                                .addComponent(btAnulate, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addComponent(lbOthers, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
@@ -221,17 +270,22 @@ public class PanelConfirmPedido extends javax.swing.JPanel implements ActionList
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(btConfirm, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                     .addComponent(jScrollPane1)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(lbInfo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGap(0, 0, 0)
-                        .addComponent(lbTipo, javax.swing.GroupLayout.PREFERRED_SIZE, 121, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(lbTitle, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(lbInfo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(lbTipo, javax.swing.GroupLayout.PREFERRED_SIZE, 121, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lbStatus, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(lbTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(lbTitle, javax.swing.GroupLayout.DEFAULT_SIZE, 31, Short.MAX_VALUE)
+                    .addComponent(lbStatus, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(lbInfo, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -249,19 +303,26 @@ public class PanelConfirmPedido extends javax.swing.JPanel implements ActionList
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(lbOthers, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btAdd, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(btAdd, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btAnulate, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addContainerGap())
         );
+
+        layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {btAnulate, btConfirm, btPrint});
+
     }// </editor-fold>//GEN-END:initComponents
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btAdd;
+    private javax.swing.JButton btAnulate;
     private javax.swing.JButton btConfirm;
     private javax.swing.JButton btPrint;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lbInfo;
     private javax.swing.JLabel lbOthers;
+    private javax.swing.JLabel lbStatus;
     private javax.swing.JLabel lbTable;
     private javax.swing.JLabel lbTipo;
     private javax.swing.JLabel lbTitle;
