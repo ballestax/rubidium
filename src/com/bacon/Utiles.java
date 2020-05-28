@@ -493,5 +493,29 @@ public class Utiles {
         }
 
     }
+    
+    public static int sumarArray(int[] dat) {
+        int suma = 0;
+        for (int i = 0; i < dat.length; i++) {
+            suma += dat[i];
+        }
+        return suma;
+    }
+
+    public static float sumarArray(float[] dat) {
+        float suma = 0f;
+        for (int i = 0; i < dat.length; i++) {
+            suma += dat[i];
+        }
+        return suma;
+    }
+
+    public static double sumarArray(double[] dat) {
+        double suma = 0.0;
+        for (int i = 0; i < dat.length; i++) {
+            suma += dat[i];
+        }
+        return suma;
+    }
 
 }

@@ -163,10 +163,9 @@ public class PrinterService {
             escpos.feed(1);
 
             escpos.writeLF(font2, "Gracias por su compra");
-            
-            
+
             escpos.writeLF(font5, "#QuedateEnCasa");
-            
+
             escpos.feed(5);
 
             escpos.cut(EscPos.CutMode.FULL);
@@ -228,7 +227,7 @@ public class PrinterService {
             List<ProductoPed> products = invoice.getProducts();
             for (int i = 0; i < products.size(); i++) {
                 ProductoPed product = products.get(i);
-                Presentation presentation = product.getPresentation();                
+                Presentation presentation = product.getPresentation();
                 double priceFinal = product.getPrecio() + product.getValueAdicionales();
                 escpos.writeLF(String.format(formatInfo, product.getCantidad(), (product.getProduct().getName()).toUpperCase(),
                         "", app.DCFORM_P.format(priceFinal)));
@@ -236,10 +235,10 @@ public class PrinterService {
                 if (presentation != null) {
                     stPres = " (" + presentation.getName() + ")";
                     escpos.writeLF("    " + stPres);
-                }                
+                }
 
                 StringBuilder stb = new StringBuilder();
-                if (product.getExclusiones().size() > 0) {                    
+                if (product.getExclusiones().size() > 0) {
                     stb.append("Sin: ");
                     for (int j = 0; j < product.getExclusiones().size(); j++) {
                         Ingredient ing = product.getExclusiones().get(j);
@@ -268,6 +267,58 @@ public class PrinterService {
 
             escpos.feed(5);
 
+            escpos.cut(EscPos.CutMode.FULL);
+
+            escpos.close();
+
+        } catch (IOException ex) {
+            java.util.logging.Logger.getLogger(PanelPedido.class.getName()).log(Level.ALL.SEVERE, null, ex);
+        }
+    }
+
+    public void imprimirGuide(Invoice invoice, String printerName) {
+
+        Waiter waiter = null;
+        Table table = null;
+        Client client = null;
+        try {
+            waiter = app.getControl().getWaitersByID(invoice.getIdWaitress());
+            table = app.getControl().getTableByID(invoice.getTable());
+
+            client = app.getControl().getClient(invoice.getIdCliente().toString());
+        } catch (Exception e) {
+        }
+
+        PrintService printService = PrinterOutputStream.getPrintServiceByName(printerName);
+        EscPos escpos;
+        try {
+
+            Style font2 = new Style().setFontSize(Style.FontSize._1, Style.FontSize._1).setJustification(EscPosConst.Justification.Center);
+            Style font3 = new Style().setFontSize(Style.FontSize._1, Style.FontSize._1);
+            Style font4 = new Style().setFontSize(Style.FontSize._1, Style.FontSize._1).setJustification(EscPosConst.Justification.Right);
+            Style font5 = new Style().setFontSize(Style.FontSize._2, Style.FontSize._2);
+
+            escpos = new EscPos(new PrinterOutputStream(printService));
+            escpos.feed(1);
+            
+            escpos.writeLF(new Style().setFontSize(Style.FontSize._2, Style.FontSize._2).setJustification(EscPosConst.Justification.Center),
+                    "Bacon 57 Burger");
+
+            escpos.writeLF(font3, String.format("Tiquete N°: %1s", invoice.getFactura()));
+            escpos.write(font3, String.format("%s", app.DF_SL.format(invoice.getFecha())));
+            escpos.write(font4, String.format("%s", app.DF_TIME.format(invoice.getFecha())));
+            escpos.writeLF("");
+
+            if (invoice.getTipoEntrega() == PanelPedido.TIPO_DOMICILIO) {
+                escpos.writeLF(font2, "Domicilio");
+            }
+            escpos.feed(1);
+
+            escpos.writeLF(font3, "Cliente:   " + (client != null ? client.getCellphone() : "- - -"));
+            escpos.writeLF(font3, "Direccion: " + (client != null && !client.getAddresses().isEmpty() ? client.getAddresses().get(0) : "- - -"));
+
+            escpos.feed(3);
+            
             escpos.cut(EscPos.CutMode.FULL);
 
             escpos.close();

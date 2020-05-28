@@ -10,6 +10,7 @@ import com.bacon.domain.Additional;
 import com.bacon.domain.AdditionalPed;
 import com.bacon.domain.Ingredient;
 import com.bacon.domain.Invoice;
+import com.bacon.domain.OtherProduct;
 import com.bacon.domain.Presentation;
 import com.bacon.domain.Product;
 import com.bacon.domain.ProductoPed;
@@ -55,6 +56,7 @@ public class JDBCInvoiceDAO implements InvoiceDAO {
     protected static final String GET_ADDITIONAL_PRODUCT_KEY = "GET_ADDITIONAL_PRODUCT";
     protected static final String GET_EXCLUSION_PRODUCT_KEY = "GET_EXCLUSION_PRODUCT";
     protected static final String ADD_INVOICE_OTHER_PRODUCT_KEY = "ADD_INVOICE_OTHER_PRODUCT";
+    protected static final String GET_INVOICE_BY_PRODUCT_KEY = "GET_INVOICE_BY_PRODUCT";
     
     
     public JDBCInvoiceDAO(DataSource dataSource, SQLLoader sqlStatements) throws DAOException {
@@ -505,14 +507,16 @@ public class JDBCInvoiceDAO implements InvoiceDAO {
                 }
             }
             
-            List<ProductoPed> otherProducts = invoice.getOtherProducts();
+            List<OtherProduct> otherProducts = invoice.getOtherProducts();
+            
 
             for (int i = 0; i < otherProducts.size(); i++) {
-                ProductoPed product = otherProducts.get(i);                
+                ProductoPed product = new ProductoPed(otherProducts.get(i));                
                 Object[] parameters1 = {
                     idInvoice,
                     product.getProduct().getId(),
-                    product.getCantidad()
+                    product.getCantidad(),
+                    product.getPrecio()
                 };
                 ps = sqlStatements.buildSQLStatement(conn, ADD_INVOICE_OTHER_PRODUCT_KEY, parameters1);
                 ps.executeUpdate();
@@ -629,6 +633,52 @@ public class JDBCInvoiceDAO implements InvoiceDAO {
             DBManager.closeConnection(conn);
         }
         return invoices;
+    }
+    
+    public ArrayList<Object[]> getInvoiceByProductWhere(String where, String order) throws DAOException {
+        String retrieveProdIn;
+        ArrayList<Object[]> lista = new ArrayList<>();
+        try {
+            SQLExtractor sqlExtractorWhere = new SQLExtractor(where, SQLExtractor.Type.WHERE);;
+            SQLExtractor sqlExtractorOrderBy = new SQLExtractor(order, SQLExtractor.Type.ORDER_BY);;
+            Map<String, String> namedParams = new HashMap<>();
+            namedParams.put(NAMED_PARAM_WHERE, sqlExtractorWhere.extractWhere());
+            namedParams.put(NAMED_PARAM_ORDER_BY, sqlExtractorOrderBy.extractOrderBy());
+            retrieveProdIn = sqlStatements.getSQLString(GET_INVOICE_BY_PRODUCT_KEY, namedParams);
+        } catch (SQLException e) {
+            throw new DAOException("Could not properly retrieve the Salida", e);
+        } catch (IOException e) {
+            throw new DAOException("Could not properly retrieve the Salida", e);
+        }
+        Connection conn = null;
+        PreparedStatement retrieve = null;
+        ResultSet rs = null;
+        try {
+            conn = dataSource.getConnection();
+            retrieve = conn.prepareStatement(retrieveProdIn);
+            rs = retrieve.executeQuery();
+            while (rs.next()) {
+                Object[] datos = {
+                    rs.getInt(1), //id
+                    rs.getString(3), //factura
+                    rs.getDouble(4), //cantidad
+                    rs.getBigDecimal(5), //precio
+                    rs.getDate(9), //fecha
+                    rs.getString(14), //proveedor
+                    rs.getInt(6), //locacion
+                    rs.getString(2), //producto
+                };
+                lista.add(datos);
+            }
+        } catch (SQLException e) {
+            throw new DAOException("Could not properly retrieve the Invoice: " + e);
+        } finally {
+            DBManager.closeResultSet(rs);
+            DBManager.closeStatement(retrieve);
+            DBManager.closeConnection(conn);
+        }
+        return lista;
+
     }
 
 }

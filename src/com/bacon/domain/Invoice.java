@@ -24,7 +24,7 @@ public class Invoice {
     private int idWaitress;
     private int table;
     private List<ProductoPed> products;
-    private List<ProductoPed> otherProducts;
+    private List<OtherProduct> otherProducts;
     private boolean service;
     private double porcService;
     private int status;
@@ -166,15 +166,15 @@ public class Invoice {
         return isService() ? getPorcService() * getValor().doubleValue() / 100 : 0;
     }
 
-    public List<ProductoPed> getOtherProducts() {
+    public List<OtherProduct> getOtherProducts() {
         return otherProducts;
     }
 
-    public void addOtherProduct(ProductoPed product) {
+    public void addOtherProduct(OtherProduct product) {
         this.otherProducts.add(product);
     }
 
-    public void setOtherProducts(List<ProductoPed> products) {
+    public void setOtherProducts(List<OtherProduct> products) {
         this.otherProducts = products;
     }
 

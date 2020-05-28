@@ -9,6 +9,7 @@ import com.bacon.DBManager;
 import com.bacon.domain.Category;
 import com.bacon.domain.Cycle;
 import com.bacon.domain.Ingredient;
+import com.bacon.domain.OtherProduct;
 import com.bacon.domain.Permission;
 import com.bacon.domain.Presentation;
 import com.bacon.domain.Rol;
@@ -90,7 +91,9 @@ public class JDBCUtilDAO implements UtilDAO {
     public static final String ADD_OTHER_PRODUCT_KEY = "ADD_OTHER_PRODUCT";
 
     public static final String CREATE_INVOICE_OTHER_PRODUCT_TABLE_KEY = "CREATE_INVOICE_OTHER_PRODUCT_TABLE";
-    public static final String ADD_INVOICE_OTHER_PRODUCT_key = "ADD_INVOICE_OTHER_PRODUCT";
+    public static final String ADD_INVOICE_OTHER_PRODUCT_KEY = "ADD_INVOICE_OTHER_PRODUCT";
+    
+    public static final String CREATE_EXPENSES_INCOMES_TABLE_KEY = "CREATE_EXPENSES_INCOMES_TABLE";
 
     protected static final String CHECK_TABLE_EMPTY_KEY = "CHECK_TABLE";
     protected static final String INSERT_ROLE_USER_KEY = "INSERT_ROLE_USER";
@@ -155,8 +158,12 @@ public class JDBCUtilDAO implements UtilDAO {
 
         TABLE_NAME = "invoice_otherproduct";
         createTable(TABLE_NAME, CREATE_INVOICE_OTHER_PRODUCT_TABLE_KEY);
+        
+        TABLE_NAME = "expenses_incomes";
+        createTable(TABLE_NAME, CREATE_EXPENSES_INCOMES_TABLE_KEY);
 
     }
+    
 
     private void createTable(String tableName, String JDBC_KEY) throws DAOException {
         Connection conn = null;
@@ -1003,6 +1010,27 @@ public class JDBCUtilDAO implements UtilDAO {
         } catch (SQLException | IOException e) {
             DBManager.rollbackConn(conn);
             throw new DAOException("Cannot add other product", e);
+        } finally {
+            DBManager.closeStatement(ps);
+            DBManager.closeConnection(conn);
+        }
+    }
+    
+    public void addOtherProductInvoice(long idInvoice, OtherProduct otherProduct, int cantidad) throws DAOException {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        try {
+            conn = dataSource.getConnection();
+            conn.setAutoCommit(false);
+            Object[] parameters = {
+                idInvoice, otherProduct.getId(), cantidad, otherProduct.getPrice()
+            };
+            ps = sqlStatements.buildSQLStatement(conn, ADD_INVOICE_OTHER_PRODUCT_KEY, parameters);
+            ps.executeUpdate();
+            conn.commit();
+        } catch (SQLException | IOException e) {
+            DBManager.rollbackConn(conn);
+            throw new DAOException("Cannot add other product to invoice", e);
         } finally {
             DBManager.closeStatement(ps);
             DBManager.closeConnection(conn);

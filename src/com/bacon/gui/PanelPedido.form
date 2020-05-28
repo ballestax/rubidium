@@ -341,6 +341,11 @@
     <Component class="javax.swing.JButton" name="btClear">
     </Component>
     <Component class="javax.swing.JCheckBox" name="chRecogido">
+      <Properties>
+        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+          <Font name="Ubuntu" size="14" style="0"/>
+        </Property>
+      </Properties>
     </Component>
   </SubComponents>
 </Form>

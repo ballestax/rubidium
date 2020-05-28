@@ -6,7 +6,6 @@
 package com.bacon.gui;
 
 import com.bacon.Aplication;
-import com.bacon.ImageManager;
 import com.bacon.MyConstants;
 import com.bacon.domain.Cycle;
 import com.bacon.domain.Invoice;
@@ -55,6 +54,7 @@ public class PanelCash extends PanelCapturaMod implements ActionListener, Proper
     public static final Logger logger = Logger.getLogger(PanelCash.class.getCanonicalName());
     private MyDefaultTableModel model;
     private DecimalFormat decimalFormat;
+    private MyDefaultTableModel modelExt;
 
     /**
      * Creates new form PanelCash
@@ -70,10 +70,11 @@ public class PanelCash extends PanelCapturaMod implements ActionListener, Proper
 
     private void createComponents() {
 
-        String[] cols = new String[]{"Ticket", "Fecha", "Valor", "Tipo", "Mesa", "Mesero", "Facturar"};
+        String[] cols = new String[]{"ID", "Ticket", "Fecha", "Valor", "Tipo", "Mesa", "Mesero", "Facturar"};
         model = new MyDefaultTableModel(cols, 0);
 
-        
+        String[] cols2 = new String[]{"Tipo", "Categoria", "Valor", "Nota"};
+        modelExt = new MyDefaultTableModel(cols2, 0);
 
         lbFacturas.setText("Facturas");
         lbGastos.setText("Extras");
@@ -81,7 +82,7 @@ public class PanelCash extends PanelCapturaMod implements ActionListener, Proper
         btRefresh.setActionCommand(AC_REFRESH);
         btRefresh.addActionListener(this);
         btRefresh.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "update.png", 32, 32)));
-        
+
         btAddGasto.setActionCommand(AC_ADD_GASTO);
         btAddGasto.addActionListener(this);
         btAddGasto.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "add1.png", 24, 24)));
@@ -89,18 +90,26 @@ public class PanelCash extends PanelCapturaMod implements ActionListener, Proper
         decimalFormat = app.getDCFORM_W();
 
         tableInvoices.setModel(model);
-
         tableInvoices.setRowHeight(22);
-        int[] colW = new int[]{40, 100, 80, 50, 50, 50, 40};
+        int[] colW = new int[]{10, 40, 100, 80, 50, 50, 50, 40};
         for (int i = 0; i < colW.length; i++) {
             tableInvoices.getColumnModel().getColumn(i).setMinWidth(colW[i]);
             tableInvoices.getColumnModel().getColumn(i).setPreferredWidth(colW[i]);
             tableInvoices.getColumnModel().getColumn(i).setCellRenderer(new TablaCellRenderer(true));
         }
 
+        tableExtras.setModel(modelExt);
+        tableExtras.setRowHeight(22);
+        int[] colWE = new int[]{40, 100, 80};
+        for (int i = 0; i < colWE.length; i++) {
+            tableExtras.getColumnModel().getColumn(i).setMinWidth(colWE[i]);
+            tableExtras.getColumnModel().getColumn(i).setPreferredWidth(colWE[i]);
+            tableExtras.getColumnModel().getColumn(i).setCellRenderer(new TablaCellRenderer(true));
+        }
+
         TablaCellRenderer rightRenderer = new TablaCellRenderer(true);
         rightRenderer.setHorizontalAlignment(SwingConstants.RIGHT);
-        tableInvoices.getColumnModel().getColumn(2).setCellRenderer(rightRenderer);
+        tableInvoices.getColumnModel().getColumn(3).setCellRenderer(rightRenderer);
 
         tableInvoices.getColumnModel().getColumn(model.getColumnCount() - 1).setCellEditor(new BotonEditor(tableInvoices, this, "AC_MOD_USER"));
         tableInvoices.getColumnModel().getColumn(model.getColumnCount() - 1).setCellRenderer(new ButtonCellRenderer("Ver"));
@@ -140,7 +149,7 @@ public class PanelCash extends PanelCapturaMod implements ActionListener, Proper
         lbData4.setOpaque(true);
         lbData4.setBorder(BorderFactory.createLineBorder(color4.darker(), 1, true));
         lbData4.setBackground(color4.brighter());
-        
+
         Color color5 = new Color(15, 112, 67);
         lbTit5.setText("Entradas");
         lbTit5.setOpaque(true);
@@ -172,19 +181,18 @@ public class PanelCash extends PanelCapturaMod implements ActionListener, Proper
         lbEnd.setBorder(BorderFactory.createCompoundBorder(bordeOut, bordeIn));
 
 //        populateTabla("");
-
         lbData1.setText("0");
         lbData2.setText("0");
         lbData3.setText("0");
         lbData5.setText("0");
-        
+
         loadCycle();
-        
+
     }
 
     public void loadCycle() {
         if (cycle == null) {
-            cycle = app.getControl().getLastCycle();            
+            cycle = app.getControl().getLastCycle();
         }
         showCycle(cycle);
     }
@@ -231,6 +239,7 @@ public class PanelCash extends PanelCapturaMod implements ActionListener, Proper
                 total = new BigDecimal(0);
                 int totalProducts = 0;
                 int anuladas = 0;
+                int ct = 1;
                 for (int i = 0; i < invoiceslList.size(); i++) {
                     Invoice invoice = invoiceslList.get(i);
                     Waiter waiter = app.getControl().getWaitersByID(invoice.getIdWaitress());
@@ -240,6 +249,7 @@ public class PanelCash extends PanelCapturaMod implements ActionListener, Proper
                         totalProducts += invoice.getProducts().size();
 //                        servicio += invoice.getValueService();
                         model.addRow(new Object[]{
+                            ct++,
                             invoice.getFactura(),
                             app.DF_FULL2.format(invoice.getFecha()),
                             app.DCFORM_P.format(invoice.getValor()),
@@ -265,7 +275,7 @@ public class PanelCash extends PanelCapturaMod implements ActionListener, Proper
                 app.getGuiManager().setDefaultCursor();
 
                 lbData1.setText("<html><font size=4>" + app.DCFORM_P.format(total.doubleValue()) + "</font></html>");
-                
+
                 lbData3.setText("<html><font size=4>" + app.DCFORM_P.format(cycle.getInitialBalance().add(total).doubleValue()) + "</font></html>");
             }
 
@@ -339,8 +349,8 @@ public class PanelCash extends PanelCapturaMod implements ActionListener, Proper
         lbTit5 = new javax.swing.JLabel();
         btAddGasto = new javax.swing.JButton();
         lbGastos = new javax.swing.JLabel();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        listGastos = new javax.swing.JList<>();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        tableExtras = new javax.swing.JTable();
 
         jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
@@ -528,7 +538,15 @@ public class PanelCash extends PanelCapturaMod implements ActionListener, Proper
         lbGastos.setText("jLabel1");
         lbGastos.setOpaque(true);
 
-        jScrollPane2.setViewportView(listGastos);
+        tableExtras.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+
+            }
+        ));
+        jScrollPane3.setViewportView(tableExtras);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -551,7 +569,7 @@ public class PanelCash extends PanelCapturaMod implements ActionListener, Proper
                                 .addComponent(lbGastos, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addGap(1, 1, 1)
                                 .addComponent(btAddGasto, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(jScrollPane2)))
+                            .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)))
                     .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
@@ -569,7 +587,7 @@ public class PanelCash extends PanelCapturaMod implements ActionListener, Proper
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane1)
-                    .addComponent(jScrollPane2))
+                    .addComponent(jScrollPane3))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -596,7 +614,7 @@ public class PanelCash extends PanelCapturaMod implements ActionListener, Proper
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JLabel lbData1;
     private javax.swing.JLabel lbData2;
@@ -613,7 +631,7 @@ public class PanelCash extends PanelCapturaMod implements ActionListener, Proper
     private javax.swing.JLabel lbTit3;
     private javax.swing.JLabel lbTit4;
     private javax.swing.JLabel lbTit5;
-    private javax.swing.JList<String> listGastos;
+    private javax.swing.JTable tableExtras;
     private javax.swing.JTable tableInvoices;
     // End of variables declaration//GEN-END:variables
 
@@ -663,7 +681,7 @@ public class PanelCash extends PanelCapturaMod implements ActionListener, Proper
             final int f = tabla.getEditingRow();
             if (f != -1 && c != -1) {
                 int row = tabla.convertRowIndexToModel(f);
-                String code = model.getValueAt(row, 0).toString();
+                String code = model.getValueAt(row, 1).toString();
                 Invoice invoice = app.getControl().getInvoiceByCode(code);
                 app.getGuiManager().reviewFacture(invoice);
 

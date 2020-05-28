@@ -41,6 +41,8 @@
                     |CREATE_OTHER_PRODUCTS_TABLE|GET_OTHER_PRODUCT|ADD_OTHER_PRODUCT|DELETE_OTHER_PRODUCT
                     |CREATE_INVOICE_OTHER_PRODUCT_TABLE|ADD_INVOICE_OTHER_PRODUCT
                     |GET_CATEGORIES_SORTED
+                    |CREATE_EXPENSES_INCOMES_TABLE|ADD_EXPENSE_INCOME|GET_EXPENSE_INCOME
+                    |GET_INVOICE_BY_PRODUCT
                     
                     
                     ) #REQUIRED
@@ -883,6 +885,22 @@
                 WHERE code = ?
             </SQLFragment>
         </SQLStatement> 
+        
+        <SQLStatement method="GET_INVOICE_BY_PRODUCT">
+            <SQLFragment>
+                SELECT
+            </SQLFragment>
+            <SQLFragment>
+                * FROM invoice_product LEFT JOIN invoices ON invoices.id=invoice_product.id_invoice
+            </SQLFragment>
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                WHERE {where}
+            </SQLFragment>    
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                ORDER BY {orderby}
+            </SQLFragment>        
+        </SQLStatement>
+        
                         
         <SQLStatement method="CREATE_WAITERS_TABLE">
             <SQLFragment>
@@ -1179,7 +1197,7 @@
                 id INTEGER AUTO_INCREMENT,
                 name VARCHAR(255) NOT NULL UNIQUE,                
                 description VARCHAR(500),
-                price DECIMAL(20,2),                
+                price DECIMAL(20,2),
                 PRIMARY KEY (id)
                 )ENGINE=InnoDB DEFAULT CHARSET=latin1;
             </SQLFragment>
@@ -1222,6 +1240,7 @@
                 id_invoice INTEGER NOT NULL,
                 id_otherproduct INTEGER NOT NULL,
                 cantidad INTEGER,
+                price DECIMAL(20,2),
                 PRIMARY KEY (id)                
                 )ENGINE=InnoDB DEFAULT CHARSET=latin1;
             </SQLFragment>
@@ -1229,7 +1248,7 @@
         
         <SQLStatement method="ADD_INVOICE_OTHER_PRODUCT">
             <SQLFragment>
-                INSERT INTO invoice_otherproduct (id_invoice, id_otherproduct, cantidad) VALUES (?,?,?);
+                INSERT INTO invoice_otherproduct (id_invoice, id_otherproduct, cantidad, price) VALUES (?,?,?,?);
             </SQLFragment>
         </SQLStatement>
                 
@@ -1243,16 +1262,41 @@
             </SQLFragment>
         </SQLStatement>
 
+
+        <SQLStatement method="CREATE_EXPENSES_INCOMES_TABLE">            
+            <SQLFragment>
+                CREATE TABLE expenses_incomes(
+                id INTEGER AUTO_INCREMENT,
+                type INTEGER NOT NULL,
+                category INTEGER NOT NULL,
+                value DECIMAL(20,2),
+                note VARCHAR(255),
+                PRIMARY KEY (id)                
+                )ENGINE=InnoDB DEFAULT CHARSET=latin1;
+            </SQLFragment>
+        </SQLStatement>   
         
+        <SQLStatement method="ADD_EXPENSE_INCOME">
+            <SQLFragment>
+                INSERT INTO expense_income (type, category, value, note) 
+                VALUES (?,?,?,?)
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="GET_EXPENSE_INCOME">
+            <SQLFragment>
+                SELECT
+            </SQLFragment>
+            <SQLFragment>
+                * FROM expenses_incomes
+            </SQLFragment>
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                WHERE {where}
+            </SQLFragment>    
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                ORDER BY {orderby}
+            </SQLFragment>        
+        </SQLStatement>	     
                                  
     </DAOStatements>
 </DAOConfiguration>
-
-
-
-
-
-
-
-
-

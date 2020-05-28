@@ -697,5 +697,16 @@ public class Control {
             return null;
         }
     }
+    
+    public ArrayList<Object[]> getInvoiceByProductListWhere(String where, String order) {
+        try {
+            JDBCInvoiceDAO salidaDAO = (JDBCInvoiceDAO) JDBCDAOFactory.getInstance().getInvoiceDAO();
+            return salidaDAO.getInvoiceByProductWhere(where, order);
+        } catch (DAOException ex) {
+            logger.error("Error getting invoice by product list.", ex);
+            GUIManager.showErrorMessage(null, "Error consultando lista de facturas por productos", "Error");
+            return null;
+        }
+    }
 
 }

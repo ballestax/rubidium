@@ -132,9 +132,9 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Tabl
         Font font = new Font("Arial", 1, 18);
         Font font2 = new Font("Serif", 1, 15);
         
-        colorDelivery = ColorDg.colorAleatorio().getColor1();
+        colorDelivery = ColorDg.colorAleatorio().getColor1().darker();
 //        colorLocal = new Color(180,30,154);
-        colorLocal = ColorDg.colorAleatorio().getColor2();
+        colorLocal = ColorDg.colorAleatorio().getColor2().darker();
         
         DCFORM_P = (DecimalFormat) NumberFormat.getInstance();
         DCFORM_P.applyPattern("$ ###,###,###");
@@ -490,13 +490,13 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Tabl
             String propPrinter = app.getConfiguration().getProperty(Configuration.PRINTER_SELECTED);
             if (invoice != null) {
                 
-                app.getPrinterService().imprimirPedido(invoice, propPrinter);
+                app.getPrinterService().imprimirGuide(invoice, propPrinter);
             } else {
                 if (products.isEmpty()) {
                     GUIManager.showErrorMessage(null, "No hay productos en el pedido", "Advertencia");
                 } else {
                     Invoice invoicePrev = getInvoice();
-                    app.getPrinterService().imprimirPedido(invoicePrev, propPrinter);
+                    app.getPrinterService().imprimirGuide(invoicePrev, propPrinter);
                 }
                 
             }
@@ -764,6 +764,7 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Tabl
                 pPed.setCantidad(cantidad);
                 otherProducts.set(row, otherProduct);
             } catch (Exception e) {
+                System.err.println(e.getMessage());
             }
             
         } else {
@@ -780,7 +781,7 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Tabl
                 modeloTb.setRowEditable(modeloTb.getRowCount() - 1, false);
                 modeloTb.setCellEditable(modeloTb.getRowCount() - 1, 0, true);
             } catch (Exception ex) {
-                System.out.println(ex.getMessage());
+                System.err.println(ex.getMessage());
             }
         }
     }
@@ -929,6 +930,8 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Tabl
         }
         
         invoice.setProducts(products);
+        
+        invoice.setOtherProducts(otherProducts);
         
         invoice.isService();
         
@@ -1445,6 +1448,8 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Tabl
 
         chServ.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         chServ.setOpaque(true);
+
+        chRecogido.setFont(new java.awt.Font("Ubuntu", 0, 14)); // NOI18N
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);

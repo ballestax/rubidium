@@ -23,7 +23,7 @@
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" attributes="0">
                               <Component id="btAdd" min="-2" pref="50" max="-2" attributes="0"/>
-                              <EmptySpace pref="142" max="32767" attributes="0"/>
+                              <EmptySpace pref="232" max="32767" attributes="0"/>
                               <Component id="btAnulate" min="-2" pref="88" max="-2" attributes="0"/>
                           </Group>
                           <Component id="lbOthers" max="32767" attributes="0"/>
@@ -44,9 +44,10 @@
                           <Component id="lbTitle" alignment="0" max="32767" attributes="0"/>
                           <Component id="lbInfo" max="32767" attributes="0"/>
                       </Group>
+                      <EmptySpace min="-2" pref="1" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                          <Component id="lbTipo" min="-2" pref="121" max="-2" attributes="0"/>
-                          <Component id="lbStatus" max="32767" attributes="0"/>
+                          <Component id="lbStatus" pref="166" max="32767" attributes="0"/>
+                          <Component id="lbTipo" max="32767" attributes="0"/>
                       </Group>
                   </Group>
               </Group>
@@ -154,6 +155,7 @@
     </Component>
     <Component class="javax.swing.JLabel" name="lbTipo">
       <Properties>
+        <Property name="horizontalAlignment" type="int" value="4"/>
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
           <Border info="org.netbeans.modules.form.compat2.border.EtchedBorderInfo">
             <EtchetBorder/>
