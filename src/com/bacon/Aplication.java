@@ -72,13 +72,13 @@ public final class Aplication implements ActionListener, PropertyChangeListener,
     public static final String PREFERENCES = "";
     public static final String DATABASE = "baconapp";
     public static final String WORK_FOLDER = "baconapp";
-    public static final String DB_USER = "nait";
+    public static final String DB_USER = "root";
     public static boolean INSTALL_DB = false;
     private static final boolean messaged = true;
     public static final String DEFAULT_EXPORT_DIR = "";
 
     //Correr la aplicacion con configuracion de servidor local
-    private static boolean local = true;
+    private static boolean local = !true;
 
     public DateFormat DF = new SimpleDateFormat("dd-MM-yyyy");
     public DateFormat DF_FULL = new SimpleDateFormat("dd MMMM yyyy hh:mm");
