@@ -54,6 +54,13 @@ public class PanelConfirmPedido extends javax.swing.JPanel implements ActionList
         btPrint.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "Printer-orange.png", 32, 32)));
         btPrint.setActionCommand(AC_PRINT_BILL);
         btPrint.addActionListener(this);
+        
+        btPrint2.setToolTipText("Guia");
+        btPrint2.setMargin(new Insets(2, 2, 2, 2));
+        btPrint2.setFocusPainted(false);
+        btPrint2.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "email-info.png", 32, 32)));
+        btPrint2.setActionCommand(AC_PRINT_GUIDE);
+        btPrint2.addActionListener(this);
 
         btConfirm.setText("Guardar");
         btConfirm.setActionCommand(AC_SAVE_BILL);
@@ -77,6 +84,7 @@ public class PanelConfirmPedido extends javax.swing.JPanel implements ActionList
 
 //        jScrollPane1.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
     }
+    public static final String AC_PRINT_GUIDE = "AC_PRINT_GUIDE";
     public static final String AC_ANULATE_BILL = "AC_ANULATE_BILL";
     public static final String AC_SAVE_BILL = "AC_SAVE_BILL";
     public static final String AC_PRINT_BILL = "AC_PRINT_BILL";
@@ -186,6 +194,14 @@ public class PanelConfirmPedido extends javax.swing.JPanel implements ActionList
         } else if (AC_ANULATE_BILL.equals(e.getActionCommand())) {
             anularFactura();
 
+        }else if (AC_PRINT_GUIDE.equals(e.getActionCommand())) {
+            String propPrinter = app.getConfiguration().getProperty(Configuration.PRINTER_SELECTED);
+            if (propPrinter.isEmpty()) {
+                GUIManager.showErrorMessage(null, "No ha seleccionado una impresora valida para imprimir", "Impresora no encontrada");
+                return;
+            }
+            String printerName = propPrinter;
+            app.getPrinterService().imprimirGuide(invoice, printerName);
         }
 
     }
@@ -230,6 +246,7 @@ public class PanelConfirmPedido extends javax.swing.JPanel implements ActionList
         lbTipo = new javax.swing.JLabel();
         lbStatus = new javax.swing.JLabel();
         btAnulate = new javax.swing.JButton();
+        btPrint2 = new javax.swing.JButton();
 
         lbTitle.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
@@ -237,6 +254,12 @@ public class PanelConfirmPedido extends javax.swing.JPanel implements ActionList
         lbTotal.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
         lbInfo.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+
+        btPrint.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btPrintActionPerformed(evt);
+            }
+        });
 
         lbTable.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         jScrollPane1.setViewportView(lbTable);
@@ -258,18 +281,20 @@ public class PanelConfirmPedido extends javax.swing.JPanel implements ActionList
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lbOthers, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(btAdd, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 232, Short.MAX_VALUE)
-                                .addComponent(btAnulate, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(lbOthers, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 249, Short.MAX_VALUE)
+                                .addComponent(btAnulate, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(lbTotal, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 184, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(btPrint, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addComponent(btPrint2, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btConfirm, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                                .addComponent(btPrint, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btConfirm, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(lbTotal, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 184, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addComponent(jScrollPane1)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
@@ -295,19 +320,16 @@ public class PanelConfirmPedido extends javax.swing.JPanel implements ActionList
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 293, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(lbTotal, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(btConfirm, javax.swing.GroupLayout.DEFAULT_SIZE, 39, Short.MAX_VALUE)
-                            .addComponent(btPrint, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(lbOthers, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(btAdd, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(btAnulate, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lbTotal, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lbOthers, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                    .addComponent(btAnulate, javax.swing.GroupLayout.DEFAULT_SIZE, 25, Short.MAX_VALUE)
+                    .addComponent(btPrint2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btPrint, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btConfirm, javax.swing.GroupLayout.DEFAULT_SIZE, 39, Short.MAX_VALUE)
+                    .addComponent(btAdd, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
 
@@ -315,12 +337,17 @@ public class PanelConfirmPedido extends javax.swing.JPanel implements ActionList
 
     }// </editor-fold>//GEN-END:initComponents
 
+    private void btPrintActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btPrintActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btPrintActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btAdd;
     private javax.swing.JButton btAnulate;
     private javax.swing.JButton btConfirm;
     private javax.swing.JButton btPrint;
+    private javax.swing.JButton btPrint2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lbInfo;
     private javax.swing.JLabel lbOthers;
