@@ -60,10 +60,10 @@ public class MyDatePickerImp extends JComponent implements ActionListener, Caret
 
     private void initComponent(boolean show) {
 
-        btPick = new JButton();
+        btPick = new JButton("C");
         btPick.setActionCommand("SHOW_DATEPICKER");
         btPick.addActionListener(this);
-        btPick.setIcon(new ImageIcon(Resources.getImagen("gui/img/calendario.png", MyDatePickerImp.this.getClass(), 16, 16)));
+//        btPick.setIcon(new ImageIcon(Resources.getImagen("gui/img/calendario.png", MyDatePickerImp.this.getClass(), 16, 16)));
         btPick.setPreferredSize(new Dimension(16, 16));
         datePicker = new DatePicker(date);
         datePicker.addPropertyChangeListener(this);

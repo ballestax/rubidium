@@ -63,6 +63,7 @@ public final class Aplication implements ActionListener, PropertyChangeListener,
     public static final String ACTION_SHOW_ORDER = "acShowOrder";
     public static final String ACTION_SHOW_ORDER_LIST = "acShowOrderList";
     public static final String ACTION_SHOW_CASH = "acShowCash";
+    public static final String ACTION_SHOW_REPORTS = "acShowReports";
 
     public static final String ACTION_RETURN_TO_MENU = "acReturnToMenu";
     public static final String ACTION_CLOSE_SESION = "acCLoseSesion";
@@ -114,7 +115,7 @@ public final class Aplication implements ActionListener, PropertyChangeListener,
     public final DecimalFormat DCFORM_W;
     public final DecimalFormat DCFORM_P;
     private ProgAction acShowOrderList;
-    
+    private ProgAction acShowReports;
 
     public Aplication() {
 
@@ -167,17 +168,16 @@ public final class Aplication implements ActionListener, PropertyChangeListener,
 
         control = new Control(this);
         String propST = configuration.getProperty(Configuration.DATABASE_STATION, "false");
-        
+
         boolean station = Boolean.parseBoolean(propST);
         if (!station) {
             INSTALL_DB = true;
             control.initDatabase();
             setupPermissionsFromLocal();
-        }else {
+        } else {
             logger.debug("working as station");
             INSTALL_DB = false;
         }
-               
 
         configuration.save();
 
@@ -443,6 +443,16 @@ public final class Aplication implements ActionListener, PropertyChangeListener,
         acShowCash.setSmallIcon(new ImageIcon(imgManager.getImagen(getFolderIcons() + "cash.png", 25, 25)));
         acShowCash.setLargeIcon(new ImageIcon(imgManager.getImagen(getFolderIcons() + "cash.png", 32, 32)));
 
+        acShowReports = new ProgAction("Reportes",
+                null, "Ver modulo reportes", 'r') {
+            public void actionPerformed(ActionEvent e) {
+                Permission perm = getControl().getPermissionByName("show-reports-module");
+                getGuiManager().showBasicPanel(getGuiManager().getPanelBasicReports(), perm);
+            }
+        };
+        acShowReports.setSmallIcon(new ImageIcon(imgManager.getImagen(getFolderIcons() + "reports.png", 25, 25)));
+        acShowReports.setLargeIcon(new ImageIcon(imgManager.getImagen(getFolderIcons() + "reports.png", 32, 32)));
+
         acCerrarSesion = new ProgAction("Cerrar secion",
                 null, "Cerrar la sesion del usuario actual", 'x') {
             public void actionPerformed(ActionEvent e) {
@@ -477,6 +487,10 @@ public final class Aplication implements ActionListener, PropertyChangeListener,
 
             case ACTION_SHOW_CASH:
                 return acShowCash;
+
+            case ACTION_SHOW_REPORTS:
+                return acShowReports;
+                
             default:
                 return null;
         }
@@ -584,7 +598,7 @@ public final class Aplication implements ActionListener, PropertyChangeListener,
     }
 
     @Override
-    public void propertyChange(final PropertyChangeEvent evt) {        
+    public void propertyChange(final PropertyChangeEvent evt) {
         if (PanelProduct2.AC_ADD_QUICK.equals(evt.getPropertyName())) {
             Product producto = (Product) evt.getNewValue();
 //            guiManager.getPanelPedido().addProduct(producto);

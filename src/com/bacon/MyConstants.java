@@ -49,6 +49,7 @@ public class MyConstants {
         new Permission("show-admin-module", "Ver el modulo administrador"),
         new Permission("show-pedidos-module", "Ver el modulo pedidos"),
         new Permission("show-cash-module", "Ver el modulo caja"),
+        new Permission("show-reports-module", "Ver el modulo reportes"),
         new Permission("show-orderlist-module", "Ver el modulo lista de pedidos"),
         new Permission("show-tab-backup", "Ver pestaña copia de seguridad"),        
         new Permission("show-tab-config", "Ver pestaña configuracion"),

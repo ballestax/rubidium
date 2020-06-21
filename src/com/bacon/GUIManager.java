@@ -38,6 +38,7 @@ import com.bacon.gui.PanelDash;
 import com.bacon.gui.PanelNewCycle;
 import com.bacon.gui.PanelOtherProduct;
 import com.bacon.gui.PanelPresentation;
+import com.bacon.gui.PanelReportSales;
 import com.bacon.gui.PanelSelCategory;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -108,12 +109,14 @@ public class GUIManager {
     private PanelListPedidos panelListPedidos;
     private PanelConfigPrint pnConfigPrint;
     private PanelBasic panelBasicCash;
+    private PanelBasic panelBasicReports;
     private PanelCash panelCash;
     private GuiPanelSelProduct panelSelProduct;
     private PanelAddProduct panelAddProduct;
     private PanelConfigOthers pnConfigOthers;
     private PanelOtherProduct panelOtherProduct;
     private PanelSelCategory panelSelCategory;
+    private PanelReportSales panelReportSales;
 
     private GUIManager() {
 
@@ -228,6 +231,13 @@ public class GUIManager {
         }
         return panelCash;
     }
+    
+    private PanelReportSales getPanelReports() {
+        if (panelReportSales == null) {
+            panelReportSales = new PanelReportSales(app);
+        }
+        return panelReportSales;
+    }
 
     public PanelBasic getPanelBasicAdminModule() {
         if (panelBasicAdminModule == null) {
@@ -259,6 +269,14 @@ public class GUIManager {
             panelBasicCash = new PanelBasic(app, "Caja", icon, getPanelCash(null));
         }
         return panelBasicCash;
+    }
+    
+    public PanelBasic getPanelBasicReports() {
+        if (panelBasicReports == null) {
+            ImageIcon icon = new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "reports.png", 30, 30));
+            panelBasicReports = new PanelBasic(app, "Reportes", icon, getPanelReports());
+        }
+        return panelBasicReports;
     }
 
     private Component getPanelPresentation() {
@@ -458,6 +476,11 @@ public class GUIManager {
             perm = app.getControl().getPermissionByName("show-cash-module");
             if (user != null && app.getControl().hasPermission(user, perm)) {
                 toolbar.add((app.getAction(Aplication.ACTION_SHOW_CASH)));
+            }
+            
+            perm = app.getControl().getPermissionByName("show-reports-module");
+            if (user != null && app.getControl().hasPermission(user, perm)) {
+                toolbar.add((app.getAction(Aplication.ACTION_SHOW_REPORTS)));
             }
 
             perm = app.getControl().getPermissionByName("show-admin-module");
