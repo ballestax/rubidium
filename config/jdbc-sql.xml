@@ -825,6 +825,7 @@
                 sale_date DATETIME,                
                 deliveryType INTEGER, 
                 value DECIMAL(20,2),
+                numDeliverys INTEGER,
                 valueDelivery DECIMAL(20,2),
                 discount DECIMAL,                               
                 idClient VARCHAR(11),
@@ -843,7 +844,7 @@
         
         <SQLStatement method="ADD_INVOICE">
             <SQLFragment>
-                INSERT INTO invoices (code,sale_date,deliveryType,value,valueDelivery,discount,idClient,idMesero,mesa,ciclo,notes, isservice, service_porc, status) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?);
+                INSERT INTO invoices (code,sale_date,deliveryType,value,numDeliverys,valueDelivery,discount,idClient,idMesero,mesa,ciclo,notes, isservice, service_porc, status) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);
             </SQLFragment>
         </SQLStatement>        
         
@@ -873,6 +874,7 @@
                 UPDATE invoices SET                          
                 deliveryType=?,
                 value=?,
+                numDeliverys=?,
                 valueDelivery=?,
                 discount=?,
                 idClient=?,

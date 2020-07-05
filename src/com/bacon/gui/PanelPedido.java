@@ -62,6 +62,8 @@ import javax.swing.SwingWorker;
 import javax.swing.border.Border;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import org.apache.commons.lang3.StringUtils;
@@ -77,12 +79,13 @@ import org.dz.TextFormatter;
  *
  * @author lrod
  */
-public class PanelPedido extends PanelCapturaMod implements ActionListener, TableModelListener, PropertyChangeListener {
+public class PanelPedido extends PanelCapturaMod implements ActionListener, ChangeListener, TableModelListener, PropertyChangeListener {
     
     private final Aplication app;
     private org.dzur.gui.MyListModel model;
     private MyDefaultTableModel modeloTb;
     private SpinnerNumberModel spModel;
+    private SpinnerNumberModel spModelDel;
     private DecimalFormat DCFORM_P;
     private BigDecimal totalFact;
     private String[] entregasLoc, entregasDom;
@@ -112,6 +115,7 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Tabl
     private boolean block;
     private JMenuItem itemDelete;
     private LinkMouseListener linkMouseListener;
+    private boolean showDescuento;
 
     /**
      * Creates new form PanelPedido
@@ -140,6 +144,8 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Tabl
         DCFORM_P.applyPattern("$ ###,###,###");
         
         linkMouseListener = new LinkMouseListener();
+        
+        showDescuento = false;
         
         lbTitle.setText("Pedido");
         
@@ -188,6 +194,8 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Tabl
             }
             
         });
+        
+        spNumDom.setFont(font);
         
         tfService.setHorizontalAlignment(SwingConstants.RIGHT);
         tfService.setFont(font);
@@ -306,6 +314,8 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Tabl
         
         tbListado.setModel(modeloTb);
         
+        tbListado.getTableHeader().setReorderingAllowed(false);
+        
         boolean showExclusions = Boolean.parseBoolean(app.getConfiguration().getProperty(Configuration.SHOW_EXCLUSIONS));
         
         int height = 35; // + (showExclusions ? 15 : 0);
@@ -342,7 +352,7 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Tabl
                     String[] stAdicionales3 = productoPed.getStAdicionales3();
                     for (int i = 0; i < stAdicionales3.length; i++) {
                         stb.append(stAdicionales3[i]).append("<br>");
-                    }                    
+                    }
                     if (productoPed.hasExcluisones()) {
                         stb.append("<p>").append(productoPed.getExclusiones()).append("</h1>");
                     }
@@ -352,8 +362,8 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Tabl
                             .append(app.DCFORM_P.format(productoPed.getPrecio() + productoPed.getValueAdicionales()))
                             .append("</font></h2>");
                     
-                    JOptionPane.showMessageDialog(tbListado, stb.toString(), 
-                            StringUtils.capitalize(productoPed.getProduct().getName()), 
+                    JOptionPane.showMessageDialog(tbListado, stb.toString(),
+                            StringUtils.capitalize(productoPed.getProduct().getName()),
                             JOptionPane.INFORMATION_MESSAGE);
                 }
             }
@@ -373,6 +383,11 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Tabl
         }
         
         spModel = new SpinnerNumberModel(1, 1, 100, 1);
+        
+        spModelDel = new SpinnerNumberModel(1, 1, 100, 1);
+        
+        spNumDom.setModel(spModelDel);
+        spNumDom.addChangeListener(this);
         
         tbListado.getColumnModel().getColumn(0).setCellEditor(new SpinnerEditor(spModel));
         tbListado.getColumnModel().getColumn(0).setCellRenderer(new SpinnerRenderer(fontTabla));
@@ -408,11 +423,13 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Tabl
 //        btPrint.setVisible(false);
         btPrint1.setVisible(false);
         
-        calcularValores();
+        showLabelDescuento();
         
-        showLocal();
+        showDelivery();
         
         block = false;
+        
+        calcularValores();
         
         lbFactura.setText(calculateProximoRegistro());
     }
@@ -428,6 +445,11 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Tabl
     public static final String AC_CHANGE_DOMICILIO = "AC_CHANGE_DOMICILIO";
     public static final String AC_CONFIRMAR_PEDIDO = "AC_CONFIRMAR_PEDIDO";
     public static final String AC_CHECK_SERVICE = "AC_CHECK_SERVICE";
+    
+    private void showLabelDescuento() {
+        regDescuento.setVisible(showDescuento);
+        lbDescuento1.setVisible(showDescuento);
+    }
     
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -469,6 +491,7 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Tabl
             regDescuento.setEnabled(true);
             popupTabla.add(itemDelete);
             lbCliente.setText("");
+            spModelDel.setValue(1);
             invoice = null;
             lbFactura.setText(calculateProximoRegistro());
             
@@ -550,6 +573,24 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Tabl
             lbStatus.setIcon(null);
             lbCliente.removeMouseListener(linkMouseListener);
         }
+    }
+    
+    @Override
+    public void stateChanged(ChangeEvent e) {
+        calcularValores();
+    }
+    
+    private void calcularDelivery() {
+        int valueDelivery = app.getConfiguration().getProperty(Configuration.DELIVERY_VALUE, 2000);
+        int num = 0;
+        if (tipo == TIPO_DOMICILIO) {
+//            try {
+            num = (Integer) spModelDel.getValue();
+//            } catch (Exception e) {
+//            }
+        }
+        double delivery = num * valueDelivery;
+        lbEntregas.setText(DCFORM_P.format(delivery));
     }
     
     @Override
@@ -808,6 +849,7 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Tabl
         lbDescuento1.setText(DCFORM_P.format(descuento > 0 ? descuento * -1 : descuento));
         tfService.setText(DCFORM_P.format(servicio));
         double domicilio = 0;
+        calcularDelivery();
         try {
             domicilio = DCFORM_P.parse(lbEntregas.getText()).doubleValue();
         } catch (Exception e) {
@@ -905,10 +947,13 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Tabl
         invoice.setService(false);
         invoice.setPorcService(0);
         
+        invoice.setNumDeliverys(0);
+        
         String tipoEntrega = regDomicilio.getText().toUpperCase();
         switch (tipoEntrega) {
             case ENTREGA_DOMICILIO:
                 invoice.setTipoEntrega(TIPO_DOMICILIO);
+                invoice.setNumDeliverys((Integer)spNumDom.getValue());
                 invoice.setValorDelivery(new BigDecimal(DCFORM_P.parse(lbEntregas.getText()).doubleValue()));
                 invoice.setIdWaitress(0);
                 invoice.setTable(0);
@@ -1050,17 +1095,20 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Tabl
         invoice.setService(false);
         invoice.setPorcService(0);
         
+        invoice.setNumDeliverys(0);
+        
         String tipoEntrega = regDomicilio.getText().toUpperCase();
         switch (tipoEntrega) {
             case ENTREGA_DOMICILIO:
                 invoice.setTipoEntrega(TIPO_DOMICILIO);
-                 {
-                    try {
-                        invoice.setValorDelivery(new BigDecimal(DCFORM_P.parse(lbEntregas.getText()).doubleValue()));
-                    } catch (ParseException ex) {
-                        invoice.setValorDelivery(BigDecimal.ZERO);
-                    }
+                
+                try {
+                    invoice.setNumDeliverys((Integer) spModelDel.getValue());
+                    invoice.setValorDelivery(new BigDecimal(DCFORM_P.parse(lbEntregas.getText()).doubleValue()));
+                } catch (ParseException ex) {
+                    invoice.setValorDelivery(BigDecimal.ZERO);
                 }
+                
                 invoice.setIdWaitress(0);
                 invoice.setTable(0);
                 break;
@@ -1077,6 +1125,8 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Tabl
             case ENTREGA_PARA_LLEVAR:
                 invoice.setTipoEntrega(TIPO_PARA_LLEVAR);
                 invoice.setValorDelivery(BigDecimal.ZERO);
+                invoice.setIdWaitress(0);
+                invoice.setTable(0);
                 break;
         }
         
@@ -1118,6 +1168,9 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Tabl
     
     private double calcularDescuento() {
         double desc = 0;
+        if (!showDescuento) {
+            return desc;
+        }
         try {
             Double value = Double.parseDouble(regDescuento.getText());
             desc = value;
@@ -1279,6 +1332,8 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Tabl
     private void showDelivery() {
         tipo = TIPO_DOMICILIO;
         
+        btTogle2.setSelected(true);
+        
         lbTitle.setForeground(colorDelivery.darker());
         //this.setBackground(colorDelivery.brighter());
         regCelular.setTint(colorDelivery);
@@ -1289,6 +1344,9 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Tabl
         jScrollPane2.setBorder(BorderFactory.createLineBorder(colorDelivery, 1, true));
         tbListado.getTableHeader().setBackground(colorDelivery.brighter());
         
+        spNumDom.setVisible(true);
+        regDomicilio.setVisible(true);
+        lbEntregas.setVisible(true);
         regCelular.setVisible(true);
         regDireccion.setVisible(true);
         lbCliente.setVisible(true);
@@ -1324,6 +1382,8 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Tabl
     private void showLocal() {
         tipo = TIPO_LOCAL;
         
+        btTogle1.setSelected(true);
+        
         lbTitle.setForeground(colorLocal.darker());
 //        this.setBackground(colorLocal.brighter());      
         regMesa.setTint(colorLocal);
@@ -1332,6 +1392,9 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Tabl
         jScrollPane2.setBorder(BorderFactory.createLineBorder(colorLocal, 1, true));
         tbListado.getTableHeader().setBackground(colorLocal.brighter());
         
+        spNumDom.setVisible(false);
+        regDomicilio.setVisible(false);
+        lbEntregas.setVisible(false);
         regCelular.setVisible(false);
         regDireccion.setVisible(false);
         lbCliente.setVisible(false);
@@ -1382,7 +1445,7 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Tabl
         regTotal = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS,"","",60);
         regSubtotal = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "","",60);
         regService = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Servicio","",70);
-        regDomicilio = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Entrega",new String[1],90);
+        regDomicilio = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Entrega",new String[1],60);
         lbDescuento1 = new javax.swing.JLabel();
         lbEntregas = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
@@ -1402,10 +1465,21 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Tabl
         btPrint1 = new javax.swing.JButton();
         btClear = new javax.swing.JButton();
         chRecogido = new javax.swing.JCheckBox();
+        spNumDom = new javax.swing.JSpinner();
+        filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0), new java.awt.Dimension(32767, 0));
 
         lbTitle.setFont(new java.awt.Font("Ubuntu", 1, 18)); // NOI18N
         lbTitle.setText("jLabel1");
         lbTitle.setBorder(javax.swing.BorderFactory.createCompoundBorder(javax.swing.BorderFactory.createEtchedBorder(), javax.swing.BorderFactory.createEmptyBorder(1, 5, 1, 5)));
+
+        regTotal.setMinimumSize(new java.awt.Dimension(160, 31));
+        regTotal.setPreferredSize(new java.awt.Dimension(160, 31));
+
+        regSubtotal.setMinimumSize(new java.awt.Dimension(160, 31));
+        regSubtotal.setPreferredSize(new java.awt.Dimension(160, 31));
+
+        lbEntregas.setMinimumSize(new java.awt.Dimension(80, 31));
+        lbEntregas.setPreferredSize(new java.awt.Dimension(100, 31));
 
         tbListado.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -1458,47 +1532,11 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Tabl
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(btConfirm, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btPrint, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btPrint1, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(0, 0, Short.MAX_VALUE))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addComponent(chServ, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGap(0, 0, 0)
-                                        .addComponent(regService, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                    .addComponent(regDomicilio, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                .addGap(1, 1, 1)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(lbEntregas, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(tfService, javax.swing.GroupLayout.DEFAULT_SIZE, 117, Short.MAX_VALUE))))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(regDescuento, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(0, 0, 0)
-                                .addComponent(lbDescuento1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                            .addComponent(regSubtotal, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(regTotal, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                     .addComponent(jScrollPane2)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(regDireccion, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(chRecogido, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(lbTitle)
-                        .addGap(1, 1, 1)
-                        .addComponent(lbFactura, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(55, 55, 55)
-                        .addComponent(btDelete, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(regCelular, javax.swing.GroupLayout.PREFERRED_SIZE, 232, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(2, 2, 2)
@@ -1509,6 +1547,45 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Tabl
                         .addComponent(lbStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(lbCliente, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(lbTitle)
+                        .addGap(1, 1, 1)
+                        .addComponent(lbFactura, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(55, 55, 55)
+                        .addComponent(btDelete, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(regDomicilio, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(2, 2, 2)
+                                .addComponent(spNumDom, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(1, 1, 1)
+                                .addComponent(lbEntregas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(btConfirm, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btPrint, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btPrint1, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(filler1, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(chServ, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(regService, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(tfService, javax.swing.GroupLayout.PREFERRED_SIZE, 147, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(regDescuento, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(1, 1, 1)
+                                .addComponent(lbDescuento1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(regTotal, javax.swing.GroupLayout.DEFAULT_SIZE, 245, Short.MAX_VALUE)
+                            .addComponent(regSubtotal, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(regMesa, javax.swing.GroupLayout.PREFERRED_SIZE, 232, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -1541,31 +1618,33 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Tabl
                     .addComponent(regDireccion, javax.swing.GroupLayout.DEFAULT_SIZE, 27, Short.MAX_VALUE)
                     .addComponent(chRecogido, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 87, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 124, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                    .addComponent(regDomicilio, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lbEntregas, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(spNumDom, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(regSubtotal, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
                     .addComponent(tfService, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(regService, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(regSubtotal, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chServ, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(chServ, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(regDescuento, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE)
+                    .addComponent(lbDescuento1, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
-                    .addComponent(regDomicilio, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(regDescuento, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE)
-                    .addComponent(lbDescuento1, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lbEntregas, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(regTotal, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE)
-                    .addComponent(btConfirm, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btPrint1, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(regTotal, javax.swing.GroupLayout.PREFERRED_SIZE, 30, Short.MAX_VALUE)
                     .addComponent(btPrint, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btPrint1, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(btConfirm, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(filler1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
 
         layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {btSearch, regCelular, regDireccion});
 
-        layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {lbDescuento1, lbEntregas, regDescuento, regDomicilio, regService, regSubtotal, regTotal, tfService});
+        layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {lbDescuento1, lbEntregas, regDescuento, regDomicilio, regService, regSubtotal, regTotal, spNumDom, tfService});
 
     }// </editor-fold>//GEN-END:initComponents
 
@@ -1582,6 +1661,7 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Tabl
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JCheckBox chRecogido;
     private javax.swing.JCheckBox chServ;
+    private javax.swing.Box.Filler filler1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JLabel lbCliente;
@@ -1599,6 +1679,7 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Tabl
     private com.bacon.gui.util.Registro regService;
     private com.bacon.gui.util.Registro regSubtotal;
     private com.bacon.gui.util.Registro regTotal;
+    private javax.swing.JSpinner spNumDom;
     private javax.swing.JTable tbListado;
     private javax.swing.JTextField tfService;
     // End of variables declaration//GEN-END:variables

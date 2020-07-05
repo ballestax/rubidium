@@ -142,7 +142,7 @@ public class PrinterService {
             if (invoice.getTipoEntrega() == TIPO_DOMICILIO) {
                 escpos.writeLF(font2, "________________________________________________");
 
-                escpos.writeLF(String.format(formatInfo, "1", "Domicilio", "", app.DCFORM_P.format(invoice.getValorDelivery())));
+                escpos.writeLF(String.format(formatInfo, invoice.getNumDeliverys(), "Domicilio", "", app.DCFORM_P.format(invoice.getValorDelivery())));
                 total = total.add(invoice.getValorDelivery());
             } else if (invoice.getTipoEntrega() == PanelPedido.TIPO_LOCAL) {
                 escpos.writeLF(font2, "________________________________________________");
@@ -297,7 +297,7 @@ public class PrinterService {
             Style font3 = new Style().setFontSize(Style.FontSize._1, Style.FontSize._1);
             Style font4 = new Style().setFontSize(Style.FontSize._1, Style.FontSize._1).setJustification(EscPosConst.Justification.Right);
             Style font5 = new Style().setFontSize(Style.FontSize._2, Style.FontSize._2);
-            
+
             String column1Format = "%3.3s";  // fixed size 3 characters, left aligned
             String column2Format = "%-25.25s";  // fixed size 8 characters, left aligned
             String column3Format = "%7.7s";   // fixed size 6 characters, right aligned
@@ -306,7 +306,7 @@ public class PrinterService {
 
             escpos = new EscPos(new PrinterOutputStream(printService));
             escpos.feed(1);
-            
+
             escpos.writeLF(new Style().setFontSize(Style.FontSize._2, Style.FontSize._2).setJustification(EscPosConst.Justification.Center),
                     "Bacon 57 Burger");
             escpos.feed(1);
@@ -320,11 +320,11 @@ public class PrinterService {
             escpos.writeLF(font3, "Direccion: " + (client != null && !client.getAddresses().isEmpty() ? client.getAddresses().get(0) : "- - -"));
 
             escpos.feed(1);
-            
+
             BigDecimal total = invoice.getValor();
 
             escpos.writeLF(font2, "================================================");
-            
+
             escpos.writeLF(String.format(formatInfo, "", "Subtotal:", "", app.DCFORM_P.format(total)));
             if (invoice.getTipoEntrega() == TIPO_DOMICILIO) {
                 escpos.writeLF(font2, "________________________________________________");
@@ -332,15 +332,15 @@ public class PrinterService {
                 escpos.writeLF(String.format(formatInfo, "1", "Domicilio", "", app.DCFORM_P.format(invoice.getValorDelivery())));
                 total = total.add(invoice.getValorDelivery());
             }
-            
+
             escpos.writeLF(font2, "________________________________________________");
 
             escpos.writeLF(String.format(formatInfo, "", "", "Total:", app.DCFORM_P.format(total)));
 
             escpos.writeLF(font2, "================================================");
-            
-             escpos.feed(4);
-            
+
+            escpos.feed(4);
+
             escpos.cut(EscPos.CutMode.FULL);
 
             escpos.close();

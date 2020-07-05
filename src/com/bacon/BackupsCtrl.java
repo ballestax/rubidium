@@ -5,7 +5,6 @@
  */
 package com.bacon;
 
-
 import com.bacon.persistence.JDBC.JDBCDAOFactory;
 import static com.bacon.persistence.JDBC.JDBCDAOFactory.NAMED_PARAM_TABLE;
 import static com.bacon.persistence.JDBC.JDBCDAOFactory.TRUNCATE_TABLE_KEY;
@@ -47,7 +46,28 @@ public class BackupsCtrl {
         logger.debug("Starting backup");
         SQLDump inst = SQLDump.getInstance(app);
         String[] tablas = {
-            "table",
+            "additional_product",
+            "additionals",
+            "clients",
+            "config",
+            "cycles",
+            "exclusion_product",
+            "expenses_incomes",
+            "ingredients",
+            "invoice_otherproduct",
+            "invoice_product",
+            "invoices",
+            "other_products",
+            "permission_role",
+            "permissions",
+            "presentation_product",
+            "product_ingredient",
+            "products",
+//            "role_user",
+            "roles",
+            "tables",
+//            "users",
+            "waiters"
         };
 
         StandardPBEStringEncryptor sse = new StandardPBEStringEncryptor();
@@ -55,7 +75,7 @@ public class BackupsCtrl {
         ArrayList<String> backup = new ArrayList<>();
         for (String tabla : tablas) {
             try {
-                logger.debug("Doing backup: "+tabla);
+                logger.debug("Doing backup: " + tabla);
                 ArrayList<String> backupTable = inst.getBackupTable(tabla);
                 for (int i = 0; i < backupTable.size(); i++) {
                     String get = backupTable.get(i);

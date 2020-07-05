@@ -18,6 +18,7 @@ public class Invoice {
     private Long idCliente;
     private BigDecimal valor;
     private Double descuento;
+    private int numDeliverys;
     private BigDecimal valorDelivery;
     private int tipoEntrega;
     private String nota;
@@ -185,5 +186,15 @@ public class Invoice {
     public void setStatus(int status) {
         this.status = status;
     }
+
+    public int getNumDeliverys() {
+        return numDeliverys;
+    }
+
+    public void setNumDeliverys(int numDeliverys) {
+        this.numDeliverys = numDeliverys;
+    }
+    
+    
 
 }

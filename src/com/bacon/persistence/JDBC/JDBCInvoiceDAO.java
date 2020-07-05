@@ -118,16 +118,17 @@ public class JDBCInvoiceDAO implements InvoiceDAO {
                 invoice.setFecha(rs.getDate(3));
                 invoice.setTipoEntrega(rs.getInt(4));
                 invoice.setValor(rs.getBigDecimal(5));
-                invoice.setValorDelivery(rs.getBigDecimal(6));
-                invoice.setDescuento(rs.getDouble(7));
-                invoice.setIdCliente(rs.getLong(8));
-                invoice.setIdWaitress(rs.getInt(9));
-                invoice.setTable(rs.getInt(10));
-                invoice.setCiclo(rs.getLong(11));
-                invoice.setNota(rs.getString(12));
-                invoice.setService(rs.getBoolean(13));
-                invoice.setPorcService(rs.getDouble(14));
-                invoice.setStatus(rs.getInt(15));
+                invoice.setNumDeliverys(rs.getInt(6));
+                invoice.setValorDelivery(rs.getBigDecimal(7));
+                invoice.setDescuento(rs.getDouble(8));
+                invoice.setIdCliente(rs.getLong(9));
+                invoice.setIdWaitress(rs.getInt(10));
+                invoice.setTable(rs.getInt(11));
+                invoice.setCiclo(rs.getLong(12));
+                invoice.setNota(rs.getString(13));
+                invoice.setService(rs.getBoolean(14));
+                invoice.setPorcService(rs.getDouble(15));
+                invoice.setStatus(rs.getInt(16));
 
                 Object[] parameters = {invoice.getFactura()};
 
@@ -286,16 +287,17 @@ public class JDBCInvoiceDAO implements InvoiceDAO {
                 invoice.setFecha(rs.getDate(3));
                 invoice.setTipoEntrega(rs.getInt(4));
                 invoice.setValor(rs.getBigDecimal(5));
-                invoice.setValorDelivery(rs.getBigDecimal(6));
-                invoice.setDescuento(rs.getDouble(7));
-                invoice.setIdCliente(rs.getLong(8));
-                invoice.setIdWaitress(rs.getInt(9));
-                invoice.setTable(rs.getInt(10));
-                invoice.setCiclo(rs.getLong(11));
-                invoice.setNota(rs.getString(12));
-                invoice.setService(rs.getBoolean(13));
-                invoice.setPorcService(rs.getDouble(14));
-                invoice.setStatus(rs.getInt(15));
+                invoice.setNumDeliverys(rs.getInt(6));
+                invoice.setValorDelivery(rs.getBigDecimal(7));
+                invoice.setDescuento(rs.getDouble(8));
+                invoice.setIdCliente(rs.getLong(9));
+                invoice.setIdWaitress(rs.getInt(10));
+                invoice.setTable(rs.getInt(11));
+                invoice.setCiclo(rs.getLong(12));
+                invoice.setNota(rs.getString(13));
+                invoice.setService(rs.getBoolean(14));
+                invoice.setPorcService(rs.getDouble(15));
+                invoice.setStatus(rs.getInt(16));
                 
                 Object[] parameters = {invoice.getFactura()};
 
@@ -429,6 +431,7 @@ public class JDBCInvoiceDAO implements InvoiceDAO {
                 invoice.getFecha(),
                 invoice.getTipoEntrega(),
                 invoice.getValor(),
+                invoice.getNumDeliverys(),
                 invoice.getValorDelivery(),
                 invoice.getDescuento(),
                 invoice.getIdCliente(),
@@ -567,6 +570,7 @@ public class JDBCInvoiceDAO implements InvoiceDAO {
             Object[] parameters = {
                 invoice.getTipoEntrega(),
                 invoice.getValor(),
+                invoice.getNumDeliverys(),
                 invoice.getValorDelivery(),
                 invoice.getDescuento(),
                 invoice.getIdCliente(),
@@ -613,16 +617,17 @@ public class JDBCInvoiceDAO implements InvoiceDAO {
                 invoice.setFecha(rs.getDate(3));
                 invoice.setTipoEntrega(rs.getInt(4));
                 invoice.setValor(rs.getBigDecimal(5));
-                invoice.setValorDelivery(rs.getBigDecimal(6));
-                invoice.setDescuento(rs.getDouble(7));
-                invoice.setIdCliente(rs.getLong(8));
-                invoice.setIdWaitress(rs.getInt(9));
-                invoice.setTable(rs.getInt(10));
-                invoice.setCiclo(rs.getLong(11));
-                invoice.setNota(rs.getString(12));
-                invoice.setService(rs.getBoolean(13));
-                invoice.setPorcService(rs.getDouble(14));
-                invoice.setStatus(rs.getInt(15));
+                invoice.setNumDeliverys(rs.getInt(6));
+                invoice.setValorDelivery(rs.getBigDecimal(7));
+                invoice.setDescuento(rs.getDouble(8));
+                invoice.setIdCliente(rs.getLong(9));
+                invoice.setIdWaitress(rs.getInt(10));
+                invoice.setTable(rs.getInt(11));
+                invoice.setCiclo(rs.getLong(12));
+                invoice.setNota(rs.getString(13));
+                invoice.setService(rs.getBoolean(14));
+                invoice.setPorcService(rs.getDouble(15));
+                invoice.setStatus(rs.getInt(16));
                 invoices.add(invoice);
             }
         } catch (SQLException e) {
