@@ -16,6 +16,7 @@ import com.bacon.persistence.dao.ConfigDAO;
 import com.bacon.persistence.dao.DAOFactory;
 import com.bacon.persistence.dao.IngredientDAO;
 import com.bacon.persistence.dao.InvoiceDAO;
+import com.bacon.persistence.dao.ItemDAO;
 import com.bacon.persistence.dao.ProductDAO;
 import com.bacon.persistence.dao.UserDAO;
 import com.bacon.persistence.dao.UtilDAO;
@@ -299,6 +300,11 @@ public class JDBCDAOFactory extends DAOFactory {
     @Override
     public ClientDAO getClientDAO() throws DAOException {
         return new JDBCClientDAO(getDataSource(), sqlStatements);
+    }
+
+    @Override
+    public ItemDAO getItemDAO() throws DAOException {
+        return new JDBCItemDAO(getDataSource(), sqlStatements);
     }
 
 }

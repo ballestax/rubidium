@@ -96,12 +96,12 @@ public class PanelListItem extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addComponent(lbNombre)
                 .addGap(0, 0, 0)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lbPrecio, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(lbAdicion)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(lbNotas))))
+                        .addComponent(lbNotas))
+                    .addComponent(lbPrecio)))
             .addComponent(spCantidad)
         );
     }// </editor-fold>//GEN-END:initComponents

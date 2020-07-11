@@ -1,7 +1,6 @@
 package com.bacon.domain;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Objects;
 import org.apache.commons.collections.CollectionUtils;
 

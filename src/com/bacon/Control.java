@@ -12,6 +12,7 @@ import com.bacon.domain.ConfigDB;
 import com.bacon.domain.Cycle;
 import com.bacon.domain.Ingredient;
 import com.bacon.domain.Invoice;
+import com.bacon.domain.Item;
 import com.bacon.domain.Permission;
 import com.bacon.domain.Presentation;
 import com.bacon.domain.Product;
@@ -25,6 +26,7 @@ import com.bacon.persistence.JDBC.JDBCConfigDAO;
 import com.bacon.persistence.JDBC.JDBCDAOFactory;
 import com.bacon.persistence.JDBC.JDBCIngredientDAO;
 import com.bacon.persistence.JDBC.JDBCInvoiceDAO;
+import com.bacon.persistence.JDBC.JDBCItemDAO;
 import com.bacon.persistence.JDBC.JDBCProductDAO;
 import com.bacon.persistence.JDBC.JDBCUserDAO;
 import com.bacon.persistence.JDBC.JDBCUtilDAO;
@@ -56,7 +58,7 @@ public class Control {
         try {
 
             logger.debug("Init database...");
-            
+
             /*if (Aplication.INSTALL_DB) {
                 //preguntas la contraseña y crea la database
                 new JDBCDAOFactory().createDatabase();
@@ -84,6 +86,9 @@ public class Control {
 
             JDBCClientDAO clientDAO = (JDBCClientDAO) DAOFactory.getInstance().getClientDAO();
             clientDAO.init();
+
+            JDBCItemDAO itemDAO = (JDBCItemDAO) DAOFactory.getInstance().getItemDAO();
+            itemDAO.init();
 
             JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
             utilDAO.init();
@@ -556,15 +561,15 @@ public class Control {
             return false;
         }
     }
-    
+
     public void updateInvoice(Invoice invoice) {
         try {
             JDBCInvoiceDAO invoiceDAO = (JDBCInvoiceDAO) DAOFactory.getInstance().getInvoiceDAO();
-            invoiceDAO.updateInvoice(invoice);            
+            invoiceDAO.updateInvoice(invoice);
         } catch (DAOException ex) {
             String msg = "Error updating invoice";
             logger.error(msg, ex);
-            GUIManager.showErrorMessage(null, msg, "Error");            
+            GUIManager.showErrorMessage(null, msg, "Error");
         }
     }
 
@@ -697,7 +702,7 @@ public class Control {
             return null;
         }
     }
-    
+
     public ArrayList<Object[]> getInvoiceByProductListWhere(String where, String order) {
         try {
             JDBCInvoiceDAO salidaDAO = (JDBCInvoiceDAO) JDBCDAOFactory.getInstance().getInvoiceDAO();
@@ -705,6 +710,16 @@ public class Control {
         } catch (DAOException ex) {
             logger.error("Error getting invoice by product list.", ex);
             GUIManager.showErrorMessage(null, "Error consultando lista de facturas por productos", "Error");
+            return null;
+        }
+    }
+    
+    public ArrayList<Item> getItemList(String where) {
+        try {
+            JDBCItemDAO itemDAO = (JDBCItemDAO) DAOFactory.getInstance().getItemDAO();
+            return itemDAO.getItemList(where, "");
+        } catch (DAOException ex) {
+            logger.error("Error getting Item list.", ex);
             return null;
         }
     }

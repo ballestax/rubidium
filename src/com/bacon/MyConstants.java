@@ -53,7 +53,9 @@ public class MyConstants {
         new Permission("show-orderlist-module", "Ver el modulo lista de pedidos"),
         new Permission("show-tab-backup", "Ver pestaña copia de seguridad"),        
         new Permission("show-tab-config", "Ver pestaña configuracion"),
-        new Permission("show-tab-users", "Ver el modulo administrador"),};
+        new Permission("show-tab-users", "Ver el modulo administrador"),
+        new Permission("show-inventory-module", "Ver el modulo inventario"),
+    };
 
     public static final SimpleDateFormat FORMAT_DATE = new SimpleDateFormat("dd-MM-yyyy");
 

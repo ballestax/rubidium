@@ -16,6 +16,7 @@ import com.bacon.gui.GuiPanelNewUser;
 import com.bacon.gui.GuiPanelSelProduct;
 import com.bacon.gui.util.JStatusbar;
 import com.bacon.gui.PanelAccess;
+import com.bacon.gui.PanelAddItem;
 import com.bacon.gui.PanelAddProduct;
 import com.bacon.gui.PanelAdminBackup;
 import com.bacon.gui.PanelAdminConfig;
@@ -35,9 +36,9 @@ import com.bacon.gui.PanelNewRol;
 import com.bacon.gui.PanelNewUser;
 import com.bacon.gui.PanelPedido;
 import com.bacon.gui.PanelDash;
+import com.bacon.gui.PanelInventory;
 import com.bacon.gui.PanelNewCycle;
 import com.bacon.gui.PanelOtherProduct;
-import com.bacon.gui.PanelPresentation;
 import com.bacon.gui.PanelReportSales;
 import com.bacon.gui.PanelSelCategory;
 import java.awt.BorderLayout;
@@ -117,6 +118,9 @@ public class GUIManager {
     private PanelOtherProduct panelOtherProduct;
     private PanelSelCategory panelSelCategory;
     private PanelReportSales panelReportSales;
+    private PanelBasic panelBasicInventory;
+    private PanelInventory panelInventory;
+    private PanelAddItem panelAddItem;
 
     private GUIManager() {
 
@@ -238,6 +242,13 @@ public class GUIManager {
         }
         return panelReportSales;
     }
+    
+    private PanelInventory getPanelInventory() {
+        if (panelInventory == null) {
+            panelInventory = new PanelInventory(app);
+        }
+        return panelInventory;
+    }
 
     public PanelBasic getPanelBasicAdminModule() {
         if (panelBasicAdminModule == null) {
@@ -277,6 +288,14 @@ public class GUIManager {
             panelBasicReports = new PanelBasic(app, "Reportes", icon, getPanelReports());
         }
         return panelBasicReports;
+    }
+    
+    public PanelBasic getPanelBasicInventory() {
+        if (panelBasicInventory == null) {
+            ImageIcon icon = new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "Inventory-maintenance.png", 30, 30));
+            panelBasicInventory = new PanelBasic(app, "Inventarios", icon, getPanelInventory());
+        }
+        return panelBasicInventory;
     }
 
     private Component getPanelPresentation() {
@@ -319,6 +338,13 @@ public class GUIManager {
             panelAddProduct = new PanelAddProduct(app, null);
         }
         return panelAddProduct;
+    }
+    
+    public PanelAddItem getPanelAddItem() {
+        if (panelAddItem == null) {
+            panelAddItem = new PanelAddItem(app);
+        }
+        return panelAddItem;
     }
 
     public PanelOtherProduct getPanelOtherProduct() {
@@ -481,6 +507,11 @@ public class GUIManager {
             perm = app.getControl().getPermissionByName("show-reports-module");
             if (user != null && app.getControl().hasPermission(user, perm)) {
                 toolbar.add((app.getAction(Aplication.ACTION_SHOW_REPORTS)));
+            }
+            
+            perm = app.getControl().getPermissionByName("show-inventory-module");
+            if (user != null && app.getControl().hasPermission(user, perm)) {
+                toolbar.add((app.getAction(Aplication.ACTION_SHOW_INVENTORY)));
             }
 
             perm = app.getControl().getPermissionByName("show-admin-module");
@@ -927,6 +958,27 @@ public class GUIManager {
         dialog.setResizable(false);
         dialog.add(getPanelOtherProduct());
         dialog.setTitle("Agregar otro producto.");
+        dialog.pack();
+        dialog.setLocationRelativeTo(getFrame());
+        setDefaultCursor();
+        dialog.setVisible(true);
+    }
+    
+    public void showPanelAddItem(PropertyChangeListener listener) {
+        setWaitCursor();
+        JDialog dialog = new MyDialogEsc();
+        dialog.setModal(true);
+        int w = 700;
+        int h = 400;
+        dialog.setPreferredSize(new Dimension(w, h));
+
+        if (!getPanelAddItem().containsListener(listener)) {
+            getPanelAddItem().addPropertyChangeListener(listener);
+        }
+        getPanelAddItem().reset();
+//        dialog.setResizable(false);
+        dialog.add(getPanelAddItem());
+        dialog.setTitle("Agregar item al inventario.");
         dialog.pack();
         dialog.setLocationRelativeTo(getFrame());
         setDefaultCursor();

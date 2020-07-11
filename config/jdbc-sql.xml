@@ -43,6 +43,7 @@
                     |GET_CATEGORIES_SORTED
                     |CREATE_EXPENSES_INCOMES_TABLE|ADD_EXPENSE_INCOME|GET_EXPENSE_INCOME
                     |GET_INVOICE_BY_PRODUCT
+                    |CREATE_INVENTORY_TABLE|GET_ITEM
                     
                     
                     ) #REQUIRED
@@ -1299,6 +1300,44 @@
                 ORDER BY {orderby}
             </SQLFragment>        
         </SQLStatement>	     
+        
+        
+        <SQLStatement method="CREATE_INVENTORY_TABLE">            
+            <SQLFragment>
+                CREATE TABLE inventory(
+                id INTEGER AUTO_INCREMENT,
+                name VARCHAR(255),
+                quantity DECIMAL(12,2),
+                measure VARCHAR(100),
+                cost DECIMAL(20,2),
+                price DECIMAL(20,2),
+                location INTEGER,
+                stock DECIMAL(12,2),
+                stockMin DECIMAL(12,2),                
+                average DECIMAL(20,2),
+                init DECIMAL(12,2),
+                lastUpdatedTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                user VARCHAR(25) NOT NULL DEFAULT 'USER_DF',
+                PRIMARY KEY (id)
+                )ENGINE=InnoDB DEFAULT CHARSET=latin1;
+            </SQLFragment>
+        </SQLStatement>   
+        
+        <SQLStatement method="GET_ITEM">
+            <SQLFragment>
+                SELECT
+            </SQLFragment>
+            <SQLFragment>
+                * FROM inventory
+            </SQLFragment>
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                WHERE {where}
+            </SQLFragment>    
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                ORDER BY {orderby}
+            </SQLFragment>        
+        </SQLStatement>
+                                 
                                  
     </DAOStatements>
 </DAOConfiguration>
