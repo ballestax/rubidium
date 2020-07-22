@@ -37,10 +37,14 @@ import com.bacon.gui.PanelNewUser;
 import com.bacon.gui.PanelPedido;
 import com.bacon.gui.PanelDash;
 import com.bacon.gui.PanelInventory;
+import com.bacon.gui.PanelList;
+import com.bacon.gui.PanelNewConciliacion;
 import com.bacon.gui.PanelNewCycle;
+import com.bacon.gui.PanelNewLocation;
 import com.bacon.gui.PanelOtherProduct;
 import com.bacon.gui.PanelReportSales;
 import com.bacon.gui.PanelSelCategory;
+import com.bacon.gui.PanelSelItem;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -121,6 +125,10 @@ public class GUIManager {
     private PanelBasic panelBasicInventory;
     private PanelInventory panelInventory;
     private PanelAddItem panelAddItem;
+    private PanelList<Object> pnNewList;
+    private PanelSelItem panelSelItem;
+    private PanelNewConciliacion panelNewConciliacion;
+    private PanelNewLocation pnNewLocation;
 
     private GUIManager() {
 
@@ -235,14 +243,14 @@ public class GUIManager {
         }
         return panelCash;
     }
-    
+
     private PanelReportSales getPanelReports() {
         if (panelReportSales == null) {
             panelReportSales = new PanelReportSales(app);
         }
         return panelReportSales;
     }
-    
+
     private PanelInventory getPanelInventory() {
         if (panelInventory == null) {
             panelInventory = new PanelInventory(app);
@@ -281,7 +289,7 @@ public class GUIManager {
         }
         return panelBasicCash;
     }
-    
+
     public PanelBasic getPanelBasicReports() {
         if (panelBasicReports == null) {
             ImageIcon icon = new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "reports.png", 30, 30));
@@ -289,7 +297,7 @@ public class GUIManager {
         }
         return panelBasicReports;
     }
-    
+
     public PanelBasic getPanelBasicInventory() {
         if (panelBasicInventory == null) {
             ImageIcon icon = new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "Inventory-maintenance.png", 30, 30));
@@ -339,7 +347,7 @@ public class GUIManager {
         }
         return panelAddProduct;
     }
-    
+
     public PanelAddItem getPanelAddItem() {
         if (panelAddItem == null) {
             panelAddItem = new PanelAddItem(app);
@@ -359,6 +367,36 @@ public class GUIManager {
             panelSelCategory = new PanelSelCategory(app, null);
         }
         return panelSelCategory;
+    }
+
+    public PanelSelItem getPanelSelItem() {
+        if (panelSelItem == null) {
+            panelSelItem = new PanelSelItem(app, null);
+        }
+        panelSelItem.reset();
+        return panelSelItem;
+    }
+
+    public PanelList getPanelNewList(String title, PropertyChangeListener listener, ArrayList lista) {
+        pnNewList = new PanelList<>(app, title, listener, lista);
+        return pnNewList;
+    }
+
+    public PanelNewConciliacion getPanelNewConciliacion(boolean reset) {
+        if (panelNewConciliacion == null) {
+            panelNewConciliacion = new PanelNewConciliacion(app);
+        }
+        if (reset) {
+            panelNewConciliacion.reset();
+        }
+        return panelNewConciliacion;
+    }
+
+    public PanelNewLocation getPanelNewLocation() {
+        if (pnNewLocation == null) {
+            pnNewLocation = new PanelNewLocation(app);
+        }
+        return pnNewLocation;
     }
 
     private Color getColor() {
@@ -503,14 +541,14 @@ public class GUIManager {
             if (user != null && app.getControl().hasPermission(user, perm)) {
                 toolbar.add((app.getAction(Aplication.ACTION_SHOW_CASH)));
             }
-            
+
             perm = app.getControl().getPermissionByName("show-reports-module");
             if (user != null && app.getControl().hasPermission(user, perm)) {
                 toolbar.add((app.getAction(Aplication.ACTION_SHOW_REPORTS)));
             }
-            
+
             perm = app.getControl().getPermissionByName("show-inventory-module");
-            if (user != null && app.getControl().hasPermission(user, perm)) {
+            if (user != null && perm != null && app.getControl().hasPermission(user, perm)) {
                 toolbar.add((app.getAction(Aplication.ACTION_SHOW_INVENTORY)));
             }
 
@@ -574,7 +612,7 @@ public class GUIManager {
             JMenu ayuda = new JMenu("Ayuda");
 
             JMenuItem acerca = new JMenuItem("Acerca de");
-            acerca.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "ButtonInfo.png", 18, 18)));
+            acerca.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "information.png", 18, 18)));
             JMenuItem salir = new JMenuItem("Salir");
             archivo.add(app.getAction(Aplication.ACTION_SHOW_PREFERENCES));
             archivo.add(new JPopupMenu.Separator());
@@ -854,7 +892,7 @@ public class GUIManager {
         dialog.setVisible(true);
     }
 
-    public void reviewFacture(Invoice invoice) {        
+    public void reviewFacture(Invoice invoice) {
         PanelConfirmPedido confirmPedido = new PanelConfirmPedido(app, invoice);
 
         setWaitCursor();
@@ -880,6 +918,24 @@ public class GUIManager {
         PanelClientCard clientCard = new PanelClientCard(app, client);
         clientCard.addPropertyChangeListener(getPanelPedido());
         dialog.add(clientCard);
+//        dialog.setResizable(false);
+//        dialog.setTitle();
+        dialog.pack();
+        dialog.setLocationRelativeTo(getFrame());
+        setDefaultCursor();
+        dialog.setVisible(true);
+    }
+
+    public void showInventoryCard() {
+        setWaitCursor();
+        JDialog dialog = getDialog(true);
+//        dialog.setUndecorated(true);
+//        int w = 360;
+//        int h = 200;
+//        dialog.setPreferredSize(new Dimension(w, h));
+//        PanelClientCard clientCard = new PanelClientCard(app, client);
+//        clientCard.addPropertyChangeListener(getPanelPedido());
+//        dialog.add(clientCard);
 //        dialog.setResizable(false);
 //        dialog.setTitle();
         dialog.pack();
@@ -963,12 +1019,12 @@ public class GUIManager {
         setDefaultCursor();
         dialog.setVisible(true);
     }
-    
+
     public void showPanelAddItem(PropertyChangeListener listener) {
         setWaitCursor();
         JDialog dialog = new MyDialogEsc();
         dialog.setModal(true);
-        int w = 700;
+        int w = 800;
         int h = 400;
         dialog.setPreferredSize(new Dimension(w, h));
 
@@ -979,6 +1035,79 @@ public class GUIManager {
 //        dialog.setResizable(false);
         dialog.add(getPanelAddItem());
         dialog.setTitle("Agregar item al inventario.");
+        dialog.pack();
+        dialog.setLocationRelativeTo(getFrame());
+        setDefaultCursor();
+        dialog.setVisible(true);
+    }
+
+    public void showPanelSelItem(PropertyChangeListener listener) {
+        setWaitCursor();
+        JDialog dialog = new MyDialogEsc();
+        dialog.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
+        if (!getPanelSelItem().containsListener(listener)) {
+            getPanelSelItem().addPropertyChangeListener(listener);
+        }
+        dialog.add(getPanelSelItem());
+        dialog.setTitle("Agregar item.");
+        dialog.pack();
+        dialog.setLocationRelativeTo(getFrame());
+        setDefaultCursor();
+        dialog.setVisible(true);
+    }
+
+    public void showPanelNewUnit(String title, PropertyChangeListener listener, ArrayList lista) {
+        setWaitCursor();
+        JDialog dialog = new MyDialog();
+        dialog.setModal(true);
+        dialog.setIconImage(app.getImgManager().getImagen("gui/img/Inventory-maintenance.png", 18, 18));
+        dialog.add(getPanelNewList(title, listener, lista));
+        dialog.setTitle("Unidades de medida.");
+        dialog.pack();
+        dialog.setLocationRelativeTo(getFrame());
+        setDefaultCursor();
+        dialog.setVisible(true);
+    }
+
+//    public void showPanelNewLocation() {
+//        setWaitCursor();
+//        JDialog dialog = new MyDialog();
+//        dialog.setModal(true);
+//        dialog.setIconImage(app.getImgManager().getImagen("gui/img/Inventory-maintenance.png", 18, 18));        
+////        if (!getPanelNewLocation().containsListener(getPanelNewProduct())) {
+////            getPanelNewLocation().addPropertyChangeListener(getPanelNewProduct());
+////        }
+//        dialog.add(getPanelNewLocation());
+//        dialog.setTitle("Nueva Locacion.");
+//        dialog.pack();
+//        dialog.setLocationRelativeTo(getFrame());
+//        setDefaultCursor();
+//        dialog.setVisible(true);
+//    }
+    public void showPanelConciliacion(boolean reset) {
+        setWaitCursor();
+        JDialog dialog = new MyDialog();
+        dialog.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
+        if (!getPanelNewConciliacion(false).containsListener(getPanelInventory())) {
+            getPanelNewConciliacion(false).addPropertyChangeListener(getPanelInventory());
+        }
+        dialog.add(getPanelNewConciliacion(reset));
+        dialog.setTitle("Agregar conciliacion.");
+        dialog.pack();
+        dialog.setLocationRelativeTo(getFrame());
+        setDefaultCursor();
+        dialog.setVisible(true);
+    }
+
+    public void showPanelNewLocation(PropertyChangeListener listener) {
+        setWaitCursor();
+        JDialog dialog = new MyDialog();
+        dialog.setModal(true);
+        if (!getPanelSelItem().containsListener(listener)) {
+            getPanelSelItem().addPropertyChangeListener(listener);
+        }
+        dialog.add(getPanelNewLocation());
+        dialog.setTitle("Nueva Locacion.");
         dialog.pack();
         dialog.setLocationRelativeTo(getFrame());
         setDefaultCursor();

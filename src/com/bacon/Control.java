@@ -8,11 +8,13 @@ package com.bacon;
 import com.bacon.domain.Additional;
 import com.bacon.domain.Category;
 import com.bacon.domain.Client;
+import com.bacon.domain.Conciliacion;
 import com.bacon.domain.ConfigDB;
 import com.bacon.domain.Cycle;
 import com.bacon.domain.Ingredient;
 import com.bacon.domain.Invoice;
 import com.bacon.domain.Item;
+import com.bacon.domain.Location;
 import com.bacon.domain.Permission;
 import com.bacon.domain.Presentation;
 import com.bacon.domain.Product;
@@ -22,11 +24,13 @@ import com.bacon.domain.User;
 import com.bacon.domain.Waiter;
 import com.bacon.persistence.JDBC.JDBCAdditionalDAO;
 import com.bacon.persistence.JDBC.JDBCClientDAO;
+import com.bacon.persistence.JDBC.JDBCConciliacionDAO;
 import com.bacon.persistence.JDBC.JDBCConfigDAO;
 import com.bacon.persistence.JDBC.JDBCDAOFactory;
 import com.bacon.persistence.JDBC.JDBCIngredientDAO;
 import com.bacon.persistence.JDBC.JDBCInvoiceDAO;
 import com.bacon.persistence.JDBC.JDBCItemDAO;
+import com.bacon.persistence.JDBC.JDBCLocationDAO;
 import com.bacon.persistence.JDBC.JDBCProductDAO;
 import com.bacon.persistence.JDBC.JDBCUserDAO;
 import com.bacon.persistence.JDBC.JDBCUtilDAO;
@@ -37,6 +41,7 @@ import com.bacon.persistence.dao.UserRetrieveException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
 import org.apache.log4j.Logger;
@@ -89,6 +94,12 @@ public class Control {
 
             JDBCItemDAO itemDAO = (JDBCItemDAO) DAOFactory.getInstance().getItemDAO();
             itemDAO.init();
+
+            JDBCConciliacionDAO conciliacionDAO = (JDBCConciliacionDAO) DAOFactory.getInstance().getConciliacionDAO();
+            conciliacionDAO.init();
+            
+            JDBCLocationDAO locationDAO = (JDBCLocationDAO) DAOFactory.getInstance().getLocationDAO();
+            locationDAO.init();
 
             JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
             utilDAO.init();
@@ -521,11 +532,27 @@ public class Control {
     public int contarRows(String sql) {
         try {
             JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
+            System.out.println("::sql = " + sql);
             return utilDAO.countTableRows(sql);
         } catch (DAOException ex) {
             logger.error("Error couting rows.", ex);
             GUIManager.showErrorMessage(null, "Error consultando numero de registros", "Error");
             return -1;
+        }
+    }
+
+    public int countInvoices(String where) {
+        String query = "select * from invoices " + (where != null && !where.isEmpty() ? "where " + where : "");
+        return contarRows(query);
+    }
+
+    public ArrayList<Invoice> getInvoicesLitelList(String where, String order, int init, int end) {
+        try {
+            JDBCInvoiceDAO invoiceDAO = (JDBCInvoiceDAO) DAOFactory.getInstance().getInvoiceDAO();
+            return invoiceDAO.getInvoiceLiteList(where, order, init, end);
+        } catch (DAOException ex) {
+            logger.error("Error getting Invoices list.", ex);
+            return null;
         }
     }
 
@@ -713,13 +740,122 @@ public class Control {
             return null;
         }
     }
-    
-    public ArrayList<Item> getItemList(String where) {
+
+    public ArrayList<Item> getItemList(String where, String order) {
         try {
             JDBCItemDAO itemDAO = (JDBCItemDAO) DAOFactory.getInstance().getItemDAO();
-            return itemDAO.getItemList(where, "");
+            return itemDAO.getItemList(where, order);
         } catch (DAOException ex) {
             logger.error("Error getting Item list.", ex);
+            return null;
+        }
+    }
+
+    public Item getItemWhere(String where) {
+        return getItemList(where, "").get(0);
+    }
+
+    public boolean addItem(Item item) {
+        try {
+            JDBCItemDAO itemDAO = (JDBCItemDAO) DAOFactory.getInstance().getItemDAO();
+            itemDAO.addItem(item);
+            return true;
+        } catch (DAOException ex) {
+            logger.error("Error adding Item.", ex);
+            return false;
+        }
+    }
+
+    public ArrayList<String> getUnitsList(String where, String order) {
+        try {
+            JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
+            return utilDAO.getUnitList(where, order);
+        } catch (DAOException ex) {
+            logger.error("Error getting units list.", ex);
+            GUIManager.showErrorMessage(null, "Error consultando lista de unidades", "Error");
+            return null;
+        }
+    }
+
+    public void addUnit(String nombre) {
+        try {
+            JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
+            utilDAO.addUnit(nombre);
+        } catch (DAOException ex) {
+            logger.error("Error adding unit.", ex);
+            GUIManager.showErrorMessage(null, "Error agregando unidad", "Error");
+        }
+    }
+
+    public void deleteUnit(String nombre) {
+        try {
+            JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
+            utilDAO.deleteUnit(nombre);
+        } catch (DAOException ex) {
+            logger.error("Error deleting unit.", ex);
+            GUIManager.showErrorMessage(null, "Error eliminando unidad", "Error");
+        }
+    }
+
+    public void updateUnit(String nombre, String id) {
+        try {
+            JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
+            utilDAO.updateUnit(nombre, id);
+        } catch (DAOException ex) {
+            logger.error("Error updating unit.", ex);
+            GUIManager.showErrorMessage(null, "Error updating unidad", "Error");
+        }
+    }
+
+    public HashMap checkInventory(int idPres) {
+        try {
+            JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
+            return utilDAO.checkInventory(idPres);
+        } catch (DAOException ex) {
+            logger.error("Error gettinf data.", ex);
+            GUIManager.showErrorMessage(null, "Error getting data", "Error");
+            return null;
+        }
+    }
+
+    public void addItemToInventory(long idItem, double quantity) {
+        try {
+            JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
+            utilDAO.addInventoryQuantity(idItem, quantity);
+        } catch (DAOException ex) {
+            logger.error("Error gettinf data.", ex);
+            GUIManager.showErrorMessage(null, "Error getting data", "Error");
+        }
+    }
+
+//    public ArrayList<Item> getItemsBySql(String query) {
+//        try {
+//            JDBCItemDAO itemDAO = (JDBCItemDAO) JDBCDAOFactory.getInstance().getItemDAO();
+//            return itemDAO.getItemsBy(query);
+//        } catch (Exception e) {
+//            logger.error("Error getting items list by sql");
+//            GUIManager.showErrorMessage(null, "Error consultando lista de items", "Error");
+//            return null;
+//        }
+//    }
+    public ArrayList<Location> getLocationList(String where, String order) {
+        try {
+            JDBCLocationDAO locationDAO = (JDBCLocationDAO) DAOFactory.getInstance().getLocationDAO();
+            return locationDAO.getLocationList(where, order);
+        } catch (DAOException ex) {
+            logger.error("Error getting location list.", ex);
+            GUIManager.showErrorMessage(null, "Error consultando lista de locations", "Error");
+            return null;
+        }
+    }
+    
+    public ArrayList<Conciliacion> getConciliacionList(String where, String order) {
+        try {
+            JDBCConciliacionDAO concDao = (JDBCConciliacionDAO) JDBCDAOFactory.getInstance().getConciliacionDAO();
+            return concDao.getConciliacionList(where, order);
+        } catch (Exception ex) {
+            logger.error("Error getting salida by conciliacion list.", ex);
+            GUIManager.showErrorMessage(null, "Error consultando lista de conciliaciones", "Error");
             return null;
         }
     }

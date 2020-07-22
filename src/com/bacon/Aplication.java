@@ -389,14 +389,14 @@ public final class Aplication implements ActionListener, PropertyChangeListener,
 
     private void initActions() {
         acExitApp = new ProgAction("Salir",
-                new ImageIcon(imgManager.getImagen(getFolderIcons() + "Salir.png", 32, 32)), "Salir de la aplicacion", 'x') {
+                new ImageIcon(imgManager.getImagen(getFolderIcons() + "cancel.png", 32, 32)), "Salir de la aplicacion", 'x') {
             public void actionPerformed(ActionEvent e) {
                 salir(0);
             }
 
         };
-        acExitApp.setSmallIcon(new ImageIcon(imgManager.getImagen(getFolderIcons() + "exit.png", 25, 25)));
-        acExitApp.setLargeIcon(new ImageIcon(imgManager.getImagen(getFolderIcons() + "exit.png", 32, 32)));
+        acExitApp.setSmallIcon(new ImageIcon(imgManager.getImagen(getFolderIcons() + "cancel.png", 25, 25)));
+        acExitApp.setLargeIcon(new ImageIcon(imgManager.getImagen(getFolderIcons() + "cancel.png", 32, 32)));
 
         acReturnToMenu = new ProgAction("Volver",
                 null, "Volver al menu Principal", 'v') {

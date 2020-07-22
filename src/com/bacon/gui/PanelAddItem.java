@@ -3,11 +3,17 @@ package com.bacon.gui;
 import com.bacon.Aplication;
 import com.bacon.ProgAction;
 import com.bacon.Utiles;
+import com.bacon.domain.Item;
+import com.bacon.domain.Location;
 import com.bacon.domain.Presentation;
 import com.bacon.domain.Product;
 import com.bacon.gui.util.TableSelectCellRenderer;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import javax.swing.BoxLayout;
@@ -16,6 +22,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
+import org.bx.TextFormatter;
 import org.bx.gui.ListSelection;
 import org.bx.gui.MyDefaultTableModel;
 import org.dz.PanelCaptura;
@@ -24,12 +31,15 @@ import org.dz.PanelCaptura;
  *
  * @author lrod
  */
-public class PanelAddItem extends PanelCaptura implements TableModelListener {
+public class PanelAddItem extends PanelCaptura implements ActionListener, PropertyChangeListener, TableModelListener {
 
     private final Aplication app;
-    private ProgAction acAddUnit;
+    private ProgAction acAddUnit, acAddLocation;
     private MyDefaultTableModel model;
     private ListSelection listaSeleccion;
+    private int widthLabel;
+
+    public static final int COL_SEL = 2;
 
     /**
      * Creates new form PanelAddItem
@@ -45,7 +55,39 @@ public class PanelAddItem extends PanelCaptura implements TableModelListener {
 
     private void createComponents() {
 
-        String[] colNames = {"Sel", "Codigo", "Producto", "Presentacion", "Cantidad"};
+        Font font = new Font("Sans", 1, 16);
+
+        regQuantity.setFontCampo(font);
+        regQuantity.setDocument(TextFormatter.getDoubleLimiter());
+
+        ArrayList<String> units = app.getControl().getUnitsList("", "name");
+        regMeseure.setText(units.toArray());
+        regMeseure.setFontCampo(font);
+
+        ArrayList<Location> locations = app.getControl().getLocationList("", "name");
+        regLocation.setText(locations.toArray());
+        regLocation.setFontCampo(font);
+
+        regName.setFontCampo(font);
+        regStockMax.setFontCampo(font);
+        regStockMax.setDocument(TextFormatter.getDoubleLimiter());
+        regStockMin.setFontCampo(font);
+        regStockMin.setDocument(TextFormatter.getDoubleLimiter());
+        regPrice.setFontCampo(font);
+        regPrice.setDocument(TextFormatter.getDoubleLimiter());
+        regCost.setFontCampo(font);
+        regCost.setDocument(TextFormatter.getDoubleLimiter());
+
+        chSaveExit.setFont(new Font("Sans", 1, 10));
+        chSaveExit.setText("Guardar y salir");
+
+        btSave.setFont(new Font("Sans", 1, 11));
+        btSave.setText("Guardar");
+//        btSave.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "save.png", 24, 24)));
+        btSave.setActionCommand(AC_SAVE_ITEM);
+        btSave.addActionListener(this);
+
+        String[] colNames = {"Sel", "Producto", "ID", "Presentacion", "Cantidad"};
         ArrayList<String> asList = new ArrayList<>(Arrays.asList(colNames));
 //        asList.add(loc);
         model = new MyDefaultTableModel(asList.toArray(), 0);
@@ -53,11 +95,11 @@ public class PanelAddItem extends PanelCaptura implements TableModelListener {
         tableProducts.getTableHeader().setReorderingAllowed(false);
         listaSeleccion = new ListSelection(tableProducts);
 
-        tableProducts.setRowHeight(22);
+        tableProducts.setRowHeight(24);
         tableProducts.getTableHeader().addMouseListener(listaSeleccion);
         model.addTableModelListener(this);
 
-        int[] colW = {5, 20, 120, 100, 20};
+        int[] colW = {5, 120, 20, 100, 20};
 
         for (int i = 0; i < tableProducts.getColumnCount(); i++) {
             tableProducts.getColumnModel().getColumn(i).setCellRenderer(new TableSelectCellRenderer(true));
@@ -71,20 +113,23 @@ public class PanelAddItem extends PanelCaptura implements TableModelListener {
         loadProducts();
 
     }
+    public static final String AC_SAVE_ITEM = "AC_SAVE_ITEM";
 
     private void loadProducts() {
         SwingWorker sw = new SwingWorker() {
             @Override
             protected Object doInBackground() throws Exception {
                 ArrayList<Product> productos = app.getControl().getProductsList("", "");
-                System.out.println("exp = " + productos.size());
                 for (int i = 0; i < productos.size(); i++) {
                     Product p = productos.get(i);
                     ArrayList<Presentation> press = app.getControl().getPresentationsByProduct(p.getId());
                     for (int j = 0; j < press.size(); j++) {
-                        model.addRow(new Object[]{false, p.getCode(), p.getName(), press.get(j).getName(), 0});
+                        model.addRow(new Object[]{false, p.getName(), press.get(j).getId(), press.get(j).getName(), 1});
+                        model.setRowEditable(model.getRowCount() - 1, false);
+                        model.setCellEditable(model.getRowCount() - 1, 0, true);
+                        model.setCellEditable(model.getRowCount() - 1, 4, true);
                     }
-                    
+
                 }
                 return true;
             }
@@ -93,11 +138,31 @@ public class PanelAddItem extends PanelCaptura implements TableModelListener {
 
     }
 
+    public ArrayList<String> getUnitsList() {
+        ArrayList<String> unidadList = app.getControl().getUnitsList("", "name");
+        return unidadList;
+    }
+
+    public ArrayList<Location> getLocationsList() {
+        ArrayList<Location> locationList = app.getControl().getLocationList("", "name");
+        return locationList;
+    }
+
     public final void initActions() {
+
+        widthLabel = 75;
+
         ImageIcon icon = new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "add1.png", 24, 24));
         acAddUnit = new ProgAction("", icon, "Agregar medida", 'm') {
             public void actionPerformed(ActionEvent e) {
-                System.out.println("action:" + e);
+                app.getGuiManager().showPanelNewUnit("Unidades de medida", PanelAddItem.this, getUnitsList());
+            }
+        };
+
+        icon = new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "add1.png", 24, 24));
+        acAddLocation = new ProgAction("", icon, "Agregar locacion", 'l') {
+            public void actionPerformed(ActionEvent e) {
+                app.getGuiManager().showPanelNewLocation(PanelAddItem.this);
             }
         };
     }
@@ -111,17 +176,24 @@ public class PanelAddItem extends PanelCaptura implements TableModelListener {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        regName = new org.dz.Registro(BoxLayout.X_AXIS, "Nombre", "", 70);
-        regMeseure = new org.dz.Registro(BoxLayout.X_AXIS, "Medida", new Object[1], acAddUnit,70);
-        regInitial = new org.dz.Registro(BoxLayout.X_AXIS, "Inicial", "", 70);
-        registro4 = new org.dz.Registro(BoxLayout.X_AXIS, "Stock", "", 70);
-        registro5 = new org.dz.Registro(BoxLayout.X_AXIS, "Stock min", "", 70);
+        regName = new org.dz.Registro(BoxLayout.X_AXIS, "Nombre", "", widthLabel);
+        regMeseure = new org.dz.Registro(BoxLayout.X_AXIS, "Medida", new Object[1], acAddUnit,widthLabel);
+        regQuantity = new org.dz.Registro(BoxLayout.X_AXIS, "Cantidad", "", widthLabel);
+        regStockMax = new org.dz.Registro(BoxLayout.X_AXIS, "Stock max", "", widthLabel);
+        regStockMin = new org.dz.Registro(BoxLayout.X_AXIS, "Stock min", "", widthLabel);
         jScrollPane1 = new javax.swing.JScrollPane();
         tableProducts = new javax.swing.JTable();
-        registro6 = new org.dz.Registro(BoxLayout.X_AXIS, "Costo", "", 70);
-        registro7 = new org.dz.Registro(BoxLayout.X_AXIS, "Precio", "", 70);
+        regPrice = new org.dz.Registro(BoxLayout.X_AXIS, "Precio", "", widthLabel);
+        regCost = new org.dz.Registro(BoxLayout.X_AXIS, "Costo", "", widthLabel);
+        labelInfo = new javax.swing.JLabel();
+        btSave = new javax.swing.JButton();
+        chSaveExit = new javax.swing.JCheckBox();
+        regLocation = new org.dz.Registro(BoxLayout.X_AXIS, "Locacion", new Object[1], acAddLocation,widthLabel);
+
+        regName.setNextFocusableComponent(regMeseure);
 
         regMeseure.setLabelFont(new Font("arial",0,11));
+        regMeseure.setNextFocusableComponent(regQuantity);
 
         tableProducts.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -133,6 +205,11 @@ public class PanelAddItem extends PanelCaptura implements TableModelListener {
         ));
         jScrollPane1.setViewportView(tableProducts);
 
+        chSaveExit.setText("jCheckBox1");
+
+        regMeseure.setLabelFont(new Font("arial",0,11));
+        regLocation.setNextFocusableComponent(regQuantity);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -140,66 +217,185 @@ public class PanelAddItem extends PanelCaptura implements TableModelListener {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(regName, javax.swing.GroupLayout.DEFAULT_SIZE, 255, Short.MAX_VALUE)
                     .addComponent(regMeseure, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(regInitial, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(registro4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(registro5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(registro6, javax.swing.GroupLayout.PREFERRED_SIZE, 255, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(registro7, javax.swing.GroupLayout.PREFERRED_SIZE, 255, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(regStockMin, javax.swing.GroupLayout.DEFAULT_SIZE, 169, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(regStockMax, javax.swing.GroupLayout.DEFAULT_SIZE, 168, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(regCost, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(regPrice, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(regName, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(regQuantity, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(labelInfo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(chSaveExit)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btSave, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(regLocation, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 426, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 516, Short.MAX_VALUE)
                 .addContainerGap())
         );
-
-        layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {regInitial, regMeseure, regName, registro4, registro5, registro6, registro7});
-
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(regName, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(regMeseure, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(regInitial, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(regLocation, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(registro4, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(regQuantity, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(registro5, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(regStockMax, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(regStockMin, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(registro6, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(regCost, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(regPrice, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(registro7, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 21, Short.MAX_VALUE)))
+                        .addComponent(labelInfo, javax.swing.GroupLayout.PREFERRED_SIZE, 117, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(btSave, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(chSaveExit, javax.swing.GroupLayout.Alignment.TRAILING))))
                 .addGap(13, 13, 13))
         );
     }// </editor-fold>//GEN-END:initComponents
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btSave;
+    private javax.swing.JCheckBox chSaveExit;
     private javax.swing.JScrollPane jScrollPane1;
-    private org.dz.Registro regInitial;
+    private javax.swing.JLabel labelInfo;
+    private org.dz.Registro regCost;
+    private org.dz.Registro regLocation;
     private org.dz.Registro regMeseure;
     private org.dz.Registro regName;
-    private org.dz.Registro registro4;
-    private org.dz.Registro registro5;
-    private org.dz.Registro registro6;
-    private org.dz.Registro registro7;
+    private org.dz.Registro regPrice;
+    private org.dz.Registro regQuantity;
+    private org.dz.Registro regStockMax;
+    private org.dz.Registro regStockMin;
     private javax.swing.JTable tableProducts;
     // End of variables declaration//GEN-END:variables
 
     @Override
     public void reset() {
+        regName.setText("");
+        regMeseure.setText("");
+        regPrice.setText("");
+        regQuantity.setText("");
+        regStockMax.setText("");
+        regStockMin.setText("");
 
+        for (int i = 0; i < tableProducts.getRowCount(); ++i) {
+            model.setValueAt(Boolean.FALSE, i, 0);
+        }
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (AC_SAVE_ITEM.equals(e.getActionCommand())) {
+            Item item = parseItem();
+            if (item != null) {
+                app.getControl().addItem(item);
+
+//                Item item1 = app.getControl().getItemWhere("name='"+item.getName()+"'");
+                pcs.firePropertyChange(AC_ADD_ITEM, null, item);
+                if (chSaveExit.isSelected()) {
+                    cancelPanel();
+                } else {
+                    reset();
+                }
+            }
+        }
+    }
+    public static final String AC_ADD_ITEM = "AC_ADD_ITEM";
+
+    public void cancelPanel() {
+        getRootPane().getParent().setVisible(false);
+        reset();
     }
 
     @Override
     public void tableChanged(TableModelEvent e) {
         updateTabla();
+    }
+
+    private Item parseItem() {
+        Item item = null;
+        boolean validate = true;
+        if (regName.getText().isEmpty()) {
+            regName.setBorderToError();
+            validate = false;
+        }
+
+        if (regMeseure.getText().isEmpty()) {
+            regMeseure.setBorderToError();
+            validate = false;
+        }
+        
+        if (regLocation.getText().isEmpty()) {
+            regLocation.setBorderToError();
+            validate = false;
+        }
+
+        if (regQuantity.getText().isEmpty()) {
+            regQuantity.setBorderToError();
+            validate = false;
+        }
+
+        if (validate) {
+            item = new Item();
+            item.setName(regName.getText().toLowerCase());
+            item.setMeasure(regMeseure.getText().toLowerCase());
+            item.setLocation(((Location)regLocation.getObject()).getId());
+            item.setQuantity(Double.parseDouble(regQuantity.getText()));
+            try {
+                Double stockMin = Double.parseDouble(regStockMin.getText());
+                item.setStockMin(stockMin);
+            } catch (NumberFormatException e) {
+                item.setStockMin(0);
+            }
+            try {
+                Double stockMax = Double.parseDouble(regStockMax.getText());
+                item.setStock(stockMax);
+            } catch (NumberFormatException e) {
+                item.setStock(0);
+            }
+            try {
+                BigDecimal cost = new BigDecimal(regCost.getText());
+                item.setCost(cost);
+            } catch (NumberFormatException e) {
+                item.setCost(BigDecimal.ZERO);
+            }
+            try {
+                BigDecimal price = new BigDecimal(regPrice.getText());
+                item.setPrice(price);
+            } catch (NumberFormatException e) {
+                item.setPrice(BigDecimal.ZERO);
+            }
+
+            item.setInit(item.getQuantity());
+//            item.setLocation(0);
+            item.setAverage(BigDecimal.ZERO);
+            item.setUser(app.getUser().getUsername().toLowerCase());
+            ArrayList<Object[]> selecteds = getSelecteds();
+            for (int i = 0; i < selecteds.size(); i++) {
+                Object[] dat = selecteds.get(i);
+                item.addPresentations(Integer.parseInt(dat[0].toString()), Double.parseDouble(dat[1].toString()));
+            }
+//            System.out.println("item = " + item);
+        }
+        return item;
     }
 
     private void updateTabla() {
@@ -211,15 +407,18 @@ public class PanelAddItem extends PanelCaptura implements TableModelListener {
         });
     }
 
-    private ArrayList<String> getSelecteds() {
-        ArrayList<String> prods = new ArrayList<>();
+    private ArrayList<Object[]> getSelecteds() {
+        ArrayList<Object[]> prods = new ArrayList<>();
         int[] selectedsRows = getSelectedsRows();
         for (int i = 0; i < selectedsRows.length; i++) {
-            prods.add(model.getValueAt(selectedsRows[i], 1).toString());
+            Object[] data = {
+                model.getValueAt(selectedsRows[i], COL_SEL).toString(),
+                model.getValueAt(selectedsRows[i], 4).toString(),};
+            prods.add(data);
         }
         return prods;
     }
-    
+
     public int[] getSelectedsRows() {
         int[] sel = new int[model.getRowCount()];
         Arrays.fill(sel, -1);
@@ -232,4 +431,34 @@ public class PanelAddItem extends PanelCaptura implements TableModelListener {
         Arrays.sort(sel);
         return sel;
     }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        System.out.println("evt = " + evt.getPropertyName());
+        if (PanelList.AC_SELECTED.equals(evt.getPropertyName())) {
+            regMeseure.setText(evt.getNewValue().toString());
+        } else if (PanelList.AC_ADD.equals(evt.getPropertyName())) {
+            app.getControl().addUnit(evt.getNewValue().toString());
+            updateUnitList();
+        } else if (PanelList.AC_EDIT.equals(evt.getPropertyName())) {
+            app.getControl().updateUnit(evt.getNewValue().toString(), evt.getOldValue().toString());
+            updateUnitList();
+        } else if (PanelList.AC_DELETE.equals(evt.getPropertyName())) {
+            app.getControl().deleteUnit(evt.getNewValue().toString());
+            updateUnitList();
+        }else if(PanelNewLocation.AC_ADD_LOCATION.equals(evt.getPropertyName())){
+            
+        }
+    }
+
+    private void updateUnitList() {
+        ArrayList<String> unidadList = getUnitsList();
+        regMeseure.setText(unidadList.toArray(new String[1]));
+    }
+    
+    private void updateLocationList() {
+        ArrayList<Location> location = getLocationsList();
+        regLocation.setText(location.toArray(new String[1]));
+    }
+
 }

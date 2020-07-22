@@ -92,8 +92,10 @@ public class JDBCUtilDAO implements UtilDAO {
 
     public static final String CREATE_INVOICE_OTHER_PRODUCT_TABLE_KEY = "CREATE_INVOICE_OTHER_PRODUCT_TABLE";
     public static final String ADD_INVOICE_OTHER_PRODUCT_KEY = "ADD_INVOICE_OTHER_PRODUCT";
-    
+
     public static final String CREATE_EXPENSES_INCOMES_TABLE_KEY = "CREATE_EXPENSES_INCOMES_TABLE";
+
+    public static final String CHECK_INVENTORY_KEY = "CHECK_INVENTORY";
 
     protected static final String CHECK_TABLE_EMPTY_KEY = "CHECK_TABLE";
     protected static final String INSERT_ROLE_USER_KEY = "INSERT_ROLE_USER";
@@ -103,6 +105,16 @@ public class JDBCUtilDAO implements UtilDAO {
     public static final String GET_FIRST_REGISTRO_KEY = "GET_FIRST_REGISTRO";
 
     public static final String GET_CATEGORIES_SORTED_KEY = "GET_CATEGORIES_SORTED";
+
+    public static final String CREATE_UNITS_TABLE_KEY = "CREATE_UNITS_TABLE";
+    public static final String ADD_UNIT_KEY = "ADD_UNIT";
+    public static final String GET_UNIT_KEY = "GET_UNIT";
+    public static final String DELETE_UNIT_KEY = "DELETE_UNIT";
+    public static final String UPDATE_UNIT_KEY = "UPDATE_UNIT";
+
+    public static final String CREATE_INVENTORY_PRODUCT_TABLE_KEY = "CREATE_INVENTORY_PRODUCT_TABLE";
+    public static final String UPDATE_INVENTORY_QUANTITY_KEY = "UPDATE_INVENTORY_QUANTITY";
+    public static final String ADD_INVENTORY_QUANTITY_KEY = "ADD_INVENTORY_QUANTITY";
 
     private static final Logger logger = Logger.getLogger(JDBCUtilDAO.class.getCanonicalName());
 
@@ -158,12 +170,17 @@ public class JDBCUtilDAO implements UtilDAO {
 
         TABLE_NAME = "invoice_otherproduct";
         createTable(TABLE_NAME, CREATE_INVOICE_OTHER_PRODUCT_TABLE_KEY);
-        
+
         TABLE_NAME = "expenses_incomes";
         createTable(TABLE_NAME, CREATE_EXPENSES_INCOMES_TABLE_KEY);
 
+        TABLE_NAME = "units";
+        createTable(TABLE_NAME, CREATE_UNITS_TABLE_KEY);
+
+        TABLE_NAME = "inventory_product";
+        createTable(TABLE_NAME, CREATE_INVENTORY_PRODUCT_TABLE_KEY);
+
     }
-    
 
     private void createTable(String tableName, String JDBC_KEY) throws DAOException {
         Connection conn = null;
@@ -222,7 +239,7 @@ public class JDBCUtilDAO implements UtilDAO {
 //            Object[] parameters = {code};
 //            pSt = sqlStatements.buildSQLStatement(conn, EXIST_CLAVE_KEY, parameters);
             rs = pSt.executeQuery();
-            
+
             while (rs.next()) {
                 count = rs.getInt(1);
             }
@@ -337,7 +354,7 @@ public class JDBCUtilDAO implements UtilDAO {
             conn.setAutoCommit(false);
             for (int i = 0; i < permissions.size(); i++) {
                 Permission perm = permissions.get(i);
-                
+
                 Object[] parameters = {
                     perm.getId(),
                     role.getId(),};
@@ -1015,7 +1032,7 @@ public class JDBCUtilDAO implements UtilDAO {
             DBManager.closeConnection(conn);
         }
     }
-    
+
     public void addOtherProductInvoice(long idInvoice, OtherProduct otherProduct, int cantidad) throws DAOException {
         Connection conn = null;
         PreparedStatement ps = null;
@@ -1064,6 +1081,189 @@ public class JDBCUtilDAO implements UtilDAO {
             DBManager.closeConnection(conn);
         }
         return categories;
+    }
+
+    public void addUnit(String unidad) throws DAOException {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        try {
+            conn = dataSource.getConnection();
+            conn.setAutoCommit(false);
+            Object[] parameters = {
+                unidad
+            };
+            ps = sqlStatements.buildSQLStatement(conn, ADD_UNIT_KEY, parameters);
+            ps.executeUpdate();
+            conn.commit();
+        } catch (SQLException e) {
+            DBManager.rollbackConn(conn);
+            throw new DAOException("Cannot add Unit", e);
+        } catch (IOException e) {
+            DBManager.rollbackConn(conn);
+            throw new DAOException("Cannot add Unit", e);
+        } finally {
+            DBManager.closeStatement(ps);
+            DBManager.closeConnection(conn);
+        }
+    }
+
+    public ArrayList<String> getUnitList(String where, String orderBy) throws DAOException {
+        String retrieveUnit;
+        ArrayList<String> unidades = new ArrayList<>();
+        try {
+            SQLExtractor sqlExtractorWhere = new SQLExtractor(where, SQLExtractor.Type.WHERE);;
+            SQLExtractor sqlExtractorOrderBy = new SQLExtractor(orderBy, SQLExtractor.Type.ORDER_BY);;
+            Map<String, String> namedParams = new HashMap<>();
+            namedParams.put(NAMED_PARAM_WHERE, sqlExtractorWhere.extractWhere());
+            namedParams.put(NAMED_PARAM_ORDER_BY, sqlExtractorOrderBy.extractOrderBy());
+            retrieveUnit = sqlStatements.getSQLString(GET_UNIT_KEY, namedParams);
+
+        } catch (SQLException e) {
+            throw new DAOException("Could not properly retrieve the Unites List", e);
+        } catch (IOException e) {
+            throw new DAOException("Could not properly retrieve the Unites List", e);
+        }
+
+        Connection conn = null;
+        PreparedStatement retrieve = null;
+        ResultSet rs = null;
+        String unidad = null;
+        try {
+            conn = dataSource.getConnection();
+            retrieve = conn.prepareStatement(retrieveUnit);
+            rs = retrieve.executeQuery();
+
+            while (rs.next()) {
+                unidad = rs.getString(2);
+                unidades.add(unidad);
+            }
+        } catch (SQLException e) {
+            throw new DAOException("Could not proper retrieve the Unit: " + e);
+        } finally {
+            DBManager.closeResultSet(rs);
+            DBManager.closeStatement(retrieve);
+            DBManager.closeConnection(conn);
+        }
+        return unidades;
+    }
+
+    public void deleteUnit(String name) throws DAOException {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        try {
+            conn = dataSource.getConnection();
+            conn.setAutoCommit(false);
+            Object[] parameters = {name};
+            ps = sqlStatements.buildSQLStatement(conn, DELETE_UNIT_KEY, parameters);
+            ps.executeUpdate();
+            conn.commit();
+        } catch (SQLException e) {
+            DBManager.rollbackConn(conn);
+            throw new DAOException("Cannot delete the unidad", e);
+        } catch (IOException e) {
+            throw new DAOException("Cannot delete the unidad", e);
+        } finally {
+            DBManager.closeStatement(ps);
+            DBManager.closeConnection(conn);
+        }
+    }
+
+    public void updateUnit(String unidad, String id) throws DAOException {
+        Connection conn = null;
+        PreparedStatement update = null;
+        String idUnid = "'" + unidad + "'";
+        try {
+            conn = dataSource.getConnection();
+            conn.setAutoCommit(false);
+            Object[] parameters = {
+                unidad,
+                id
+            };
+            update = sqlStatements.buildSQLStatement(conn, UPDATE_UNIT_KEY, parameters);
+            update.executeUpdate();
+            conn.commit();
+        } catch (SQLException e) {
+            DBManager.rollbackConn(conn);
+            throw new DAOException("Could not properly update the Unit", e);
+        } catch (IOException e) {
+            DBManager.rollbackConn(conn);
+            throw new DAOException("Could not properly update the Unit", e);
+        } finally {
+            DBManager.closeStatement(update);
+            DBManager.closeConnection(conn);
+        }
+    }
+
+    public HashMap checkInventory(int idPres) throws DAOException {
+        String retrieveList;
+        HashMap data = new HashMap<>();
+        Connection conn = null;
+        PreparedStatement retrieve = null;
+        ResultSet rs = null;
+        Object[] parameters = {idPres};
+        try {
+            conn = dataSource.getConnection();
+            retrieve = sqlStatements.buildSQLStatement(conn, CHECK_INVENTORY_KEY, parameters);
+            rs = retrieve.executeQuery();
+            while (rs.next()) {
+
+                data.put("id", rs.getInt("id"));
+                data.put("name", rs.getString("name"));
+                data.put("pres", rs.getString("pres"));
+                data.put("measure", rs.getString("measure"));
+                data.put("exist", rs.getDouble("exist"));
+                data.put("idPres", rs.getInt("idPres"));
+                data.put("quantity", rs.getDouble("quantity"));
+
+//                presentations.add(pres);
+            }
+        } catch (SQLException e) {
+            throw new DAOException("Could not properly retrieve the presentations list: " + e);
+        } catch (IOException e) {
+            throw new DAOException("Could not properly retrieve the presentations list: " + e);
+        } finally {
+            DBManager.closeResultSet(rs);
+            DBManager.closeStatement(retrieve);
+            DBManager.closeConnection(conn);
+        }
+        return data;
+    }
+
+    public void addInventoryQuantity(long id, double quantity) throws DAOException {
+        updateInventoryQuantity(id, quantity, ADD_INVENTORY_QUANTITY_KEY);
+    }
+
+    public void setInventoryQuantity(long id, double quantity) throws DAOException {
+        updateInventoryQuantity(id, quantity, UPDATE_INVENTORY_QUANTITY_KEY);
+    }
+
+    public void updateInventoryQuantity(long id, double quantity, String KEY) throws DAOException {
+        Connection conn = null;
+        PreparedStatement update = null;
+        System.out.println("id = " + id);
+        System.out.println("quantity = " + quantity);
+        try {
+            conn = dataSource.getConnection();
+            conn.setAutoCommit(false);
+            Object[] parameters = {
+                quantity,
+                id
+            };
+            
+            update = sqlStatements.buildSQLStatement(conn, KEY, parameters);
+            System.out.println("update = " + update);
+            update.executeUpdate();
+            conn.commit();
+        } catch (SQLException e) {
+            DBManager.rollbackConn(conn);
+            throw new DAOException("Could not properly update the Item", e);
+        } catch (IOException e) {
+            DBManager.rollbackConn(conn);
+            throw new DAOException("Could not properly update the Item", e);
+        } finally {
+            DBManager.closeStatement(update);
+            DBManager.closeConnection(conn);
+        }
     }
 
 }

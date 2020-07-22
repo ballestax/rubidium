@@ -2,6 +2,8 @@ package com.bacon.gui;
 
 import com.bacon.Aplication;
 import com.bacon.domain.Item;
+import static com.bacon.gui.PanelSelItem.AC_ADD_ITEM_TO_TABLE;
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.FlowLayout;
@@ -13,12 +15,16 @@ import java.text.Format;
 import java.util.ArrayList;
 import javax.swing.BorderFactory;
 import static javax.swing.BorderFactory.createLineBorder;
+import javax.swing.DefaultListSelectionModel;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableCellRenderer;
 import org.bx.gui.MyDefaultTableModel;
 import org.dz.PanelCapturaMod;
@@ -27,11 +33,13 @@ import org.dz.PanelCapturaMod;
  *
  * @author lrod
  */
-public class PanelInventory extends PanelCapturaMod implements ActionListener {
+public class PanelInventory extends PanelCapturaMod implements ActionListener, ListSelectionListener {
 
     private final Aplication app;
 
     private MyDefaultTableModel model;
+    
+    private PanelReportProductDetail pnDetail;
 
     /**
      * Creates new form PanelReportSales
@@ -52,38 +60,69 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener {
         btAdd.setActionCommand(AC_SHOW_ADD_ITEM);
         btAdd.addActionListener(this);
 
-        panelButtons.add(btAdd);
+        JButton btLoad = new JButton("LOAD");
+        btLoad.setActionCommand(AC_LOAD_ITEM);
+        btLoad.addActionListener(this);
 
-        String[] colNames = new String[]{"N°", "Item", "Cantidad", "Medida", "Cost", "Price"};
+        JButton btRefresh = new JButton("REFRESH");
+        btRefresh.setActionCommand(AC_REFRESH_ITEMS);
+        btRefresh.addActionListener(this);
+
+        JButton btConciliation = new JButton("CONCILIACION");
+        btConciliation.setActionCommand(AC_ADD_CONCILIATION);
+        btConciliation.addActionListener(this);
+
+        panelButtons.add(btAdd);
+        panelButtons.add(btLoad);
+        panelButtons.add(btRefresh);
+        panelButtons.add(btConciliation);
+
+        String[] colNames = new String[]{"N°", "Item", "Cantidad", "Medida", "Cost", "Price", "Stock min", "Stock max"};
 
         model = new MyDefaultTableModel(colNames, 0);
         tableItems.setModel(model);
         tableItems.setRowHeight(24);
         tableItems.setFont(new Font("Tahoma", 0, 16));
+        
+        
+        DefaultListSelectionModel selectionModel = new DefaultListSelectionModel();
+        selectionModel.addListSelectionListener(this);
+        
+        tableItems.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        tableItems.setSelectionModel(selectionModel);
 
         TablaCellRenderer tRenderer = new TablaCellRenderer(true, app.getDCFORM_P());
 
-        int[] colW = new int[]{10, 50, 30, 30, 30, 30};
+        int[] colW = new int[]{10, 120, 20, 20, 20, 20, 20, 20};
         for (int i = 0; i < colW.length; i++) {
             tableItems.getColumnModel().getColumn(i).setMinWidth(colW[i]);
             tableItems.getColumnModel().getColumn(i).setPreferredWidth(colW[i]);
             tableItems.getColumnModel().getColumn(i).setCellRenderer(new TablaCellRenderer(true, null));
         }
-
         tableItems.getColumnModel().getColumn(2).setCellRenderer(tRenderer);
         tableItems.getColumnModel().getColumn(4).setCellRenderer(tRenderer);
         tableItems.getColumnModel().getColumn(5).setCellRenderer(tRenderer);
+        tableItems.getColumnModel().getColumn(6).setCellRenderer(tRenderer);
+        tableItems.getColumnModel().getColumn(7).setCellRenderer(tRenderer);
 //        tableItems.getColumnModel().getColumn(model.getColumnCount() - 1).setCellEditor(new BotonEditor(tableItems, this, "AC_MOD_USER"));
 //        tableItems.getColumnModel().getColumn(model.getColumnCount() - 1).setCellRenderer(new ButtonCellRenderer("Ver"));
+
+        pnDetail = new PanelReportProductDetail(app);
+
+        jPanel1.setLayout(new BorderLayout());
+        jPanel1.add(pnDetail);
 
         populateTable();
 
     }
+    public static final String AC_ADD_CONCILIATION = "AC_ADD_CONCILIATION";
+    public static final String AC_REFRESH_ITEMS = "AC_REFRESH_ITEMS";
+    public static final String AC_LOAD_ITEM = "AC_LOAD_ITEM";
     public static final String AC_SHOW_ADD_ITEM = "AC_SHOW_ADD_ITEM";
 
     private void populateTable() {
 
-        ArrayList<Item> itemList = app.getControl().getItemList("");
+        ArrayList<Item> itemList = app.getControl().getItemList("", "");
 
         SwingWorker sw = new SwingWorker() {
             @Override
@@ -97,7 +136,9 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener {
                         item.getQuantity(),
                         item.getMeasure(),
                         item.getCost(),
-                        item.getPrice()
+                        item.getPrice(),
+                        item.getStockMin(),
+                        item.getStock()
                     });
                     model.setRowEditable(model.getRowCount() - 1, false);
                 }
@@ -143,7 +184,7 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener {
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 365, Short.MAX_VALUE)
+            .addGap(0, 385, Short.MAX_VALUE)
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -170,7 +211,7 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener {
             .addGroup(layout.createSequentialGroup()
                 .addGap(0, 0, 0)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 890, Short.MAX_VALUE)
+                    .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 899, Short.MAX_VALUE)
                     .addComponent(panelButtons, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
         );
         layout.setVerticalGroup(
@@ -194,19 +235,42 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener {
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
+        if (PanelAddItem.AC_ADD_ITEM.equals(evt.getPropertyName())) {
+            populateTable();
+        } else if (AC_ADD_ITEM_TO_TABLE.equals(evt.getPropertyName())) {
+            populateTable();
+        } else if (PanelNewConciliacion.ACTION_SAVE_CONCILIACION.equals(evt.getPropertyName())) {
+            populateTable();
+        }
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         if (AC_SHOW_ADD_ITEM.equals(e.getActionCommand())) {
             app.getGuiManager().showPanelAddItem(this);
+        } else if (AC_LOAD_ITEM.equals(e.getActionCommand())) {
+            app.getGuiManager().showPanelSelItem(this);
+        } else if (AC_REFRESH_ITEMS.equals(e.getActionCommand())) {
+            populateTable();
+        } else if (AC_ADD_CONCILIATION.equals(e.getActionCommand())) {
+            app.getGuiManager().showPanelConciliacion(true);
         }
+
+    }
+
+    @Override
+    public void valueChanged(ListSelectionEvent e) {
+        int lInd = e.getLastIndex();
+        Item item = app.getControl().getItemWhere("id="+model.getValueAt(lInd, 0));
+//        valido = prod != null;
+        pnDetail.showInfoProduct(item);
     }
 
     public class TablaCellRenderer extends JLabel implements TableCellRenderer {
 
         boolean isBordered = true;
-        private boolean anulada;
+        private boolean agotada;
+        private int status;
 //        protected enum status {Color.black; Color.blue; Color.orange; Color.red};
         private final Format formatter;
 
@@ -214,7 +278,7 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener {
             super();
             this.isBordered = isBordered;
             this.formatter = formatter;
-            anulada = false;
+            agotada = false;
             setFont(new Font("tahoma", 0, 14));
             setOpaque(true);
         }
@@ -222,6 +286,7 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener {
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
             int r = table.convertRowIndexToModel(row);
+            int col = 2;
 
             if (value != null) {
                 if (formatter != null) {
@@ -232,9 +297,17 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener {
                     }
                 }
                 setText(value.toString().toUpperCase());
+
+                double cant = 0;
+                try {
+                    cant = Double.parseDouble(model.getValueAt(r, col).toString());
+
+                } catch (Exception e) {
+                }
+                agotada = cant <= 0;
             }
             if (isSelected) {
-                setForeground(!anulada ? Color.black : Color.red);
+                setForeground(!agotada ? Color.black : Color.red);
                 setBackground(tableItems.getSelectionBackground());
                 if (hasFocus) {
                     setBorder(BorderFactory.createLineBorder(Color.darkGray));
@@ -243,7 +316,7 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener {
                 }
             } else {
                 setBackground(tableItems.getBackground());
-                setForeground(!anulada ? Color.black : Color.red);
+                setForeground(!agotada ? Color.black : Color.red);
                 setBorder(UIManager.getBorder("Table.cellBorder"));
             }
             return this;

@@ -1,7 +1,10 @@
 package com.bacon.domain;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -22,21 +25,26 @@ public class Item {
     private double init;
     private double stockMin;
     private double stock;
-    
+
+    private List<Object[]> presentations;
+
     private Date updateTime;
     private String user;
 
     public Item() {
+        this.presentations = new ArrayList<>();
     }
 
-    public Item(long id) {
+    public Item(long id) {        
         this.id = id;
+        this.presentations = new ArrayList<>();
     }
 
     public Item(long id, String code, String name, String medida) {
-        this.id = id;        
+        this.id = id;
         this.name = name;
         this.measure = medida;
+        this.presentations = new ArrayList<>();
     }
 
     public void setId(long id) {
@@ -142,10 +150,25 @@ public class Item {
     public void setUser(String user) {
         this.user = user;
     }
-    
+
+    public List<Object[]> getPresentations() {
+        return presentations;
+    }
+
+    public void setPresentations(List<Object[]> presentations) {
+        this.presentations = presentations;
+    }
+
+    public void addPresentations(int idPresentation, double cant) {
+        if (presentations == null) {
+            presentations = new ArrayList<>();
+        }
+        presentations.add(new Object[]{idPresentation, cant});
+    }
+
     @Override
     public String toString() {
-        return "[" + id + "] " + name;
+        return "[" + id + "] " + name + " -> " + Arrays.toString(getPresentations().toArray(new Object[1]));
     }
 
     @Override

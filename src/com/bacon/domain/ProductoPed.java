@@ -1,6 +1,7 @@
 package com.bacon.domain;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Objects;
 import org.apache.commons.collections.CollectionUtils;
 
@@ -17,6 +18,7 @@ public class ProductoPed {
     protected String especificaciones;
     protected int cantidad;
     protected double precio;
+    protected HashMap data;
 
     public ProductoPed() {
         this(new Product());
@@ -163,6 +165,21 @@ public class ProductoPed {
 
     public void addExclusion(Ingredient excluision) {
         this.exclusiones.add(excluision);
+    }
+
+    public HashMap getData() {
+        return data;
+    }
+
+    public void setData(HashMap data) {
+        this.data = data;
+    }
+
+    public void putData(String key, Object value) {
+        if (data == null) {
+            data = new HashMap<>();
+        }
+        data.put(key, value);
     }
 
     @Override

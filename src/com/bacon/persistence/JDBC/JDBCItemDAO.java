@@ -7,6 +7,9 @@ package com.bacon.persistence.JDBC;
 
 import com.bacon.DBManager;
 import com.bacon.domain.Item;
+import com.bacon.domain.ProductoPed;
+import static com.bacon.persistence.JDBC.JDBCInvoiceDAO.ADD_INVOICE_PRODUCT_KEY;
+import static com.bacon.persistence.JDBC.JDBCUtilDAO.GET_MAX_ID_KEY;
 import com.bacon.persistence.SQLExtractor;
 import com.bacon.persistence.SQLLoader;
 import com.bacon.persistence.dao.DAOException;
@@ -19,6 +22,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 import javax.sql.DataSource;
@@ -40,6 +44,7 @@ public class JDBCItemDAO implements ItemDAO {
     protected static final String UPDATE_ITEM_KEY = "UPDATE_ITEM";
     protected static final String GET_ITEM_KEY = "GET_ITEM";
     protected static final String DELETE_ITEM_KEY = "DELETE_ITEM";
+    public static final String ADD_INVENTORY_PRODUCT_KEY = "ADD_INVENTORY_PRODUCT";
 
     public JDBCItemDAO(DataSource dataSource, SQLLoader sqlStatements) throws DAOException {
         this.dataSource = dataSource;
@@ -76,6 +81,11 @@ public class JDBCItemDAO implements ItemDAO {
         return getItemList(query, "").get(0);
     }
 
+    public ArrayList<Item> getItemsBy(String query) throws DAOException {
+        System.out.println("query:: = " + query);
+        return getItemList(query, "");
+    }
+
     @Override
     public Item getItem(int id) throws DAOException {
         return getItemBy("id=" + id);
@@ -89,9 +99,11 @@ public class JDBCItemDAO implements ItemDAO {
     public ArrayList<Item> getItemList(String where, String orderBy) throws DAOException {
         String retrieveItems;
         ArrayList<Item> items = new ArrayList<>();
+        System.out.println("where = " + where);
+        System.out.println("order = " + orderBy);
         try {
-            SQLExtractor sqlExtractorWhere = new SQLExtractor(where, SQLExtractor.Type.WHERE);;
-            SQLExtractor sqlExtractorOrderBy = new SQLExtractor(orderBy, SQLExtractor.Type.ORDER_BY);;
+            SQLExtractor sqlExtractorWhere = new SQLExtractor(where, SQLExtractor.Type.WHERE);
+            SQLExtractor sqlExtractorOrderBy = new SQLExtractor(orderBy, SQLExtractor.Type.ORDER_BY);
             Map<String, String> namedParams = new HashMap<>();
             namedParams.put(NAMED_PARAM_WHERE, sqlExtractorWhere.extractWhere());
             namedParams.put(NAMED_PARAM_ORDER_BY, sqlExtractorOrderBy.extractOrderBy());
@@ -110,6 +122,7 @@ public class JDBCItemDAO implements ItemDAO {
         try {
             conn = dataSource.getConnection();
             retrieve = conn.prepareStatement(retrieveItems);
+//            System.out.println("::retrieve = " + retrieveItems);
             rs = retrieve.executeQuery();
 
             while (rs.next()) {
@@ -146,6 +159,7 @@ public class JDBCItemDAO implements ItemDAO {
         }
         Connection conn = null;
         PreparedStatement ps = null;
+        ResultSet rs = null;
         try {
             conn = dataSource.getConnection();
             conn.setAutoCommit(false);
@@ -163,8 +177,33 @@ public class JDBCItemDAO implements ItemDAO {
                 item.getUser()
             };
             ps = sqlStatements.buildSQLStatement(conn, ADD_ITEM_KEY, parameters);
-
             ps.executeUpdate();
+
+            int idItem = 0;
+
+            Map<String, String> namedParams = new HashMap<>();
+            namedParams.put(JDBCDAOFactory.NAMED_PARAM_TABLE, "inventory");
+            String query = sqlStatements.getSQLString(GET_MAX_ID_KEY, namedParams);
+            ps = conn.prepareStatement(query);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                idItem = rs.getInt(1);
+            }
+
+            List<Object[]> presList = item.getPresentations();
+
+            for (int i = 0; i < presList.size(); i++) {
+                int idPres = Integer.parseInt(presList.get(i)[0].toString());
+                double cant = Double.parseDouble(presList.get(i)[1].toString());
+                Object[] parameters1 = {
+                    idItem,
+                    idPres,
+                    cant
+                };
+                ps = sqlStatements.buildSQLStatement(conn, ADD_INVENTORY_PRODUCT_KEY, parameters1);
+                ps.executeUpdate();
+            }
+
             conn.commit();
         } catch (SQLException e) {
             DBManager.rollbackConn(conn);

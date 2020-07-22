@@ -43,8 +43,12 @@
                     |GET_CATEGORIES_SORTED
                     |CREATE_EXPENSES_INCOMES_TABLE|ADD_EXPENSE_INCOME|GET_EXPENSE_INCOME
                     |GET_INVOICE_BY_PRODUCT
-                    |CREATE_INVENTORY_TABLE|GET_ITEM
-                    
+                    |CREATE_INVENTORY_TABLE|GET_ITEM|ADD_ITEM
+                    |ADD_UNIT|GET_UNIT|UPDATE_UNIT|DELETE_UNIT|CREATE_UNITS_TABLE
+                    |CREATE_INVENTORY_PRODUCT_TABLE|ADD_INVENTORY_PRODUCT|CHECK_INVENTORY
+                    |UPDATE_INVENTORY_QUANTITY|ADD_INVENTORY_QUANTITY
+                    |CREATE_CONCILIACIONES_TABLE|ADD_CONCILIACION|GET_CONCILIACION|UPDATE_CONCILIACION|DELETE_CONCILIACION
+                    |ADD_LOCATION|GET_LOCATION|UPDATE_LOCATION|DELETE_LOCATION|CREATE_LOCATIONS_TABLE
                     
                     ) #REQUIRED
                     
@@ -861,6 +865,9 @@
             </SQLFragment>    
             <SQLFragment excludeIfNamedParamEmpty="TRUE">
                 ORDER BY {orderby}
+            </SQLFragment>
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                LIMIT {start}, {num}
             </SQLFragment>        
         </SQLStatement>
         
@@ -1321,6 +1328,20 @@
                 PRIMARY KEY (id)
                 )ENGINE=InnoDB DEFAULT CHARSET=latin1;
             </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="CREATE_INVENTORY_PRODUCT_TABLE">            
+            <SQLFragment>
+                CREATE TABLE inventory_product(
+                id INTEGER AUTO_INCREMENT,
+                item_id INTEGER NOT NULL,                
+                presentation_id INTEGER NOT NULL,
+                quantity DECIMAL(12,2),
+                PRIMARY KEY (id),
+                FOREIGN KEY (item_id) REFERENCES inventory(id) ON DELETE CASCADE ON UPDATE CASCADE,                
+                FOREIGN KEY (presentation_id) REFERENCES presentation_product(id) ON DELETE CASCADE ON UPDATE CASCADE
+                )ENGINE=InnoDB DEFAULT CHARSET=latin1;
+            </SQLFragment>
         </SQLStatement>   
         
         <SQLStatement method="GET_ITEM">
@@ -1337,7 +1358,196 @@
                 ORDER BY {orderby}
             </SQLFragment>        
         </SQLStatement>
-                                 
-                                 
+        
+        <SQLStatement method="ADD_ITEM">
+            <SQLFragment>
+                INSERT INTO inventory (name,quantity,measure,cost,price,location,stock,stockmin,average,init,user) VALUES (?,?,?,?,?,?,?,?,?,?,?);
+            </SQLFragment>            
+        </SQLStatement>
+        
+        <SQLStatement method="ADD_INVENTORY_PRODUCT">
+            <SQLFragment>
+                INSERT INTO inventory_product (item_id, presentation_id, quantity) VALUES (?,?,?);
+            </SQLFragment>
+        </SQLStatement>
+        
+        
+        <SQLStatement method="CREATE_UNITS_TABLE">
+            <SQLFragment>
+                CREATE TABLE units(
+                id INTEGER AUTO_INCREMENT,
+                name VARCHAR(255) NOT NULL UNIQUE,                
+                PRIMARY KEY (id)
+                )ENGINE=InnoDB DEFAULT CHARSET=latin1;
+            </SQLFragment>
+        </SQLStatement>	
+        
+        <SQLStatement method="ADD_UNIT">
+            <SQLFragment>
+                INSERT INTO units (name) VALUES (?);
+            </SQLFragment>
+        </SQLStatement>        
+        
+        <SQLStatement method="GET_UNIT">
+            <SQLFragment>
+                SELECT
+            </SQLFragment>
+            <SQLFragment>
+                * FROM units
+            </SQLFragment>
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                WHERE {where}
+            </SQLFragment>    
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                ORDER BY {orderby}
+            </SQLFragment>        
+        </SQLStatement>
+        
+        <SQLStatement method="DELETE_UNIT">
+            <SQLFragment>
+                DELETE FROM units WHERE name = ?;
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="UPDATE_UNIT">
+            <SQLFragment>
+                UPDATE units SET 
+                name=?
+                WHERE name = ?;
+            </SQLFragment>
+        </SQLStatement> 
+        
+        <SQLStatement method="CHECK_INVENTORY">
+            <SQLFragment>
+                SELECT i.id, i.name, pp.name as pres, i.measure, i.quantity as exist, ip.presentation_id as idPres, ip.quantity 
+                FROM inventory i, inventory_product ip, presentation_product pp 
+                WHERE i.id=ip.item_id AND pp.id=ip.presentation_id AND ip.presentation_id=?
+            </SQLFragment>
+        </SQLStatement> 
+        
+        <SQLStatement method="UPDATE_INVENTORY_QUANTITY">
+            <SQLFragment>
+                UPDATE inventory SET quantity = ?
+                WHERE id = ? 
+            </SQLFragment>
+        </SQLStatement> 
+        
+        <SQLStatement method="ADD_INVENTORY_QUANTITY">
+            <SQLFragment>
+                UPDATE inventory SET quantity = quantity + ?
+                WHERE id = ? 
+            </SQLFragment>
+        </SQLStatement> 
+        
+        
+        <SQLStatement method="CREATE_CONCILIACIONES_TABLE">
+            <SQLFragment>
+                CREATE TABLE conciliaciones(
+                id INTEGER AUTO_INCREMENT,
+                codigo VARCHAR(10) NOT NULL UNIQUE,                
+                fecha DATE,
+                idItem INTEGER,	
+                existencias INTEGER,
+                conciliacion INTEGER,
+                locacion INTEGER(2),
+                nota VARCHAR(500),
+                lastUpdatedTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                user VARCHAR(25),
+                PRIMARY KEY (id)
+                )ENGINE=InnoDB DEFAULT CHARSET=latin1;
+            </SQLFragment>
+        </SQLStatement>	
+		
+        <SQLStatement method="GET_CONCILIACION">
+            <SQLFragment>
+                SELECT
+            </SQLFragment>
+            <SQLFragment>
+                * FROM conciliaciones
+            </SQLFragment>
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                WHERE {where}
+            </SQLFragment>
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                ORDER BY {orderby}
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="ADD_CONCILIACION">
+            <SQLFragment>
+                INSERT INTO conciliaciones (codigo,fecha,idItem,existencias,conciliacion,locacion,nota,user) VALUES (?,?,?,?,?,?,?,?);
+            </SQLFragment>
+        </SQLStatement>	
+        
+        <SQLStatement method="DELETE_CONCILIACION">
+            <SQLFragment>
+                DELETE FROM conciliaciones WHERE id = ?;
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="UPDATE_CONCILIACION">
+            <SQLFragment>
+                UPDATE conciliaciones SET                 
+                codigo=?,
+                fecha=?,
+                idItem=?,
+                existencias=?,
+                conciliacion=?,
+                locacion=?,
+                nota=?,
+                user=?
+                WHERE id = ?
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="CREATE_LOCATIONS_TABLE">
+            <SQLFragment>
+                CREATE TABLE locations(
+                id INTEGER AUTO_INCREMENT,
+                name VARCHAR(255) NOT NULL UNIQUE,
+                address VARCHAR(255),
+                salePoint TINYINT(1),
+                PRIMARY KEY (id)
+                )ENGINE=InnoDB DEFAULT CHARSET=latin1;
+            </SQLFragment>
+        </SQLStatement>	
+        
+        <SQLStatement method="ADD_LOCATION">
+            <SQLFragment>
+                INSERT INTO locations (name, address, salePoint) VALUES (?,?,?);
+            </SQLFragment>
+        </SQLStatement>        
+        
+        <SQLStatement method="GET_LOCATION">
+            <SQLFragment>
+                SELECT
+            </SQLFragment>
+            <SQLFragment>
+                * FROM locations
+            </SQLFragment>
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                WHERE {where}
+            </SQLFragment>    
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                ORDER BY {orderby}
+            </SQLFragment>        
+        </SQLStatement>
+        
+        <SQLStatement method="DELETE_LOCATION">
+            <SQLFragment>
+                DELETE FROM locations WHERE id = ?;
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="UPDATE_LOCATION">
+            <SQLFragment>
+                UPDATE locations SET 
+                name=?,
+                address=?,
+                salePoint=?
+                WHERE id = ?
+            </SQLFragment>
+        </SQLStatement> 
+        
     </DAOStatements>
 </DAOConfiguration>

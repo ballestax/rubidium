@@ -73,5 +73,9 @@ public abstract class DAOFactory {
     public abstract ClientDAO getClientDAO() throws DAOException;
     
     public abstract ItemDAO getItemDAO() throws DAOException;
+    
+    public abstract ConciliacionDAO getConciliacionDAO() throws DAOException;
+    
+    public abstract LocationDAO getLocationDAO() throws DAOException;
 
 }

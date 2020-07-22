@@ -12,11 +12,13 @@ import com.bacon.persistence.dao.DAOException;
 import com.bacon.persistence.SQLLoader;
 import com.bacon.persistence.dao.AdditionalDAO;
 import com.bacon.persistence.dao.ClientDAO;
+import com.bacon.persistence.dao.ConciliacionDAO;
 import com.bacon.persistence.dao.ConfigDAO;
 import com.bacon.persistence.dao.DAOFactory;
 import com.bacon.persistence.dao.IngredientDAO;
 import com.bacon.persistence.dao.InvoiceDAO;
 import com.bacon.persistence.dao.ItemDAO;
+import com.bacon.persistence.dao.LocationDAO;
 import com.bacon.persistence.dao.ProductDAO;
 import com.bacon.persistence.dao.UserDAO;
 import com.bacon.persistence.dao.UtilDAO;
@@ -306,5 +308,15 @@ public class JDBCDAOFactory extends DAOFactory {
     public ItemDAO getItemDAO() throws DAOException {
         return new JDBCItemDAO(getDataSource(), sqlStatements);
     }
+
+    @Override
+    public ConciliacionDAO getConciliacionDAO() throws DAOException {
+        return new JDBCConciliacionDAO(dataSource, sqlStatements);
+    }
+
+    @Override
+    public LocationDAO getLocationDAO() throws DAOException {
+        return new JDBCLocationDAO(dataSource, sqlStatements);
+    }       
 
 }
