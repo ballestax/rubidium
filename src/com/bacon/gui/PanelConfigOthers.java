@@ -63,6 +63,16 @@ public class PanelConfigOthers extends javax.swing.JPanel implements ActionListe
         regShowExclusions.setText("Mostrar exclusiones en panel pedido");
         regShowExclusions.setSelected(showExclusions);
         
+        lbInfo3.setText("Facturar sin existencias");
+        String prop = app.getConfiguration().getProperty(com.bacon.Configuration.INVOICE_OUT_STOCK, "false");
+        boolean outStock = false;
+        try {
+            outStock = Boolean.parseBoolean(prop);
+        } catch (Exception e) {
+        }
+        regInvoiceOutStock.setText("Permitir guardar facturas sin exsitencias en  inventario");
+        regInvoiceOutStock.setSelected(outStock);
+        
         
 
         btApply.setText("Aplicar");
@@ -88,6 +98,8 @@ public class PanelConfigOthers extends javax.swing.JPanel implements ActionListe
         regPrintPrev = new javax.swing.JCheckBox();
         lbInfo2 = new javax.swing.JLabel();
         regShowExclusions = new javax.swing.JCheckBox();
+        lbInfo3 = new javax.swing.JLabel();
+        regInvoiceOutStock = new javax.swing.JCheckBox();
 
         lbTitle.setBackground(java.awt.Color.lightGray);
         lbTitle.setOpaque(true);
@@ -105,6 +117,11 @@ public class PanelConfigOthers extends javax.swing.JPanel implements ActionListe
 
         regShowExclusions.setText("jCheckBox1");
 
+        lbInfo3.setText("jLabel2");
+        lbInfo3.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+
+        regInvoiceOutStock.setText("jCheckBox1");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -121,7 +138,9 @@ public class PanelConfigOthers extends javax.swing.JPanel implements ActionListe
                     .addComponent(lbInfo1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(regPrintPrev, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(lbInfo2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(regShowExclusions, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(regShowExclusions, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(lbInfo3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(regInvoiceOutStock, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -141,7 +160,11 @@ public class PanelConfigOthers extends javax.swing.JPanel implements ActionListe
                 .addComponent(lbInfo2, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(regShowExclusions)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 32, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(lbInfo3, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(regInvoiceOutStock)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 106, Short.MAX_VALUE)
                 .addComponent(btApply, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
@@ -154,8 +177,10 @@ public class PanelConfigOthers extends javax.swing.JPanel implements ActionListe
     private javax.swing.JLabel lbInfo;
     private javax.swing.JLabel lbInfo1;
     private javax.swing.JLabel lbInfo2;
+    private javax.swing.JLabel lbInfo3;
     private javax.swing.JLabel lbTitle;
     private com.bacon.gui.util.Registro regDelivery;
+    private javax.swing.JCheckBox regInvoiceOutStock;
     private javax.swing.JCheckBox regPrintPrev;
     private javax.swing.JCheckBox regShowExclusions;
     // End of variables declaration//GEN-END:variables
@@ -171,6 +196,9 @@ public class PanelConfigOthers extends javax.swing.JPanel implements ActionListe
             
             boolean selected2 = regShowExclusions.isSelected();
             app.getConfiguration().setProperty(com.bacon.Configuration.SHOW_EXCLUSIONS, String.valueOf(selected2));
+            
+            boolean selected3 = regInvoiceOutStock.isSelected();
+            app.getConfiguration().setProperty(com.bacon.Configuration.INVOICE_OUT_STOCK, String.valueOf(selected3));
 
             app.getConfiguration().save();
         }

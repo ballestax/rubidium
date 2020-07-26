@@ -32,7 +32,7 @@ public final class Install {
 
         TWST = cld.getTime();
         
-        writeHash();
+//        writeHash();
     }
 
     public Date getTWST() {
@@ -84,12 +84,12 @@ public final class Install {
         }
     }
 
-    protected final void writeHash() {
-        registro.put(REG + "/" + CLAVE, "1821232734");
-        try {
-            registro.flush();
-        } catch (Exception e) {
-            System.err.println("(Exc)guardarPreferencias(): " + e);
-        }
-    }
+//    protected final void writeHash() {
+//        registro.put(REG + "/" + CLAVE, "1821232734");
+//        try {
+//            registro.flush();
+//        } catch (Exception e) {
+//            System.err.println("(Exc)guardarPreferencias(): " + e);
+//        }
+//    }
 }

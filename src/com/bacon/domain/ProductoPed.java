@@ -18,7 +18,7 @@ public class ProductoPed {
     protected String especificaciones;
     protected int cantidad;
     protected double precio;
-    protected HashMap data;
+    protected HashMap<Integer, HashMap> data;
 
     public ProductoPed() {
         this(new Product());
@@ -167,19 +167,19 @@ public class ProductoPed {
         this.exclusiones.add(excluision);
     }
 
-    public HashMap getData() {
+    public HashMap<Integer, HashMap> getData() {
         return data;
     }
 
-    public void setData(HashMap data) {
+    public void setData(HashMap<Integer, HashMap> data) {
         this.data = data;
     }
 
-    public void putData(String key, Object value) {
-        if (data == null) {
-            data = new HashMap<>();
+    public void putData(Integer key, HashMap data) {
+        if (this.data == null) {
+            this.data = new HashMap<>();
         }
-        data.put(key, value);
+        this.data.put(key, data);
     }
 
     @Override

@@ -393,7 +393,6 @@ public class PanelAddItem extends PanelCaptura implements ActionListener, Proper
                 Object[] dat = selecteds.get(i);
                 item.addPresentations(Integer.parseInt(dat[0].toString()), Double.parseDouble(dat[1].toString()));
             }
-//            System.out.println("item = " + item);
         }
         return item;
     }
@@ -434,7 +433,6 @@ public class PanelAddItem extends PanelCaptura implements ActionListener, Proper
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        System.out.println("evt = " + evt.getPropertyName());
         if (PanelList.AC_SELECTED.equals(evt.getPropertyName())) {
             regMeseure.setText(evt.getNewValue().toString());
         } else if (PanelList.AC_ADD.equals(evt.getPropertyName())) {

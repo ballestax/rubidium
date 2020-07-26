@@ -118,9 +118,7 @@ public class PanelProduct2 extends PanelCapturaMod implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        logger.debug("Fired event:" + e.getActionCommand());
-        if (AC_ADD_QUICK.equals(e.getActionCommand())) {
-            logger.debug("Fired changed:" + product);
+        if (AC_ADD_QUICK.equals(e.getActionCommand())) {            
             pcs.firePropertyChange(AC_ADD_QUICK, null, product);
         } else if (AC_ADD_CUSTOM.equals(e.getActionCommand())) {
             app.getGuiManager().showCustomPedido(product, app);

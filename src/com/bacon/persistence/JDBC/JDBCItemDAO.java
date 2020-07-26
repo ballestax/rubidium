@@ -81,8 +81,7 @@ public class JDBCItemDAO implements ItemDAO {
         return getItemList(query, "").get(0);
     }
 
-    public ArrayList<Item> getItemsBy(String query) throws DAOException {
-        System.out.println("query:: = " + query);
+    public ArrayList<Item> getItemsBy(String query) throws DAOException {        
         return getItemList(query, "");
     }
 
@@ -99,8 +98,6 @@ public class JDBCItemDAO implements ItemDAO {
     public ArrayList<Item> getItemList(String where, String orderBy) throws DAOException {
         String retrieveItems;
         ArrayList<Item> items = new ArrayList<>();
-        System.out.println("where = " + where);
-        System.out.println("order = " + orderBy);
         try {
             SQLExtractor sqlExtractorWhere = new SQLExtractor(where, SQLExtractor.Type.WHERE);
             SQLExtractor sqlExtractorOrderBy = new SQLExtractor(orderBy, SQLExtractor.Type.ORDER_BY);
@@ -122,7 +119,6 @@ public class JDBCItemDAO implements ItemDAO {
         try {
             conn = dataSource.getConnection();
             retrieve = conn.prepareStatement(retrieveItems);
-//            System.out.println("::retrieve = " + retrieveItems);
             rs = retrieve.executeQuery();
 
             while (rs.next()) {

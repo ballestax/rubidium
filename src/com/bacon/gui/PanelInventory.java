@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import javax.swing.BorderFactory;
 import static javax.swing.BorderFactory.createLineBorder;
 import javax.swing.DefaultListSelectionModel;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JTable;
@@ -26,6 +27,7 @@ import javax.swing.UIManager;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableCellRenderer;
+import org.apache.log4j.Logger;
 import org.bx.gui.MyDefaultTableModel;
 import org.dz.PanelCapturaMod;
 
@@ -36,10 +38,9 @@ import org.dz.PanelCapturaMod;
 public class PanelInventory extends PanelCapturaMod implements ActionListener, ListSelectionListener {
 
     private final Aplication app;
-
     private MyDefaultTableModel model;
-    
     private PanelReportProductDetail pnDetail;
+    public static final Logger logger = Logger.getLogger(PanelInventory.class.getCanonicalName());
 
     /**
      * Creates new form PanelReportSales
@@ -56,19 +57,23 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
 
         panelButtons.setLayout(new FlowLayout(FlowLayout.LEFT));
 
-        JButton btAdd = new JButton("ADD");
+        JButton btAdd = new JButton("Agregar");
+        btAdd.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "shopping-basket-add.png", 24, 24)));
         btAdd.setActionCommand(AC_SHOW_ADD_ITEM);
         btAdd.addActionListener(this);
 
-        JButton btLoad = new JButton("LOAD");
+        JButton btLoad = new JButton("Cargar");
+        btLoad.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "shopping-basket-accept.png", 24, 24)));
         btLoad.setActionCommand(AC_LOAD_ITEM);
         btLoad.addActionListener(this);
 
-        JButton btRefresh = new JButton("REFRESH");
+        JButton btRefresh = new JButton("Actualizar");
+        btRefresh.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "shopping-basket-refresh.png", 24, 24)));
         btRefresh.setActionCommand(AC_REFRESH_ITEMS);
         btRefresh.addActionListener(this);
 
-        JButton btConciliation = new JButton("CONCILIACION");
+        JButton btConciliation = new JButton("Conciliar");
+        btConciliation.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "shopping-basket-prohibit.png", 24, 24)));
         btConciliation.setActionCommand(AC_ADD_CONCILIATION);
         btConciliation.addActionListener(this);
 
@@ -83,11 +88,10 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
         tableItems.setModel(model);
         tableItems.setRowHeight(24);
         tableItems.setFont(new Font("Tahoma", 0, 16));
-        
-        
+
         DefaultListSelectionModel selectionModel = new DefaultListSelectionModel();
         selectionModel.addListSelectionListener(this);
-        
+
         tableItems.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tableItems.setSelectionModel(selectionModel);
 
@@ -163,7 +167,7 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
         jPanel1 = new javax.swing.JPanel();
         panelButtons = new javax.swing.JPanel();
 
-        jSplitPane1.setDividerLocation(500);
+        jSplitPane1.setDividerLocation(700);
         jSplitPane1.setResizeWeight(0.5);
 
         tableItems.setModel(new javax.swing.table.DefaultTableModel(
@@ -184,7 +188,7 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 385, Short.MAX_VALUE)
+            .addGap(0, 187, Short.MAX_VALUE)
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -255,31 +259,39 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
         } else if (AC_ADD_CONCILIATION.equals(e.getActionCommand())) {
             app.getGuiManager().showPanelConciliacion(true);
         }
-
     }
 
     @Override
     public void valueChanged(ListSelectionEvent e) {
-        int lInd = e.getLastIndex();
-        Item item = app.getControl().getItemWhere("id="+model.getValueAt(lInd, 0));
-//        valido = prod != null;
-        pnDetail.showInfoProduct(item);
+        int row = tableItems.getSelectedRow();
+        if (row < 0) {
+            pnDetail.showInfoProduct(null);
+        }
+        try {
+            Object id = model.getValueAt(row, 0);
+            Item item = app.getControl().getItemWhere("id=" + id);
+            pnDetail.showInfoProduct(item);
+        } catch (Exception ex) {
+            logger.error(ex.getMessage());
+        }
     }
 
     public class TablaCellRenderer extends JLabel implements TableCellRenderer {
 
         boolean isBordered = true;
-        private boolean agotada;
+        private boolean agotada, warning;
         private int status;
 //        protected enum status {Color.black; Color.blue; Color.orange; Color.red};
         private final Format formatter;
+        private final Color ORANGE = new Color(244, 145, 0);
 
         public TablaCellRenderer(boolean isBordered, Format formatter) {
             super();
             this.isBordered = isBordered;
             this.formatter = formatter;
             agotada = false;
-            setFont(new Font("tahoma", 0, 14));
+            warning = false;
+            setFont(new Font("tahoma", 1, 14));
             setOpaque(true);
         }
 
@@ -287,6 +299,7 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
             int r = table.convertRowIndexToModel(row);
             int col = 2;
+            int col2 = 6;
 
             if (value != null) {
                 if (formatter != null) {
@@ -299,15 +312,18 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
                 setText(value.toString().toUpperCase());
 
                 double cant = 0;
+                double min = 0;
                 try {
                     cant = Double.parseDouble(model.getValueAt(r, col).toString());
+                    min = Double.parseDouble(model.getValueAt(r, col2).toString());
 
                 } catch (Exception e) {
                 }
                 agotada = cant <= 0;
+                warning = cant <= min;
             }
             if (isSelected) {
-                setForeground(!agotada ? Color.black : Color.red);
+                setForeground(!agotada ? warning ? ORANGE : Color.black : Color.red);
                 setBackground(tableItems.getSelectionBackground());
                 if (hasFocus) {
                     setBorder(BorderFactory.createLineBorder(Color.darkGray));
@@ -316,7 +332,8 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
                 }
             } else {
                 setBackground(tableItems.getBackground());
-                setForeground(!agotada ? Color.black : Color.red);
+                setForeground(!agotada ? warning ? ORANGE : Color.black : Color.red);
+//                setBackground(agotada || warning ? getForeground().brighter().brighter().brighter() : tableItems.getBackground());
                 setBorder(UIManager.getBorder("Table.cellBorder"));
             }
             return this;

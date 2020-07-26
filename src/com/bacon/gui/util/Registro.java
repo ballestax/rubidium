@@ -429,8 +429,7 @@ public class Registro extends JComponent implements Reseteable, CaretListener {
             campo = componente;
             if (campo instanceof JTextField) {
                 ((JTextField) campo).addCaretListener(this);
-            } else if (campo instanceof MyDatePickerImp) {
-                System.out.println("DatePick");
+            } else if (campo instanceof MyDatePickerImp) {                
                 ((MyDatePickerImp) campo).addCaretListener(this);
             }
         }

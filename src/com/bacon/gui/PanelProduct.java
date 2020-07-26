@@ -10,7 +10,6 @@ import com.bacon.Configuration;
 import com.bacon.domain.Product;
 import static com.bacon.gui.PanelProduct2.AC_ADD_CUSTOM;
 import static com.bacon.gui.PanelProduct2.AC_ADD_QUICK;
-import static com.bacon.gui.PanelProduct2.logger;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Insets;
@@ -101,7 +100,7 @@ public class PanelProduct extends PanelCapturaMod implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (AC_ADD_QUICK.equals(e.getActionCommand())) {
-            logger.debug("Fired changed:" + product);
+            
             pcs.firePropertyChange(AC_ADD_QUICK, null, product);
         } else if (AC_ADD_CUSTOM.equals(e.getActionCommand())) {
             app.getGuiManager().showCustomPedido(product, app);

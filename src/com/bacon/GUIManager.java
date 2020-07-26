@@ -963,7 +963,7 @@ public class GUIManager {
         JDialog dialog = new MyDialogEsc();
         dialog.setModal(true);
         int w = 700;
-        int h = 400;
+        int h = 500;
         dialog.setPreferredSize(new Dimension(w, h));
 
         if (!getPanelSelProduct().containsListener(listener)) {
@@ -1025,7 +1025,7 @@ public class GUIManager {
         JDialog dialog = new MyDialogEsc();
         dialog.setModal(true);
         int w = 800;
-        int h = 400;
+        int h = 500;
         dialog.setPreferredSize(new Dimension(w, h));
 
         if (!getPanelAddItem().containsListener(listener)) {

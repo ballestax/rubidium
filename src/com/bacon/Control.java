@@ -12,6 +12,7 @@ import com.bacon.domain.Conciliacion;
 import com.bacon.domain.ConfigDB;
 import com.bacon.domain.Cycle;
 import com.bacon.domain.Ingredient;
+import com.bacon.domain.InventoryEvent;
 import com.bacon.domain.Invoice;
 import com.bacon.domain.Item;
 import com.bacon.domain.Location;
@@ -97,7 +98,7 @@ public class Control {
 
             JDBCConciliacionDAO conciliacionDAO = (JDBCConciliacionDAO) DAOFactory.getInstance().getConciliacionDAO();
             conciliacionDAO.init();
-            
+
             JDBCLocationDAO locationDAO = (JDBCLocationDAO) DAOFactory.getInstance().getLocationDAO();
             locationDAO.init();
 
@@ -532,7 +533,6 @@ public class Control {
     public int contarRows(String sql) {
         try {
             JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
-            System.out.println("::sql = " + sql);
             return utilDAO.countTableRows(sql);
         } catch (DAOException ex) {
             logger.error("Error couting rows.", ex);
@@ -807,7 +807,7 @@ public class Control {
         }
     }
 
-    public HashMap checkInventory(int idPres) {
+    public HashMap<Integer,HashMap> checkInventory(int idPres) {
         try {
             JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
             return utilDAO.checkInventory(idPres);
@@ -848,7 +848,7 @@ public class Control {
             return null;
         }
     }
-    
+
     public ArrayList<Conciliacion> getConciliacionList(String where, String order) {
         try {
             JDBCConciliacionDAO concDao = (JDBCConciliacionDAO) JDBCDAOFactory.getInstance().getConciliacionDAO();
@@ -856,6 +856,27 @@ public class Control {
         } catch (Exception ex) {
             logger.error("Error getting salida by conciliacion list.", ex);
             GUIManager.showErrorMessage(null, "Error consultando lista de conciliaciones", "Error");
+            return null;
+        }
+    }
+
+    public void addInventoryRegister(Item item, int event, double quantity) {
+        try {
+            JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
+            utilDAO.addInventoryRegister(item, event, quantity);
+        } catch (DAOException ex) {
+            logger.error("Error adding event register.", ex);
+            GUIManager.showErrorMessage(null, "Error adding event register", "Error");
+        }
+    }
+
+    public ArrayList<InventoryEvent> getInventoryRegisterList(String where, String order) {
+        try {
+            JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
+            return utilDAO.getRegisterEventList(where, order);
+        } catch (DAOException ex) {
+            logger.error("Error getting event list.", ex);
+            GUIManager.showErrorMessage(null, "Error consultando lista de eventos", "Error");
             return null;
         }
     }

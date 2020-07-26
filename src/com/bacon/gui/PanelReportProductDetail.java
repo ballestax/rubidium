@@ -5,12 +5,12 @@
  */
 package com.bacon.gui;
 
-
 import com.bacon.Aplication;
 import com.bacon.GUIManager;
 import com.bacon.PDFGenerator;
 import com.bacon.Utiles;
 import com.bacon.domain.Conciliacion;
+import com.bacon.domain.InventoryEvent;
 import com.bacon.domain.Item;
 import com.bacon.domain.Location;
 import java.awt.Color;
@@ -63,35 +63,32 @@ public class PanelReportProductDetail extends PanelCapturaMod implements ActionL
 
     private void createComponent() {
 
-
-        colsWidth = new float[]{1.4f, 1.4f, 1.4f, 3.0f, 2.5f, 1.2f, 1.5f, 1.5f};
-        colsALign = new int[]{0, 0, 0, 0, 0, 2, 2, 2};
-        String[] cols = {"Tipo", "Fecha", "Factura", "Proveedor/Cliente", "Locacion", "Cantidad", "Valor", "Total"};
+        colsWidth = new float[]{1.4f, 1.4f, 1.4f, 2.5f, 1.2f, 1.5f, 1.5f};
+        colsALign = new int[]{0, 0, 0, 0, 2, 2, 2};
+        String[] cols = {"Tipo", "Fecha", "Codigo", "Locacion", "Cantidad", "Valor", "Total"};
         modeloTabla = new MyDefaultTableModel(cols, 0);
         tablaDetails.setModel(modeloTabla);
         tablaDetails.setRowHeight(24);
         FormatRenderer formatRenderer = new FormatRenderer(app.getDCFORM_P());
+        tablaDetails.getColumnModel().getColumn(4).setCellRenderer(formatRenderer);
         tablaDetails.getColumnModel().getColumn(5).setCellRenderer(formatRenderer);
         tablaDetails.getColumnModel().getColumn(6).setCellRenderer(formatRenderer);
-        tablaDetails.getColumnModel().getColumn(7).setCellRenderer(formatRenderer);
     }
     public static final String AC_CLEAR_BUSQUEDA = "AC_CLEAR_BUSQUEDA";
     public static final String AC_SEL_CATEGORIA = "AC_SEL_CATEGORIA";
 
     public void showInfoProduct(Item item) {
-
+        modeloTabla.setRowCount(0);
         if (item == null) {
             lbInfoProducto.setText("");
-            modeloTabla.setRowCount(0);
             return;
         }
         Map<Integer, String> locMap = getLocationsMap();
-        
         double cant = 0;
         double costoIni = 0;
         double cantIni = 0;
         String locs = "";
-        if (item!=null) {
+        if (item != null) {
             cantIni = item.getInit();
             costoIni = item.getCost().doubleValue();
 //            productInvList.get(0).getLocacion();
@@ -109,36 +106,35 @@ public class PanelReportProductDetail extends PanelCapturaMod implements ActionL
         String cat = "INVENTARIO";
 
 //        ArrayList<Object[]> entradaByProductList = app.getControl().getEntradaByProductList(item.getCodigo());
-//        ArrayList<Object[]> salidaByProductList = app.getControl().getSalidaByProductList(item.getCodigo());
-        ArrayList<Conciliacion> conciliacionList = app.getControl().getConciliacionList("idItem=" + item.getId()+ "", "fecha");
+        ArrayList<InventoryEvent> eventInList = app.getControl().getInventoryRegisterList("event=" + InventoryEvent.EVENT_IN + " AND idItem=" + item.getId(), "lastUpdatedTime");
+        ArrayList<Conciliacion> conciliacionList = app.getControl().getConciliacionList("idItem=" + item.getId() + "", "fecha");
         modeloTabla.setRowCount(0);
-        modeloTabla.addRow(new Object[]{"INICIAL", "   ----------", "   ----------", "   ----------", "   ----------", cantIni, costoIni, cantIni * costoIni});
+        modeloTabla.addRow(new Object[]{"INICIAL", "   ----------", "   ----------", "   ----------", cantIni, costoIni, cantIni * costoIni});
         double entradas = 0;
-//        for (int i = 0; i < entradaByProductList.size(); i++) {
-//            Object[] row = entradaByProductList.get(i);
-//            Proveedor prov = app.getControl().getProveedor(Long.parseLong(row[5].toString()));
-//            double total = Double.parseDouble(row[2].toString()) * Double.parseDouble(row[3].toString());
-//            entradas += Double.parseDouble(row[2].toString());
-//            modeloTabla.addRow(new Object[]{"ENTRADA", app.DF.format((Date) row[4]), row[1], prov.getRazonSocial(), locMap.get(row[6]), row[2], row[3], total});
-//            modeloTabla.setRowEditable(modeloTabla.getRowCount() - 1, false);
-//        }
+        for (int i = 0; i < eventInList.size(); i++) {
+            InventoryEvent event = eventInList.get(i);
+            entradas += event.getQuantity();
+            String code = "E" + Utiles.getNumeroFormateado((int) event.getId(), 5);
+            modeloTabla.addRow(new Object[]{"ENTRADA", app.DF.format(event.getLastUpdate()), code, "---", event.getQuantity(), 0, 0});
+            modeloTabla.setRowEditable(modeloTabla.getRowCount() - 1, false);
+        }
         double salidas = 0;
-//        for (int i = 0; i < salidaByProductList.size(); i++) {
-//            Object[] row = salidaByProductList.get(i);
-//            Cliente clie = app.getControl().getCliente(Long.parseLong(row[5].toString()));
-//            double total = Double.parseDouble(row[2].toString()) * Double.parseDouble(row[3].toString());
-//            salidas += Double.parseDouble(row[2].toString());
-//            modeloTabla.addRow(new Object[]{"SALIDA", app.DF.format((Date) row[4]), row[1], clie.getRazonSocial(), locMap.get(row[6]), row[2], row[3], total});
+//        for (int i = 0; i < eventInList.size(); i++) {
+//            InventoryEvent event = eventInList.get(i);
+//            entradas += event.getQuantity();
+//            modeloTabla.addRow(new Object[]{"ENTRADA", event.getLastUpdate(), event.getId(), "---", event.getQuantity(), 0, 0});
 //            modeloTabla.setRowEditable(modeloTabla.getRowCount() - 1, false);
 //        }
         double conciliaciones = 0;
         for (int i = 0; i < conciliacionList.size(); i++) {
             Conciliacion conc = conciliacionList.get(i);
-            double dif = conc.getConciliacion()-conc.getExistencias();
+            double dif = conc.getConciliacion() - conc.getExistencias();
             conciliaciones += dif;
-            modeloTabla.addRow(new Object[]{"CONC.", app.DF.format(conc.getFecha()), conc.getCodigo(), "---", locMap.get(conc.getLocacion()), dif, 0, 0});
+            modeloTabla.addRow(new Object[]{"CONC.", app.DF.format(conc.getFecha()), conc.getCodigo(), locMap.get(conc.getLocacion()), dif, 0, 0});
             modeloTabla.setRowEditable(modeloTabla.getRowCount() - 1, false);
         }
+
+        cant = item.getInit() + entradas - salidas + conciliaciones;
 
         StringBuilder strHtml = new StringBuilder();
         strHtml.append("<html><table width=\"100%\" border=\"1\" cellspacing=\"0\"><tr>");
@@ -168,13 +164,12 @@ public class PanelReportProductDetail extends PanelCapturaMod implements ActionL
         lbInfoProducto.setText(str.toString());
 
     }
-    
+
     @Override
     public void actionPerformed(ActionEvent e) {
-        
+
     }
 
-    
     public Map<Integer, String> getLocationsMap() {
         ArrayList<Location> locations = app.getControl().getLocationList("", "");
         Map<Integer, String> mapLocations = new HashMap<>();
@@ -241,8 +236,6 @@ public class PanelReportProductDetail extends PanelCapturaMod implements ActionL
     private javax.swing.JLabel lbInfoProducto;
     private javax.swing.JTable tablaDetails;
     // End of variables declaration//GEN-END:variables
-
-    
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {

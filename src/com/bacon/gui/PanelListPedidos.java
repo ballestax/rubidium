@@ -130,8 +130,7 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener 
             @Override
             public void actionPerformed(ActionEvent e) {
                 int r = tableList.getSelectedRow();
-                String fact = tableList.getValueAt(r, 0).toString();
-                System.out.println("fact:" + fact);
+                String fact = tableList.getValueAt(r, 0).toString();                
                 Invoice inv = app.getControl().getInvoiceByCode(fact);
                 StringBuilder msg = new StringBuilder();
                 msg.append("<html>Esta seguro que desea anular la factura N° ");

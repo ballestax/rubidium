@@ -62,7 +62,6 @@ public class PanelCategory extends PanelCapturaMod implements PropertyChangeList
         lbTitle.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                System.out.println("click aqio");
             }
         });
         

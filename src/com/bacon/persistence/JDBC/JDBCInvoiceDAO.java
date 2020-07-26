@@ -14,6 +14,7 @@ import com.bacon.domain.OtherProduct;
 import com.bacon.domain.Presentation;
 import com.bacon.domain.Product;
 import com.bacon.domain.ProductoPed;
+import static com.bacon.persistence.JDBC.JDBCUtilDAO.ADD_INVENTORY_QUANTITY_KEY;
 import static com.bacon.persistence.JDBC.JDBCUtilDAO.GET_MAX_ID_KEY;
 import com.bacon.persistence.SQLExtractor;
 import com.bacon.persistence.SQLLoader;
@@ -30,6 +31,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 import javax.sql.DataSource;
 
@@ -258,7 +260,7 @@ public class JDBCInvoiceDAO implements InvoiceDAO {
     }
 
     public ArrayList<Invoice> getInvoiceLiteList(String where, String orderBy, int startEntry, int endEntry) throws DAOException {
-        
+
         if (startEntry < 0) {
             startEntry = 0;
         }
@@ -270,7 +272,7 @@ public class JDBCInvoiceDAO implements InvoiceDAO {
         if (endEntry <= startEntry) {
             return new ArrayList<Invoice>();
         }
-        
+
         String retrieveProd;
         ArrayList<Invoice> invoices = new ArrayList<>();
         try {
@@ -282,7 +284,7 @@ public class JDBCInvoiceDAO implements InvoiceDAO {
             namedParams.put(NAMED_PARAM_START, String.valueOf(startEntry));
             namedParams.put(NAMED_PARAM_END, String.valueOf(endEntry));
             namedParams.put(NAMED_PARAM_NUM, String.valueOf(endEntry - startEntry));
-     
+
             retrieveProd = sqlStatements.getSQLString(GET_INVOICE_KEY, namedParams);
 
         } catch (SQLException e) {
@@ -546,18 +548,22 @@ public class JDBCInvoiceDAO implements InvoiceDAO {
                 ps = sqlStatements.buildSQLStatement(conn, ADD_INVOICE_PRODUCT_KEY, parameters1);
                 ps.executeUpdate();
 
-                HashMap data = product.getData();
-                if (product.hasPresentation() && data != null && !data.isEmpty()) {
+                HashMap<Integer, HashMap> mData = product.getData();
+                if (product.hasPresentation() && mData != null && !mData.isEmpty()) {
+//                    double exist = Double.parseDouble(data.get("exist").toString());
+                    Set<Integer> keys = mData.keySet();
+                    for (Integer key : keys) {
+                        HashMap data = mData.get(key);
+                        double quant = Double.parseDouble(data.get("quantity").toString());
+                        double res = (quant * product.getCantidad() * -1);
+                        Object[] parameterx = {
+                            res,
+                            data.get("id")
+                        };
+                        ps = sqlStatements.buildSQLStatement(conn, JDBCUtilDAO.ADD_INVENTORY_QUANTITY_KEY, parameterx);
+                        ps.executeUpdate();
+                    }
 
-                    double exist = Double.parseDouble(data.get("exist").toString());
-                    double quant = Double.parseDouble(data.get("quantity").toString());
-                    double res = exist - (quant * product.getCantidad());
-                    Object[] parameterx = {
-                        res,
-                        data.get("id")
-                    };
-                    ps = sqlStatements.buildSQLStatement(conn, JDBCUtilDAO.UPDATE_INVENTORY_QUANTITY_KEY, parameterx);
-                    ps.executeUpdate();
                 }
 
                 int idProduct = 0;

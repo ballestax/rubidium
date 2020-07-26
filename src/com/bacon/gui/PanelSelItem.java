@@ -198,8 +198,7 @@ public class PanelSelItem extends PanelCaptura implements ActionListener, CaretL
         if (tfValorUnit.getText().trim().isEmpty()) {
             tfValorUnit.setBorder(bordeError);
             valido = false;
-        }
-        
+        }        
         if (tfValorTotal.getText().trim().isEmpty()) {
             tfValorTotal.setBorder(bordeError);
             valido = false;
@@ -451,7 +450,7 @@ public class PanelSelItem extends PanelCaptura implements ActionListener, CaretL
     
     public void showResumen() {
         int row = tabla.getSelectedRow();
-        Item item = app.getControl().getItemWhere("id=" + modelo.getValueAt(row, 0));
+        Item item = app.getControl().getItemWhere("id=" + tabla.getValueAt(row, 0));
         if (row != -1) {
             double cantidad = 0, precio = 0, total = 0;
             tfValorUnit.setText(item.getCost().toString());
@@ -520,6 +519,7 @@ public class PanelSelItem extends PanelCaptura implements ActionListener, CaretL
             Item item = getItem();
             if (item != null) {
                 app.getControl().addItemToInventory(item.getId(), item.getQuantity());
+                app.getControl().addInventoryRegister(item, 1, item.getQuantity());
                 pcs.firePropertyChange(AC_ADD_ITEM_TO_TABLE, null, item);
                 getRootPane().getParent().setVisible(false);
             }

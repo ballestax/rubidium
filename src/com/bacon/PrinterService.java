@@ -90,7 +90,7 @@ public class PrinterService {
                     "Bacon 57 Burger");
             escpos.writeLF(font2, "NIT. 1129518949-8");
             escpos.writeLF(font2, "Calle 18 # 5-59");
-            escpos.writeLF(font2, "321 5944870");
+            escpos.writeLF(font2, "321 5944870 - 315 4048585");
             escpos.feed(1);
             if (invoice.getTipoEntrega() == PanelPedido.TIPO_LOCAL) {
 

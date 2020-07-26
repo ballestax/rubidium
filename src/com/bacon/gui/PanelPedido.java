@@ -11,6 +11,7 @@ import com.bacon.GUIManager;
 import com.bacon.domain.Client;
 import com.bacon.domain.Cycle;
 import com.bacon.domain.Invoice;
+import com.bacon.domain.Item;
 import com.bacon.domain.OtherProduct;
 import com.bacon.domain.Presentation;
 import com.bacon.domain.Product;
@@ -36,9 +37,12 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Set;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
+import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
@@ -52,11 +56,14 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
+import org.apache.commons.collections.keyvalue.MultiKey;
+import org.apache.commons.collections.map.MultiValueMap;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.balx.ColorDg;
 import org.balx.TextFormato;
 import org.bx.gui.MyDefaultTableModel;
+import org.dz.MyDialogEsc;
 import org.dz.PanelCapturaMod;
 import org.dz.TextFormatter;
 
@@ -77,6 +84,9 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
     private String[] tiempos;
     private ArrayList<ProductoPed> products;
     private ArrayList<OtherProduct> otherProducts;
+    private HashMap<Long, Object[]> checkInventory;
+    private MultiValueMap mapInventory;
+
     public static final Logger logger = Logger.getLogger(PanelPedido.class.getCanonicalName());
     private JPopupMenu popupTabla;
     private MyPopupListener popupListenerTabla;
@@ -103,6 +113,7 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
     private boolean showDescuento;
     private ImageIcon iconOk;
     private ImageIcon iconWarning;
+    private ImageIcon iconDefault;
 
     /**
      * Creates new form PanelPedido
@@ -113,6 +124,8 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
         this.app = app;
         products = new ArrayList<>();
         otherProducts = new ArrayList<>();
+        checkInventory = new HashMap<>();
+        mapInventory = new MultiValueMap();
         initComponents();
         createComponents();
     }
@@ -135,6 +148,7 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
         showDescuento = false;
 
         lbTitle.setText("Pedido");
+        lbTitle.setToolTipText(getInfoCiclo(app.getControl().getLastCycle()));
 
         btTogle1.setText("Local");
         btTogle1.setActionCommand(AC_SELECT_LOCAL);
@@ -298,9 +312,10 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
 
         iconOk = new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "package-accept.png", 18, 18));
         iconWarning = new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "package-warning.png", 18, 18));
+        iconDefault = new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "package-info.png", 18, 18));
 
-        btInventoryInfo.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "package-info.png", 18, 18)));
-        btInventoryInfo.setActionCommand(AC_INVENTORY_INFO);
+        btInventoryInfo.setIcon(iconDefault);
+        btInventoryInfo.setActionCommand(AC_SHOW_INVENTORY);
         btInventoryInfo.addActionListener(this);
 
         String[] cols = {"Cant", "Producto", "Unidad", "Valor"};
@@ -463,10 +478,18 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
 
         } else if (AC_CHANGE_DOMICILIO.equals(e.getActionCommand())) {
             String dom = regDomicilio.getText();
-            if (entregasDom[0].equals(dom)) {
+            if (entregasDom[0].equals(dom)) {  // DOMICILIO
                 int valueDelivery = app.getConfiguration().getProperty(Configuration.DELIVERY_VALUE, 2000);
+                if (spModelDel != null) {
+                    spModelDel.setValue(1);
+                }
+                spNumDom.setVisible(true);
                 lbEntregas.setText(DCFORM_P.format(valueDelivery));
-            } else {
+            } else {  // PARA LLEVAR
+                spNumDom.setVisible(false);
+                if (spModelDel != null) {
+                    spModelDel.setValue(0);
+                }
                 lbEntregas.setText(DCFORM_P.format(0));
             }
             calcularValores();
@@ -489,13 +512,17 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
             popupTabla.add(itemDelete);
             lbCliente.setText("");
             spModelDel.setValue(1);
+            btInventoryInfo.setIcon(iconDefault);
             invoice = null;
+
             lbFactura.setText(calculateProximoRegistro());
 
             if (Boolean.valueOf(app.getConfiguration().getProperty(Configuration.PRINT_PREV_DELIVERY))) {
                 btPrint.setVisible(true);
             }
-
+            
+            lbTitle.setToolTipText(getInfoCiclo(app.getControl().getLastCycle()));
+            
             block = false;
         } else if (AC_SELECT_DELIVERY.equals(e.getActionCommand())) {
             showDelivery();
@@ -556,10 +583,13 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
         } else if (AC_CHECK_RECOGIDO.equals(e.getActionCommand())) {
             if (chRecogido.isSelected()) {
                 regDireccion.setText("RECOGIDO");
+                spNumDom.setVisible(false);
                 regDomicilio.setSelected(1);
+
             } else {
                 regDireccion.setText("");
                 regDomicilio.setSelected(0);
+                spNumDom.setVisible(true);
             }
 
         } else if (AC_CLEAR_CLIENT.equals(e.getActionCommand())) {
@@ -570,6 +600,15 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
             lbStatus.setIcon(null);
             lbCliente.removeMouseListener(linkMouseListener);
         } else if (AC_SHOW_INVENTORY.equals(e.getActionCommand())) {
+            HashMap<Integer, Double> inventory = checkInventory();
+            if (!inventory.isEmpty()) {
+                String htmlInv = htmlInfoInventory(inventory);
+                MyDialogEsc dialog = new MyDialogEsc(app.getGuiManager().getFrame());
+                dialog.add(new JLabel(htmlInv));
+                dialog.pack();
+                dialog.setLocationRelativeTo(null);
+                dialog.setVisible(true);
+            }
 
         }
     }
@@ -599,7 +638,27 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
                 if (e.getColumn() == 0) {
                     tbListado.setValueAt(calculatePrecio(e.getLastRow()), e.getLastRow(), 3);
                     int cant = Integer.parseInt(tbListado.getValueAt(e.getLastRow(), 0).toString());
-                    products.get(e.getLastRow()).setCantidad(cant);
+                    ProductoPed prd = products.get(e.getLastRow());
+                    prd.setCantidad(cant);
+
+                    //update map inventory
+                    SwingWorker sw = new SwingWorker() {
+                        @Override
+                        protected Object doInBackground() throws Exception {
+                            HashMap<Integer, HashMap> mData = prd.getData();
+                            Set<Integer> keys = mData.keySet();
+                            for (Integer key : keys) {
+                                HashMap data = mData.get(key);
+                                double res = Double.valueOf(data.get("quantity").toString()) * cant;
+                                MultiKey mKey = new MultiKey(data.get("id"), prd.hashCode());
+                                mapInventory.remove(mKey);
+                                mapInventory.put(mKey, res);
+                            }
+                            return true;
+                        }
+                    };
+                    sw.execute();
+//                    checkInventory();
                 }
                 break;
             case TableModelEvent.INSERT:
@@ -607,7 +666,15 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
                 break;
             case TableModelEvent.DELETE:
                 try {
-                    products.remove(e.getLastRow());
+                    ProductoPed rem = products.remove(e.getLastRow());
+                    HashMap<Integer, HashMap> mData = rem.getData();
+                    Set<Integer> keys = mData.keySet();
+                    for (Integer key : keys) {
+                        HashMap data = mData.get(key);
+                        MultiKey mKey = new MultiKey(data.get("id"), rem.hashCode());
+                        Object remove = mapInventory.remove(mKey);
+                    }
+                    checkInventory();
                 } catch (Exception ex) {
                 }
                 break;
@@ -621,7 +688,6 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        logger.debug("last:" + evt.getPropertyName() + ":" + evt.getPropagationId());
         if (PanelProduct2.AC_ADD_QUICK.equals(evt.getPropertyName())) {
             Product prod = (Product) evt.getNewValue();
             Presentation pres = app.getControl().getPresentationsByDefault(prod.getId());
@@ -743,20 +809,28 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
     }
 
     public void addProductPed(ProductoPed productPed, int cantidad, double price, boolean isOther) {
-
         if (block) {
             GUIManager.showErrorMessage(null, "El pedido esta cerrado no se puede agregar más productos", "Pedido cerrado");
             return;
         }
 
         Product producto = productPed.getProduct();
-        
-        if(productPed.hasPresentation()){
-            HashMap dataInv = app.getControl().checkInventory(productPed.getPresentation().getId());
-            productPed.setData(dataInv);
+
+        if (productPed.hasPresentation()) {
+            HashMap<Integer, HashMap> mapData = app.getControl().checkInventory(productPed.getPresentation().getId());
+            productPed.setData(mapData);
+            if (mapData != null && !mapData.isEmpty()) {
+                Set<Integer> keys = mapData.keySet();
+                for (Integer key : keys) {
+                    HashMap data = mapData.get(key);
+                    double res = Double.valueOf(data.get("quantity").toString()) * cantidad;
+                    MultiKey mKey = new MultiKey(data.get("id"), productPed.hashCode());
+                    mapInventory.put(mKey, res);
+                }
+            }
+            checkInventory();
         }
-        
-        
+
         if (products.contains(productPed) && price == productPed.getPrecio()) {
             try {
                 int row = products.indexOf(productPed);
@@ -766,7 +840,6 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
                 products.set(row, productPed);
             } catch (Exception e) {
             }
-
         } else {
             try {
                 productPed.setCantidad(cantidad);
@@ -786,7 +859,6 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
 //                if (productPed.hasPresentation()) {
 //                    checkProductInventory(productPed.getPresentation().getId(), productPed.getCantidad());
 //                }
-
                 modeloTb.setRowEditable(modeloTb.getRowCount() - 1, false);
                 modeloTb.setCellEditable(modeloTb.getRowCount() - 1, 0, true);
             } catch (Exception ex) {
@@ -795,6 +867,75 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
         }
 
 //        checkAllInventory();
+    }
+
+    private HashMap<Integer, Double> checkInventory() {
+
+        Set keySet = mapInventory.keySet();
+
+        Iterator<MultiKey> it = keySet.iterator();
+
+        HashMap<Integer, Double> invSimple = new HashMap<>();
+        while (it.hasNext()) {
+            MultiKey key = it.next();
+            int id = (int) key.getKey(0);
+            ArrayList<Double> vals = (ArrayList) mapInventory.get(key);
+            double sum = 0;
+            for (int i = 0; i < vals.size(); i++) {
+                sum += vals.get(i);
+            }
+            if (invSimple.containsKey(id)) {
+                Double val = invSimple.get(id);
+                invSimple.put(id, val + sum);
+            } else {
+                invSimple.put(id, sum);
+            }
+        }
+        return invSimple;
+
+    }
+
+    private String htmlInfoInventory(HashMap<Integer, Double> simpInv) {
+
+        Set<Integer> keys = simpInv.keySet();
+
+        StringBuilder stb = new StringBuilder();
+        stb.append("<html><table border=1>");
+        stb.append("<thead>");
+        stb.append("<td>ITEM</td><td>INVENTARIO</td><td>CANTIDAD</td>");
+        stb.append("</thead>");
+        stb.append("<tbody>");
+        for (Integer next : keys) {
+            Item item = app.getControl().getItemWhere("id=" + next);
+            Double cant = simpInv.get(next);
+            String color = item.getQuantity() >= cant ? "#00ff32" : "#ff4400";
+            stb.append("<tr>")
+                    .append("<td><font size=+1 color=").append(color).append(">").append(item.getName().toUpperCase()).append("</font></td>")
+                    .append("<td><font size=+1> ").append(item.getQuantity()).append("</font></td>")
+                    .append("<td><font size=+1 color=blue>").append(cant).append("</font></td>")
+                    .append("</tr>");
+        }
+        stb.append("</tbody>");
+        stb.append("</table></html>");
+
+        return stb.toString();
+    }
+
+    private synchronized boolean checkAllInventory() {
+        HashMap<Integer, Double> simpInv = checkInventory();
+        Set<Integer> keys = simpInv.keySet();
+
+        boolean band;
+
+        for (Integer next : keys) {
+            Item item = app.getControl().getItemWhere("id=" + next);
+            Double cant = simpInv.get(next);
+            band = item.getQuantity() < cant;
+            if (band) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public void addOtherProductPed(OtherProduct otherProduct, int cantidad, double price) {
@@ -840,53 +981,9 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
         }
     }
 
-    private void checkProductInventory(ProductoPed pp) {
-        checkProductInventory(pp.getPresentation().getId(), pp.getCantidad());
-    }
-
-    private boolean checkProductInventory(int id, int cant) {
-
-        HashMap check = app.getControl().checkInventory(id);
-
-        double exist = 0;
-        double desc = 0;
-
-//        System.out.println(Arrays.toString(check.entrySet().toArray()));
-        if (!check.isEmpty()) {
-            System.out.println("checking.." + check.get("name"));
-            exist = Double.parseDouble(check.get("exist").toString());
-            desc = Double.parseDouble(check.get("quantity").toString());
-        }
-        return cant * desc <= exist;
-    }
-
-    private boolean checkAllInventory() {
-
-        boolean band = true;
-        for (int i = 0; i < products.size(); i++) {
-            ProductoPed prod = products.get(i);
-            if (prod.hasPresentation()) {
-                band = checkProductInventory(prod.getPresentation().getId(), prod.getCantidad());
-            }
-            if (!band) {
-                break;
-            }
-        }
-        if (band) {
-            btInventoryInfo.setIcon(iconOk);
-        } else {
-            btInventoryInfo.setIcon(iconWarning);
-        }
-
-        System.out.println("band = " + band);
-        tbListado.repaint();
-//        tbListado.updateUI();
-        return band;
-
-    }
-
     private void clearPedido() {
         products.clear();
+        mapInventory.clear();
         modeloTb.setRowCount(0);
         regDomicilio.setSelected(0);
         regCelular.setText("");
@@ -914,9 +1011,22 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
         }
         regTotal.setText(DCFORM_P.format(subtotal + domicilio + servicio - descuento));
 
-        checkAllInventory();
-//        tbListado.updateUI();
-//        tbListado.repaint();
+        SwingWorker sw = new SwingWorker() {
+
+            @Override
+            protected Object doInBackground() throws Exception {
+
+                boolean inventoryOK = checkAllInventory();
+                if (inventoryOK) {
+                    btInventoryInfo.setIcon(iconOk);
+                } else {
+                    btInventoryInfo.setIcon(iconWarning);
+                }
+                return true;
+            }
+        };
+        sw.execute();
+
     }
 
     private boolean verificarDatosFactura() throws ParseException {
@@ -929,6 +1039,15 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
             tbListado.getCellEditor().stopCellEditing();
         } catch (Exception e) {
         }
+        
+        //checkCiclo
+        Cycle lastCycle = app.getControl().getLastCycle();
+        if(lastCycle.getStatus()==Cycle.CLOSED){
+            GUIManager.showErrorMessage(null, "El ciclo: "+lastCycle.getId()+" esta cerrado\n"
+                    + "Empiece un nuevo ciclo para facturar", "Ciclo cerrado");
+            return false;
+        }
+        
 
         if (products.isEmpty() && otherProducts.isEmpty()) {
             GUIManager.showErrorMessage(null, "No hay productos en la lista", "Pedido vacio");
@@ -939,9 +1058,14 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
             return false;
         }
 
-        if(!checkAllInventory()){
-            GUIManager.showErrorMessage(null, "Los productos exceden las existencias en inventario", "Producto agotado");
-            return false;
+        if (!checkAllInventory()) {
+            String property = app.getConfiguration().getProperty(Configuration.INVOICE_OUT_STOCK, "true");
+            boolean permit = Boolean.valueOf(property);
+            GUIManager.showErrorMessage(null, "Los productos exceden las existencias en inventario.\n"
+                    + "Esta " + (permit ? "habilitado" : "deshabilitado") + " facturar sin existencias", "Producto agotado");
+            if (!permit) {
+                return false;
+            }
         }
 
         Waiter waitres = (Waiter) regMesera.getSelectedItem();
@@ -1085,6 +1209,13 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
 
         return true;
 
+    }
+
+    private String getInfoCiclo(Cycle ciclo) {
+        boolean status = ciclo.getStatus()==Cycle.CLOSED;
+        return "<html><font size=+1 color="+(status?"RED":"#00c90e")+">Ciclo: " + ciclo.getId()+""
+                + "<p>Inicio: "+app.DF_FULL.format(ciclo.getInit())+""
+                + "<p>Estado:"+(status ?"Cerrado":"Abierto")+"</font></html>";
     }
 
     public Invoice getInvoice() {
@@ -1497,13 +1628,13 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(chRecogido, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(regDomicilio, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(2, 2, 2)
                                 .addComponent(spNumDom, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(1, 1, 1)
-                                .addComponent(lbEntregas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addComponent(lbEntregas, javax.swing.GroupLayout.PREFERRED_SIZE, 82, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(btConfirm, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -1517,8 +1648,8 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(regService, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(tfService, javax.swing.GroupLayout.PREFERRED_SIZE, 147, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(tfService, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(8, 8, 8)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(regDescuento, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)

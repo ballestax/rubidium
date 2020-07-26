@@ -47,6 +47,7 @@ public class Configuration {
     public static final String SHOW_EXCLUSIONS = "cf.showexclusions";
     public static final String MAX_CATEGORIES_LIST = "cf.maxcategorieslist";
     public static final String PN_ENTRADA_PERIODO = "cf.listperiodo";
+    public static final String INVOICE_OUT_STOCK = "cf.invoiceoutstock";
     
     
     private StandardPBEStringEncryptor encryptor;

@@ -30,13 +30,13 @@
                       <Component id="chRecogido" min="-2" pref="83" max="-2" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
-                      <Group type="103" groupAlignment="0" attributes="0">
+                      <Group type="103" groupAlignment="0" max="-2" attributes="0">
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="regDomicilio" min="-2" pref="165" max="-2" attributes="0"/>
                               <EmptySpace min="-2" pref="2" max="-2" attributes="0"/>
                               <Component id="spNumDom" min="-2" pref="52" max="-2" attributes="0"/>
                               <EmptySpace min="-2" pref="1" max="-2" attributes="0"/>
-                              <Component id="lbEntregas" min="-2" max="-2" attributes="0"/>
+                              <Component id="lbEntregas" min="-2" pref="82" max="-2" attributes="0"/>
                           </Group>
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="btConfirm" min="-2" pref="100" max="-2" attributes="0"/>
@@ -52,10 +52,10 @@
                               <EmptySpace min="-2" max="-2" attributes="0"/>
                               <Component id="regService" min="-2" pref="100" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="tfService" min="-2" pref="147" max="-2" attributes="0"/>
+                              <Component id="tfService" min="-2" pref="120" max="-2" attributes="0"/>
                           </Group>
                       </Group>
-                      <EmptySpace min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="8" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="regDescuento" min="-2" pref="60" max="-2" attributes="0"/>

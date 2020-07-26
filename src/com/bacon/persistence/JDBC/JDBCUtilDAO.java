@@ -9,6 +9,8 @@ import com.bacon.DBManager;
 import com.bacon.domain.Category;
 import com.bacon.domain.Cycle;
 import com.bacon.domain.Ingredient;
+import com.bacon.domain.InventoryEvent;
+import com.bacon.domain.Item;
 import com.bacon.domain.OtherProduct;
 import com.bacon.domain.Permission;
 import com.bacon.domain.Presentation;
@@ -116,6 +118,10 @@ public class JDBCUtilDAO implements UtilDAO {
     public static final String UPDATE_INVENTORY_QUANTITY_KEY = "UPDATE_INVENTORY_QUANTITY";
     public static final String ADD_INVENTORY_QUANTITY_KEY = "ADD_INVENTORY_QUANTITY";
 
+    public static final String CREATE_INVENTORY_REGISTER_TABLE_KEY = "CREATE_INVENTORY_REGISTER_TABLE";
+    public static final String ADD_INVENTORY_EVENT_KEY = "ADD_INVENTORY_EVENT";
+    public static final String GET_INVENTORY_EVENT_LIST_KEY = "GET_INVENTORY_EVENT_LIST";
+
     private static final Logger logger = Logger.getLogger(JDBCUtilDAO.class.getCanonicalName());
 
     public static final String NAMED_PARAM_KEY = "{key}";
@@ -179,6 +185,9 @@ public class JDBCUtilDAO implements UtilDAO {
 
         TABLE_NAME = "inventory_product";
         createTable(TABLE_NAME, CREATE_INVENTORY_PRODUCT_TABLE_KEY);
+
+        TABLE_NAME = "inventory_register";
+        createTable(TABLE_NAME, CREATE_INVENTORY_REGISTER_TABLE_KEY);
 
     }
 
@@ -1194,9 +1203,10 @@ public class JDBCUtilDAO implements UtilDAO {
         }
     }
 
-    public HashMap checkInventory(int idPres) throws DAOException {
+    public HashMap<Integer, HashMap> checkInventory(int idPres) throws DAOException {
         String retrieveList;
-        HashMap data = new HashMap<>();
+        HashMap<Integer,HashMap> mData = new HashMap<>();
+        HashMap data = null;
         Connection conn = null;
         PreparedStatement retrieve = null;
         ResultSet rs = null;
@@ -1206,8 +1216,9 @@ public class JDBCUtilDAO implements UtilDAO {
             retrieve = sqlStatements.buildSQLStatement(conn, CHECK_INVENTORY_KEY, parameters);
             rs = retrieve.executeQuery();
             while (rs.next()) {
-
-                data.put("id", rs.getInt("id"));
+                data = new HashMap<>();
+                int id = rs.getInt("id");
+                data.put("id", id);
                 data.put("name", rs.getString("name"));
                 data.put("pres", rs.getString("pres"));
                 data.put("measure", rs.getString("measure"));
@@ -1215,7 +1226,7 @@ public class JDBCUtilDAO implements UtilDAO {
                 data.put("idPres", rs.getInt("idPres"));
                 data.put("quantity", rs.getDouble("quantity"));
 
-//                presentations.add(pres);
+                mData.put(id, data);
             }
         } catch (SQLException e) {
             throw new DAOException("Could not properly retrieve the presentations list: " + e);
@@ -1226,7 +1237,7 @@ public class JDBCUtilDAO implements UtilDAO {
             DBManager.closeStatement(retrieve);
             DBManager.closeConnection(conn);
         }
-        return data;
+        return mData;
     }
 
     public void addInventoryQuantity(long id, double quantity) throws DAOException {
@@ -1240,8 +1251,6 @@ public class JDBCUtilDAO implements UtilDAO {
     public void updateInventoryQuantity(long id, double quantity, String KEY) throws DAOException {
         Connection conn = null;
         PreparedStatement update = null;
-        System.out.println("id = " + id);
-        System.out.println("quantity = " + quantity);
         try {
             conn = dataSource.getConnection();
             conn.setAutoCommit(false);
@@ -1249,9 +1258,7 @@ public class JDBCUtilDAO implements UtilDAO {
                 quantity,
                 id
             };
-            
             update = sqlStatements.buildSQLStatement(conn, KEY, parameters);
-            System.out.println("update = " + update);
             update.executeUpdate();
             conn.commit();
         } catch (SQLException e) {
@@ -1264,6 +1271,77 @@ public class JDBCUtilDAO implements UtilDAO {
             DBManager.closeStatement(update);
             DBManager.closeConnection(conn);
         }
+    }
+
+    public void addInventoryRegister(Item item, int EVENT, double quantity) throws DAOException {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        try {
+            conn = dataSource.getConnection();
+            conn.setAutoCommit(false);
+            Object[] parameters = {
+                item.getId(),
+                EVENT,
+                quantity
+            };
+            ps = sqlStatements.buildSQLStatement(conn, ADD_INVENTORY_EVENT_KEY, parameters);
+            ps.executeUpdate();
+            conn.commit();
+        } catch (SQLException e) {
+            DBManager.rollbackConn(conn);
+            throw new DAOException("Cannot add Inventory event ", e);
+        } catch (IOException e) {
+            DBManager.rollbackConn(conn);
+            throw new DAOException("Cannot add Inventory vent", e);
+        } finally {
+            DBManager.closeStatement(ps);
+            DBManager.closeConnection(conn);
+        }
+    }
+
+    public ArrayList<InventoryEvent> getRegisterEventList(String where, String orderBy) throws DAOException {
+        String retrieveUnit;
+        ArrayList<InventoryEvent> events = new ArrayList<>();
+        try {
+            SQLExtractor sqlExtractorWhere = new SQLExtractor(where, SQLExtractor.Type.WHERE);;
+            SQLExtractor sqlExtractorOrderBy = new SQLExtractor(orderBy, SQLExtractor.Type.ORDER_BY);;
+            Map<String, String> namedParams = new HashMap<>();
+            namedParams.put(NAMED_PARAM_WHERE, sqlExtractorWhere.extractWhere());
+            namedParams.put(NAMED_PARAM_ORDER_BY, sqlExtractorOrderBy.extractOrderBy());
+            retrieveUnit = sqlStatements.getSQLString(GET_INVENTORY_EVENT_LIST_KEY, namedParams);
+
+        } catch (SQLException e) {
+            throw new DAOException("Could not properly retrieve the events List", e);
+        } catch (IOException e) {
+            throw new DAOException("Could not properly retrieve the events List", e);
+        }
+
+        Connection conn = null;
+        PreparedStatement retrieve = null;
+        ResultSet rs = null;
+        InventoryEvent event = null;
+        try {
+            conn = dataSource.getConnection();
+            retrieve = conn.prepareStatement(retrieveUnit);
+            rs = retrieve.executeQuery();
+
+            while (rs.next()) {
+                event = new InventoryEvent();
+                event.setId(rs.getLong("id"));
+                event.setIdItem(rs.getLong("idItem"));
+                event.setEvent(rs.getInt("event"));
+                event.setQuantity(rs.getDouble("quantity"));
+                event.setLastUpdate(rs.getDate("lastUpdatedTime"));
+                events.add(event);
+            }
+        } catch (SQLException e) {
+            throw new DAOException("Could not proper retrieve the Unit: " + e);
+        } finally {
+            DBManager.closeResultSet(rs);
+            DBManager.closeStatement(retrieve);
+            DBManager.closeConnection(conn);
+        }
+        return events;
     }
 
 }
