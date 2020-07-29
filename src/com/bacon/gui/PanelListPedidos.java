@@ -5,6 +5,7 @@ import com.bacon.Configuration;
 import com.bacon.MyConstants;
 import com.bacon.domain.Client;
 import com.bacon.domain.Invoice;
+import com.bacon.domain.ProductoPed;
 import com.bacon.domain.Table;
 import com.bacon.domain.Waiter;
 import com.bacon.gui.util.MyPopupListener;
@@ -22,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.EventObject;
+import java.util.List;
 import javax.swing.AbstractCellEditor;
 import javax.swing.BorderFactory;
 import static javax.swing.BorderFactory.createLineBorder;
@@ -80,6 +82,8 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener 
     private ArrayList<Waiter> waitersList;
     private SimpleDateFormat formFecha;
 
+    public static final Logger logger = Logger.getLogger(PanelListPedidos.class.getCanonicalName());
+
 //    private org.dz.MyDatePickerImp dpFinal;
 //    private org.dz.MyDatePickerImp dpInicio;
     /**
@@ -94,7 +98,7 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener 
     }
 
     private void createComponents() {
-        
+
         formFecha = new SimpleDateFormat("dd MMMM yyyy");
 
         jLabel1.setText("Buscar");
@@ -108,7 +112,7 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener 
 
         tableList.getTableHeader().setBackground(COLOR_BACKG);
 
-        TablaCellRenderer tRenderer = new TablaCellRenderer(true,app.getDCFORM_P());
+        TablaCellRenderer tRenderer = new TablaCellRenderer(true, app.getDCFORM_P());
 
         int[] colW = new int[]{50, 50, 40, 15, 50, 60, 30, 50, 60, 60, 30};
         for (int i = 0; i < colW.length; i++) {
@@ -130,7 +134,7 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener 
             @Override
             public void actionPerformed(ActionEvent e) {
                 int r = tableList.getSelectedRow();
-                String fact = tableList.getValueAt(r, 0).toString();                
+                String fact = tableList.getValueAt(r, 0).toString();
                 Invoice inv = app.getControl().getInvoiceByCode(fact);
                 StringBuilder msg = new StringBuilder();
                 msg.append("<html>Esta seguro que desea anular la factura N° ");
@@ -142,7 +146,9 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener 
                 int opt = JOptionPane.showConfirmDialog(null, msg, "Advertencia", JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
                 if (opt == JOptionPane.OK_OPTION) {
                     inv.setStatus(Invoice.ST_ANULADA);
-                    app.getControl().updateInvoice(inv);   
+                    app.getControl().updateInvoice(inv);
+                    List<ProductoPed> list= inv.getProducts();
+                    app.getControl().restoreInventory(list);
                     loadPedidos();
                 }
 

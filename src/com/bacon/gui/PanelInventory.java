@@ -67,6 +67,11 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
         btLoad.setActionCommand(AC_LOAD_ITEM);
         btLoad.addActionListener(this);
 
+        JButton btDesc = new JButton("Descargar");
+        btDesc.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "shopping-basket-remove.png", 24, 24)));
+        btDesc.setActionCommand(AC_DOWNLOAD_ITEM);
+        btDesc.addActionListener(this);
+
         JButton btRefresh = new JButton("Actualizar");
         btRefresh.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "shopping-basket-refresh.png", 24, 24)));
         btRefresh.setActionCommand(AC_REFRESH_ITEMS);
@@ -79,6 +84,7 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
 
         panelButtons.add(btAdd);
         panelButtons.add(btLoad);
+        panelButtons.add(btDesc);
         panelButtons.add(btRefresh);
         panelButtons.add(btConciliation);
 
@@ -123,6 +129,7 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
     public static final String AC_REFRESH_ITEMS = "AC_REFRESH_ITEMS";
     public static final String AC_LOAD_ITEM = "AC_LOAD_ITEM";
     public static final String AC_SHOW_ADD_ITEM = "AC_SHOW_ADD_ITEM";
+    public static final String AC_DOWNLOAD_ITEM = "AC_DOWNLOAD_ITEM";
 
     private void populateTable() {
 
@@ -258,6 +265,8 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
             populateTable();
         } else if (AC_ADD_CONCILIATION.equals(e.getActionCommand())) {
             app.getGuiManager().showPanelConciliacion(true);
+        } else if (AC_DOWNLOAD_ITEM.equals(e.getActionCommand())) {
+            app.getGuiManager().showPanelDownItem(this);
         }
     }
 

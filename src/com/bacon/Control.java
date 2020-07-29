@@ -19,6 +19,7 @@ import com.bacon.domain.Location;
 import com.bacon.domain.Permission;
 import com.bacon.domain.Presentation;
 import com.bacon.domain.Product;
+import com.bacon.domain.ProductoPed;
 import com.bacon.domain.Rol;
 import com.bacon.domain.Table;
 import com.bacon.domain.User;
@@ -600,6 +601,17 @@ public class Control {
         }
     }
 
+    public void anulateInvoice(Invoice invoice) {
+        try {
+            JDBCInvoiceDAO invoiceDAO = (JDBCInvoiceDAO) DAOFactory.getInstance().getInvoiceDAO();
+            invoiceDAO.updateInvoice(invoice);
+        } catch (DAOException ex) {
+            String msg = "Error updating invoice";
+            logger.error(msg, ex);
+            GUIManager.showErrorMessage(null, msg, "Error");
+        }
+    }
+
     public Date getPrimerRegistro(String tabla, String field) {
         try {
             JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
@@ -807,12 +819,12 @@ public class Control {
         }
     }
 
-    public HashMap<Integer,HashMap> checkInventory(int idPres) {
+    public HashMap<Integer, HashMap> checkInventory(int idPres) {
         try {
             JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
             return utilDAO.checkInventory(idPres);
         } catch (DAOException ex) {
-            logger.error("Error gettinf data.", ex);
+            logger.error("Error getting data.", ex);
             GUIManager.showErrorMessage(null, "Error getting data", "Error");
             return null;
         }
@@ -823,7 +835,7 @@ public class Control {
             JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
             utilDAO.addInventoryQuantity(idItem, quantity);
         } catch (DAOException ex) {
-            logger.error("Error gettinf data.", ex);
+            logger.error("Error getting data.", ex);
             GUIManager.showErrorMessage(null, "Error getting data", "Error");
         }
     }
@@ -878,6 +890,22 @@ public class Control {
             logger.error("Error getting event list.", ex);
             GUIManager.showErrorMessage(null, "Error consultando lista de eventos", "Error");
             return null;
+        }
+    }
+
+    public void restoreInventory(List<ProductoPed> listProductoPeds) {
+        List<ProductoPed> list = listProductoPeds;
+        for (int idx = 0; idx < list.size(); idx++) {
+            ProductoPed pPed = list.get(idx);
+            Presentation pres = pPed.getPresentation();
+            HashMap<Integer, HashMap> mData = app.getControl().checkInventory(pres.getId());
+            for (Integer key : mData.keySet()) {
+                HashMap data = mData.get(key);
+                int id = Integer.parseInt(data.get("id").toString());
+                double quantity = Double.parseDouble(data.get("quantity").toString());
+                app.getControl().addItemToInventory(id, quantity * pPed.getCantidad());
+                logger.debug("Update inventory: " + pPed.getProduct().getName() + ":: " + data.get("name") + "-> idItem:" + id + "[" + quantity + "]");
+            }
         }
     }
 

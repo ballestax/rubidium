@@ -36,6 +36,7 @@ import com.bacon.gui.PanelNewRol;
 import com.bacon.gui.PanelNewUser;
 import com.bacon.gui.PanelPedido;
 import com.bacon.gui.PanelDash;
+import com.bacon.gui.PanelDownItem;
 import com.bacon.gui.PanelInventory;
 import com.bacon.gui.PanelList;
 import com.bacon.gui.PanelNewConciliacion;
@@ -129,6 +130,7 @@ public class GUIManager {
     private PanelSelItem panelSelItem;
     private PanelNewConciliacion panelNewConciliacion;
     private PanelNewLocation pnNewLocation;
+    private PanelDownItem panelDownItem;
 
     private GUIManager() {
 
@@ -375,6 +377,14 @@ public class GUIManager {
         }
         panelSelItem.reset();
         return panelSelItem;
+    }
+
+    public PanelDownItem getPanelDownItem() {
+        if (panelDownItem == null) {
+            panelDownItem = new PanelDownItem(app, null);
+        }
+        panelDownItem.reset();
+        return panelDownItem;
     }
 
     public PanelList getPanelNewList(String title, PropertyChangeListener listener, ArrayList lista) {
@@ -1050,6 +1060,21 @@ public class GUIManager {
         }
         dialog.add(getPanelSelItem());
         dialog.setTitle("Agregar item.");
+        dialog.pack();
+        dialog.setLocationRelativeTo(getFrame());
+        setDefaultCursor();
+        dialog.setVisible(true);
+    }
+    
+    public void showPanelDownItem(PropertyChangeListener listener) {
+        setWaitCursor();
+        JDialog dialog = new MyDialogEsc();
+        dialog.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
+        if (!getPanelSelItem().containsListener(listener)) {
+            getPanelSelItem().addPropertyChangeListener(listener);
+        }
+        dialog.add(getPanelDownItem());
+        dialog.setTitle("Descargar item.");
         dialog.pack();
         dialog.setLocationRelativeTo(getFrame());
         setDefaultCursor();

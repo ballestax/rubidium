@@ -6,7 +6,10 @@ package com.bacon.persistence.dao;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -39,15 +42,19 @@ public abstract class DAOFactory {
             if (className == null) {
                 throw new IOException("Invalid " + PROPERTY_FACTORY_CLASS_FILE + " property");
             }
-            INSTANCE = (DAOFactory) Class.forName(className).newInstance();
-        } catch (IllegalAccessException ex) {
-            throw new DAOException("Cannot construct factory class.", ex);
-        } catch (ClassNotFoundException ex) {
+            INSTANCE = (DAOFactory) Class.forName(className).getDeclaredConstructor().newInstance();
+        } catch (IllegalAccessException | ClassNotFoundException | InstantiationException ex) {
             throw new DAOException("Cannot construct factory class.", ex);
         } catch (IOException ex) {
             throw new DAOException("Unable to parse configuration file", ex);
-        } catch (InstantiationException ex) {
-            throw new DAOException("Cannot construct factory class.", ex);
+        } catch (NoSuchMethodException ex) {
+            throw new DAOException("No such method construct factory class.", ex);
+        } catch (SecurityException ex) {
+            throw new DAOException("Security construct factory class.", ex);
+        } catch (IllegalArgumentException ex) {
+            throw new DAOException("Illegal arguments.", ex);
+        } catch (InvocationTargetException ex) {
+            throw new DAOException("Invocation target.", ex);
         }
 
     }

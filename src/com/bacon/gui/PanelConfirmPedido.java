@@ -54,7 +54,7 @@ public class PanelConfirmPedido extends javax.swing.JPanel implements ActionList
         btPrint.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "Printer-orange.png", 32, 32)));
         btPrint.setActionCommand(AC_PRINT_BILL);
         btPrint.addActionListener(this);
-        
+
         btPrint2.setToolTipText("Guia");
         btPrint2.setMargin(new Insets(2, 2, 2, 2));
         btPrint2.setFocusPainted(false);
@@ -80,7 +80,6 @@ public class PanelConfirmPedido extends javax.swing.JPanel implements ActionList
         btAnulate.setActionCommand(AC_ANULATE_BILL);
         btAnulate.addActionListener(this);
         btAnulate.setEnabled(invoice.getStatus() != Invoice.ST_ANULADA);
-            
 
 //        jScrollPane1.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
     }
@@ -163,7 +162,7 @@ public class PanelConfirmPedido extends javax.swing.JPanel implements ActionList
             }
 
             lbTotal.setText("<html>Total<br><font size=+1 color=red>" + app.getCurrencyFormat().format(total) + "</html>");
-            
+
             updateUI();
         }
     }
@@ -194,7 +193,7 @@ public class PanelConfirmPedido extends javax.swing.JPanel implements ActionList
         } else if (AC_ANULATE_BILL.equals(e.getActionCommand())) {
             anularFactura();
 
-        }else if (AC_PRINT_GUIDE.equals(e.getActionCommand())) {
+        } else if (AC_PRINT_GUIDE.equals(e.getActionCommand())) {
             String propPrinter = app.getConfiguration().getProperty(Configuration.PRINTER_SELECTED);
             if (propPrinter.isEmpty()) {
                 GUIManager.showErrorMessage(null, "No ha seleccionado una impresora valida para imprimir", "Impresora no encontrada");
@@ -219,9 +218,10 @@ public class PanelConfirmPedido extends javax.swing.JPanel implements ActionList
         int opt = JOptionPane.showConfirmDialog(null, msg, "Advertencia", JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
         if (opt == JOptionPane.OK_OPTION) {
             invoice.setStatus(Invoice.ST_ANULADA);
-            app.getControl().updateInvoice(invoice);      
+            app.getControl().updateInvoice(invoice);
             updateInvoice();
-            
+            List<ProductoPed> list = invoice.getProducts();
+            app.getControl().restoreInventory(list);
         }
     }
 

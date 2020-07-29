@@ -38,7 +38,6 @@ import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableCellEditor;
@@ -66,6 +65,7 @@ public class PanelAddProduct extends PanelCapturaMod implements ActionListener, 
 
     /**
      * Creates new form PanelAddProduct
+     * @param app
      */
     public PanelAddProduct(Aplication app, PropertyChangeListener pcl) {
         this.app = app;

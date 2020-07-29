@@ -106,19 +106,26 @@ public class PanelReportProductDetail extends PanelCapturaMod implements ActionL
         String cat = "INVENTARIO";
 
 //        ArrayList<Object[]> entradaByProductList = app.getControl().getEntradaByProductList(item.getCodigo());
-        ArrayList<InventoryEvent> eventInList = app.getControl().getInventoryRegisterList("event=" + InventoryEvent.EVENT_IN + " AND idItem=" + item.getId(), "lastUpdatedTime");
+        ArrayList<InventoryEvent> eventInList = app.getControl().getInventoryRegisterList("idItem=" + item.getId(), "lastUpdatedTime");
         ArrayList<Conciliacion> conciliacionList = app.getControl().getConciliacionList("idItem=" + item.getId() + "", "fecha");
         modeloTabla.setRowCount(0);
         modeloTabla.addRow(new Object[]{"INICIAL", "   ----------", "   ----------", "   ----------", cantIni, costoIni, cantIni * costoIni});
         double entradas = 0;
+        double salidas = 0;
         for (int i = 0; i < eventInList.size(); i++) {
             InventoryEvent event = eventInList.get(i);
-            entradas += event.getQuantity();
-            String code = "E" + Utiles.getNumeroFormateado((int) event.getId(), 5);
-            modeloTabla.addRow(new Object[]{"ENTRADA", app.DF.format(event.getLastUpdate()), code, "---", event.getQuantity(), 0, 0});
+            if (event.getEvent() == InventoryEvent.EVENT_IN) {
+                entradas += event.getQuantity();
+                String code = "E" + Utiles.getNumeroFormateado((int) event.getId(), 5);
+                modeloTabla.addRow(new Object[]{"ENTRADA", app.DF.format(event.getLastUpdate()), code, "---", event.getQuantity(), 0, 0});
+            } else {
+                salidas += event.getQuantity();
+                String code = "S" + Utiles.getNumeroFormateado((int) event.getId(), 5);
+                modeloTabla.addRow(new Object[]{"SALIDA", app.DF.format(event.getLastUpdate()), code, "---", event.getQuantity(), 0, 0});
+            }
             modeloTabla.setRowEditable(modeloTabla.getRowCount() - 1, false);
         }
-        double salidas = 0;
+
 //        for (int i = 0; i < eventInList.size(); i++) {
 //            InventoryEvent event = eventInList.get(i);
 //            entradas += event.getQuantity();
