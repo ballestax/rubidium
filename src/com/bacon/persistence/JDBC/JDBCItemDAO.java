@@ -7,8 +7,6 @@ package com.bacon.persistence.JDBC;
 
 import com.bacon.DBManager;
 import com.bacon.domain.Item;
-import com.bacon.domain.ProductoPed;
-import static com.bacon.persistence.JDBC.JDBCInvoiceDAO.ADD_INVOICE_PRODUCT_KEY;
 import static com.bacon.persistence.JDBC.JDBCUtilDAO.GET_MAX_ID_KEY;
 import com.bacon.persistence.SQLExtractor;
 import com.bacon.persistence.SQLLoader;
@@ -45,6 +43,7 @@ public class JDBCItemDAO implements ItemDAO {
     protected static final String GET_ITEM_KEY = "GET_ITEM";
     protected static final String DELETE_ITEM_KEY = "DELETE_ITEM";
     public static final String ADD_INVENTORY_PRODUCT_KEY = "ADD_INVENTORY_PRODUCT";
+    public static final String ADD_INVENTORY_PRESENTATION_KEY = "ADD_INVENTORY_PRESENTATION";
 
     public JDBCItemDAO(DataSource dataSource, SQLLoader sqlStatements) throws DAOException {
         this.dataSource = dataSource;
@@ -81,7 +80,7 @@ public class JDBCItemDAO implements ItemDAO {
         return getItemList(query, "").get(0);
     }
 
-    public ArrayList<Item> getItemsBy(String query) throws DAOException {        
+    public ArrayList<Item> getItemsBy(String query) throws DAOException {
         return getItemList(query, "");
     }
 
@@ -189,14 +188,18 @@ public class JDBCItemDAO implements ItemDAO {
             List<Object[]> presList = item.getPresentations();
 
             for (int i = 0; i < presList.size(); i++) {
-                int idPres = Integer.parseInt(presList.get(i)[0].toString());
-                double cant = Double.parseDouble(presList.get(i)[1].toString());
-                Object[] parameters1 = {
-                    idItem,
-                    idPres,
-                    cant
-                };
-                ps = sqlStatements.buildSQLStatement(conn, ADD_INVENTORY_PRODUCT_KEY, parameters1);
+                int idProd = Integer.parseInt(presList.get(i)[0].toString());
+                int idPres = Integer.parseInt(presList.get(i)[1].toString());
+                double cant = Double.parseDouble(presList.get(i)[2].toString());
+
+                if (idPres != 0) {
+                    Object[] parameters1 = {idItem, idProd, idPres, cant};
+                    ps = sqlStatements.buildSQLStatement(conn, ADD_INVENTORY_PRESENTATION_KEY, parameters1);
+                    
+                }else{
+                    Object[] parameters1 = {idItem, idProd, cant};
+                    ps = sqlStatements.buildSQLStatement(conn, ADD_INVENTORY_PRODUCT_KEY, parameters1);
+                }
                 ps.executeUpdate();
             }
 

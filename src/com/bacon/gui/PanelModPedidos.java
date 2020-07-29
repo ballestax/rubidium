@@ -93,7 +93,7 @@ public class PanelModPedidos extends PanelCapturaMod
     }
 
     private void loadAllProducts() {
-        productsList = app.getControl().getProductsList("", "");
+        productsList = app.getControl().getProductsList("enabled=1", "");
     }
 
     /**
@@ -134,9 +134,9 @@ public class PanelModPedidos extends PanelCapturaMod
             this.updateUI();
         } else if (evt.getPropertyName().startsWith(PanelSelCategory.SEL_CAT_)) {
             String cat = evt.getPropertyName().substring(8).toLowerCase();
-            ArrayList<Product> productsList = this.productsList;;
+            ArrayList<Product> productsList = this.productsList;
             if (!"TODO".equalsIgnoreCase(cat)) {
-                productsList = app.getControl().getProductsList("category='" + cat + "'", "");
+                productsList = app.getControl().getProductsList("category='" + cat + "' AND enabled=1", "");
             }
             panelCategory.setProducts(productsList);
             panelLeft.updateUI();

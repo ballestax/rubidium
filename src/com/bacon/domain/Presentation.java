@@ -14,6 +14,7 @@ public class Presentation {
     private String name;
     private double price;
     private boolean _default;
+    private boolean _enabled;
 
     public Presentation() {
     }
@@ -93,6 +94,14 @@ public class Presentation {
         return _default;
     }
 
+    public boolean isEnabled() {
+        return _enabled;
+    }
+
+    public void setEnabled(boolean _enabled) {
+        this._enabled = _enabled;
+    }
+
     @Override
     public int hashCode() {
         int hash = 3;
@@ -101,7 +110,5 @@ public class Presentation {
         hash = 53 * hash + Objects.hashCode(this.name);
         return hash;
     }
-    
-    
 
 }

@@ -13,7 +13,15 @@
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
             <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/Aplication.java</file>
+            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/Control.java</file>
+            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/gui/PanelAddItem.java</file>
+            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/persistence/JDBC/JDBCProductDAO.java</file>
+            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/gui/PanelReportProductDetail.java</file>
+            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/GUIManager.java</file>
             <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/gui/PanelListPedidos.java</file>
+            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/config/jdbc-sql.xml</file>
+            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/gui/PanelDownItem.java</file>
+            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/domain/InventoryEvent.java</file>
             <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/gui/PanelPedido.java</file>
         </group>
     </open-files>

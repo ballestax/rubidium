@@ -22,10 +22,12 @@ import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
+import org.apache.commons.lang3.StringUtils;
 import org.bx.TextFormatter;
 import org.bx.gui.ListSelection;
 import org.bx.gui.MyDefaultTableModel;
 import org.dz.PanelCaptura;
+import org.dzur.StringUtil;
 
 /**
  *
@@ -39,7 +41,8 @@ public class PanelAddItem extends PanelCaptura implements ActionListener, Proper
     private ListSelection listaSeleccion;
     private int widthLabel;
 
-    public static final int COL_SEL = 2;
+    public static final int COL_SEL1 = 1;
+    public static final int COL_SEL2 = 3;
 
     /**
      * Creates new form PanelAddItem
@@ -87,7 +90,7 @@ public class PanelAddItem extends PanelCaptura implements ActionListener, Proper
         btSave.setActionCommand(AC_SAVE_ITEM);
         btSave.addActionListener(this);
 
-        String[] colNames = {"Sel", "Producto", "ID", "Presentacion", "Cantidad"};
+        String[] colNames = {"Sel", "ID", "Producto", "ID pres.", "Presentacion", "Cantidad"};
         ArrayList<String> asList = new ArrayList<>(Arrays.asList(colNames));
 //        asList.add(loc);
         model = new MyDefaultTableModel(asList.toArray(), 0);
@@ -99,7 +102,7 @@ public class PanelAddItem extends PanelCaptura implements ActionListener, Proper
         tableProducts.getTableHeader().addMouseListener(listaSeleccion);
         model.addTableModelListener(this);
 
-        int[] colW = {5, 120, 20, 100, 20};
+        int[] colW = {5, 20, 120, 20, 100, 20};
 
         for (int i = 0; i < tableProducts.getColumnCount(); i++) {
             tableProducts.getColumnModel().getColumn(i).setCellRenderer(new TableSelectCellRenderer(true));
@@ -119,17 +122,20 @@ public class PanelAddItem extends PanelCaptura implements ActionListener, Proper
         SwingWorker sw = new SwingWorker() {
             @Override
             protected Object doInBackground() throws Exception {
-                ArrayList<Product> productos = app.getControl().getProductsList("", "");
+                ArrayList<Product> productos = app.getControl().getProductsList("", "category DESC, name");
                 for (int i = 0; i < productos.size(); i++) {
                     Product p = productos.get(i);
                     ArrayList<Presentation> press = app.getControl().getPresentationsByProduct(p.getId());
-                    for (int j = 0; j < press.size(); j++) {
-                        model.addRow(new Object[]{false, p.getName(), press.get(j).getId(), press.get(j).getName(), 1});
-                        model.setRowEditable(model.getRowCount() - 1, false);
-                        model.setCellEditable(model.getRowCount() - 1, 0, true);
-                        model.setCellEditable(model.getRowCount() - 1, 4, true);
+                    if (!press.isEmpty()) {
+                        for (int j = 0; j < press.size(); j++) {
+                            model.addRow(new Object[]{false, p.getId(), p.getName().toUpperCase(), press.get(j).getId(), press.get(j).getName().toUpperCase(), 1});
+                        }
+                    } else {
+                        model.addRow(new Object[]{false, p.getId(), p.getName().toUpperCase(), "--", "--", 1});
                     }
-
+                    model.setRowEditable(model.getRowCount() - 1, false);
+                    model.setCellEditable(model.getRowCount() - 1, 0, true);
+                    model.setCellEditable(model.getRowCount() - 1, 5, true);
                 }
                 return true;
             }
@@ -342,7 +348,7 @@ public class PanelAddItem extends PanelCaptura implements ActionListener, Proper
             regMeseure.setBorderToError();
             validate = false;
         }
-        
+
         if (regLocation.getText().isEmpty()) {
             regLocation.setBorderToError();
             validate = false;
@@ -357,7 +363,7 @@ public class PanelAddItem extends PanelCaptura implements ActionListener, Proper
             item = new Item();
             item.setName(regName.getText().toLowerCase());
             item.setMeasure(regMeseure.getText().toLowerCase());
-            item.setLocation(((Location)regLocation.getObject()).getId());
+            item.setLocation(((Location) regLocation.getObject()).getId());
             item.setQuantity(Double.parseDouble(regQuantity.getText()));
             try {
                 Double stockMin = Double.parseDouble(regStockMin.getText());
@@ -391,7 +397,9 @@ public class PanelAddItem extends PanelCaptura implements ActionListener, Proper
             ArrayList<Object[]> selecteds = getSelecteds();
             for (int i = 0; i < selecteds.size(); i++) {
                 Object[] dat = selecteds.get(i);
-                item.addPresentations(Integer.parseInt(dat[0].toString()), Double.parseDouble(dat[1].toString()));
+                String dat1 = dat[1].toString();
+                dat1 = StringUtils.isNumeric(dat1) ? dat1 : "0";
+                item.addPresentations(Integer.parseInt(dat[0].toString()), Integer.parseInt(dat1), Double.parseDouble(dat[2].toString()));
             }
         }
         return item;
@@ -411,8 +419,9 @@ public class PanelAddItem extends PanelCaptura implements ActionListener, Proper
         int[] selectedsRows = getSelectedsRows();
         for (int i = 0; i < selectedsRows.length; i++) {
             Object[] data = {
-                model.getValueAt(selectedsRows[i], COL_SEL).toString(),
-                model.getValueAt(selectedsRows[i], 4).toString(),};
+                model.getValueAt(selectedsRows[i], COL_SEL1).toString(),
+                model.getValueAt(selectedsRows[i], COL_SEL2).toString(),
+                model.getValueAt(selectedsRows[i], 5).toString(),};
             prods.add(data);
         }
         return prods;
@@ -444,8 +453,8 @@ public class PanelAddItem extends PanelCaptura implements ActionListener, Proper
         } else if (PanelList.AC_DELETE.equals(evt.getPropertyName())) {
             app.getControl().deleteUnit(evt.getNewValue().toString());
             updateUnitList();
-        }else if(PanelNewLocation.AC_ADD_LOCATION.equals(evt.getPropertyName())){
-            
+        } else if (PanelNewLocation.AC_ADD_LOCATION.equals(evt.getPropertyName())) {
+
         }
     }
 
@@ -453,7 +462,7 @@ public class PanelAddItem extends PanelCaptura implements ActionListener, Proper
         ArrayList<String> unidadList = getUnitsList();
         regMeseure.setText(unidadList.toArray(new String[1]));
     }
-    
+
     private void updateLocationList() {
         ArrayList<Location> location = getLocationsList();
         regLocation.setText(location.toArray(new String[1]));

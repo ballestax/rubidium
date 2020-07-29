@@ -171,6 +171,7 @@ public class JDBCInvoiceDAO implements InvoiceDAO {
                                 pres.setName(rsx.getString(4));
                                 pres.setPrice(rsx.getDouble(5));
                                 pres.setDefault(rsx.getBoolean(6));
+                                pres.setEnabled(rs.getBoolean(7));
                                 productoPed.setPresentation(pres);
                             }
                         } catch (SQLException e) {
@@ -414,6 +415,7 @@ public class JDBCInvoiceDAO implements InvoiceDAO {
                                 pres.setName(rsx.getString(4));
                                 pres.setPrice(rsx.getDouble(5));
                                 pres.setDefault(rsx.getBoolean(6));
+                                pres.setEnabled(rs.getBoolean(7));
                             }
                             productoPed.setPresentation(pres);
                         } catch (SQLException e) {

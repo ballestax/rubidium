@@ -1034,8 +1034,8 @@ public class GUIManager {
         setWaitCursor();
         JDialog dialog = new MyDialogEsc();
         dialog.setModal(true);
-        int w = 800;
-        int h = 500;
+        int w = 1000;
+        int h = 600;
         dialog.setPreferredSize(new Dimension(w, h));
 
         if (!getPanelAddItem().containsListener(listener)) {

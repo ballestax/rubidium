@@ -162,9 +162,9 @@ public class PanelCustomPedido extends PanelCapturaMod implements ActionListener
         panel2 = new JPanel();
         panel2.setBorder(BorderFactory.createEmptyBorder(5, 2, 5, 15));
         sPanel1.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        
+
         ArrayList<Additional> adds = app.getControl().getAdditionalList("", "i.name");
-        int COLS = 4;        
+        int COLS = 4;
         panel2.setLayout(new GridLayout(0, COLS, 5, 5));
         sPanel1.setViewportView(panel2);
         for (int i = 0; i < adds.size(); i++) {
@@ -182,13 +182,16 @@ public class PanelCustomPedido extends PanelCapturaMod implements ActionListener
         bgPres = new ButtonGroup();
         if (!presList.isEmpty()) {
             for (int i = 0; i < presList.size(); i++) {
+
                 Presentation pres = presList.get(i);
-                PanelPresentation panPres = new PanelPresentation(app, pres);
-                bgPres.add(panPres.getSelector());
-                panPres.setSelected(i == 0);
-                panPres.setActionCommand(AC_SEL_PRES);
-                panPres.addActionListener(this);
-                panel3.add(panPres);
+                if (pres.isEnabled()) {
+                    PanelPresentation panPres = new PanelPresentation(app, pres);
+                    bgPres.add(panPres.getSelector());
+                    panPres.setSelected(pres.isDefault());
+                    panPres.setActionCommand(AC_SEL_PRES);
+                    panPres.addActionListener(this);
+                    panel3.add(panPres);
+                }
             }
 
         } else {

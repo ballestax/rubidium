@@ -24,6 +24,7 @@ public class Product {
     private String category;
     private boolean variablePrice;
     private List<Ingredient> ingredients;
+    private boolean _enabled;
 
     public Product(long id) {
         this.id = id;
@@ -111,6 +112,14 @@ public class Product {
         ingredients.add(ingredient);
     }
 
+    public boolean isEnabled() {
+        return _enabled;
+    }
+
+    public void setEnabled(boolean _enabled) {
+        this._enabled = _enabled;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (obj == this) {
@@ -143,7 +152,7 @@ public class Product {
                 + "\ncode:" + code
                 + "\nprice:" + price
                 + "\ncategory:" + category
-                +"\n]";
+                + "\n]";
     }
 
 }

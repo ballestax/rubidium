@@ -35,7 +35,7 @@ public class Item {
         this.presentations = new ArrayList<>();
     }
 
-    public Item(long id) {        
+    public Item(long id) {
         this.id = id;
         this.presentations = new ArrayList<>();
     }
@@ -159,11 +159,11 @@ public class Item {
         this.presentations = presentations;
     }
 
-    public void addPresentations(int idPresentation, double cant) {
+    public void addPresentations(int idProduct, int idPresentation, double cant) {
         if (presentations == null) {
             presentations = new ArrayList<>();
         }
-        presentations.add(new Object[]{idPresentation, cant});
+        presentations.add(new Object[]{idProduct, idPresentation, cant});
     }
 
     @Override

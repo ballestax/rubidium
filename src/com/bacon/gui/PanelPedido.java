@@ -829,6 +829,19 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
                 }
             }
             checkInventory();
+        }else{
+            HashMap<Integer, HashMap> mapData = app.getControl().checkInventoryProduct(productPed.getProduct().getId());
+            productPed.setData(mapData);
+            if (mapData != null && !mapData.isEmpty()) {
+                Set<Integer> keys = mapData.keySet();
+                for (Integer key : keys) {
+                    HashMap data = mapData.get(key);
+                    double res = Double.valueOf(data.get("quantity").toString()) * cantidad;
+                    MultiKey mKey = new MultiKey(data.get("id"), productPed.hashCode());
+                    mapInventory.put(mKey, res);
+                }
+            }
+            checkInventory();
         }
 
         if (products.contains(productPed) && price == productPed.getPrecio()) {

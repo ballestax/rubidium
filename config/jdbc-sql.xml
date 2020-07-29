@@ -45,7 +45,8 @@
                     |GET_INVOICE_BY_PRODUCT
                     |CREATE_INVENTORY_TABLE|GET_ITEM|ADD_ITEM
                     |ADD_UNIT|GET_UNIT|UPDATE_UNIT|DELETE_UNIT|CREATE_UNITS_TABLE
-                    |CREATE_INVENTORY_PRODUCT_TABLE|ADD_INVENTORY_PRODUCT|CHECK_INVENTORY
+                    |CREATE_INVENTORY_PRODUCT_TABLE|ADD_INVENTORY_PRODUCT|CHECK_INVENTORY|CHECK_INVENTORY_PRODUCT
+                    |ADD_INVENTORY_PRESENTATION
                     |UPDATE_INVENTORY_QUANTITY|ADD_INVENTORY_QUANTITY
                     |CREATE_CONCILIACIONES_TABLE|ADD_CONCILIACION|GET_CONCILIACION|UPDATE_CONCILIACION|DELETE_CONCILIACION
                     |ADD_LOCATION|GET_LOCATION|UPDATE_LOCATION|DELETE_LOCATION|CREATE_LOCATIONS_TABLE
@@ -650,7 +651,8 @@
                 price DECIMAL(20,2),
                 variable TINYINT(1),
                 image VARCHAR(255),
-                category VARCHAR(25),                
+                category VARCHAR(25),
+                variable TINYINT(1) DEFAULT 1, 
                 PRIMARY KEY (id)
                 )ENGINE=InnoDB DEFAULT CHARSET=latin1;
             </SQLFragment>
@@ -658,8 +660,7 @@
         
         <SQLStatement method="ADD_PRODUCT">
             <SQLFragment>
-
-                INSERT INTO products (name,code, description, price, image, category, variable) VALUES (?,?,?,?,?,?,?);
+                INSERT INTO products (name,code, description, price, image, category, variable, enabled) VALUES (?,?,?,?,?,?,?,?);
             </SQLFragment>
         </SQLStatement>        
         
@@ -692,7 +693,8 @@
                 description=?,
                 price=?,
                 image=?,
-                variable=? 
+                variable=?,
+                enabled=? 
                 WHERE code = ?
             </SQLFragment>
         </SQLStatement> 
@@ -1118,6 +1120,7 @@
                 name VARCHAR(100),
                 price DECIMAL(20,2),
                 isdefault TINYINT(1) DEFAULT '0',
+                isenabled TINYINT(1) DEFAULT '1',
                 PRIMARY KEY (id),
                 FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE ON UPDATE CASCADE                
                 );
@@ -1126,7 +1129,7 @@
         
         <SQLStatement method="GET_PRESENTATIONS_BY_PRODUCT">
             <SQLFragment>
-                SELECT ps.id, ps.product_id, ps.serie,ps.name,ps.price,ps.isdefault
+                SELECT ps.id, ps.product_id, ps.serie,ps.name,ps.price,ps.isdefault,ps.isenabled
                 FROM presentation_product ps
                 WHERE 
                 ps.product_id = ?
@@ -1135,7 +1138,7 @@
         
         <SQLStatement method="GET_PRESENTATION_BY_DEFAULT">
             <SQLFragment>
-                SELECT ps.id, ps.product_id, ps.serie,ps.name,ps.price,ps.isdefault
+                SELECT ps.id, ps.product_id, ps.serie,ps.name,ps.price,ps.isdefault,ps.isenabled
                 FROM presentation_product ps
                 WHERE 
                 ps.product_id = ? AND isdefault = ?
@@ -1144,7 +1147,7 @@
         
         <SQLStatement method="GET_PRESENTATION">
             <SQLFragment>
-                SELECT ps.id, ps.product_id, ps.serie,ps.name,ps.price,ps.isdefault
+                SELECT ps.id, ps.product_id, ps.serie,ps.name,ps.price,ps.isdefault,ps.isenabled
                 FROM presentation_product ps
                 WHERE ps.id = ?
             </SQLFragment>
@@ -1337,6 +1340,7 @@
                 id INTEGER AUTO_INCREMENT,
                 item_id INTEGER NOT NULL,                
                 presentation_id INTEGER NOT NULL,
+                product_id INTEGER,
                 quantity DECIMAL(12,2),
                 PRIMARY KEY (id),
                 FOREIGN KEY (item_id) REFERENCES inventory(id) ON DELETE CASCADE ON UPDATE CASCADE,                
@@ -1366,9 +1370,15 @@
             </SQLFragment>            
         </SQLStatement>
         
+        <SQLStatement method="ADD_INVENTORY_PRESENTATION">
+            <SQLFragment>
+                INSERT INTO inventory_product (item_id, product_id, presentation_id, quantity) VALUES (?,?,?,?);
+            </SQLFragment>
+        </SQLStatement>
+        
         <SQLStatement method="ADD_INVENTORY_PRODUCT">
             <SQLFragment>
-                INSERT INTO inventory_product (item_id, presentation_id, quantity) VALUES (?,?,?);
+                INSERT INTO inventory_product (item_id, product_id, quantity) VALUES (?,?,?);
             </SQLFragment>
         </SQLStatement>
         
@@ -1424,8 +1434,16 @@
                 FROM inventory i, inventory_product ip, presentation_product pp 
                 WHERE i.id=ip.item_id AND pp.id=ip.presentation_id AND ip.presentation_id=?
             </SQLFragment>
-        </SQLStatement> 
+        </SQLStatement>
         
+        <SQLStatement method="CHECK_INVENTORY_PRODUCT">
+            <SQLFragment>
+                SELECT i.id, i.name, p.name as pres, i.measure, i.quantity as exist, ip.presentation_id as idPres, ip.quantity 
+                FROM inventory i, products p, inventory_product ip 
+                WHERE i.id=ip.item_id AND p.id=ip.product_id AND ip.product_id=?
+            </SQLFragment>
+        </SQLStatement>
+                
         <SQLStatement method="UPDATE_INVENTORY_QUANTITY">
             <SQLFragment>
                 UPDATE inventory SET quantity = ?

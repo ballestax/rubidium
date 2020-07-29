@@ -124,7 +124,7 @@ public class PanelCategory extends PanelCapturaMod implements PropertyChangeList
         
         if (products != null) {
             for (int i = 0; i < products.size(); i++) {
-                Product prod = products.get(i);
+                Product prod = products.get(i);                
                 PanelProduct2 pnProd = new PanelProduct2(app, prod);
                 pnProd.addPropertyChangeListener(this);
                 pnItems.add(pnProd);

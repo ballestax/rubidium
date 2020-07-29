@@ -216,12 +216,14 @@ public class ProductoPed {
 
     @Override
     public int hashCode() {
-        int hash = 3;
-        hash = 53 * hash + Objects.hashCode(this.producto);
-        hash = 53 * hash + Objects.hashCode(this.precio);
-        hash = 53 * hash + Objects.hashCode(this.adicionales);
-        hash = 53 * hash + Objects.hashCode(this.exclusiones);
+        int hash = 7;
+        hash = 97 * hash + Objects.hashCode(this.producto);
+        hash = 97 * hash + Objects.hashCode(this.adicionales);
+        hash = 97 * hash + Objects.hashCode(this.exclusiones);
+        hash = 97 * hash + Objects.hashCode(this.presentation);
+        hash = 97 * hash + (int) (Double.doubleToLongBits(this.precio) ^ (Double.doubleToLongBits(this.precio) >>> 32));
         return hash;
     }
+
 
 }

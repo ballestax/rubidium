@@ -829,6 +829,17 @@ public class Control {
             return null;
         }
     }
+    
+    public HashMap<Integer, HashMap> checkInventoryProduct(long idProd) {
+        try {
+            JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
+            return utilDAO.checkInventoryProduct(idProd);
+        } catch (DAOException ex) {
+            logger.error("Error getting data.", ex);
+            GUIManager.showErrorMessage(null, "Error getting data", "Error");
+            return null;
+        }
+    }
 
     public void addItemToInventory(long idItem, double quantity) {
         try {

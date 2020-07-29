@@ -104,6 +104,7 @@ public class JDBCProductDAO implements ProductDAO {
                 producto.setImage(rs.getString(6));
                 producto.setCategory(rs.getString(7));
                 producto.setVariablePrice(rs.getBoolean(8));
+                producto.setEnabled(rs.getBoolean(9));
             }
         } catch (SQLException e) {
             throw new DAOException("Could not properly retrieve the Product: " + e);
@@ -160,8 +161,8 @@ public class JDBCProductDAO implements ProductDAO {
                 producto.setPrice(rs.getBigDecimal(5).doubleValue());
                 producto.setVariablePrice(rs.getBoolean(6));
                 producto.setImage(rs.getString(7));
-                producto.setCategory(rs.getString(8));                
-                
+                producto.setCategory(rs.getString(8)); 
+                producto.setEnabled(rs.getBoolean(9));                
                 productos.add(producto);
             }
         } catch (SQLException e) {
@@ -191,7 +192,9 @@ public class JDBCProductDAO implements ProductDAO {
                 producto.getPrice(),
                 producto.getImage(),
                 producto.getCategory(),
-                producto.isVariablePrice()};
+                producto.isVariablePrice(),
+                producto.isEnabled()
+            };
             ps = sqlStatements.buildSQLStatement(conn, ADD_PRODUCT_KEY, parameters);
             
             ps.executeUpdate();
@@ -244,7 +247,8 @@ public class JDBCProductDAO implements ProductDAO {
                 producto.getPrice(),
                 producto.getImage(),
                 producto.getCategory(),
-                producto.isVariablePrice()
+                producto.isVariablePrice(),
+                producto.isEnabled()
             };
             update = sqlStatements.buildSQLStatement(conn, UPDATE_PRODUCT_KEY, parameters);
             update.executeUpdate();
@@ -282,6 +286,7 @@ public class JDBCProductDAO implements ProductDAO {
                 producto.setVariablePrice(rs.getBoolean(6));
                 producto.setImage(rs.getString(7));
                 producto.setCategory(rs.getString(8));                
+                producto.setEnabled(rs.getBoolean(9));
                 productos.add(producto);
             }
         } catch (SQLException e) {

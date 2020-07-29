@@ -23,7 +23,6 @@ import com.bacon.persistence.SQLLoader;
 import com.bacon.persistence.dao.DAOException;
 import com.bacon.persistence.dao.UtilDAO;
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -98,6 +97,7 @@ public class JDBCUtilDAO implements UtilDAO {
     public static final String CREATE_EXPENSES_INCOMES_TABLE_KEY = "CREATE_EXPENSES_INCOMES_TABLE";
 
     public static final String CHECK_INVENTORY_KEY = "CHECK_INVENTORY";
+    public static final String CHECK_INVENTORY_PRODUCT_KEY = "CHECK_INVENTORY_PRODUCT";
 
     protected static final String CHECK_TABLE_EMPTY_KEY = "CHECK_TABLE";
     protected static final String INSERT_ROLE_USER_KEY = "INSERT_ROLE_USER";
@@ -881,6 +881,7 @@ public class JDBCUtilDAO implements UtilDAO {
                 pres.setName(rs.getString(4));
                 pres.setPrice(rs.getDouble(5));
                 pres.setDefault(rs.getBoolean(6));
+                pres.setEnabled(rs.getBoolean(7));
                 presentations.add(pres);
             }
         } catch (SQLException e) {
@@ -914,6 +915,7 @@ public class JDBCUtilDAO implements UtilDAO {
                 pres.setName(rs.getString(4));
                 pres.setPrice(rs.getDouble(5));
                 pres.setDefault(rs.getBoolean(6));
+                pres.setEnabled(rs.getBoolean(7));
             }
         } catch (SQLException e) {
             throw new DAOException("Could not properly retrieve the presentations list: " + e);
@@ -1191,10 +1193,7 @@ public class JDBCUtilDAO implements UtilDAO {
             update = sqlStatements.buildSQLStatement(conn, UPDATE_UNIT_KEY, parameters);
             update.executeUpdate();
             conn.commit();
-        } catch (SQLException e) {
-            DBManager.rollbackConn(conn);
-            throw new DAOException("Could not properly update the Unit", e);
-        } catch (IOException e) {
+        } catch (SQLException | IOException e) {
             DBManager.rollbackConn(conn);
             throw new DAOException("Could not properly update the Unit", e);
         } finally {
@@ -1203,8 +1202,7 @@ public class JDBCUtilDAO implements UtilDAO {
         }
     }
 
-    public HashMap<Integer, HashMap> checkInventory(int idPres) throws DAOException {
-        String retrieveList;
+    public HashMap<Integer, HashMap> checkInventory(int idPres) throws DAOException {        
         HashMap<Integer,HashMap> mData = new HashMap<>();
         HashMap data = null;
         Connection conn = null;
@@ -1225,13 +1223,43 @@ public class JDBCUtilDAO implements UtilDAO {
                 data.put("exist", rs.getDouble("exist"));
                 data.put("idPres", rs.getInt("idPres"));
                 data.put("quantity", rs.getDouble("quantity"));
-
                 mData.put(id, data);
             }
-        } catch (SQLException e) {
+        } catch (SQLException | IOException e) {
             throw new DAOException("Could not properly retrieve the presentations list: " + e);
-        } catch (IOException e) {
-            throw new DAOException("Could not properly retrieve the presentations list: " + e);
+        } finally {
+            DBManager.closeResultSet(rs);
+            DBManager.closeStatement(retrieve);
+            DBManager.closeConnection(conn);
+        }
+        return mData;
+    }
+    
+    public HashMap<Integer, HashMap> checkInventoryProduct(long idProd) throws DAOException {        
+        HashMap<Integer,HashMap> mData = new HashMap<>();
+        HashMap data = null;
+        Connection conn = null;
+        PreparedStatement retrieve = null;
+        ResultSet rs = null;
+        Object[] parameters = {idProd};
+        try {
+            conn = dataSource.getConnection();
+            retrieve = sqlStatements.buildSQLStatement(conn, CHECK_INVENTORY_PRODUCT_KEY, parameters);
+            rs = retrieve.executeQuery();
+            while (rs.next()) {
+                data = new HashMap<>();
+                int id = rs.getInt("id");
+                data.put("id", id);
+                data.put("name", rs.getString("name"));
+                data.put("pres", rs.getString("pres"));
+                data.put("measure", rs.getString("measure"));
+                data.put("exist", rs.getDouble("exist"));
+                data.put("idPres", rs.getInt("idPres"));
+                data.put("quantity", rs.getDouble("quantity"));
+                mData.put(id, data);
+            }
+        } catch (SQLException | IOException e) {
+            throw new DAOException("Could not properly retrieve the products list: " + e);
         } finally {
             DBManager.closeResultSet(rs);
             DBManager.closeStatement(retrieve);
@@ -1303,16 +1331,14 @@ public class JDBCUtilDAO implements UtilDAO {
         String retrieveUnit;
         ArrayList<InventoryEvent> events = new ArrayList<>();
         try {
-            SQLExtractor sqlExtractorWhere = new SQLExtractor(where, SQLExtractor.Type.WHERE);;
-            SQLExtractor sqlExtractorOrderBy = new SQLExtractor(orderBy, SQLExtractor.Type.ORDER_BY);;
+            SQLExtractor sqlExtractorWhere = new SQLExtractor(where, SQLExtractor.Type.WHERE);
+            SQLExtractor sqlExtractorOrderBy = new SQLExtractor(orderBy, SQLExtractor.Type.ORDER_BY);
             Map<String, String> namedParams = new HashMap<>();
             namedParams.put(NAMED_PARAM_WHERE, sqlExtractorWhere.extractWhere());
             namedParams.put(NAMED_PARAM_ORDER_BY, sqlExtractorOrderBy.extractOrderBy());
             retrieveUnit = sqlStatements.getSQLString(GET_INVENTORY_EVENT_LIST_KEY, namedParams);
 
-        } catch (SQLException e) {
-            throw new DAOException("Could not properly retrieve the events List", e);
-        } catch (IOException e) {
+        } catch (SQLException | IOException e) {
             throw new DAOException("Could not properly retrieve the events List", e);
         }
 
