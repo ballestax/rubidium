@@ -551,7 +551,9 @@ public class JDBCInvoiceDAO implements InvoiceDAO {
                 ps.executeUpdate();
 
                 HashMap<Integer, HashMap> mData = product.getData();
-                if (product.hasPresentation() && mData != null && !mData.isEmpty()) {
+                
+                //fix issue para productos sin presentacion
+                if (mData != null && !mData.isEmpty()) {
 //                    double exist = Double.parseDouble(data.get("exist").toString());
                     Set<Integer> keys = mData.keySet();
                     for (Integer key : keys) {

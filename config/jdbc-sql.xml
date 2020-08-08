@@ -1327,6 +1327,7 @@
                 stockMin DECIMAL(12,2),                
                 average DECIMAL(20,2),
                 init DECIMAL(12,2),
+                createdTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 lastUpdatedTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                 user VARCHAR(25) NOT NULL DEFAULT 'USER_DF',
                 PRIMARY KEY (id)

@@ -133,6 +133,7 @@ public class JDBCItemDAO implements ItemDAO {
                 item.setStockMin(rs.getDouble("stockMin"));
                 item.setAverage(rs.getBigDecimal("average"));
                 item.setInit(rs.getDouble("init"));
+                item.setCreatedTime(rs.getDate("createdTime"));
                 item.setUpdateTime(rs.getDate("lastUpdatedTime"));
                 item.setUser(rs.getString("user"));
                 items.add(item);

@@ -28,6 +28,7 @@ public class Item {
 
     private List<Object[]> presentations;
 
+    private Date createdTime;
     private Date updateTime;
     private String user;
 
@@ -133,6 +134,14 @@ public class Item {
 
     public void setStock(double stock) {
         this.stock = stock;
+    }
+
+    public Date getCreatedTime() {
+        return createdTime;
+    }
+
+    public void setCreatedTime(Date createdTime) {
+        this.createdTime = createdTime;
     }
 
     public Date getUpdateTime() {
