@@ -51,6 +51,8 @@
                     |CREATE_CONCILIACIONES_TABLE|ADD_CONCILIACION|GET_CONCILIACION|UPDATE_CONCILIACION|DELETE_CONCILIACION
                     |ADD_LOCATION|GET_LOCATION|UPDATE_LOCATION|DELETE_LOCATION|CREATE_LOCATIONS_TABLE
                     |CREATE_INVENTORY_REGISTER_TABLE|ADD_INVENTORY_EVENT|GET_INVENTORY_EVENT_LIST
+                    |GET_PRODUCTS_OUT_INVENTORY|GET_PRESENTATIONS_OUT_INVENTORY
+                    |GET_ITEM_PRESENTATIONS
                     
                     ) #REQUIRED
                     
@@ -1603,7 +1605,46 @@
             </SQLFragment>        
         </SQLStatement>
         
-                        
+        <SQLStatement method="GET_PRODUCTS_OUT_INVENTORY">
+            <SQLFragment>
+                SELECT p.id as id, p.name as name, sum(ip.cantidad) as quantity
+                FROM  invoices i, invoice_product ip, products p
+                WHERE i.id=ip.id_invoice AND ip.id_product=p.id and i.status=0 AND ip.id_product=?
+                AND (i.sale_date BETWEEN ? AND ?)
+                GROUP BY p.id
+            </SQLFragment>            
+        </SQLStatement>
+                
+        <SQLStatement method="GET_PRESENTATIONS_OUT_INVENTORY">
+            <SQLFragment>                
+                SELECT
+                p.name,
+                pp.name AS pres,
+                sum(ip.cantidad * ivp.quantity) AS quantity,
+                ip.id_presentation,
+                p.id AS prod_id,
+                ivp.item_id,
+                i.sale_date
+                FROM
+                invoice_product ip
+                LEFT JOIN inventory_product ivp ON
+                ip.id_presentation = ivp.presentation_id,
+                presentation_product pp,
+                products p,
+                invoices i
+                WHERE
+                ip.id_presentation = ? AND ivp.item_id = ? 
+                AND ip.id_presentation = pp.id AND pp.product_id = p.id
+                AND ip.id_invoice = i.id
+                AND (i.sale_date BETWEEN ? AND ?)                
+            </SQLFragment>            
+        </SQLStatement>
+        
+        <SQLStatement method="GET_ITEM_PRESENTATIONS">
+            <SQLFragment>
+                SELECT * FROM inventory_product ip WHERE ip.item_id=?
+            </SQLFragment>
+        </SQLStatement>
         
     </DAOStatements>
 </DAOConfiguration>

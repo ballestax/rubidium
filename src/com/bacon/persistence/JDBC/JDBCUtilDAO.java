@@ -122,6 +122,11 @@ public class JDBCUtilDAO implements UtilDAO {
     public static final String ADD_INVENTORY_EVENT_KEY = "ADD_INVENTORY_EVENT";
     public static final String GET_INVENTORY_EVENT_LIST_KEY = "GET_INVENTORY_EVENT_LIST";
 
+    public static final String GET_PRESENTATIONS_OUT_INVENTORY_KEY = "GET_PRESENTATIONS_OUT_INVENTORY";
+    public static final String GET_PRODUCTS_OUT_INVENTORY_KEY = "GET_PRODUCTS_OUT_INVENTORY";
+
+    public static final String GET_PRESENTATIONS_BY_ITEM_KEY = "GET_ITEM_PRESENTATIONS";
+
     private static final Logger logger = Logger.getLogger(JDBCUtilDAO.class.getCanonicalName());
 
     public static final String NAMED_PARAM_KEY = "{key}";
@@ -1202,8 +1207,8 @@ public class JDBCUtilDAO implements UtilDAO {
         }
     }
 
-    public HashMap<Integer, HashMap> checkInventory(int idPres) throws DAOException {        
-        HashMap<Integer,HashMap> mData = new HashMap<>();
+    public HashMap<Integer, HashMap> checkInventory(int idPres) throws DAOException {
+        HashMap<Integer, HashMap> mData = new HashMap<>();
         HashMap data = null;
         Connection conn = null;
         PreparedStatement retrieve = null;
@@ -1234,9 +1239,9 @@ public class JDBCUtilDAO implements UtilDAO {
         }
         return mData;
     }
-    
-    public HashMap<Integer, HashMap> checkInventoryProduct(long idProd) throws DAOException {        
-        HashMap<Integer,HashMap> mData = new HashMap<>();
+
+    public HashMap<Integer, HashMap> checkInventoryProduct(long idProd) throws DAOException {
+        HashMap<Integer, HashMap> mData = new HashMap<>();
         HashMap data = null;
         Connection conn = null;
         PreparedStatement retrieve = null;
@@ -1370,4 +1375,83 @@ public class JDBCUtilDAO implements UtilDAO {
         return events;
     }
 
+    public ArrayList<Object[]> getProductsOutInventory(long idProd, Date start) throws DAOException {
+        ArrayList<Object[]> list = new ArrayList<>();
+        Connection conn = null;
+        PreparedStatement retrieve = null;
+        ResultSet rs = null;
+        Object[] parameters = {idProd, start, new Date()};
+        try {
+            conn = dataSource.getConnection();
+            retrieve = sqlStatements.buildSQLStatement(conn, GET_PRODUCTS_OUT_INVENTORY_KEY, parameters);
+            rs = retrieve.executeQuery();
+            while (rs.next()) {
+                int id = rs.getInt("id");
+                String name = rs.getString("name");
+                double quantity = rs.getDouble("quantity");
+                list.add(new Object[]{id, name, quantity});
+            }
+        } catch (SQLException | IOException e) {
+            throw new DAOException("Could not properly retrieve the products out: " + e);
+        } finally {
+            DBManager.closeResultSet(rs);
+            DBManager.closeStatement(retrieve);
+            DBManager.closeConnection(conn);
+        }
+        return list;
+    }
+
+    public ArrayList<Object[]> getPresentationOutInventory(long idPres, long idItem, Date start) throws DAOException {
+        ArrayList<Object[]> list = new ArrayList<>();
+        Connection conn = null;
+        PreparedStatement retrieve = null;
+        ResultSet rs = null;
+        Object[] parameters = {idPres, idItem, start, new Date(),};
+        try {
+            conn = dataSource.getConnection();
+            retrieve = sqlStatements.buildSQLStatement(conn, GET_PRESENTATIONS_OUT_INVENTORY_KEY, parameters);
+            System.out.println("retrieve = " + retrieve);
+            rs = retrieve.executeQuery();
+            while (rs.next()) {
+                int id = rs.getInt("prod_id");
+                String name = rs.getString("name");
+                String press = rs.getString("pres");
+                double quantity = rs.getDouble("quantity");
+                list.add(new Object[]{id, name, press, quantity});
+            }
+        } catch (SQLException | IOException e) {
+            throw new DAOException("Could not properly retrieve the products out: " + e);
+        } finally {
+            DBManager.closeResultSet(rs);
+            DBManager.closeStatement(retrieve);
+            DBManager.closeConnection(conn);
+        }
+        return list;
+    }
+
+    public ArrayList<Object[]> getPresentationsByItem(long idItem) throws DAOException {
+        ArrayList<Object[]> list = new ArrayList<>();
+        Connection conn = null;
+        PreparedStatement retrieve = null;
+        ResultSet rs = null;
+        Object[] parameters = {idItem};
+        try {
+            conn = dataSource.getConnection();
+            retrieve = sqlStatements.buildSQLStatement(conn, GET_PRESENTATIONS_BY_ITEM_KEY, parameters);
+            rs = retrieve.executeQuery();
+            while (rs.next()) {
+                int idPres = rs.getInt("presentation_id");
+                int idProd = rs.getInt("product_id");
+                double quantity = rs.getDouble("quantity");
+                list.add(new Object[]{idPres, idProd, quantity});
+            }
+        } catch (SQLException | IOException e) {
+            throw new DAOException("Could not properly retrieve the item presentations: " + e);
+        } finally {
+            DBManager.closeResultSet(rs);
+            DBManager.closeStatement(retrieve);
+            DBManager.closeConnection(conn);
+        }
+        return list;
+    }
 }

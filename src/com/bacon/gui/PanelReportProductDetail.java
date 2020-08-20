@@ -23,6 +23,7 @@ import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -45,6 +46,7 @@ public class PanelReportProductDetail extends PanelCapturaMod implements ActionL
     private MyListModel modeloLista;
     private String nombreProd;
     private float[] colsWidth;
+    private int[] colsWidthInt;
     private int[] colsALign;
     private boolean valido;
     private String codigoProd;
@@ -63,16 +65,22 @@ public class PanelReportProductDetail extends PanelCapturaMod implements ActionL
 
     private void createComponent() {
 
-        colsWidth = new float[]{1.4f, 1.4f, 1.4f, 2.5f, 1.2f, 1.5f, 1.5f};
-        colsALign = new int[]{0, 0, 0, 0, 2, 2, 2};
-        String[] cols = {"Tipo", "Fecha", "Codigo", "Locacion", "Cantidad", "Valor", "Total"};
+        colsWidth = new float[]{1.5f, 1.5f, 3.0f, 1.0f, 1.0f};
+        colsWidthInt = new int[]{20, 20, 200, 30, 30};
+        colsALign = new int[]{0, 0, 0, 0, 2};
+        String[] cols = {"Tipo", "Fecha", "Codigo", "Locacion", "Cantidad"};
         modeloTabla = new MyDefaultTableModel(cols, 0);
         tablaDetails.setModel(modeloTabla);
         tablaDetails.setRowHeight(24);
         FormatRenderer formatRenderer = new FormatRenderer(app.getDCFORM_P());
+        
+        for (int i = 0; i < cols.length; i++) {
+            tablaDetails.getColumnModel().getColumn(i).setMinWidth(colsWidthInt[i]);
+            tablaDetails.getColumnModel().getColumn(i).setPreferredWidth(colsWidthInt[i]);
+        }
         tablaDetails.getColumnModel().getColumn(4).setCellRenderer(formatRenderer);
-        tablaDetails.getColumnModel().getColumn(5).setCellRenderer(formatRenderer);
-        tablaDetails.getColumnModel().getColumn(6).setCellRenderer(formatRenderer);
+//        tablaDetails.getColumnModel().getColumn(5).setCellRenderer(formatRenderer);
+//        tablaDetails.getColumnModel().getColumn(6).setCellRenderer(formatRenderer);
     }
     public static final String AC_CLEAR_BUSQUEDA = "AC_CLEAR_BUSQUEDA";
     public static final String AC_SEL_CATEGORIA = "AC_SEL_CATEGORIA";
@@ -108,10 +116,43 @@ public class PanelReportProductDetail extends PanelCapturaMod implements ActionL
 //        ArrayList<Object[]> entradaByProductList = app.getControl().getEntradaByProductList(item.getCodigo());
         ArrayList<InventoryEvent> eventInList = app.getControl().getInventoryRegisterList("idItem=" + item.getId(), "lastUpdatedTime");
         ArrayList<Conciliacion> conciliacionList = app.getControl().getConciliacionList("idItem=" + item.getId() + "", "fecha");
+        ArrayList<Object[]> presentationsByItem = app.getControl().getPresentationsByItem(item.getId());
+
         modeloTabla.setRowCount(0);
         modeloTabla.addRow(new Object[]{"INICIAL", "   ----------", "   ----------", "   ----------", cantIni, costoIni, cantIni * costoIni});
         double entradas = 0;
         double salidas = 0;
+
+        for (int i = 0; i < presentationsByItem.size(); i++) {
+            Object[] get = presentationsByItem.get(i);
+            int idPres = Integer.parseInt(get[0].toString());
+            int idProd = Integer.parseInt(get[1].toString());
+//            System.out.println(idPres + "  - " + idProd);
+            if (idPres == 0) {
+
+                ArrayList<Object[]> outProd = app.getControl().getProductsOutInventoryList(idProd, item.getCreatedTime());
+
+                for (int j = 0; j < outProd.size(); j++) {
+                    Object[] data = outProd.get(j);
+                    double quantity = Double.parseDouble(data[2].toString());
+                    modeloTabla.addRow(new Object[]{"VENTA", app.DF.format(item.getCreatedTime()), data[1].toString().toUpperCase(),
+                        "---", quantity});
+                    salidas += quantity;
+                }
+            } else {
+                ArrayList<Object[]> outPres = app.getControl().getPresentationsOutInventoryList(idPres, item.getId(), item.getCreatedTime());
+                for (int j = 0; j < outPres.size(); j++) {
+                    Object[] data = outPres.get(j);                    
+                    double quantity = Double.parseDouble(data[3].toString());                    
+                    String name = (data[1].toString()+" <"+data[2].toString()+">").toUpperCase();
+                    modeloTabla.addRow(new Object[]{"VENTA", app.DF.format(item.getCreatedTime()), name,
+                        "---", quantity});
+                    salidas += quantity;
+                }
+            }
+            modeloTabla.setRowEditable(modeloTabla.getRowCount() - 1, false);
+        }
+
         for (int i = 0; i < eventInList.size(); i++) {
             InventoryEvent event = eventInList.get(i);
             if (event.getEvent() == InventoryEvent.EVENT_IN) {

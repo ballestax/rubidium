@@ -133,7 +133,7 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
 
     private void populateTable() {
 
-        ArrayList<Item> itemList = app.getControl().getItemList("", "");
+        ArrayList<Item> itemList = app.getControl().getItemList("", "name");
 
         SwingWorker sw = new SwingWorker() {
             @Override
@@ -277,8 +277,8 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
             pnDetail.showInfoProduct(null);
         }
         try {
-            Object id = model.getValueAt(row, 0);
-            Item item = app.getControl().getItemWhere("id=" + id);
+            Object id = model.getValueAt(row, 0);            
+            Item item = app.getControl().getItemWhere("id=" + id);            
             pnDetail.showInfoProduct(item);
         } catch (Exception ex) {
             logger.error(ex.getMessage());

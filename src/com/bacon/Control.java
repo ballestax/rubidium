@@ -829,7 +829,7 @@ public class Control {
             return null;
         }
     }
-    
+
     public HashMap<Integer, HashMap> checkInventoryProduct(long idProd) {
         try {
             JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
@@ -917,6 +917,39 @@ public class Control {
                 app.getControl().addItemToInventory(id, quantity * pPed.getCantidad());
                 logger.debug("Update inventory: " + pPed.getProduct().getName() + ":: " + data.get("name") + "-> idItem:" + id + "[" + quantity + "]");
             }
+        }
+    }
+
+    public ArrayList<Object[]> getProductsOutInventoryList(long idProd, Date start) {
+        try {
+            JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
+            return utilDAO.getProductsOutInventory(idProd, start);
+        } catch (DAOException ex) {
+            logger.error("Error getting product out list.", ex);
+            GUIManager.showErrorMessage(null, "Error consultando lista de salida de productos", "Error");
+            return null;
+        }
+    }
+
+     public ArrayList<Object[]> getPresentationsOutInventoryList(long idPres,long idItem, Date start) {
+        try {
+            JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
+            return utilDAO.getPresentationOutInventory(idPres,idItem,  start);
+        } catch (DAOException ex) {
+            logger.error("Error getting presentation out list.", ex);
+            GUIManager.showErrorMessage(null, "Error consultando lista de salida de productos por presentacion", "Error");
+            return null;
+        }
+    }
+     
+    public ArrayList<Object[]> getPresentationsByItem(long idItem) {
+        try {
+            JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
+            return utilDAO.getPresentationsByItem(idItem);
+        } catch (DAOException ex) {
+            logger.error("Error getting presentation by item.", ex);
+            GUIManager.showErrorMessage(null, "Error consultando lista presentacion por item", "Error");
+            return null;
         }
     }
 
