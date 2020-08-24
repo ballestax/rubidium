@@ -53,6 +53,7 @@
                     |CREATE_INVENTORY_REGISTER_TABLE|ADD_INVENTORY_EVENT|GET_INVENTORY_EVENT_LIST
                     |GET_PRODUCTS_OUT_INVENTORY|GET_PRESENTATIONS_OUT_INVENTORY
                     |GET_ITEM_PRESENTATIONS
+                    |GET_PRODUCTS_SALES
                     
                     ) #REQUIRED
                     
@@ -1644,6 +1645,27 @@
             <SQLFragment>
                 SELECT * FROM inventory_product ip WHERE ip.item_id=?
             </SQLFragment>
+        </SQLStatement>
+        
+        
+        <SQLStatement method="GET_PRODUCTS_SALES">
+            <SQLFragment>
+                SELECT
+                ivp.id_product as idProd, ivp.id_presentation as idPres, p.category as cat, p.name as name,
+                pp.name as pres, sum(ivp.cantidad) as quantity, sum(ivp.price*ivp.cantidad) as total
+                FROM 
+                invoice_product ivp
+                LEFT JOIN presentation_product pp ON ivp.id_presentation=pp.id
+                LEFT JOIN invoices i on ivp.id_invoice=i.id,
+                products p
+                WHERE
+                ivp.id_product=p.id
+                AND (i.sale_date BETWEEN ? AND ?)
+                GROUP BY
+                p.category, ivp.id_product, ivp.id_presentation
+                ORDER BY p.category, p.name
+            </SQLFragment>
+            
         </SQLStatement>
         
     </DAOStatements>

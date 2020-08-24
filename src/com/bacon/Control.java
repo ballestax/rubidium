@@ -952,5 +952,16 @@ public class Control {
             return null;
         }
     }
+    
+    public ArrayList<Object[]> getProductsSales(Date start, Date end) {
+        try {
+            JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
+            return utilDAO.getProductsSales(start, end);
+        } catch (DAOException ex) {
+            logger.error("Error getting products sales.", ex);
+            GUIManager.showErrorMessage(null, "Error consultando lista productos vendidos", "Error");
+            return null;
+        }
+    }
 
 }

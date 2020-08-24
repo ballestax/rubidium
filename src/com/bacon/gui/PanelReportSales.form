@@ -16,9 +16,9 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Group type="102" alignment="1" attributes="0">
+          <Group type="102" alignment="0" attributes="0">
               <EmptySpace min="-2" max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="1" attributes="0">
+              <Group type="103" groupAlignment="0" attributes="0">
                   <Component id="pnLabels" max="32767" attributes="0"/>
                   <Component id="pnFilters" alignment="0" max="32767" attributes="0"/>
                   <Group type="102" alignment="1" attributes="0">
@@ -26,7 +26,7 @@
                       <EmptySpace min="-2" max="-2" attributes="0"/>
                       <Component id="panelNav" max="32767" attributes="0"/>
                   </Group>
-                  <Component id="jScrollPane1" max="32767" attributes="0"/>
+                  <Component id="jScrollPane1" alignment="1" max="32767" attributes="0"/>
               </Group>
               <EmptySpace min="-2" max="-2" attributes="0"/>
           </Group>
@@ -37,16 +37,16 @@
           <Group type="102" attributes="0">
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Component id="pnFilters" min="-2" max="-2" attributes="0"/>
-              <EmptySpace max="-2" attributes="0"/>
+              <EmptySpace min="-2" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="2" attributes="0">
                   <Component id="panelNav" linkSize="5" alignment="2" min="-2" max="-2" attributes="0"/>
                   <Component id="lbTitle" linkSize="5" alignment="2" min="-2" pref="28" max="-2" attributes="0"/>
               </Group>
               <EmptySpace min="-2" max="-2" attributes="0"/>
-              <Component id="jScrollPane1" pref="183" max="32767" attributes="0"/>
-              <EmptySpace max="-2" attributes="0"/>
-              <Component id="pnLabels" min="-2" pref="42" max="-2" attributes="0"/>
-              <EmptySpace max="-2" attributes="0"/>
+              <Component id="jScrollPane1" pref="216" max="32767" attributes="0"/>
+              <EmptySpace type="unrelated" min="-2" max="-2" attributes="0"/>
+              <Component id="pnLabels" min="-2" pref="48" max="-2" attributes="0"/>
+              <EmptySpace min="-2" max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -66,7 +66,7 @@
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="regTipo" linkSize="2" min="-2" pref="125" max="-2" attributes="0"/>
+                  <Component id="regTipo" min="-2" pref="201" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="regPeriodo" linkSize="2" min="-2" pref="125" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
@@ -77,7 +77,11 @@
                   <Component id="regDateP2" linkSize="2" min="-2" pref="122" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="regTipoReg" linkSize="2" min="-2" pref="125" max="-2" attributes="0"/>
-                  <EmptySpace pref="274" max="32767" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="regCategory" min="-2" pref="150" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="regProduct" min="-2" pref="150" max="-2" attributes="0"/>
+                  <EmptySpace pref="12" max="32767" attributes="0"/>
                   <Component id="btConsult" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
@@ -96,6 +100,8 @@
                               <Component id="regDateP1" linkSize="1" alignment="2" min="-2" max="-2" attributes="0"/>
                               <Component id="regPeriodo" linkSize="1" alignment="2" min="-2" max="-2" attributes="0"/>
                               <Component id="regSelection" linkSize="1" alignment="2" min="-2" pref="28" max="-2" attributes="0"/>
+                              <Component id="regCategory" alignment="2" min="-2" max="-2" attributes="0"/>
+                              <Component id="regProduct" alignment="2" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                       </Group>
@@ -144,6 +150,16 @@
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.bacon.gui.util.Registro(BoxLayout.Y_AXIS,&quot;Fecha final&quot;, datePick2)"/>
             <AuxValue name="JavaCodeGenerator_CreateCodePre" type="java.lang.String" value="datePick2 = new MyDatePickerImp(new Date(), true);"/>
+          </AuxValues>
+        </Component>
+        <Component class="org.dz.Registro" name="regCategory">
+          <AuxValues>
+            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new org.dz.Registro(BoxLayout.Y_AXIS, &quot;TipoReg&quot;, new String[1])"/>
+          </AuxValues>
+        </Component>
+        <Component class="org.dz.Registro" name="regProduct">
+          <AuxValues>
+            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new org.dz.Registro(BoxLayout.Y_AXIS, &quot;TipoReg&quot;, new String[1])"/>
           </AuxValues>
         </Component>
       </SubComponents>

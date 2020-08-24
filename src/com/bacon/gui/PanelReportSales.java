@@ -2,10 +2,14 @@ package com.bacon.gui;
 
 import com.bacon.Aplication;
 import com.bacon.MyConstants;
+import static com.bacon.MyConstants.FILTER_NUM_INT_DIFFERENT;
+import static com.bacon.MyConstants.FILTER_NUM_INT_GREATER_EQUAL;
+import static com.bacon.MyConstants.FILTER_NUM_INT_LESS;
+import static com.bacon.MyConstants.FILTER_NUM_INT_LESS_EQUAL;
 import com.bacon.domain.Invoice;
-import com.bacon.domain.ProductoPed;
 import com.bacon.gui.util.MyDatePickerImp;
 import java.awt.Color;
+import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -13,17 +17,21 @@ import java.beans.PropertyChangeEvent;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
+import javax.swing.RowFilter;
 import javax.swing.SwingConstants;
 import javax.swing.SwingWorker;
+import javax.swing.table.TableRowSorter;
 import org.bx.gui.MyDefaultTableModel;
 import org.dz.PanelCapturaMod;
 import org.dz.TextFormatter;
+import java.util.Collections;
 
 /**
  *
@@ -43,8 +51,12 @@ public class PanelReportSales extends PanelCapturaMod implements ActionListener 
     private MyDatePickerImp datePick1, datePick2;
     private Font DF_TABLE_FONT;
     private int numFilasDF;
+    private Date start, end;
+    private TableRowSorter<MyDefaultTableModel> lastSorter;
 
     public static final String AC_SEL_TIPO_REGISTRO = "AC_SEL_TIPO_REGISTRO";
+    public static final String AC_SEL_CATEGORY = "AC_SEL_CATEGORY";
+    public static final String AC_SEL_PRODUCT = "AC_SEL_PRODUCT";
     public static final String AC_CHANGE_TIPO = "AC_CHANGE_TIPO";
     public static final String AC_SEL_PERIODO = "AC_SEL_PERIODO";
     public static final String AC_SEL_OPCION = "AC_SEL_OPCION";
@@ -60,6 +72,8 @@ public class PanelReportSales extends PanelCapturaMod implements ActionListener 
     public static final String ACTION_NEXT_PAGE = "ACTION_NEXT_PAGE";
     public static final String ACTION_PREV_PAGE = "ACTION_PREV_PAGE";
     public static final String ACTION_FIRST_PAGE = "ACTION_FIRST_PAGE";
+
+    public static final String SEL_TODAS = "<- TODAS ->";
 
     private String title;
     private String query;
@@ -80,7 +94,7 @@ public class PanelReportSales extends PanelCapturaMod implements ActionListener 
 
         datePick1.addPropertyChangeListener(this);
         datePick2.addPropertyChangeListener(this);
-        
+
         regDateP1.setActionCommand("AC_CHANGE_DATE");
         regDateP1.addActionListener(this);
 
@@ -89,9 +103,9 @@ public class PanelReportSales extends PanelCapturaMod implements ActionListener 
 
 //        datePick1 = new MyDatePickerImp(new Date(), true);
 //        datePick2 = new MyDatePickerImp(new Date(), true);
-        colNamesProd = new String[]{"N°", "Producto", "Factura", "", "Locación", "Fecha", "Cantidad", "Valor"};
-        colWidthProd = new float[]{0.8f, 3.2f, 1.4f, 3, 2, 1.5f, 1.4f, 1.7f};
-        colAlignProd = new int[]{0, 0, 0, 0, 0, 1, 2, 2};
+        colNamesProd = new String[]{"idprod", "Categoria", "Producto", "Presentacion", "Cantidad", "Valor"};
+        colWidthProd = new float[]{0.5f, 0.5f, 2f, 2f, 1.8f, 2f};
+        colAlignProd = new int[]{0, 0, 0, 0, 2, 2};
 
 //        colNamesMov = new String[]{"N°", "Fecha", "Factura", "Cliente", "Tipo", " Valor", "Abono", "Vencimiento"};
 //        colWidthMov = new float[]{0.8f, 1.5f, 1.5f, 3, 1.5f, 2, 2, 2};
@@ -132,6 +146,18 @@ public class PanelReportSales extends PanelCapturaMod implements ActionListener 
         regTipoReg.setText(new String[]{"TODOS", "FACTURA VENTA"});
         regTipoReg.setFontCampo(new Font("Tahoma", 0, 15));
 
+        regCategory.setLabelText("Categoria");
+        regCategory.setActionCommand(AC_SEL_CATEGORY);
+        regCategory.addActionListener(this);
+        regCategory.setText(new String[]{});
+        regCategory.setFontCampo(new Font("Tahoma", 0, 14));
+
+        regProduct.setLabelText("Producto");
+        regProduct.setActionCommand(AC_SEL_PRODUCT);
+        regProduct.addActionListener(this);
+        regProduct.setText(new String[]{});
+        regProduct.setFontCampo(new Font("Tahoma", 0, 14));
+
         //NAV
         btUpdate.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "update.png", 12, 12)));
         btUpdate.setToolTipText("Actualizar");
@@ -162,6 +188,11 @@ public class PanelReportSales extends PanelCapturaMod implements ActionListener 
         paginaActual = 1;
 //        setupNavegador();
 
+        regTipoReg.setVisible(false);
+        
+//        pnLabels.setLayout(new FlowLayout());
+//        pnLabels.add(new LabelInfo("Total",200000));
+
         opcionHoy();
 
     }
@@ -177,10 +208,15 @@ public class PanelReportSales extends PanelCapturaMod implements ActionListener 
     }
 
     public void opcionHoy() {
+        Calendar cal = Calendar.getInstance();
         datePick1.setDate(new Date());
         regDateP1.setVisible(true);
         regDateP2.setEnabled(false);
         regDateP2.setVisible(false);
+        datePick1.setEnabled(false);
+
+        setEndTime(cal);
+
         query = "(sale_date between '" + app.DF_SQL.format(datePick1.getDate()) + " 00:00:00' and '" + app.DF_SQL.format(datePick1.getDate()) + " 23:59:59')";
         makeTitle();
     }
@@ -189,6 +225,7 @@ public class PanelReportSales extends PanelCapturaMod implements ActionListener 
         regDateP1.setVisible(true);
         regDateP1.setEnabled(true);
         regDateP2.setVisible(false);
+        datePick1.setEnabled(true);
         query = "(sale_date between '" + app.DF_SQL.format(datePick1.getDate()) + " 00:00:00' and '" + app.DF_SQL.format(datePick1.getDate()) + " 23:59:59')";
     }
 
@@ -205,6 +242,8 @@ public class PanelReportSales extends PanelCapturaMod implements ActionListener 
         cal.add(Calendar.DAY_OF_WEEK, +7);
         datePick2.setDate(cal.getTime());
 
+        setEndTime(cal);
+
         query = "(sale_date between '" + app.DF_SQL.format(datePick1.getDate()) + " 00:00:00' and '" + app.DF_SQL.format(datePick2.getDate()) + " 23:59:59')";
     }
 
@@ -220,6 +259,8 @@ public class PanelReportSales extends PanelCapturaMod implements ActionListener 
         datePick2.setDate(cal.getTime());
         cal.add(Calendar.DAY_OF_WEEK, -7);
         datePick1.setDate(cal.getTime());
+
+        setEndTime(cal);
 
         query = "(sale_date between '" + app.DF_SQL.format(datePick1.getDate()) + " 00:00:00' and '" + app.DF_SQL.format(datePick2.getDate()) + " 23:59:59')";
     }
@@ -238,6 +279,8 @@ public class PanelReportSales extends PanelCapturaMod implements ActionListener 
         cal.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DAY_OF_MONTH));
         datePick2.setDate(cal.getTime());
 
+        setEndTime(cal);
+
         query = "(sale_date between '" + app.DF_SQL.format(datePick1.getDate()) + " 00:00:00' and '" + app.DF_SQL.format(datePick2.getDate()) + " 23:59:59')";
     }
 
@@ -254,7 +297,17 @@ public class PanelReportSales extends PanelCapturaMod implements ActionListener 
         cal.set(Calendar.DAY_OF_YEAR, cal.getActualMaximum(Calendar.DAY_OF_YEAR));
         datePick2.setDate(cal.getTime());
 
+        setEndTime(cal);
+
         query = "(sale_date between '" + app.DF_SQL.format(datePick1.getDate()) + " 00:00:00' and '" + app.DF_SQL.format(datePick2.getDate()) + " 23:59:59')";
+    }
+
+    public void setEndTime(Calendar cal) {
+        cal.setTime(datePick2.getDate());
+        cal.set(Calendar.HOUR_OF_DAY, 23);
+        cal.set(Calendar.MINUTE, 59);
+        cal.set(Calendar.SECOND, 59);
+        end = cal.getTime();
     }
 
     private void opcionRango() {
@@ -270,19 +323,18 @@ public class PanelReportSales extends PanelCapturaMod implements ActionListener 
         if (datePick1.getDate().compareTo(datePick2.getDate()) > 0) {
 //            GUIManager.showErrorMessage("La fecha incicial es mayor ", cal, query);
         }
+
+        setEndTime(cal);
+
         query = "(sale_date between '" + app.DF_SQL.format(datePick1.getDate()) + " 00:00:00' and '" + app.DF_SQL.format(datePick2.getDate()) + " 23:59:59')";
     }
 
     private void changeTipo() {
         String tipo = regTipo.getText();
         if (MyConstants.TIPO_REPORTE[0].equals(tipo)) {
-            regTipoReg.setVisible(true);
+            regCategory.setVisible(false);
         } else if (MyConstants.TIPO_REPORTE[1].equals(tipo)) {
-            regTipoReg.setVisible(false);
-        } else if (MyConstants.TIPO_REPORTE[2].equals(tipo)) {
-            regTipoReg.setVisible(false);
-        } else if (MyConstants.TIPO_REPORTE[3].equals(tipo)) {
-            regTipoReg.setVisible(false);
+            regCategory.setVisible(true);
         }
         makeTitle();
     }
@@ -310,11 +362,23 @@ public class PanelReportSales extends PanelCapturaMod implements ActionListener 
 
     private void doConsult(String TIPO) {
         makeTitle();
+        Calendar cal = Calendar.getInstance();
+
+        cal.setTime(datePick1.getDate());
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        start = cal.getTime();
         if ("RANGO".equals(regPeriodo.getText())) {
+            setEndTime(cal);
             query = "(sale_date between '" + app.DF_SQL.format(datePick1.getDate()) + " 00:00:00' and '" + app.DF_SQL.format(datePick2.getDate()) + " 23:59:59')";
         } else if ("OTRO DIA".equals(regSelection.getText())) {
+            cal.add(Calendar.SECOND, 86399); // Agregar un dia menos un segundo a la fecha
+            end = cal.getTime();
             query = "(sale_date between '" + app.DF_SQL.format(datePick1.getDate()) + " 00:00:00' and '" + app.DF_SQL.format(datePick1.getDate()) + " 23:59:59')";
         }
+
+        enableNav(true);
 
         setupNavegador();
 
@@ -331,9 +395,11 @@ public class PanelReportSales extends PanelCapturaMod implements ActionListener 
             setupTable(colNamesSal, colAlignSal, colWidthSal);
             populateTabla(salidaList, TIPO, ini + 1);
         } else if (MyConstants.TIPO_REPORTE[1].equals(TIPO)) {
-            ArrayList productSalidaList = app.getControl().getInvoiceByProductListWhere(query, "sale_date");
+            enableNav(false);
+            ArrayList productSalesList = app.getControl().getProductsSales(start, end);
             setupTable(colNamesProd, colAlignProd, colWidthProd);
-            populateTabla(productSalidaList, TIPO, 1);
+
+            populateTabla(productSalesList, TIPO, 1);
         }
         /* } else if (MyConstants.TIPO_REPORTE[2].equals(TIPO)) {
             ArrayList<Entrada> entradaList = app.getControl().getEntradaList(query, "fecha");
@@ -357,7 +423,9 @@ public class PanelReportSales extends PanelCapturaMod implements ActionListener 
 
     private void populateTabla(ArrayList list, String tipo, int ini) {
         modelo.setRowCount(0);
+        tableReport.setRowSorter(null);
         if (tipo.equals(MyConstants.TIPO_REPORTE[0])) {  // VENTAS Y COMPRAS
+            modelo.setColumnIdentifiers(colNamesSal);
             SwingWorker sw = new SwingWorker() {
                 @Override
                 protected Object doInBackground() throws Exception {
@@ -371,7 +439,7 @@ public class PanelReportSales extends PanelCapturaMod implements ActionListener 
 //                                total += get.getPrecio() * get.getCantidad();
 //                            }
                             Invoice invoice = (Invoice) list.get(i);
-//                            modelo.setColumnIdentifiers(colNamesSal);
+
                             tableReport.getColumnModel().getColumn(7).setCellRenderer(formatRenderer);
                             tableReport.getColumnModel().getColumn(8).setCellRenderer(formatRenderer);
                             tableReport.getColumnModel().getColumn(9).setCellRenderer(formatRenderer);
@@ -406,24 +474,38 @@ public class PanelReportSales extends PanelCapturaMod implements ActionListener 
             sw.execute();
 
         } else if (tipo.equals(MyConstants.TIPO_REPORTE[1])) {
+            modelo.setColumnIdentifiers(colNamesProd);
+            HashSet catSet = new HashSet<>();
+            HashSet prodSet = new HashSet<>();
+            catSet.add(SEL_TODAS);
+            SwingWorker sw1 = new SwingWorker() {
+                @Override
+                protected Object doInBackground() throws Exception {
+                    tableReport.getColumnModel().getColumn(4).setCellRenderer(formatRenderer);
+                    tableReport.getColumnModel().getColumn(5).setCellRenderer(formatRenderer);
+                    for (int i = 0; i < list.size(); i++) {
+                        Object[] row = (Object[]) list.get(i);
+                        catSet.add(row[1]);
+                        prodSet.add(row[2]);
+                        modelo.addRow(row);
+                        modelo.setRowEditable(modelo.getRowCount() - 1, false);
+                    }
+                    return true;
+                }
 
-            colNamesProd[3] = "Cliente";
-            tableReport.getColumnModel().getColumn(5).setHeaderValue(colNamesProd[5]);
-//            modelo.setColumnIdentifiers(colNamesProd);
-//            tabla.getColumnModel().getColumn(3).setCellRenderer(formatRenderer);
-//            tabla.getColumnModel().getColumn(4).setCellRenderer(formatRenderer);
-            for (int i = 0; i < list.size(); i++) {
-                Object[] row = (Object[]) list.get(i);
-//                ProductoPed prod = app.getControl().getProducto(row[7].toString());
-//                Cliente cliente = app.getControl().getCliente(Long.parseLong(row[5].toString()));
-//                Location location = app.getControl().getLocation(Integer.parseInt(row[6].toString()));
+                @Override
+                protected void done() {
+                    app.getGuiManager().setDefaultCursor();
+                    ArrayList sortedList = new ArrayList(catSet);
+                    Collections.sort(sortedList);
+                    regCategory.setText(sortedList.toArray());
+                    regProduct.setText(prodSet.toArray());
+                }
 
-//                modelo.addRow(new Object[]{modelo.getRowCount() + 1,
-////                    prod.getNombre(), row[1],
-//                    cliente.getRazonSocial(), location.getNombre(), row[4], row[2], row[3]
-//                });
-//                modelo.setRowEditable(modelo.getRowCount() - 1, false);
-            }
+            };
+            app.getGuiManager().setWaitCursor();
+            tableReport.updateUI();
+            sw1.execute();
         }
         //Limpiar la query no se acumele la misma consulta
 //        query = "";  // error limpia el periodo seleccionado
@@ -449,6 +531,8 @@ public class PanelReportSales extends PanelCapturaMod implements ActionListener 
         regDateP1 = new com.bacon.gui.util.Registro(BoxLayout.Y_AXIS, "Fecha inicio", datePick1);
         datePick2 = new MyDatePickerImp(new Date(), true);
         regDateP2 = new com.bacon.gui.util.Registro(BoxLayout.Y_AXIS,"Fecha final", datePick2);
+        regCategory = new org.dz.Registro(BoxLayout.Y_AXIS, "TipoReg", new String[1]);
+        regProduct = new org.dz.Registro(BoxLayout.Y_AXIS, "TipoReg", new String[1]);
         lbTitle = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         tableReport = new javax.swing.JTable();
@@ -475,7 +559,7 @@ public class PanelReportSales extends PanelCapturaMod implements ActionListener 
             pnFiltersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnFiltersLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(regTipo, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(regTipo, javax.swing.GroupLayout.PREFERRED_SIZE, 201, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(regPeriodo, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -486,12 +570,16 @@ public class PanelReportSales extends PanelCapturaMod implements ActionListener 
                 .addComponent(regDateP2, javax.swing.GroupLayout.PREFERRED_SIZE, 122, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(regTipoReg, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 274, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(regCategory, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(regProduct, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 12, Short.MAX_VALUE)
                 .addComponent(btConsult)
                 .addContainerGap())
         );
 
-        pnFiltersLayout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {regDateP1, regDateP2, regPeriodo, regSelection, regTipo, regTipoReg});
+        pnFiltersLayout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {regDateP1, regDateP2, regPeriodo, regSelection, regTipoReg});
 
         pnFiltersLayout.setVerticalGroup(
             pnFiltersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -505,7 +593,9 @@ public class PanelReportSales extends PanelCapturaMod implements ActionListener 
                             .addComponent(regDateP2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(regDateP1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(regPeriodo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(regSelection, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(regSelection, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(regCategory, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(regProduct, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addContainerGap())
                     .addGroup(javax.swing.GroupLayout.Alignment.CENTER, pnFiltersLayout.createSequentialGroup()
                         .addComponent(btConsult)
@@ -609,16 +699,16 @@ public class PanelReportSales extends PanelCapturaMod implements ActionListener 
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+            .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(pnLabels, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(pnFilters, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(layout.createSequentialGroup()
+                    .addComponent(pnFilters, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addComponent(lbTitle, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(panelNav, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addComponent(jScrollPane1))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -631,9 +721,9 @@ public class PanelReportSales extends PanelCapturaMod implements ActionListener 
                     .addComponent(panelNav, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(lbTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 183, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(pnLabels, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 216, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(pnLabels, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
 
@@ -672,9 +762,11 @@ public class PanelReportSales extends PanelCapturaMod implements ActionListener 
     private javax.swing.JPanel panelNav;
     private javax.swing.JPanel pnFilters;
     private javax.swing.JPanel pnLabels;
+    private org.dz.Registro regCategory;
     private com.bacon.gui.util.Registro regDateP1;
     private com.bacon.gui.util.Registro regDateP2;
     private org.dz.Registro regPeriodo;
+    private org.dz.Registro regProduct;
     private org.dz.Registro regSelection;
     private org.dz.Registro regTipo;
     private org.dz.Registro regTipoReg;
@@ -685,7 +777,7 @@ public class PanelReportSales extends PanelCapturaMod implements ActionListener 
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        if(MyDatePickerImp.DATE_CHANGED.equals(evt.getPropertyName())){
+        if (MyDatePickerImp.DATE_CHANGED.equals(evt.getPropertyName())) {
             makeTitle();
         }
     }
@@ -760,7 +852,24 @@ public class PanelReportSales extends PanelCapturaMod implements ActionListener 
             paginaActual = paginas;
 //            setupNavegador();
             loadData();
+        } else if (AC_SEL_CATEGORY.equals(e.getActionCommand())) {
+            String cat = regCategory.getText();
+            filtrar(cat, 1, MyConstants.FILTER_TEXT_INT_EQUALS);
+            HashSet<String> prodSet = new HashSet<>();
+            for (int row = 0; row < tableReport.getRowCount(); row++) {
+                String prod = tableReport.getValueAt(row, 2).toString();
+                prodSet.add(prod);
+            }
+            prodSet.add(SEL_TODAS);
+            ArrayList sortedList = new ArrayList(prodSet);
+            Collections.sort(sortedList);
+            regProduct.setText(sortedList.toArray());
+
+        } else if (AC_SEL_PRODUCT.equals(e.getActionCommand())) {
+            String prod = regProduct.getText();
+            filtrar(prod, 2, MyConstants.FILTER_TEXT_INT_EQUALS);
         }
+
     }
 
     private void setupNavegador() {
@@ -827,6 +936,84 @@ public class PanelReportSales extends PanelCapturaMod implements ActionListener 
         box.add(lbValue);
 
         return box;
+    }
+
+    public void enableNav(boolean enabled) {
+        btUpdate.setEnabled(enabled);
+        btFirstPage.setEnabled(enabled);
+        btLastPage.setEnabled(enabled);
+        btNextPage.setEnabled(enabled);
+        btPrevPage.setEnabled(enabled);
+        tfBuscar.setEnabled(enabled);
+        tfFilas.setEnabled(enabled);
+        lbFilas.setEnabled(enabled);
+        lbBuscar.setEnabled(enabled);
+        String color = enabled ? "black" : "gray";
+        labelPaginas.setText("<html><font color='" + color + "'> . . . </font></html>");
+
+    }
+
+    public void filtrar(final String text, final int columna, final int tFilter) {
+
+        if (SEL_TODAS.equals(text)) {
+            tableReport.setRowSorter(null);
+            if (columna == 2) {
+                filtrar(regCategory.getText(), 1, MyConstants.FILTER_TEXT_INT_EQUALS);
+            }
+            return;
+        }
+
+        RowFilter<Object, Object> filterText = new RowFilter<Object, Object>() {
+            @Override
+            public boolean include(RowFilter.Entry entry) {
+                if (text.equals("")) {
+                    return true;
+                }
+                if (MyConstants.FILTER_TEXT_INT_START == tFilter) {
+                    return entry.getStringValue(columna).startsWith(text);
+                } else if (tFilter == MyConstants.FILTER_TEXT_INT_CONTAINS) {
+                    return entry.getStringValue(columna).contains(text);
+                } else {
+                    return entry.getStringValue(columna).equals(text);
+                }
+            }
+        };
+
+        RowFilter<Object, Object> filterNum;
+        filterNum = new RowFilter<Object, Object>() {
+            @Override
+            public boolean include(RowFilter.Entry entry) {
+                int value;
+                try {
+                    value = Integer.parseInt(text);
+                } catch (NumberFormatException e) {
+                    return true;
+                }
+                if (tFilter == MyConstants.FILTER_NUM_INT_GREATER) {
+                    return Integer.parseInt(entry.getStringValue(columna)) > value;
+                } else if (tFilter == FILTER_NUM_INT_GREATER_EQUAL) {
+                    return Integer.parseInt(entry.getStringValue(columna)) >= value;
+                } else if (tFilter == FILTER_NUM_INT_LESS) {
+                    return Integer.parseInt(entry.getStringValue(columna)) < value;
+                } else if (tFilter == FILTER_NUM_INT_LESS_EQUAL) {
+                    return Integer.parseInt(entry.getStringValue(columna)) <= value;
+                } else if (tFilter == FILTER_NUM_INT_DIFFERENT) {
+                    return Integer.parseInt(entry.getStringValue(columna)) != value;
+                } else {
+                    return Integer.parseInt(entry.getStringValue(columna)) == value;
+                }
+            }
+        };
+
+        TableRowSorter<MyDefaultTableModel> sorter = new TableRowSorter<>(modelo);
+//        sorter.setComparator(3, new COmpara);
+        if (tFilter <= 3) {
+            sorter.setRowFilter(filterText);
+        } else {
+            sorter.setRowFilter(filterNum);
+        }
+        lastSorter = sorter;
+        tableReport.setRowSorter(sorter);
     }
 
 }

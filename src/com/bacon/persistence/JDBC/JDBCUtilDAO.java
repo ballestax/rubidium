@@ -127,6 +127,8 @@ public class JDBCUtilDAO implements UtilDAO {
 
     public static final String GET_PRESENTATIONS_BY_ITEM_KEY = "GET_ITEM_PRESENTATIONS";
 
+    public static final String GET_PRODUCTS_SALES_KEY = "GET_PRODUCTS_SALES";
+
     private static final Logger logger = Logger.getLogger(JDBCUtilDAO.class.getCanonicalName());
 
     public static final String NAMED_PARAM_KEY = "{key}";
@@ -1447,6 +1449,36 @@ public class JDBCUtilDAO implements UtilDAO {
             }
         } catch (SQLException | IOException e) {
             throw new DAOException("Could not properly retrieve the item presentations: " + e);
+        } finally {
+            DBManager.closeResultSet(rs);
+            DBManager.closeStatement(retrieve);
+            DBManager.closeConnection(conn);
+        }
+        return list;
+    }
+
+    public ArrayList<Object[]> getProductsSales(Date start, Date end) throws DAOException {
+        ArrayList<Object[]> list = new ArrayList<>();
+        Connection conn = null;
+        PreparedStatement retrieve = null;
+        ResultSet rs = null;
+        Object[] parameters = {start, end};
+        try {
+            conn = dataSource.getConnection();
+            retrieve = sqlStatements.buildSQLStatement(conn, GET_PRODUCTS_SALES_KEY, parameters);
+            rs = retrieve.executeQuery();
+            while (rs.next()) {
+                int idProd = rs.getInt("idProd");
+                String cat = rs.getString("cat");
+                String name = rs.getString("name");
+                String pres = rs.getString("pres");
+                pres = pres == null ? "" : pres;
+                double quantity = rs.getDouble("quantity");
+                double total = rs.getDouble("total");
+                list.add(new Object[]{idProd, cat.toUpperCase(), name.toUpperCase(), pres.toUpperCase(), quantity, total});
+            }
+        } catch (SQLException | IOException e) {
+            throw new DAOException("Could not properly retrieve the products sales: " + e);
         } finally {
             DBManager.closeResultSet(rs);
             DBManager.closeStatement(retrieve);
