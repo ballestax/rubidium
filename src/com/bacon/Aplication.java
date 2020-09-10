@@ -88,6 +88,7 @@ public final class Aplication implements ActionListener, PropertyChangeListener,
     public DateFormat DF_FULL3 = new SimpleDateFormat("dd-MMM-yyyy HH:mm");
     public DateFormat DF_SL = new SimpleDateFormat("dd MMMM yyyy");
     public DateFormat DF_SQL = new SimpleDateFormat("yyyy-MM-dd");
+    public static final DateFormat DF_SQL_TS = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     public DateFormat DF_TIME = new SimpleDateFormat("HH:mm");
 
     private boolean tserver;

@@ -27,20 +27,21 @@ import org.bx.TextFormatter;
 import org.bx.gui.ListSelection;
 import org.bx.gui.MyDefaultTableModel;
 import org.dz.PanelCaptura;
-import org.dzur.StringUtil;
+import org.xhtmlrenderer.util.Util;
 
 /**
  *
  * @author lrod
  */
 public class PanelAddItem extends PanelCaptura implements ActionListener, PropertyChangeListener, TableModelListener {
-
+    
     private final Aplication app;
     private ProgAction acAddUnit, acAddLocation;
     private MyDefaultTableModel model;
     private ListSelection listaSeleccion;
     private int widthLabel;
-
+    private long itemId;
+    
     public static final int COL_SEL1 = 1;
     public static final int COL_SEL2 = 3;
 
@@ -51,26 +52,28 @@ public class PanelAddItem extends PanelCaptura implements ActionListener, Proper
      */
     public PanelAddItem(Aplication app) {
         this.app = app;
+        this.itemId = 0;
         initActions();
         initComponents();
         createComponents();
+        
     }
-
+    
     private void createComponents() {
-
+        
         Font font = new Font("Sans", 1, 16);
-
+        
         regQuantity.setFontCampo(font);
         regQuantity.setDocument(TextFormatter.getDoubleLimiter());
-
+        
         ArrayList<String> units = app.getControl().getUnitsList("", "name");
         regMeseure.setText(units.toArray());
         regMeseure.setFontCampo(font);
-
+        
         ArrayList<Location> locations = app.getControl().getLocationList("", "name");
         regLocation.setText(locations.toArray());
         regLocation.setFontCampo(font);
-
+        
         regName.setFontCampo(font);
         regStockMax.setFontCampo(font);
         regStockMax.setDocument(TextFormatter.getDoubleLimiter());
@@ -80,16 +83,22 @@ public class PanelAddItem extends PanelCaptura implements ActionListener, Proper
         regPrice.setDocument(TextFormatter.getDoubleLimiter());
         regCost.setFontCampo(font);
         regCost.setDocument(TextFormatter.getDoubleLimiter());
-
+        
         chSaveExit.setFont(new Font("Sans", 1, 10));
         chSaveExit.setText("Guardar y salir");
-
+        
         btSave.setFont(new Font("Sans", 1, 11));
         btSave.setText("Guardar");
 //        btSave.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "save.png", 24, 24)));
         btSave.setActionCommand(AC_SAVE_ITEM);
         btSave.addActionListener(this);
-
+        
+        btUpdate.setFont(new Font("Sans", 1, 11));
+        btUpdate.setText("Save");
+//        btUpdate.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "save.png", 24, 24)));
+        btUpdate.setActionCommand(AC_UPDATE_ITEM);
+        btUpdate.addActionListener(this);
+        
         String[] colNames = {"Sel", "ID", "Producto", "ID pres.", "Presentacion", "Cantidad"};
         ArrayList<String> asList = new ArrayList<>(Arrays.asList(colNames));
 //        asList.add(loc);
@@ -97,27 +106,28 @@ public class PanelAddItem extends PanelCaptura implements ActionListener, Proper
         tableProducts.setModel(model);
         tableProducts.getTableHeader().setReorderingAllowed(false);
         listaSeleccion = new ListSelection(tableProducts);
-
+        
         tableProducts.setRowHeight(24);
         tableProducts.getTableHeader().addMouseListener(listaSeleccion);
         model.addTableModelListener(this);
-
+        
         int[] colW = {5, 20, 120, 20, 100, 20};
-
+        
         for (int i = 0; i < tableProducts.getColumnCount(); i++) {
             tableProducts.getColumnModel().getColumn(i).setCellRenderer(new TableSelectCellRenderer(true));
             tableProducts.getColumnModel().getColumn(i).setMinWidth(colW[i]);
             tableProducts.getColumnModel().getColumn(i).setPreferredWidth(colW[i]);
         }
-
+        
         tableProducts.getColumnModel().getColumn(0).setHeaderRenderer(listaSeleccion);
         tableProducts.getColumnModel().getColumn(0).setCellEditor(tableProducts.getDefaultEditor(Boolean.class));
-
+        
         loadProducts();
-
+        
     }
     public static final String AC_SAVE_ITEM = "AC_SAVE_ITEM";
-
+    public static final String AC_UPDATE_ITEM = "AC_UPDATE_ITEM";
+    
     private void loadProducts() {
         SwingWorker sw = new SwingWorker() {
             @Override
@@ -141,36 +151,90 @@ public class PanelAddItem extends PanelCaptura implements ActionListener, Proper
             }
         };
         sw.execute();
-
+        
     }
-
+    
     public ArrayList<String> getUnitsList() {
         ArrayList<String> unidadList = app.getControl().getUnitsList("", "name");
         return unidadList;
     }
-
+    
     public ArrayList<Location> getLocationsList() {
         ArrayList<Location> locationList = app.getControl().getLocationList("", "name");
         return locationList;
     }
-
+    
     public final void initActions() {
-
+        
         widthLabel = 75;
-
+        
         ImageIcon icon = new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "add1.png", 24, 24));
         acAddUnit = new ProgAction("", icon, "Agregar medida", 'm') {
             public void actionPerformed(ActionEvent e) {
                 app.getGuiManager().showPanelNewUnit("Unidades de medida", PanelAddItem.this, getUnitsList());
             }
         };
-
+        
         icon = new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "add1.png", 24, 24));
         acAddLocation = new ProgAction("", icon, "Agregar locacion", 'l') {
             public void actionPerformed(ActionEvent e) {
                 app.getGuiManager().showPanelNewLocation(PanelAddItem.this);
             }
         };
+    }
+    
+    public void setItem(Item item) {
+        reset();
+        if (item != null) {
+            itemId = item.getId();
+            System.out.println("Setting itemId:" + itemId);
+            regName.setText(item.getName());
+            regName.setEnabled(false);
+            regMeseure.setText(item.getMeasure());
+            regMeseure.setEnabled(false);
+//            regLocation.setSelected(item.getLocation());
+            regLocation.setEnabled(false);
+            regQuantity.setText(String.valueOf(item.getQuantity()));
+            regQuantity.setEnabled(false);
+            regStockMin.setText(String.valueOf(item.getStockMin()));
+            regStockMin.setEnabled(false);
+            regStockMax.setText(String.valueOf(item.getStock()));
+            regStockMax.setEnabled(false);
+            regCost.setText(String.valueOf(item.getCost()));
+            regCost.setEnabled(false);
+            regPrice.setText(String.valueOf(item.getPrice()));
+            regPrice.setEnabled(false);
+            
+            ArrayList<Object[]> presentations = app.getControl().getPresentationsByItem(item.getId());
+
+//            List<Object[]> presentations = item.getPresentations();
+//            model.setValueAt(true, 0, 0);
+            for (int i = 0; i < presentations.size(); i++) {
+                Object[] pres = presentations.get(i);
+                int idPres = Integer.parseInt(pres[0].toString());
+                int idProd = Integer.parseInt(pres[1].toString());
+                System.out.println(Arrays.toString(pres));
+                if (idPres == 0) {
+                    for (int j = 0; j < model.getRowCount(); j++) {
+                        int rProd = Integer.parseInt(model.getValueAt(j, 1).toString());
+//                        System.out.println("::"+rProd+"::"+idProd+":"+(rProd == idProd));
+                        if (rProd == idProd) {
+                            model.setValueAt(true, j, 0);
+                        }
+                    }
+                } else {
+                    for (int j = 0; j < model.getRowCount(); j++) {
+                        if (Util.isNumber(model.getValueAt(j, 3).toString())) {
+                            int rPres = Integer.parseInt(model.getValueAt(j, 3).toString());
+//                            System.out.println("::"+rPres+"::"+idPres+":"+(rPres == idPres));
+                            if (rPres == idPres) {
+                                model.setValueAt(true, j, 0);
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -195,6 +259,7 @@ public class PanelAddItem extends PanelCaptura implements ActionListener, Proper
         btSave = new javax.swing.JButton();
         chSaveExit = new javax.swing.JCheckBox();
         regLocation = new org.dz.Registro(BoxLayout.X_AXIS, "Locacion", new Object[1], acAddLocation,widthLabel);
+        btUpdate = new javax.swing.JButton();
 
         regName.setNextFocusableComponent(regMeseure);
 
@@ -238,6 +303,8 @@ public class PanelAddItem extends PanelCaptura implements ActionListener, Proper
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addComponent(chSaveExit)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btUpdate, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btSave, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(regLocation, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -271,7 +338,8 @@ public class PanelAddItem extends PanelCaptura implements ActionListener, Proper
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(btSave, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(chSaveExit, javax.swing.GroupLayout.Alignment.TRAILING))))
+                            .addComponent(chSaveExit, javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(btUpdate, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addGap(13, 13, 13))
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -279,6 +347,7 @@ public class PanelAddItem extends PanelCaptura implements ActionListener, Proper
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btSave;
+    private javax.swing.JButton btUpdate;
     private javax.swing.JCheckBox chSaveExit;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel labelInfo;
@@ -296,17 +365,26 @@ public class PanelAddItem extends PanelCaptura implements ActionListener, Proper
     @Override
     public void reset() {
         regName.setText("");
+        regName.setEnabled(true);
         regMeseure.setText("");
+        regMeseure.setEnabled(true);
         regPrice.setText("");
+        regPrice.setEnabled(true);
+        regCost.setText("");
+        regCost.setEnabled(true);
         regQuantity.setText("");
+        regQuantity.setEnabled(true);
         regStockMax.setText("");
+        regStockMax.setEnabled(true);
         regStockMin.setText("");
-
+        regStockMin.setEnabled(true);
+        regLocation.setEnabled(true);
+        
         for (int i = 0; i < tableProducts.getRowCount(); ++i) {
             model.setValueAt(Boolean.FALSE, i, 0);
         }
     }
-
+    
     @Override
     public void actionPerformed(ActionEvent e) {
         if (AC_SAVE_ITEM.equals(e.getActionCommand())) {
@@ -322,20 +400,33 @@ public class PanelAddItem extends PanelCaptura implements ActionListener, Proper
                     reset();
                 }
             }
+        } else if (AC_UPDATE_ITEM.equals(e.getActionCommand())) {
+            Item item = parseItem();
+            if (item != null) {
+                app.getControl().updateItemPres(item);
+
+//                Item item1 = app.getControl().getItemWhere("name='"+item.getName()+"'");
+//                pcs.firePropertyChange(AC_ADD_ITEM, null, item);
+                if (chSaveExit.isSelected()) {
+                    cancelPanel();
+                } else {
+                    reset();
+                }
+            }
         }
     }
     public static final String AC_ADD_ITEM = "AC_ADD_ITEM";
-
+    
     public void cancelPanel() {
         getRootPane().getParent().setVisible(false);
         reset();
     }
-
+    
     @Override
     public void tableChanged(TableModelEvent e) {
         updateTabla();
     }
-
+    
     private Item parseItem() {
         Item item = null;
         boolean validate = true;
@@ -343,22 +434,22 @@ public class PanelAddItem extends PanelCaptura implements ActionListener, Proper
             regName.setBorderToError();
             validate = false;
         }
-
+        
         if (regMeseure.getText().isEmpty()) {
             regMeseure.setBorderToError();
             validate = false;
         }
-
+        
         if (regLocation.getText().isEmpty()) {
             regLocation.setBorderToError();
             validate = false;
         }
-
+        
         if (regQuantity.getText().isEmpty()) {
             regQuantity.setBorderToError();
             validate = false;
         }
-
+        
         if (validate) {
             item = new Item();
             item.setName(regName.getText().toLowerCase());
@@ -389,7 +480,7 @@ public class PanelAddItem extends PanelCaptura implements ActionListener, Proper
             } catch (NumberFormatException e) {
                 item.setPrice(BigDecimal.ZERO);
             }
-
+            
             item.setInit(item.getQuantity());
 //            item.setLocation(0);
             item.setAverage(BigDecimal.ZERO);
@@ -402,9 +493,12 @@ public class PanelAddItem extends PanelCaptura implements ActionListener, Proper
                 item.addPresentations(Integer.parseInt(dat[0].toString()), Integer.parseInt(dat1), Double.parseDouble(dat[2].toString()));
             }
         }
+        if (itemId != 0) {
+            item.setId(itemId);
+        }
         return item;
     }
-
+    
     private void updateTabla() {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
@@ -413,7 +507,7 @@ public class PanelAddItem extends PanelCaptura implements ActionListener, Proper
             }
         });
     }
-
+    
     private ArrayList<Object[]> getSelecteds() {
         ArrayList<Object[]> prods = new ArrayList<>();
         int[] selectedsRows = getSelectedsRows();
@@ -426,7 +520,7 @@ public class PanelAddItem extends PanelCaptura implements ActionListener, Proper
         }
         return prods;
     }
-
+    
     public int[] getSelectedsRows() {
         int[] sel = new int[model.getRowCount()];
         Arrays.fill(sel, -1);
@@ -439,7 +533,7 @@ public class PanelAddItem extends PanelCaptura implements ActionListener, Proper
         Arrays.sort(sel);
         return sel;
     }
-
+    
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         if (PanelList.AC_SELECTED.equals(evt.getPropertyName())) {
@@ -454,18 +548,18 @@ public class PanelAddItem extends PanelCaptura implements ActionListener, Proper
             app.getControl().deleteUnit(evt.getNewValue().toString());
             updateUnitList();
         } else if (PanelNewLocation.AC_ADD_LOCATION.equals(evt.getPropertyName())) {
-
+            
         }
     }
-
+    
     private void updateUnitList() {
         ArrayList<String> unidadList = getUnitsList();
         regMeseure.setText(unidadList.toArray(new String[1]));
     }
-
+    
     private void updateLocationList() {
         ArrayList<Location> location = getLocationsList();
         regLocation.setText(location.toArray(new String[1]));
     }
-
+    
 }

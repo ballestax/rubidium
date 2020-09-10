@@ -42,6 +42,7 @@ public class JDBCItemDAO implements ItemDAO {
     protected static final String UPDATE_ITEM_KEY = "UPDATE_ITEM";
     protected static final String GET_ITEM_KEY = "GET_ITEM";
     protected static final String DELETE_ITEM_KEY = "DELETE_ITEM";
+    protected static final String DELETE_ITEM_PRES_KEY = "DELETE_ITEM_PRES";
     public static final String ADD_INVENTORY_PRODUCT_KEY = "ADD_INVENTORY_PRODUCT";
     public static final String ADD_INVENTORY_PRESENTATION_KEY = "ADD_INVENTORY_PRESENTATION";
 
@@ -200,6 +201,8 @@ public class JDBCItemDAO implements ItemDAO {
                 }else{
                     Object[] parameters1 = {idItem, idProd, cant};
                     ps = sqlStatements.buildSQLStatement(conn, ADD_INVENTORY_PRODUCT_KEY, parameters1);
+    
+                
                 }
                 ps.executeUpdate();
             }
@@ -270,6 +273,54 @@ public class JDBCItemDAO implements ItemDAO {
             throw new DAOException("Could not properly update the item", e);
         } finally {
             DBManager.closeStatement(update);
+            DBManager.closeConnection(conn);
+        }
+    }
+    
+    public void updateItemPres(Item item) throws DAOException {
+        if (item == null) {
+            throw new IllegalArgumentException("Null item");
+        }
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        try {
+            conn = dataSource.getConnection();
+            conn.setAutoCommit(false);
+            
+            Object[] parameters = {item.getId()};
+            System.out.println("deleting id:"+item.getId());
+            ps = sqlStatements.buildSQLStatement(conn, DELETE_ITEM_PRES_KEY, parameters);
+            ps.executeUpdate();
+            
+            long idItem = item.getId();
+            
+            List<Object[]> presList = item.getPresentations();
+
+            for (int i = 0; i < presList.size(); i++) {
+                int idProd = Integer.parseInt(presList.get(i)[0].toString());
+                int idPres = Integer.parseInt(presList.get(i)[1].toString());
+                double cant = Double.parseDouble(presList.get(i)[2].toString());
+
+                if (idPres != 0) {
+                    Object[] parameters1 = {idItem, idProd, idPres, cant};
+                    ps = sqlStatements.buildSQLStatement(conn, ADD_INVENTORY_PRESENTATION_KEY, parameters1);
+                }else{
+                    Object[] parameters1 = {idItem, idProd, cant};
+                    ps = sqlStatements.buildSQLStatement(conn, ADD_INVENTORY_PRODUCT_KEY, parameters1);
+                }
+                ps.executeUpdate();
+            }
+
+            conn.commit();
+        } catch (SQLException e) {
+            DBManager.rollbackConn(conn);
+            throw new DAOException("Cannot update Item pres", e);
+        } catch (IOException e) {
+            DBManager.rollbackConn(conn);
+            throw new DAOException("Cannot update Item pres", e);
+        } finally {
+            DBManager.closeStatement(ps);
             DBManager.closeConnection(conn);
         }
     }

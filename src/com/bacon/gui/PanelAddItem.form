@@ -36,6 +36,8 @@
                   <Group type="102" alignment="1" attributes="0">
                       <Component id="chSaveExit" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="32767" attributes="0"/>
+                      <Component id="btUpdate" min="-2" pref="90" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
                       <Component id="btSave" min="-2" pref="90" max="-2" attributes="0"/>
                   </Group>
                   <Component id="regLocation" alignment="0" max="32767" attributes="0"/>
@@ -76,6 +78,7 @@
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Component id="btSave" alignment="1" min="-2" pref="28" max="-2" attributes="0"/>
                           <Component id="chSaveExit" alignment="1" min="-2" max="-2" attributes="0"/>
+                          <Component id="btUpdate" alignment="1" min="-2" pref="28" max="-2" attributes="0"/>
                       </Group>
                   </Group>
               </Group>
@@ -172,6 +175,8 @@
         <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new org.dz.Registro(BoxLayout.X_AXIS, &quot;Locacion&quot;, new Object[1], acAddLocation,widthLabel)"/>
         <AuxValue name="JavaCodeGenerator_InitCodePre" type="java.lang.String" value="regMeseure.setLabelFont(new Font(&quot;arial&quot;,0,11));"/>
       </AuxValues>
+    </Component>
+    <Component class="javax.swing.JButton" name="btUpdate">
     </Component>
   </SubComponents>
 </Form>

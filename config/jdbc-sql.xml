@@ -46,7 +46,7 @@
                     |CREATE_INVENTORY_TABLE|GET_ITEM|ADD_ITEM
                     |ADD_UNIT|GET_UNIT|UPDATE_UNIT|DELETE_UNIT|CREATE_UNITS_TABLE
                     |CREATE_INVENTORY_PRODUCT_TABLE|ADD_INVENTORY_PRODUCT|CHECK_INVENTORY|CHECK_INVENTORY_PRODUCT
-                    |ADD_INVENTORY_PRESENTATION
+                    |ADD_INVENTORY_PRESENTATION|DELETE_ITEM_PRES
                     |UPDATE_INVENTORY_QUANTITY|ADD_INVENTORY_QUANTITY
                     |CREATE_CONCILIACIONES_TABLE|ADD_CONCILIACION|GET_CONCILIACION|UPDATE_CONCILIACION|DELETE_CONCILIACION
                     |ADD_LOCATION|GET_LOCATION|UPDATE_LOCATION|DELETE_LOCATION|CREATE_LOCATIONS_TABLE
@@ -1386,6 +1386,12 @@
             </SQLFragment>
         </SQLStatement>
         
+        <SQLStatement method="DELETE_ITEM_PRES">
+            <SQLFragment>
+                DELETE FROM inventory_product WHERE item_id = ?;                
+            </SQLFragment>
+        </SQLStatement>
+        
         
         <SQLStatement method="CREATE_UNITS_TABLE">
             <SQLFragment>
@@ -1637,7 +1643,8 @@
                 ip.id_presentation = ? AND ivp.item_id = ? 
                 AND ip.id_presentation = pp.id AND pp.product_id = p.id
                 AND ip.id_invoice = i.id
-                AND (i.sale_date BETWEEN ? AND ?)                
+                AND (i.sale_date BETWEEN ? AND ?)
+                AND i.status=0                
             </SQLFragment>            
         </SQLStatement>
         

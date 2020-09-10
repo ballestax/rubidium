@@ -27,11 +27,11 @@ public class LabelInfo extends Box {
     private JLabel labelQuantity;
     private final DecimalFormat DCFORM_P;
 
-    public LabelInfo(String title, double quantity) {
+    public LabelInfo(String title, double quantity, Dimension dim) {
         super(BoxLayout.Y_AXIS);
 
-        setPreferredSize(new Dimension(150, 35));
-        
+        setPreferredSize(dim);
+
         this.title = title;
         this.quantity = quantity;
 
@@ -41,36 +41,52 @@ public class LabelInfo extends Box {
 
         DCFORM_P = (DecimalFormat) NumberFormat.getInstance();
         DCFORM_P.applyPattern("$ ###,###,###.##");
-        
+
         setOpaque(true);
         setBackground(colorBackground);
 
         createComponents();
     }
 
+    public void setColor(Color color) {
+
+        colorBackground = color.brighter().brighter();
+        colorBorder = color.darker();
+        
+        refreshColor();
+    }
+
     private void createComponents() {
         labelTitle = new JLabel(title);
         labelTitle.setOpaque(true);
-        labelTitle.setBackground(colorBackground);
-        
+
         labelQuantity = new JLabel(DCFORM_P.format(quantity.doubleValue()));
         labelQuantity.setOpaque(true);
-        labelQuantity.setBackground(colorBackground);
+
         labelQuantity.setHorizontalAlignment(SwingConstants.RIGHT);
-        labelQuantity.setPreferredSize(new Dimension(150,18));
+        labelQuantity.setPreferredSize(new Dimension(150, 18));
 
-        
+        refreshColor();
 
-        labelTitle.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, colorBackground.darker()));
-
-        setBorder(BorderFactory.createLineBorder(colorBorder, 1, true));
-        
-        labelQuantity.setBorder(BorderFactory.createLineBorder(Color.YELLOW));
-        
+//        labelQuantity.setBorder(BorderFactory.createLineBorder(Color.YELLOW));
         add(labelTitle);
 
         add(labelQuantity);
 
+    }
+
+    private void refreshColor() {
+        setBackground(colorBackground);
+        labelTitle.setBackground(colorBackground);
+        labelQuantity.setBackground(colorBackground);
+        labelTitle.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, colorBackground.darker()));
+
+        setBorder(BorderFactory.createLineBorder(colorBorder, 1, true));
+    }
+
+    public void setQuantity(Double quantity) {
+        this.quantity = quantity;
+        labelQuantity.setText(DCFORM_P.format(quantity.doubleValue()));
     }
 
 }

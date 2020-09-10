@@ -12,6 +12,7 @@ import java.beans.PropertyChangeListener;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -95,7 +96,6 @@ public class XLSManager {
 
     }
 
-    
     public void exportarTabla(DefaultTableModel modelo, String title, String ruta, PropertyChangeListener listener) {
         exportarTabla(modelo, title, ruta, listener, null);
     }
@@ -179,7 +179,7 @@ public class XLSManager {
                             cell.setCellValue(Integer.parseInt(obj.toString()));
                             cell.setCellType(Cell.CELL_TYPE_NUMERIC);
                             cell.setCellStyle(stiloRight);
-                        } else if (obj instanceof Double) {
+                        } else if (obj instanceof Double || obj instanceof BigDecimal) {
                             System.out.println(":" + obj.toString() + "---" + obj.getClass());
                             cell.setCellValue(Double.parseDouble(obj.toString()));
                             cell.setCellType(Cell.CELL_TYPE_NUMERIC);

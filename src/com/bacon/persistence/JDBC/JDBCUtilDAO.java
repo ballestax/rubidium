@@ -5,6 +5,7 @@
  */
 package com.bacon.persistence.JDBC;
 
+import com.bacon.Aplication;
 import com.bacon.DBManager;
 import com.bacon.domain.Category;
 import com.bacon.domain.Cycle;
@@ -1382,10 +1383,10 @@ public class JDBCUtilDAO implements UtilDAO {
         Connection conn = null;
         PreparedStatement retrieve = null;
         ResultSet rs = null;
-        Object[] parameters = {idProd, start, new Date()};
+        Object[] parameters = {idProd, Aplication.DF_SQL_TS.format(start), new Date()};
         try {
             conn = dataSource.getConnection();
-            retrieve = sqlStatements.buildSQLStatement(conn, GET_PRODUCTS_OUT_INVENTORY_KEY, parameters);
+            retrieve = sqlStatements.buildSQLStatement(conn, GET_PRODUCTS_OUT_INVENTORY_KEY, parameters);            
             rs = retrieve.executeQuery();
             while (rs.next()) {
                 int id = rs.getInt("id");
@@ -1408,11 +1409,10 @@ public class JDBCUtilDAO implements UtilDAO {
         Connection conn = null;
         PreparedStatement retrieve = null;
         ResultSet rs = null;
-        Object[] parameters = {idPres, idItem, start, new Date(),};
+        Object[] parameters = {idPres, idItem,  Aplication.DF_SQL_TS.format(start), new Date(),};
         try {
             conn = dataSource.getConnection();
-            retrieve = sqlStatements.buildSQLStatement(conn, GET_PRESENTATIONS_OUT_INVENTORY_KEY, parameters);
-            System.out.println("retrieve = " + retrieve);
+            retrieve = sqlStatements.buildSQLStatement(conn, GET_PRESENTATIONS_OUT_INVENTORY_KEY, parameters);            
             rs = retrieve.executeQuery();
             while (rs.next()) {
                 int id = rs.getInt("prod_id");

@@ -9,6 +9,8 @@ import static com.bacon.MyConstants.FILTER_NUM_INT_LESS_EQUAL;
 import com.bacon.domain.Invoice;
 import com.bacon.gui.util.MyDatePickerImp;
 import java.awt.Color;
+import java.awt.ComponentOrientation;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -18,7 +20,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Set;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -32,6 +33,8 @@ import org.bx.gui.MyDefaultTableModel;
 import org.dz.PanelCapturaMod;
 import org.dz.TextFormatter;
 import java.util.Collections;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 
 /**
  *
@@ -78,6 +81,8 @@ public class PanelReportSales extends PanelCapturaMod implements ActionListener 
     private String title;
     private String query;
 
+    private LabelInfo lbInfTotal, lbInfDelivery, lbInfService;
+
     /**
      * Creates new form PanelReportSales
      */
@@ -116,7 +121,16 @@ public class PanelReportSales extends PanelCapturaMod implements ActionListener 
 
         modelo = new MyDefaultTableModel(colNamesSal, 0);
         tableReport.setModel(modelo);
-        tableReport.setRowHeight(22);
+        tableReport.setRowHeight(24);
+        modelo.addTableModelListener(new TableModelListener() {
+
+            @Override
+            public void tableChanged(TableModelEvent e) {
+                sumColumn(7, lbInfTotal);
+                sumColumn(8, lbInfService);
+                sumColumn(9, lbInfDelivery);
+            }
+        });
 //        tableReport.getColumnModel().getColumn(4).setCellRenderer(formatRenderer);
 
         DF_TABLE_FONT = new Font("Tahoma", 0, 14);
@@ -151,12 +165,14 @@ public class PanelReportSales extends PanelCapturaMod implements ActionListener 
         regCategory.addActionListener(this);
         regCategory.setText(new String[]{});
         regCategory.setFontCampo(new Font("Tahoma", 0, 14));
+        regCategory.setVisible(false);
 
         regProduct.setLabelText("Producto");
         regProduct.setActionCommand(AC_SEL_PRODUCT);
         regProduct.addActionListener(this);
         regProduct.setText(new String[]{});
         regProduct.setFontCampo(new Font("Tahoma", 0, 14));
+        regProduct.setVisible(false);
 
         //NAV
         btUpdate.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "update.png", 12, 12)));
@@ -189,9 +205,20 @@ public class PanelReportSales extends PanelCapturaMod implements ActionListener 
 //        setupNavegador();
 
         regTipoReg.setVisible(false);
+
+        Dimension dim = new Dimension(120, 35);
+        lbInfTotal = new LabelInfo("Total", 0, dim);
         
-//        pnLabels.setLayout(new FlowLayout());
-//        pnLabels.add(new LabelInfo("Total",200000));
+        lbInfService = new LabelInfo("Servicio", 0, dim);
+        lbInfService.setColor(Color.cyan);
+        lbInfDelivery = new LabelInfo("Domicilio", 0, dim);
+        lbInfDelivery.setColor(Color.magenta);
+        
+        pnLabels.setLayout(new FlowLayout(FlowLayout.RIGHT));
+        pnLabels.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+        pnLabels.add(lbInfTotal);
+        pnLabels.add(lbInfService);
+        pnLabels.add(lbInfDelivery);
 
         opcionHoy();
 
@@ -333,8 +360,11 @@ public class PanelReportSales extends PanelCapturaMod implements ActionListener 
         String tipo = regTipo.getText();
         if (MyConstants.TIPO_REPORTE[0].equals(tipo)) {
             regCategory.setVisible(false);
+            regProduct.setVisible(false);
+
         } else if (MyConstants.TIPO_REPORTE[1].equals(tipo)) {
             regCategory.setVisible(true);
+            regProduct.setVisible(true);
         }
         makeTitle();
     }
@@ -426,6 +456,11 @@ public class PanelReportSales extends PanelCapturaMod implements ActionListener 
         tableReport.setRowSorter(null);
         if (tipo.equals(MyConstants.TIPO_REPORTE[0])) {  // VENTAS Y COMPRAS
             modelo.setColumnIdentifiers(colNamesSal);
+
+            //clear registers
+            regCategory.setText(new String[]{});
+            regProduct.setText(new String[]{});
+
             SwingWorker sw = new SwingWorker() {
                 @Override
                 protected Object doInBackground() throws Exception {
@@ -433,11 +468,7 @@ public class PanelReportSales extends PanelCapturaMod implements ActionListener 
                         Invoice inv = (Invoice) list.get(i);
                         double total = 0;
                         if (tipo.equals(MyConstants.TIPO_REPORTE[0])) {  //VENTAS
-//                            List<ProductoPed> products = inv.getProducts();
-//                            for (int j = 0; j < products.size(); j++) {
-//                                ProductoPed get = products.get(j);
-//                                total += get.getPrecio() * get.getCantidad();
-//                            }
+
                             Invoice invoice = (Invoice) list.get(i);
 
                             tableReport.getColumnModel().getColumn(7).setCellRenderer(formatRenderer);
@@ -478,7 +509,11 @@ public class PanelReportSales extends PanelCapturaMod implements ActionListener 
             HashSet catSet = new HashSet<>();
             HashSet prodSet = new HashSet<>();
             catSet.add(SEL_TODAS);
+            prodSet.add(SEL_TODAS);
+
             SwingWorker sw1 = new SwingWorker() {
+                double total = 0;
+
                 @Override
                 protected Object doInBackground() throws Exception {
                     tableReport.getColumnModel().getColumn(4).setCellRenderer(formatRenderer);
@@ -487,6 +522,7 @@ public class PanelReportSales extends PanelCapturaMod implements ActionListener 
                         Object[] row = (Object[]) list.get(i);
                         catSet.add(row[1]);
                         prodSet.add(row[2]);
+                        total += Double.parseDouble(row[5].toString());
                         modelo.addRow(row);
                         modelo.setRowEditable(modelo.getRowCount() - 1, false);
                     }
@@ -499,9 +535,12 @@ public class PanelReportSales extends PanelCapturaMod implements ActionListener 
                     ArrayList sortedList = new ArrayList(catSet);
                     Collections.sort(sortedList);
                     regCategory.setText(sortedList.toArray());
-                    regProduct.setText(prodSet.toArray());
-                }
+                    sortedList = new ArrayList(prodSet);
+                    Collections.sort(sortedList);
+                    regProduct.setText(sortedList.toArray());
+                    lbInfTotal.setQuantity(total);
 
+                }
             };
             app.getGuiManager().setWaitCursor();
             tableReport.updateUI();
@@ -953,6 +992,36 @@ public class PanelReportSales extends PanelCapturaMod implements ActionListener 
 
     }
 
+    private void sumColumn(int col, LabelInfo labInfo) {
+
+        SwingWorker sw1 = new SwingWorker() {
+            int rows = tableReport.getRowCount();
+            double sum = 0, val = 0;
+
+            @Override
+            protected Object doInBackground() throws Exception {
+
+                for (int r = 0; r < rows; r++) {
+                    try {
+                        val = Double.parseDouble(tableReport.getValueAt(r, col).toString());
+                    } catch (NumberFormatException e) {
+                        val = 0;
+                    }
+                    sum += val;
+
+                }
+                return true;
+            }
+
+            @Override
+            protected void done() {
+                labInfo.setQuantity(sum);
+            }
+        };
+        sw1.execute();
+
+    }
+
     public void filtrar(final String text, final int columna, final int tFilter) {
 
         if (SEL_TODAS.equals(text)) {
@@ -1013,7 +1082,15 @@ public class PanelReportSales extends PanelCapturaMod implements ActionListener 
             sorter.setRowFilter(filterNum);
         }
         lastSorter = sorter;
+//        sorter.addRowSorterListener(new RowSorterListener(){            
+//            public void sorterChanged(RowSorterEvent e){
+//                System.out.println(e);
+//            }
+//        });
+
         tableReport.setRowSorter(sorter);
+
+        sumColumn(5, lbInfTotal);
     }
 
 }

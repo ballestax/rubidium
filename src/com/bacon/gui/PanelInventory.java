@@ -1,7 +1,9 @@
 package com.bacon.gui;
 
 import com.bacon.Aplication;
+import com.bacon.GUIManager;
 import com.bacon.domain.Item;
+import com.bacon.gui.util.MyPopupListener;
 import static com.bacon.gui.PanelSelItem.AC_ADD_ITEM_TO_TABLE;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -19,7 +21,9 @@ import javax.swing.DefaultListSelectionModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JTable;
+import javax.swing.JPopupMenu;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingWorker;
@@ -30,6 +34,9 @@ import javax.swing.table.TableCellRenderer;
 import org.apache.log4j.Logger;
 import org.bx.gui.MyDefaultTableModel;
 import org.dz.PanelCapturaMod;
+import java.awt.Desktop;
+import java.io.File;
+import java.util.Date;
 
 /**
  *
@@ -41,6 +48,9 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
     private MyDefaultTableModel model;
     private PanelReportProductDetail pnDetail;
     public static final Logger logger = Logger.getLogger(PanelInventory.class.getCanonicalName());
+
+    private JPopupMenu popupTable;
+    private MyPopupListener popupListenerTabla;
 
     /**
      * Creates new form PanelReportSales
@@ -82,13 +92,19 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
         btConciliation.setActionCommand(AC_ADD_CONCILIATION);
         btConciliation.addActionListener(this);
 
+        JButton btExport = new JButton("Exportar");
+        btExport.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "export-file.png", 24, 24)));
+        btExport.setActionCommand(AC_EXPORT_TO);
+        btExport.addActionListener(this);
+
         panelButtons.add(btAdd);
         panelButtons.add(btLoad);
         panelButtons.add(btDesc);
         panelButtons.add(btRefresh);
         panelButtons.add(btConciliation);
+        panelButtons.add(btExport);
 
-        String[] colNames = new String[]{"N°", "Item", "Cantidad", "Medida", "Cost", "Price", "Stock min", "Stock max"};
+        String[] colNames = new String[]{"N°", "Item", "Cantidad", "Medida", "Cost", "Price", "Min", "Cost. Total"};
 
         model = new MyDefaultTableModel(colNames, 0);
         tableItems.setModel(model);
@@ -103,7 +119,7 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
 
         TablaCellRenderer tRenderer = new TablaCellRenderer(true, app.getDCFORM_P());
 
-        int[] colW = new int[]{10, 120, 20, 20, 20, 20, 20, 20};
+        int[] colW = new int[]{5, 120, 20, 20, 20, 20, 10, 30};
         for (int i = 0; i < colW.length; i++) {
             tableItems.getColumnModel().getColumn(i).setMinWidth(colW[i]);
             tableItems.getColumnModel().getColumn(i).setPreferredWidth(colW[i]);
@@ -114,8 +130,25 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
         tableItems.getColumnModel().getColumn(5).setCellRenderer(tRenderer);
         tableItems.getColumnModel().getColumn(6).setCellRenderer(tRenderer);
         tableItems.getColumnModel().getColumn(7).setCellRenderer(tRenderer);
+//        tableItems.getColumnModel().getColumn(8).setCellRenderer(tRenderer);
 //        tableItems.getColumnModel().getColumn(model.getColumnCount() - 1).setCellEditor(new BotonEditor(tableItems, this, "AC_MOD_USER"));
 //        tableItems.getColumnModel().getColumn(model.getColumnCount() - 1).setCellRenderer(new ButtonCellRenderer("Ver"));
+
+        popupTable = new JPopupMenu();
+        popupListenerTabla = new MyPopupListener(popupTable, true);
+        JMenuItem item1 = new JMenuItem("Ver");
+        item1.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int r = tableItems.getSelectedRow();
+                String id = tableItems.getValueAt(r, 0).toString();
+                Item item = app.getControl().getItemWhere("id=" + id);
+                app.getGuiManager().showPanelAddItem(PanelInventory.this, item);
+            }
+        });
+        popupTable.add(item1);
+        tableItems.addMouseListener(popupListenerTabla);
 
         pnDetail = new PanelReportProductDetail(app);
 
@@ -125,6 +158,7 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
         populateTable();
 
     }
+    public static final String AC_EXPORT_TO = "AC_EXPORT_TO";
     public static final String AC_ADD_CONCILIATION = "AC_ADD_CONCILIATION";
     public static final String AC_REFRESH_ITEMS = "AC_REFRESH_ITEMS";
     public static final String AC_LOAD_ITEM = "AC_LOAD_ITEM";
@@ -149,7 +183,7 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
                         item.getCost(),
                         item.getPrice(),
                         item.getStockMin(),
-                        item.getStock()
+                        item.getCostTotal()
                     });
                     model.setRowEditable(model.getRowCount() - 1, false);
                 }
@@ -258,7 +292,7 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
     @Override
     public void actionPerformed(ActionEvent e) {
         if (AC_SHOW_ADD_ITEM.equals(e.getActionCommand())) {
-            app.getGuiManager().showPanelAddItem(this);
+            app.getGuiManager().showPanelAddItem(this, null);
         } else if (AC_LOAD_ITEM.equals(e.getActionCommand())) {
             app.getGuiManager().showPanelSelItem(this);
         } else if (AC_REFRESH_ITEMS.equals(e.getActionCommand())) {
@@ -267,6 +301,25 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
             app.getGuiManager().showPanelConciliacion(true);
         } else if (AC_DOWNLOAD_ITEM.equals(e.getActionCommand())) {
             app.getGuiManager().showPanelDownItem(this);
+        }
+        if (e.getActionCommand().equals(AC_EXPORT_TO)) {
+            System.out.println("exportando..");
+            SwingWorker tarea = new SwingWorker() {
+                @Override
+                protected Object doInBackground() throws Exception {
+                    try {
+                        String tipo = "Inventario";
+                        String file = app.getDirDocuments() + File.separator + "Reporte_" + tipo + "_" + app.getFormatoFecha().format(new Date()) + ".xlsx";
+                        System.err.println(file);
+                        app.getXlsManager().exportarTabla(model, "Reporte " + tipo, file, PanelInventory.this);
+                        Desktop.getDesktop().open(new File(file));
+                    } catch (Exception ex) {
+                        GUIManager.showErrorMessage(null, "Error intentando abrir el archivo.\n" + ex.getMessage(), "Error");
+                    }
+                    return true;
+                }
+            };
+            tarea.execute();
         }
     }
 
@@ -277,8 +330,8 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
             pnDetail.showInfoProduct(null);
         }
         try {
-            Object id = model.getValueAt(row, 0);            
-            Item item = app.getControl().getItemWhere("id=" + id);            
+            Object id = model.getValueAt(row, 0);
+            Item item = app.getControl().getItemWhere("id=" + id);
             pnDetail.showInfoProduct(item);
         } catch (Exception ex) {
             logger.error(ex.getMessage());

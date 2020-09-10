@@ -198,5 +198,10 @@ public class Item {
         hash = 97 * hash + Objects.hashCode(this.name);
         return hash;
     }
+    
+    public   BigDecimal getCostTotal() {
+        return getCost().multiply(new BigDecimal(getQuantity()));
+    }
+    
 
 }

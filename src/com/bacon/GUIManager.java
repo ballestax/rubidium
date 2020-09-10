@@ -8,6 +8,7 @@ package com.bacon;
 import com.bacon.domain.Client;
 import com.bacon.domain.Cycle;
 import com.bacon.domain.Invoice;
+import com.bacon.domain.Item;
 import com.bacon.domain.Permission;
 import com.bacon.domain.Product;
 import com.bacon.domain.Rol;
@@ -1030,7 +1031,7 @@ public class GUIManager {
         dialog.setVisible(true);
     }
 
-    public void showPanelAddItem(PropertyChangeListener listener) {
+    public void showPanelAddItem(PropertyChangeListener listener, Item item) {
         setWaitCursor();
         JDialog dialog = new MyDialogEsc();
         dialog.setModal(true);
@@ -1042,6 +1043,9 @@ public class GUIManager {
             getPanelAddItem().addPropertyChangeListener(listener);
         }
         getPanelAddItem().reset();
+        if (item != null) {
+            getPanelAddItem().setItem(item);
+        }
 //        dialog.setResizable(false);
         dialog.add(getPanelAddItem());
         dialog.setTitle("Agregar item al inventario.");
@@ -1065,7 +1069,7 @@ public class GUIManager {
         setDefaultCursor();
         dialog.setVisible(true);
     }
-    
+
     public void showPanelDownItem(PropertyChangeListener listener) {
         setWaitCursor();
         JDialog dialog = new MyDialogEsc();

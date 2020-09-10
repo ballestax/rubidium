@@ -777,6 +777,17 @@ public class Control {
             return false;
         }
     }
+    
+    public boolean updateItemPres(Item item) {
+        try {
+            JDBCItemDAO itemDAO = (JDBCItemDAO) DAOFactory.getInstance().getItemDAO();
+            itemDAO.updateItemPres(item);
+            return true;
+        } catch (DAOException ex) {
+            logger.error("Error updating Item pres.", ex);
+            return false;
+        }
+    }
 
     public ArrayList<String> getUnitsList(String where, String order) {
         try {
