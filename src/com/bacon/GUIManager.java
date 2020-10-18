@@ -29,6 +29,7 @@ import com.bacon.gui.PanelChangePassword;
 import com.bacon.gui.PanelClientCard;
 import com.bacon.gui.PanelConfigOthers;
 import com.bacon.gui.PanelConfigPrint;
+import com.bacon.gui.PanelConfigTicket;
 import com.bacon.gui.PanelConfirmPedido;
 import com.bacon.gui.PanelCustomPedido;
 import com.bacon.gui.PanelListPedidos;
@@ -132,6 +133,7 @@ public class GUIManager {
     private PanelNewConciliacion panelNewConciliacion;
     private PanelNewLocation pnNewLocation;
     private PanelDownItem panelDownItem;
+    private PanelConfigTicket pnConfigTicket;
 
     private GUIManager() {
 
@@ -236,6 +238,7 @@ public class GUIManager {
     private PanelListPedidos getPanelListPedidos() {
         if (panelListPedidos == null) {
             panelListPedidos = new PanelListPedidos(app);
+            panelListPedidos.addPropertyChangeListener(getPanelPedido());
         }
         return panelListPedidos;
     }
@@ -1157,4 +1160,12 @@ public class GUIManager {
         return pnConfigOthers;
     }
 
+     public PanelConfigTicket getPanelConfigTicket() {
+        if (pnConfigTicket == null) {
+            pnConfigTicket = new PanelConfigTicket(app);
+        }
+        return pnConfigTicket;
+    }
+
+    
 }

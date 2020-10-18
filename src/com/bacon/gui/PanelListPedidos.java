@@ -76,6 +76,9 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener 
     public static final String ST_ENTREGADO = "ENTREGADO";
     public static final String ST_DEVUELTO = "DEVUELTO";
     public static final String ST_DESPACHADO = "DESPACHADO";
+
+    public static final String AC_SHOW_INVOICE = "AC_SHOW_INVOICE";
+
     private JPopupMenu popupTable;
     private MyPopupListener popupListenerTabla;
     private ArrayList<Client> clientList;
@@ -147,7 +150,7 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener 
                 if (opt == JOptionPane.OK_OPTION) {
                     inv.setStatus(Invoice.ST_ANULADA);
                     app.getControl().updateInvoice(inv);
-                    List<ProductoPed> list= inv.getProducts();
+                    List<ProductoPed> list = inv.getProducts();
                     app.getControl().restoreInventory(list);
                     loadPedidos();
                 }
@@ -155,6 +158,24 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener 
             }
         });
         popupTable.add(item1);
+
+        JMenuItem item2 = new JMenuItem("Cargar");
+        item2.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int r = tableList.getSelectedRow();
+                String fact = tableList.getValueAt(r, 0).toString();
+                Invoice inv = app.getControl().getInvoiceByCode(fact);
+
+                pcs.firePropertyChange(AC_SHOW_INVOICE, inv, null);
+                
+                
+
+            }
+        });
+        popupTable.add(item2);
+
         tableList.addMouseListener(popupListenerTabla);
 
         btBuscar.setText("");

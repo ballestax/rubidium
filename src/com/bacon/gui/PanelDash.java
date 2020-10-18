@@ -89,8 +89,8 @@ public class PanelDash extends JPanel {
 
 //          String logo = "";
 //        BufferedImage logoImage = org.dzur.ImagenesFx.textoImagen(logo, wl, hl, Color.blue, new Color(255,255,255,50), new Font("Tahoma",1,42));
-            if(imgMas!=null)
-            g2.drawImage(imgMas, px, py, this);
+//            if(imgMas!=null)
+////            g2.drawImage(imgMas, px, py, this);
         }
     } ///*/
 

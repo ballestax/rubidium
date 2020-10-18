@@ -106,6 +106,7 @@ public class JDBCUtilDAO implements UtilDAO {
     protected static final String GET_USER_ROLE_KEY = "GET_USER_ROLE";
 
     public static final String GET_FIRST_REGISTRO_KEY = "GET_FIRST_REGISTRO";
+    public static final String GET_LAST_REGISTRO_KEY = "GET_LAST_REGISTRO";
 
     public static final String GET_CATEGORIES_SORTED_KEY = "GET_CATEGORIES_SORTED";
 
@@ -846,7 +847,38 @@ public class JDBCUtilDAO implements UtilDAO {
             retrieve = sqlStatements.getSQLString(EXIST_CLAVE_KEY, namedParams);
             retrieve = sqlStatements.getSQLString(GET_FIRST_REGISTRO_KEY, namedParams);
         } catch (IOException e) {
-            throw new DAOException("Could not properly retrieve registrp date", e);
+            throw new DAOException("Could not properly retrieve registro date", e);
+        }
+        Connection conn = null;
+        PreparedStatement pSt = null;
+        ResultSet rs = null;
+        Date fecha = null;
+        try {
+            conn = dataSource.getConnection();
+            pSt = conn.prepareStatement(retrieve);
+            rs = pSt.executeQuery();
+            while (rs.next()) {
+                fecha = rs.getDate(1);
+            }
+        } catch (SQLException e) {
+            throw new DAOException("Could not properly retrieve the entrada date: " + e);
+        } finally {
+            DBManager.closeResultSet(rs);
+            DBManager.closeStatement(pSt);
+            DBManager.closeConnection(conn);
+        }
+        return fecha;
+    }
+    
+    public Date getLastEntrada(String tabla, String field) throws DAOException {
+        String retrieve;
+        try {
+            Map<String, String> namedParams = new HashMap<String, String>();
+            namedParams.put(JDBCDAOFactory.NAMED_PARAM_TABLE, tabla);
+            namedParams.put(JDBCDAOFactory.NAMED_PARAM_QUERY, field);
+            retrieve = sqlStatements.getSQLString(GET_LAST_REGISTRO_KEY, namedParams);
+        } catch (IOException e) {
+            throw new DAOException("Could not properly retrieve registro date", e);
         }
         Connection conn = null;
         PreparedStatement pSt = null;

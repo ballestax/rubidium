@@ -213,6 +213,7 @@ public class PanelAddItem extends PanelCaptura implements ActionListener, Proper
                 Object[] pres = presentations.get(i);
                 int idPres = Integer.parseInt(pres[0].toString());
                 int idProd = Integer.parseInt(pres[1].toString());
+                String quantity = pres[2].toString();
                 System.out.println(Arrays.toString(pres));
                 if (idPres == 0) {
                     for (int j = 0; j < model.getRowCount(); j++) {
@@ -220,6 +221,7 @@ public class PanelAddItem extends PanelCaptura implements ActionListener, Proper
 //                        System.out.println("::"+rProd+"::"+idProd+":"+(rProd == idProd));
                         if (rProd == idProd) {
                             model.setValueAt(true, j, 0);
+                            model.setValueAt(quantity, j, 5);
                         }
                     }
                 } else {
@@ -229,6 +231,7 @@ public class PanelAddItem extends PanelCaptura implements ActionListener, Proper
 //                            System.out.println("::"+rPres+"::"+idPres+":"+(rPres == idPres));
                             if (rPres == idPres) {
                                 model.setValueAt(true, j, 0);
+                                model.setValueAt(quantity, j, 5);
                             }
                         }
                     }
@@ -382,6 +385,7 @@ public class PanelAddItem extends PanelCaptura implements ActionListener, Proper
         
         for (int i = 0; i < tableProducts.getRowCount(); ++i) {
             model.setValueAt(Boolean.FALSE, i, 0);
+            model.setValueAt(1, i, 5);
         }
     }
     

@@ -161,7 +161,7 @@ public class PanelConfirmPedido extends javax.swing.JPanel implements ActionList
                 total = total + serv;
             }
 
-            lbTotal.setText("<html>Total<br><font size=+1 color=red>" + app.getCurrencyFormat().format(total) + "</html>");
+                lbTotal.setText("<html>Total<br><font size=+1 color=red>" + app.getCurrencyFormat().format(total) + "</html>");
 
             updateUI();
         }

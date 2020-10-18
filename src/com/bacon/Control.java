@@ -777,7 +777,7 @@ public class Control {
             return false;
         }
     }
-    
+
     public boolean updateItemPres(Item item) {
         try {
             JDBCItemDAO itemDAO = (JDBCItemDAO) DAOFactory.getInstance().getItemDAO();
@@ -942,17 +942,17 @@ public class Control {
         }
     }
 
-     public ArrayList<Object[]> getPresentationsOutInventoryList(long idPres,long idItem, Date start) {
+    public ArrayList<Object[]> getPresentationsOutInventoryList(long idPres, long idItem, Date start) {
         try {
             JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
-            return utilDAO.getPresentationOutInventory(idPres,idItem,  start);
+            return utilDAO.getPresentationOutInventory(idPres, idItem, start);
         } catch (DAOException ex) {
             logger.error("Error getting presentation out list.", ex);
             GUIManager.showErrorMessage(null, "Error consultando lista de salida de productos por presentacion", "Error");
             return null;
         }
     }
-     
+
     public ArrayList<Object[]> getPresentationsByItem(long idItem) {
         try {
             JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
@@ -963,7 +963,7 @@ public class Control {
             return null;
         }
     }
-    
+
     public ArrayList<Object[]> getProductsSales(Date start, Date end) {
         try {
             JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
@@ -974,5 +974,23 @@ public class Control {
             return null;
         }
     }
+
+    public Invoice getLastDelivery(String cel) {
+        try {
+
+            String query = "SELECT * FROM invoices WHERE idClient=?? ORDER BY code DESC LIMIT 1";
+            query = query.replace("??", cel);
+
+            JDBCInvoiceDAO invoiceDAO = (JDBCInvoiceDAO) DAOFactory.getInstance().getInvoiceDAO();
+            ArrayList<Invoice> invoiceByQuery = invoiceDAO.getInvoiceByQuery(query);
+            return invoiceByQuery.get(0);
+        } catch (DAOException ex) {
+            logger.error("Error getting invoice.", ex);
+            GUIManager.showErrorMessage(null, "Error consultando factura", "Error");
+            return null;
+        }
+
+    }
+    
 
 }

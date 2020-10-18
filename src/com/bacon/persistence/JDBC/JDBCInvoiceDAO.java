@@ -551,7 +551,7 @@ public class JDBCInvoiceDAO implements InvoiceDAO {
                 ps.executeUpdate();
 
                 HashMap<Integer, HashMap> mData = product.getData();
-                
+
                 //fix issue para productos sin presentacion
                 if (mData != null && !mData.isEmpty()) {
 //                    double exist = Double.parseDouble(data.get("exist").toString());
@@ -697,15 +697,15 @@ public class JDBCInvoiceDAO implements InvoiceDAO {
     }
 
     public ArrayList<Invoice> getInvoiceByQuery(String query) throws DAOException {
-        String retrieve = query;
+        
         Connection conn = null;
         PreparedStatement ps = null;
-        ResultSet rs = null;
+        ResultSet rs = null, rs1 = null, rs2 = null, rs3 = null, rsx = null;
         Invoice invoice = null;
         ArrayList<Invoice> invoices = new ArrayList<>();
         try {
             conn = dataSource.getConnection();
-            ps = conn.prepareStatement(retrieve);
+            ps = conn.prepareStatement(query);
             rs = ps.executeQuery();
             while (rs.next()) {
                 invoice = new Invoice();
@@ -726,10 +726,116 @@ public class JDBCInvoiceDAO implements InvoiceDAO {
                 invoice.setPorcService(rs.getDouble(15));
                 invoice.setStatus(rs.getInt(16));
                 invoices.add(invoice);
+
+                Object[] parameters = {invoice.getFactura()};
+
+                try {
+                    ps = sqlStatements.buildSQLStatement(conn, GET_INVOICE_PRODUCT_KEY, parameters);
+                    rs1 = ps.executeQuery();
+                    Product product;
+                    while (rs1.next()) {
+                        product = new Product();
+                        product.setId(rs1.getInt(1));
+                        product.setName(rs1.getString(2));
+                        product.setCode(rs1.getString(3));
+                        product.setDescription(rs1.getString(4));
+                        product.setPrice(rs1.getBigDecimal(5).doubleValue());
+                        product.setImage(rs1.getString(6));
+                        product.setCategory(rs1.getString(7));
+                        product.setVariablePrice(rs1.getBoolean(8));
+
+                        ProductoPed productoPed = new ProductoPed(product);
+                        productoPed.setPrecio(rs1.getBigDecimal(9).doubleValue());
+                        productoPed.setCantidad(rs1.getInt(10));
+
+                        int idProdPed = rs1.getInt(11);
+                        int idPresentation = rs1.getInt(12);
+
+                        Object[] parameters1 = {idPresentation};
+                        try {
+                            ps = sqlStatements.buildSQLStatement(conn, GET_PRESENTATION_KEY, parameters1);
+                            rsx = ps.executeQuery();
+                            Presentation pres;
+                            while (rsx.next()) {
+                                pres = new Presentation();
+                                pres.setId(rsx.getInt(1));
+                                pres.setIDProd(rsx.getInt(2));
+                                pres.setSerie(rsx.getInt(3));
+                                pres.setName(rsx.getString(4));
+                                pres.setPrice(rsx.getDouble(5));
+                                pres.setDefault(rsx.getBoolean(6));
+                                pres.setEnabled(rs.getBoolean(7));
+                                productoPed.setPresentation(pres);
+                            }
+                        } catch (SQLException e) {
+                            System.out.println(e.getMessage());
+                            throw new DAOException("Could not properly retrieve the presentation " + e);
+                        } catch (IOException e) {
+                            System.out.println(e.getMessage());
+                            throw new DAOException("Could not properly retrieve the presentation: " + e);
+                        }
+
+                        Object[] parameters2 = {idProdPed};
+
+                        try {
+                            ps = sqlStatements.buildSQLStatement(conn, GET_ADDITIONAL_PRODUCT_KEY, parameters2);
+                            rs2 = ps.executeQuery();
+                            Additional addition;
+                            while (rs2.next()) {
+
+                                addition = new Additional();
+                                addition.setId(rs2.getInt(1));
+                                addition.setName(rs2.getString(2));
+                                addition.setMeasure(rs2.getString(4));
+                                addition.setPrecio(rs2.getBigDecimal(5).doubleValue());
+
+                                int cant = rs2.getInt(6);
+
+                                productoPed.addAdicional(addition, cant);
+                            }
+                        } catch (SQLException e) {
+                            throw new DAOException("Could not properly retrieve the additional " + e);
+                        } catch (IOException e) {
+                            throw new DAOException("Could not properly retrieve the additional: " + e);
+
+                        }
+
+                        try {
+                            ps = sqlStatements.buildSQLStatement(conn, GET_EXCLUSION_PRODUCT_KEY, parameters2);
+                            rs3 = ps.executeQuery();
+                            Ingredient ingredient;
+                            while (rs3.next()) {
+
+                                ingredient = new Ingredient();
+                                ingredient.setId(rs3.getInt(1));
+                                ingredient.setName(rs3.getString(2));
+                                ingredient.setCode(rs3.getString(3));
+                                ingredient.setMeasure(rs3.getString(4));
+
+                                productoPed.addExclusion(ingredient);
+                            }
+                        } catch (SQLException e) {
+                            throw new DAOException("Could not properly retrieve the additional " + e);
+                        } catch (IOException e) {
+                            throw new DAOException("Could not properly retrieve the additional: " + e);
+
+                        }
+
+                        invoice.addProduct(productoPed);
+                    }
+                } catch (SQLException e) {
+                    throw new DAOException("Could not properly retrieve the product " + e);
+                } catch (IOException e) {
+                    throw new DAOException("Could not properly retrieve the product: " + e);
+                }
             }
         } catch (SQLException e) {
             throw new DAOException("Could not properly retrieve the Invoice: " + e);
         } finally {
+            DBManager.closeResultSet(rs3);
+            DBManager.closeResultSet(rs2);
+            DBManager.closeResultSet(rsx);
+            DBManager.closeResultSet(rs1);
             DBManager.closeResultSet(rs);
             DBManager.closeStatement(ps);
             DBManager.closeConnection(conn);

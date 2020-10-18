@@ -36,6 +36,8 @@
                   <Component id="regShowExclusions" alignment="0" max="32767" attributes="0"/>
                   <Component id="lbInfo3" alignment="0" max="32767" attributes="0"/>
                   <Component id="regInvoiceOutStock" alignment="0" max="32767" attributes="0"/>
+                  <Component id="lbInfo4" alignment="0" pref="376" max="32767" attributes="0"/>
+                  <Component id="regPrefix" alignment="0" max="32767" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -62,7 +64,11 @@
               <Component id="lbInfo3" min="-2" pref="25" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="regInvoiceOutStock" min="-2" max="-2" attributes="0"/>
-              <EmptySpace pref="106" max="32767" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="lbInfo4" min="-2" pref="25" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="regPrefix" min="-2" pref="28" max="-2" attributes="0"/>
+              <EmptySpace pref="41" max="32767" attributes="0"/>
               <Component id="btApply" min="-2" pref="22" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -139,6 +145,21 @@
       <Properties>
         <Property name="text" type="java.lang.String" value="jCheckBox1"/>
       </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="lbInfo4">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="jLabel2"/>
+        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+          <Border info="org.netbeans.modules.form.compat2.border.EtchedBorderInfo">
+            <EtchetBorder/>
+          </Border>
+        </Property>
+      </Properties>
+    </Component>
+    <Component class="com.bacon.gui.util.Registro" name="regPrefix">
+      <AuxValues>
+        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, &quot;Domicilio&quot;, &quot;&quot;)"/>
+      </AuxValues>
     </Component>
   </SubComponents>
 </Form>

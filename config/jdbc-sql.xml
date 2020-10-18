@@ -54,6 +54,7 @@
                     |GET_PRODUCTS_OUT_INVENTORY|GET_PRESENTATIONS_OUT_INVENTORY
                     |GET_ITEM_PRESENTATIONS
                     |GET_PRODUCTS_SALES
+                    |GET_LAST_INVOICE_BY_CLIENT
                     
                     ) #REQUIRED
                     
@@ -1673,6 +1674,12 @@
                 ORDER BY p.category, p.name
             </SQLFragment>
             
+        </SQLStatement>
+        
+        <SQLStatement method="GET_LAST_INVOICE_BY_CLIENT">
+            <SQLFragment>
+                SELECT * from invoices where idClient=? ORDER BY code DESC LIMIT 1
+            </SQLFragment>            
         </SQLStatement>
         
     </DAOStatements>

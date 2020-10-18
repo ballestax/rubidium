@@ -73,10 +73,21 @@ public class PrinterService {
             Image imagen = app.getImgManager().getImagen("gui/img/" + "logo2.png", 150, 150);
             BufferedImage buffImagen = Imagenes.toBuffereredImage(imagen);
             EscPosImage escposImage = new EscPosImage(buffImagen, algorithm);
+            
+            
+            //DATOS PARA LA FACTURA
+            String BS_NAME = app.getConfiguration().getProperty(Configuration.BS_NAME);
+            String BS_ID = app.getConfiguration().getProperty(Configuration.BS_ID);
+            String BS_ADDRESS = app.getConfiguration().getProperty(Configuration.BS_ADDRESS);
+            String BS_PHONE = app.getConfiguration().getProperty(Configuration.BS_PHONE);
+            String BS_CUSTOM1 = app.getConfiguration().getProperty(Configuration.BS_CUSTOM_TOP);
+            String BS_CUSTOM2 = app.getConfiguration().getProperty(Configuration.BS_CUSTOM_BOTTON);
+            
 
             // this wrapper uses esc/pos sequence: "ESC '*'"
             BitImageWrapper imageWrapper = new BitImageWrapper();
-
+            
+            
             Style font2 = new Style().setFontSize(Style.FontSize._1, Style.FontSize._1).setJustification(EscPosConst.Justification.Center);
             Style font3 = new Style().setFontSize(Style.FontSize._1, Style.FontSize._1);
             Style font4 = new Style().setFontSize(Style.FontSize._1, Style.FontSize._1).setJustification(EscPosConst.Justification.Right);
@@ -87,11 +98,16 @@ public class PrinterService {
             escpos.write(imageWrapper, escposImage);
             escpos.feed(1);
             escpos.writeLF(new Style().setFontSize(Style.FontSize._3, Style.FontSize._3).setJustification(EscPosConst.Justification.Center),
-                    "Bacon 57 Burger");
-            escpos.writeLF(font2, "NIT. 1129518949-8");
-            escpos.writeLF(font2, "Calle 18 # 5-59");
-            escpos.writeLF(font2, "321 5944870 - 315 4048585");
+                    BS_NAME);
+            escpos.writeLF(font2, BS_ID);
+            escpos.writeLF(font2, BS_ADDRESS);
+            escpos.writeLF(font2, BS_PHONE);
             escpos.feed(1);
+            
+            escpos.writeLF(font2, BS_CUSTOM1);
+            escpos.feed(1);
+            
+            
             if (invoice.getTipoEntrega() == PanelPedido.TIPO_LOCAL) {
 
                 escpos.writeLF(font3, "Mesa:   " + (table != null ? table.getName() : "- - -"));
@@ -162,9 +178,9 @@ public class PrinterService {
 
             escpos.feed(1);
 
-            escpos.writeLF(font2, "Gracias por su compra");
+            escpos.writeLF(font2, BS_CUSTOM2);
 
-            escpos.writeLF(font5, "#QuedateEnCasa");
+//            escpos.writeLF(font5, "#QuedateEnCasa");
 
             escpos.feed(5);
 
@@ -277,6 +293,8 @@ public class PrinterService {
     }
 
     public void imprimirGuide(Invoice invoice, String printerName) {
+        
+        String BS_NAME = app.getConfiguration().getProperty(Configuration.BS_NAME);
 
         Waiter waiter = null;
         Table table = null;
@@ -308,7 +326,7 @@ public class PrinterService {
             escpos.feed(1);
 
             escpos.writeLF(new Style().setFontSize(Style.FontSize._2, Style.FontSize._2).setJustification(EscPosConst.Justification.Center),
-                    "Bacon 57 Burger");
+                    BS_NAME);
             escpos.feed(1);
 
             escpos.writeLF(font3, String.format("Tiquete N°:  %1s", invoice.getFactura()));
