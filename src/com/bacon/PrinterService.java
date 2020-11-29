@@ -73,8 +73,7 @@ public class PrinterService {
             Image imagen = app.getImgManager().getImagen("gui/img/" + "logo2.png", 150, 150);
             BufferedImage buffImagen = Imagenes.toBuffereredImage(imagen);
             EscPosImage escposImage = new EscPosImage(buffImagen, algorithm);
-            
-            
+
             //DATOS PARA LA FACTURA
             String BS_NAME = app.getConfiguration().getProperty(Configuration.BS_NAME);
             String BS_ID = app.getConfiguration().getProperty(Configuration.BS_ID);
@@ -82,12 +81,10 @@ public class PrinterService {
             String BS_PHONE = app.getConfiguration().getProperty(Configuration.BS_PHONE);
             String BS_CUSTOM1 = app.getConfiguration().getProperty(Configuration.BS_CUSTOM_TOP);
             String BS_CUSTOM2 = app.getConfiguration().getProperty(Configuration.BS_CUSTOM_BOTTON);
-            
 
             // this wrapper uses esc/pos sequence: "ESC '*'"
             BitImageWrapper imageWrapper = new BitImageWrapper();
-            
-            
+
             Style font2 = new Style().setFontSize(Style.FontSize._1, Style.FontSize._1).setJustification(EscPosConst.Justification.Center);
             Style font3 = new Style().setFontSize(Style.FontSize._1, Style.FontSize._1);
             Style font4 = new Style().setFontSize(Style.FontSize._1, Style.FontSize._1).setJustification(EscPosConst.Justification.Right);
@@ -103,11 +100,10 @@ public class PrinterService {
             escpos.writeLF(font2, BS_ADDRESS);
             escpos.writeLF(font2, BS_PHONE);
             escpos.feed(1);
-            
+
             escpos.writeLF(font2, BS_CUSTOM1);
             escpos.feed(1);
-            
-            
+
             if (invoice.getTipoEntrega() == PanelPedido.TIPO_LOCAL) {
 
                 escpos.writeLF(font3, "Mesa:   " + (table != null ? table.getName() : "- - -"));
@@ -181,7 +177,6 @@ public class PrinterService {
             escpos.writeLF(font2, BS_CUSTOM2);
 
 //            escpos.writeLF(font5, "#QuedateEnCasa");
-
             escpos.feed(5);
 
             escpos.cut(EscPos.CutMode.FULL);
@@ -293,7 +288,7 @@ public class PrinterService {
     }
 
     public void imprimirGuide(Invoice invoice, String printerName) {
-        
+
         String BS_NAME = app.getConfiguration().getProperty(Configuration.BS_NAME);
 
         Waiter waiter = null;
@@ -349,6 +344,13 @@ public class PrinterService {
 
                 escpos.writeLF(String.format(formatInfo, "1", "Domicilio", "", app.DCFORM_P.format(invoice.getValorDelivery())));
                 total = total.add(invoice.getValorDelivery());
+            }
+
+            if (invoice.isService() && invoice.getPorcService() > 0) {
+                escpos.writeLF(font2, "________________________________________________");
+
+                escpos.writeLF(String.format(formatInfo, invoice.getPorcService(), "Servicio vol.", "", app.DCFORM_P.format(invoice.getValueService())));
+                total = total.add(new BigDecimal(invoice.getValueService()));
             }
 
             escpos.writeLF(font2, "________________________________________________");

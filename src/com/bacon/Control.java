@@ -172,7 +172,7 @@ public class Control {
             return configDAO.getConfigDB(clave);
         } catch (Exception e) {
             logger.error("Error getting config.", e);
-            return null;
+            return new ConfigDB();
         }
     }
 
@@ -210,6 +210,16 @@ public class Control {
             return utilDAO.getMaxID(tabla);
         } catch (Exception e) {
             logger.error("Error getting maxID for: " + tabla, e);
+            return 0;
+        }
+    }
+
+    public Object getMaxValue(String tabla, String field) {
+        try {
+            JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
+            return utilDAO.getMaxValue(tabla, field);
+        } catch (DAOException e) {
+            logger.error("Error getting max value for: " + tabla, e);
             return 0;
         }
     }
@@ -601,6 +611,17 @@ public class Control {
         }
     }
 
+    public void updateInvoiceFull(Invoice invoice, List<ProductoPed> oldProducts) {
+        try {
+            JDBCInvoiceDAO invoiceDAO = (JDBCInvoiceDAO) DAOFactory.getInstance().getInvoiceDAO();
+            invoiceDAO.updateInvoiceFull(invoice, oldProducts);
+        } catch (DAOException ex) {
+            String msg = "Error updating invoice full";
+            logger.error(msg, ex);
+            GUIManager.showErrorMessage(null, msg, "Error");
+        }
+    }
+
     public void anulateInvoice(Invoice invoice) {
         try {
             JDBCInvoiceDAO invoiceDAO = (JDBCInvoiceDAO) DAOFactory.getInstance().getInvoiceDAO();
@@ -917,10 +938,15 @@ public class Control {
 
     public void restoreInventory(List<ProductoPed> listProductoPeds) {
         List<ProductoPed> list = listProductoPeds;
+
         for (int idx = 0; idx < list.size(); idx++) {
             ProductoPed pPed = list.get(idx);
-            Presentation pres = pPed.getPresentation();
-            HashMap<Integer, HashMap> mData = app.getControl().checkInventory(pres.getId());
+            HashMap<Integer, HashMap> mData = null;
+            if (pPed.hasPresentation()) {
+                mData = app.getControl().checkInventory(pPed.getPresentation().getId());
+            } else {
+                mData = app.getControl().checkInventoryProduct(pPed.getProduct().getId());
+            }
             for (Integer key : mData.keySet()) {
                 HashMap data = mData.get(key);
                 int id = Integer.parseInt(data.get("id").toString());
@@ -928,6 +954,7 @@ public class Control {
                 app.getControl().addItemToInventory(id, quantity * pPed.getCantidad());
                 logger.debug("Update inventory: " + pPed.getProduct().getName() + ":: " + data.get("name") + "-> idItem:" + id + "[" + quantity + "]");
             }
+
         }
     }
 
@@ -991,6 +1018,5 @@ public class Control {
         }
 
     }
-    
 
 }

@@ -5,6 +5,7 @@ import com.bacon.Configuration;
 import com.bacon.MyConstants;
 import com.bacon.domain.Client;
 import com.bacon.domain.Invoice;
+import com.bacon.domain.Permission;
 import com.bacon.domain.ProductoPed;
 import com.bacon.domain.Table;
 import com.bacon.domain.Waiter;
@@ -170,7 +171,8 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener 
 
                 pcs.firePropertyChange(AC_SHOW_INVOICE, inv, null);
                 
-                
+                Permission perm = app.getControl().getPermissionByName("show-pedidos-module");
+                app.getGuiManager().showBasicPanel(app.getGuiManager().getPanelBasicPedidos(), perm);
 
             }
         });

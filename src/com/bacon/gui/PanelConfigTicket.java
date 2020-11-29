@@ -6,6 +6,11 @@
 package com.bacon.gui;
 
 import com.bacon.Aplication;
+import com.bacon.MyConstants;
+import static com.bacon.MyConstants.CF_FACTURA_ACTUAL;
+import static com.bacon.MyConstants.CF_FACTURA_FINAL;
+import static com.bacon.MyConstants.CF_FACTURA_INICIAL;
+import com.bacon.domain.ConfigDB;
 import com.github.anastaciocintra.escpos.EscPosConst;
 import com.github.anastaciocintra.escpos.Style;
 import java.awt.Color;
@@ -90,10 +95,25 @@ public class PanelConfigTicket extends javax.swing.JPanel implements ActionListe
         regText6.setLabelText("Personalizado2:");
         regFont6.setText(FONTS.values());
 
+        lbInfo7.setText("Consecutivo facturas");
+        lbInfo7.setBackground(color1);
+        ConfigDB config = app.getControl().getConfig(CF_FACTURA_INICIAL);
+        regText7.setText(config != null ? config.getValor() : "0");
+        regText7.setLabelText("Inicial:");
+
+        ConfigDB config1 = app.getControl().getConfig(CF_FACTURA_FINAL);
+        regText8.setText(config1 != null ? config1.getValor() : "0");
+        regText8.setLabelText("Final:");
+        
+        ConfigDB config2 = app.getControl().getConfig(CF_FACTURA_ACTUAL);
+        regText9.setText(config2 != null ? config2.getValor() : "0");
+        regText9.setLabelText("Factura actual:");
+
         btApply.setText("Aplicar");
         btApply.setActionCommand(ACTION_APPLY);
         btApply.addActionListener(this);
     }
+    
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -125,6 +145,10 @@ public class PanelConfigTicket extends javax.swing.JPanel implements ActionListe
         lbInfo6 = new javax.swing.JLabel();
         regText6 = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Reg6", "",100);
         regFont6 = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Fuente", new Object[0]);
+        lbInfo7 = new javax.swing.JLabel();
+        regText7 = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Reg6", "",100);
+        regText8 = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Reg6", "",100);
+        regText9 = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Reg6", "",100);
 
         lbTitle.setBackground(java.awt.Color.lightGray);
         lbTitle.setOpaque(true);
@@ -154,6 +178,10 @@ public class PanelConfigTicket extends javax.swing.JPanel implements ActionListe
         lbInfo6.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         lbInfo6.setOpaque(true);
 
+        lbInfo7.setText("jLabel2");
+        lbInfo7.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        lbInfo7.setOpaque(true);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -172,31 +200,41 @@ public class PanelConfigTicket extends javax.swing.JPanel implements ActionListe
                         .addComponent(regFont1, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(lbInfo2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(regText2, javax.swing.GroupLayout.DEFAULT_SIZE, 249, Short.MAX_VALUE)
+                        .addComponent(regText2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(regFont2, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(lbInfo3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(regText3, javax.swing.GroupLayout.DEFAULT_SIZE, 249, Short.MAX_VALUE)
+                        .addComponent(regText3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(regFont3, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(lbInfo4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(regText4, javax.swing.GroupLayout.DEFAULT_SIZE, 249, Short.MAX_VALUE)
+                        .addComponent(regText4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(regFont4, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(lbInfo5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(regText5, javax.swing.GroupLayout.DEFAULT_SIZE, 249, Short.MAX_VALUE)
+                        .addComponent(regText5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(regFont5, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(lbInfo6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(regText6, javax.swing.GroupLayout.DEFAULT_SIZE, 249, Short.MAX_VALUE)
+                        .addComponent(regText6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(regFont6, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(regFont6, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(lbInfo7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(regText7, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(regText8, javax.swing.GroupLayout.PREFERRED_SIZE, 212, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(regText9, javax.swing.GroupLayout.PREFERRED_SIZE, 212, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
+
+        layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {regText7, regText8, regText9});
+
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
@@ -238,7 +276,14 @@ public class PanelConfigTicket extends javax.swing.JPanel implements ActionListe
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(regText6, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(regFont6, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 37, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(lbInfo7, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(2, 2, 2)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                    .addComponent(regText7, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(regText8, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(regText9, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 17, Short.MAX_VALUE)
                 .addComponent(btApply, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
@@ -254,6 +299,7 @@ public class PanelConfigTicket extends javax.swing.JPanel implements ActionListe
     private javax.swing.JLabel lbInfo4;
     private javax.swing.JLabel lbInfo5;
     private javax.swing.JLabel lbInfo6;
+    private javax.swing.JLabel lbInfo7;
     private javax.swing.JLabel lbTitle;
     private com.bacon.gui.util.Registro regFont1;
     private com.bacon.gui.util.Registro regFont2;
@@ -267,6 +313,9 @@ public class PanelConfigTicket extends javax.swing.JPanel implements ActionListe
     private com.bacon.gui.util.Registro regText4;
     private com.bacon.gui.util.Registro regText5;
     private com.bacon.gui.util.Registro regText6;
+    private com.bacon.gui.util.Registro regText7;
+    private com.bacon.gui.util.Registro regText8;
+    private com.bacon.gui.util.Registro regText9;
     // End of variables declaration//GEN-END:variables
 
     @Override
@@ -274,21 +323,30 @@ public class PanelConfigTicket extends javax.swing.JPanel implements ActionListe
         if (ACTION_APPLY.equals(e.getActionCommand())) {
             String value = regText1.getText();
             app.getConfiguration().setProperty(com.bacon.Configuration.BS_NAME, value);
-            
+
             value = regText2.getText();
             app.getConfiguration().setProperty(com.bacon.Configuration.BS_ID, value);
-            
+
             value = regText3.getText();
             app.getConfiguration().setProperty(com.bacon.Configuration.BS_ADDRESS, value);
-            
+
             value = regText4.getText();
             app.getConfiguration().setProperty(com.bacon.Configuration.BS_PHONE, value);
-            
+
             value = regText5.getText();
             app.getConfiguration().setProperty(com.bacon.Configuration.BS_CUSTOM_TOP, value);
-            
+
             value = regText6.getText();
             app.getConfiguration().setProperty(com.bacon.Configuration.BS_CUSTOM_BOTTON, value);
+
+            value = regText7.getText();
+            app.getControl().addConfig(new ConfigDB(CF_FACTURA_INICIAL, ConfigDB.INTEGER, value));
+
+            value = regText8.getText();
+            app.getControl().addConfig(new ConfigDB(CF_FACTURA_FINAL, ConfigDB.INTEGER, value));
+            
+            value = regText9.getText();
+            app.getControl().addConfig(new ConfigDB(CF_FACTURA_ACTUAL, ConfigDB.INTEGER, value));
 
             app.getConfiguration().save();
         }

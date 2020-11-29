@@ -656,7 +656,7 @@
                 variable TINYINT(1),
                 image VARCHAR(255),
                 category VARCHAR(25),
-                variable TINYINT(1) DEFAULT 1, 
+                enabled TINYINT(1) DEFAULT 1, 
                 PRIMARY KEY (id)
                 )ENGINE=InnoDB DEFAULT CHARSET=latin1;
             </SQLFragment>
@@ -833,7 +833,7 @@
             <SQLFragment>
                 CREATE TABLE invoices(
                 id INTEGER AUTO_INCREMENT,
-                code VARCHAR(255) NOT NULL UNIQUE,
+                code VARCHAR(255) NOT NULL UNIQUE,                
                 sale_date DATETIME,                
                 deliveryType INTEGER, 
                 value DECIMAL(20,2),
@@ -1667,7 +1667,7 @@
                 LEFT JOIN invoices i on ivp.id_invoice=i.id,
                 products p
                 WHERE
-                ivp.id_product=p.id
+                ivp.id_product=p.id AND i.status=0
                 AND (i.sale_date BETWEEN ? AND ?)
                 GROUP BY
                 p.category, ivp.id_product, ivp.id_presentation

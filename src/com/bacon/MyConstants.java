@@ -67,5 +67,9 @@ public class MyConstants {
     
     public static final String[] PERIODOS = {"DIA", "SEMANA", "MES", "AÑO", "RANGO"};
     public static final String[] TIPO_REPORTE = {"VENTAS", "PRODUCTOS VENDIDOS"};
+    
+    public static final String CF_FACTURA_FINAL = "factura_final";
+    public static final String CF_FACTURA_INICIAL = "factura_inicial";
+    public static final String CF_FACTURA_ACTUAL = "factura_actual";
 
 }

@@ -13,7 +13,7 @@ public class Invoice {
 
     private Long id;
     private Long ciclo;
-    private String factura;
+    private String factura;    
     private Date fecha;
     private Long idCliente;
     private BigDecimal valor;

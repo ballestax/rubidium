@@ -900,6 +900,37 @@ public class JDBCUtilDAO implements UtilDAO {
         }
         return fecha;
     }
+    
+     public Object getMaxValue(String tabla, String field) throws DAOException {
+        String retrieve;
+        try {
+            Map<String, String> namedParams = new HashMap<String, String>();
+            namedParams.put(JDBCDAOFactory.NAMED_PARAM_TABLE, tabla);
+            namedParams.put(JDBCDAOFactory.NAMED_PARAM_QUERY, field);
+            retrieve = sqlStatements.getSQLString(GET_LAST_REGISTRO_KEY, namedParams);
+        } catch (IOException e) {
+            throw new DAOException("Could not properly retrieve registro date", e);
+        }
+        Connection conn = null;
+        PreparedStatement pSt = null;
+        ResultSet rs = null;
+        Object max = null;
+        try {
+            conn = dataSource.getConnection();
+            pSt = conn.prepareStatement(retrieve);
+            rs = pSt.executeQuery();
+            while (rs.next()) {
+                max = rs.getObject(1);
+            }
+        } catch (SQLException e) {
+            throw new DAOException("Could not properly retrieve the entrada date: " + e);
+        } finally {
+            DBManager.closeResultSet(rs);
+            DBManager.closeStatement(pSt);
+            DBManager.closeConnection(conn);
+        }
+        return max;
+    }
 
     public ArrayList<Presentation> getPresentationsByProduct(long id) throws DAOException {
         String retrieveList;
