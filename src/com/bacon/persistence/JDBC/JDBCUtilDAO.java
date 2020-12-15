@@ -109,6 +109,7 @@ public class JDBCUtilDAO implements UtilDAO {
     public static final String GET_LAST_REGISTRO_KEY = "GET_LAST_REGISTRO";
 
     public static final String GET_CATEGORIES_SORTED_KEY = "GET_CATEGORIES_SORTED";
+    public static final String GET_ALL_CATEGORIES_KEY = "GET_ALL_CATEGORIES";
 
     public static final String CREATE_UNITS_TABLE_KEY = "CREATE_UNITS_TABLE";
     public static final String ADD_UNIT_KEY = "ADD_UNIT";
@@ -1140,6 +1141,35 @@ public class JDBCUtilDAO implements UtilDAO {
         String retrieveList;
         try {
             retrieveList = sqlStatements.getSQLString(GET_CATEGORIES_SORTED_KEY);
+        } catch (IOException e) {
+            throw new DAOException("Could not properly retrieve the categories list", e);
+        }
+        Connection conn = null;
+        PreparedStatement retrieve = null;
+        ResultSet rs = null;
+        ArrayList<Category> categories = new ArrayList<>();
+        try {
+            conn = dataSource.getConnection();
+            retrieve = conn.prepareStatement(retrieveList);
+            rs = retrieve.executeQuery();
+            while (rs.next()) {
+                Category category = new Category(rs.getString(1));
+                categories.add(category);
+            }
+        } catch (SQLException e) {
+            throw new DAOException("Could not properly retrieve the categories list: " + e);
+        } finally {
+            DBManager.closeResultSet(rs);
+            DBManager.closeStatement(retrieve);
+            DBManager.closeConnection(conn);
+        }
+        return categories;
+    }
+    
+    public ArrayList<Category> getAllCategories() throws DAOException {
+        String retrieveList;
+        try {
+            retrieveList = sqlStatements.getSQLString(GET_ALL_CATEGORIES_KEY);
         } catch (IOException e) {
             throw new DAOException("Could not properly retrieve the categories list", e);
         }

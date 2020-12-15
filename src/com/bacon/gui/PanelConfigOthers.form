@@ -24,7 +24,7 @@
           <Group type="102" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="lbInfo" pref="376" max="32767" attributes="0"/>
+                  <Component id="lbInfo" pref="431" max="32767" attributes="0"/>
                   <Component id="regDelivery" max="32767" attributes="0"/>
                   <Group type="102" alignment="1" attributes="0">
                       <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
@@ -36,8 +36,12 @@
                   <Component id="regShowExclusions" alignment="0" max="32767" attributes="0"/>
                   <Component id="lbInfo3" alignment="0" max="32767" attributes="0"/>
                   <Component id="regInvoiceOutStock" alignment="0" max="32767" attributes="0"/>
-                  <Component id="lbInfo4" alignment="0" pref="376" max="32767" attributes="0"/>
+                  <Component id="lbInfo4" alignment="0" pref="431" max="32767" attributes="0"/>
                   <Component id="regPrefix" alignment="0" max="32767" attributes="0"/>
+                  <Component id="lbInfo5" alignment="0" pref="431" max="32767" attributes="0"/>
+                  <Component id="regZeros" alignment="0" max="32767" attributes="0"/>
+                  <Component id="lbInfo6" alignment="0" pref="431" max="32767" attributes="0"/>
+                  <Component id="regDocument" alignment="0" max="32767" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -68,7 +72,15 @@
               <Component id="lbInfo4" min="-2" pref="25" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="regPrefix" min="-2" pref="28" max="-2" attributes="0"/>
-              <EmptySpace pref="41" max="32767" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="lbInfo5" min="-2" pref="25" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="regZeros" min="-2" pref="28" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="lbInfo6" min="-2" pref="25" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="regDocument" min="-2" pref="28" max="-2" attributes="0"/>
+              <EmptySpace max="32767" attributes="0"/>
               <Component id="btApply" min="-2" pref="22" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -160,6 +172,36 @@
       <AuxValues>
         <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, &quot;Domicilio&quot;, &quot;&quot;)"/>
       </AuxValues>
+    </Component>
+    <Component class="com.bacon.gui.util.Registro" name="regZeros">
+      <AuxValues>
+        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, &quot;Domicilio&quot;, &quot;&quot;)"/>
+      </AuxValues>
+    </Component>
+    <Component class="javax.swing.JLabel" name="lbInfo5">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="jLabel2"/>
+        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+          <Border info="org.netbeans.modules.form.compat2.border.EtchedBorderInfo">
+            <EtchetBorder/>
+          </Border>
+        </Property>
+      </Properties>
+    </Component>
+    <Component class="com.bacon.gui.util.Registro" name="regDocument">
+      <AuxValues>
+        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, &quot;Domicilio&quot;, &quot;&quot;)"/>
+      </AuxValues>
+    </Component>
+    <Component class="javax.swing.JLabel" name="lbInfo6">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="jLabel2"/>
+        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+          <Border info="org.netbeans.modules.form.compat2.border.EtchedBorderInfo">
+            <EtchetBorder/>
+          </Border>
+        </Property>
+      </Properties>
     </Component>
   </SubComponents>
 </Form>

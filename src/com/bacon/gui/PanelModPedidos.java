@@ -7,6 +7,7 @@ package com.bacon.gui;
 
 import com.bacon.domain.Category;
 import com.bacon.Aplication;
+import com.bacon.Configuration;
 import com.bacon.domain.Product;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
@@ -65,8 +66,15 @@ public class PanelModPedidos extends PanelCapturaMod
         panelSelCategory = app.getGuiManager().getPanelSelCategory();
         panelSelCategory.addPropertyChangeListener(this);
 
-        categorys = app.getControl().getCategorieslList();
+        categorys = app.getControl().getCategoriesList();
+        int MAX = app.getConfiguration().getProperty(Configuration.MAX_CATEGORIES_LIST, 5);
+        if(categorys.size()<MAX){
+            categorys = app.getControl().getAllCategoriesList();
+        }
         categorys.add(0, new Category("TODO"));
+        
+        
+        
 
         panelSelCategory.setCategories(categorys);
 

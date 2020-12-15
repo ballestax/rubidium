@@ -9,6 +9,7 @@ import com.bacon.Aplication;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.BoxLayout;
+import org.dz.TextFormatter;
 
 /**
  *
@@ -70,7 +71,7 @@ public class PanelConfigOthers extends javax.swing.JPanel implements ActionListe
             outStock = Boolean.parseBoolean(prop);
         } catch (Exception e) {
         }
-        regInvoiceOutStock.setText("Permitir guardar facturas sin exsitencias en  inventario");
+        regInvoiceOutStock.setText("Permitir guardar facturas sin existencias en  inventario");
         regInvoiceOutStock.setSelected(outStock);
         
         lbInfo4.setText("Prefijo numeracion de facturas");
@@ -79,6 +80,19 @@ public class PanelConfigOthers extends javax.swing.JPanel implements ActionListe
         regPrefix.setLabelText("Prefijo");
         String prefix = app.getConfiguration().getProperty(com.bacon.Configuration.PREFIX_INVOICES, "F");
         regPrefix.setText(prefix);
+        
+        lbInfo5.setText("Numero de ceros a formatear consecutivo");
+
+//        exportDIR = property;
+        regZeros.setLabelText("Numero ceros");
+        String ceros = app.getConfiguration().getProperty(com.bacon.Configuration.ZEROS_INVOICES, "0");
+        regZeros.setDocument(TextFormatter.getIntegerLimiter());
+        regZeros.setText(ceros);
+        
+        lbInfo6.setText("Nombre Documento ticket");
+        regDocument.setLabelText("Nombre documento");
+        String nameDoc = app.getConfiguration().getProperty(com.bacon.Configuration.DOCUMENT_NAME, "Ticket N°:");        
+        regDocument.setText(nameDoc);
         
         
 
@@ -109,6 +123,10 @@ public class PanelConfigOthers extends javax.swing.JPanel implements ActionListe
         regInvoiceOutStock = new javax.swing.JCheckBox();
         lbInfo4 = new javax.swing.JLabel();
         regPrefix = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Domicilio", "");
+        regZeros = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Domicilio", "");
+        lbInfo5 = new javax.swing.JLabel();
+        regDocument = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Domicilio", "");
+        lbInfo6 = new javax.swing.JLabel();
 
         lbTitle.setBackground(java.awt.Color.lightGray);
         lbTitle.setOpaque(true);
@@ -134,6 +152,12 @@ public class PanelConfigOthers extends javax.swing.JPanel implements ActionListe
         lbInfo4.setText("jLabel2");
         lbInfo4.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
+        lbInfo5.setText("jLabel2");
+        lbInfo5.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+
+        lbInfo6.setText("jLabel2");
+        lbInfo6.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -142,7 +166,7 @@ public class PanelConfigOthers extends javax.swing.JPanel implements ActionListe
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lbInfo, javax.swing.GroupLayout.DEFAULT_SIZE, 376, Short.MAX_VALUE)
+                    .addComponent(lbInfo, javax.swing.GroupLayout.DEFAULT_SIZE, 431, Short.MAX_VALUE)
                     .addComponent(regDelivery, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
@@ -153,8 +177,12 @@ public class PanelConfigOthers extends javax.swing.JPanel implements ActionListe
                     .addComponent(regShowExclusions, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(lbInfo3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(regInvoiceOutStock, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(lbInfo4, javax.swing.GroupLayout.DEFAULT_SIZE, 376, Short.MAX_VALUE)
-                    .addComponent(regPrefix, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(lbInfo4, javax.swing.GroupLayout.DEFAULT_SIZE, 431, Short.MAX_VALUE)
+                    .addComponent(regPrefix, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(lbInfo5, javax.swing.GroupLayout.DEFAULT_SIZE, 431, Short.MAX_VALUE)
+                    .addComponent(regZeros, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(lbInfo6, javax.swing.GroupLayout.DEFAULT_SIZE, 431, Short.MAX_VALUE)
+                    .addComponent(regDocument, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -182,7 +210,15 @@ public class PanelConfigOthers extends javax.swing.JPanel implements ActionListe
                 .addComponent(lbInfo4, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(regPrefix, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 41, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(lbInfo5, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(regZeros, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(lbInfo6, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(regDocument, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(btApply, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
@@ -197,12 +233,16 @@ public class PanelConfigOthers extends javax.swing.JPanel implements ActionListe
     private javax.swing.JLabel lbInfo2;
     private javax.swing.JLabel lbInfo3;
     private javax.swing.JLabel lbInfo4;
+    private javax.swing.JLabel lbInfo5;
+    private javax.swing.JLabel lbInfo6;
     private javax.swing.JLabel lbTitle;
     private com.bacon.gui.util.Registro regDelivery;
+    private com.bacon.gui.util.Registro regDocument;
     private javax.swing.JCheckBox regInvoiceOutStock;
     private com.bacon.gui.util.Registro regPrefix;
     private javax.swing.JCheckBox regPrintPrev;
     private javax.swing.JCheckBox regShowExclusions;
+    private com.bacon.gui.util.Registro regZeros;
     // End of variables declaration//GEN-END:variables
 
     @Override
@@ -222,6 +262,9 @@ public class PanelConfigOthers extends javax.swing.JPanel implements ActionListe
             
             String prefix = regPrefix.getText();
             app.getConfiguration().setProperty(com.bacon.Configuration.PREFIX_INVOICES, prefix);
+            
+            String ceros = regZeros.getText();
+            app.getConfiguration().setProperty(com.bacon.Configuration.ZEROS_INVOICES, ceros);
 
             app.getConfiguration().save();
         }

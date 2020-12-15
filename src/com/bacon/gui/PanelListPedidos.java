@@ -575,7 +575,7 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener 
             protected Object doInBackground() throws Exception {
                 model.setRowCount(0);
 
-                ArrayList<Invoice> invoiceslList = app.getControl().getInvoiceslList(query, "code DESC, sale_date DESC");
+                ArrayList<Invoice> invoiceslList = app.getControl().getInvoiceslList(query, "sale_date DESC");
                 BigDecimal total = new BigDecimal(0);
                 double servicio = 0;
                 int totalProducts = 0;

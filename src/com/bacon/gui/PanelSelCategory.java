@@ -35,7 +35,6 @@ public class PanelSelCategory extends PanelCaptura implements ActionListener {
     }
 
     private void createComponents() {
-
         setLayout(new BorderLayout());
         Border marginBorder = BorderFactory.createEmptyBorder(5, 5, 5, 5);
         setBorder(BorderFactory.createCompoundBorder(marginBorder,

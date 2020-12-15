@@ -104,17 +104,19 @@ public class PrinterService {
             escpos.writeLF(font2, BS_CUSTOM1);
             escpos.feed(1);
 
+            String cliente = app.getConfiguration().getProperty(Configuration.CLIENT_NAME, "LOCAL");
             if (invoice.getTipoEntrega() == PanelPedido.TIPO_LOCAL) {
-
-                escpos.writeLF(font3, "Mesa:   " + (table != null ? table.getName() : "- - -"));
-                escpos.writeLF(font3, "Mesero: " + (waiter != null ? waiter.getName().toUpperCase() : "- - -"));
+                escpos.writeLF(font3, "Cliente: "+ cliente);
+                escpos.writeLF(font3, "Mesa:    " + (table != null ? table.getName() : "- - -"));
+                escpos.writeLF(font3, "Mesero:  " + (waiter != null ? waiter.getName().toUpperCase() : "- - -"));
             } else {
 
                 escpos.writeLF(font3, "Cliente:   " + (client != null ? client.getCellphone() : "- - -"));
                 escpos.writeLF(font3, "Direccion: " + (client != null && !client.getAddresses().isEmpty() ? client.getAddresses().get(0) : "- - -"));
             }
             escpos.feed(1);
-            escpos.writeLF(font3, String.format("Tiquete N°: %1s %25.25s", invoice.getFactura(), app.DF_FULL.format(invoice.getFecha())));
+            String documento = app.getConfiguration().getProperty(Configuration.DOCUMENT_NAME, "Factura N°:");
+            escpos.writeLF(font3, String.format(documento + " %1s %25.25s", invoice.getFactura(), app.DF_FULL.format(invoice.getFecha())));
             escpos.feed(1);
 
             String column1Format = "%3.3s";  // fixed size 3 characters, left aligned
@@ -324,7 +326,8 @@ public class PrinterService {
                     BS_NAME);
             escpos.feed(1);
 
-            escpos.writeLF(font3, String.format("Tiquete N°:  %1s", invoice.getFactura()));
+            String documento = app.getConfiguration().getProperty(Configuration.DOCUMENT_NAME, "Factura N°:");
+            escpos.writeLF(font3, String.format(documento+"  %1s", invoice.getFactura()));
             escpos.writeLF(font3, String.format("Fecha:       %1s", app.DF_FULL2.format(invoice.getFecha())));
 
             escpos.feed(1);

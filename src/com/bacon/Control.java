@@ -753,10 +753,20 @@ public class Control {
         }
     }
 
-    public ArrayList<Category> getCategorieslList() {
+    public ArrayList<Category> getCategoriesList() {
         try {
             JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
             return utilDAO.getCategoriesSorted();
+        } catch (DAOException ex) {
+            logger.error("Error getting Categories list.", ex);
+            return null;
+        }
+    }
+    
+    public ArrayList<Category> getAllCategoriesList() {
+        try {
+            JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
+            return utilDAO.getAllCategories();
         } catch (DAOException ex) {
             logger.error("Error getting Categories list.", ex);
             return null;
@@ -1010,7 +1020,8 @@ public class Control {
 
             JDBCInvoiceDAO invoiceDAO = (JDBCInvoiceDAO) DAOFactory.getInstance().getInvoiceDAO();
             ArrayList<Invoice> invoiceByQuery = invoiceDAO.getInvoiceByQuery(query);
-            return invoiceByQuery.get(0);
+            
+            return !invoiceByQuery.isEmpty()?invoiceByQuery.get(0):null;
         } catch (DAOException ex) {
             logger.error("Error getting invoice.", ex);
             GUIManager.showErrorMessage(null, "Error consultando factura", "Error");

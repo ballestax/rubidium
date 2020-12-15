@@ -40,6 +40,7 @@ public class Configuration {
     public static final String PRINTER_SELECTED = "cf.printer";
     public static final String DELIVERY_VALUE = "cf.delivery";
     public static final String PREFIX_INVOICES = "cf.prefix";
+    public static final String ZEROS_INVOICES = "cf.zeros";
     public static final String MAX_SERVICE_PORC = "cf.maxservice";
     public static final String DEF_SERVICE_PORC = "cf.defservice";
     public static final String IS_SERVICE_DEF = "cf.isservice";
@@ -49,6 +50,8 @@ public class Configuration {
     public static final String MAX_CATEGORIES_LIST = "cf.maxcategorieslist";
     public static final String PN_ENTRADA_PERIODO = "cf.listperiodo";
     public static final String INVOICE_OUT_STOCK = "cf.invoiceoutstock";
+    public static final String DOCUMENT_NAME = "cf.documentname";
+    public static final String CLIENT_NAME = "cf.clientname";
     
     public static final String BS_ID = "cf.tck.id";
     public static final String BS_NAME = "cf.tck.name";
