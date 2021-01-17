@@ -747,6 +747,7 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
                 lbFactura.setText(calculateProximoRegistro());
 
                 enablePedido(true);
+
                 block = false;
 
                 btConfirm.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "update.png", 10, 10)));
@@ -790,6 +791,12 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
         btInventoryInfo.setEnabled(enable);
         btSearch.setEnabled(enable);
         btClear.setEnabled(enable);
+        if (enable) {
+            popupTabla.add(itemDelete);
+        } else {
+            popupTabla.remove(itemDelete);
+        }
+
     }
 
     private void calcularDelivery() {
