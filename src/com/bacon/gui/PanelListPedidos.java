@@ -6,6 +6,7 @@ import com.bacon.MyConstants;
 import com.bacon.domain.Client;
 import com.bacon.domain.Invoice;
 import com.bacon.domain.Permission;
+import com.bacon.domain.Product;
 import com.bacon.domain.ProductoPed;
 import com.bacon.domain.Table;
 import com.bacon.domain.Waiter;
@@ -82,7 +83,7 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener 
 
     private JPopupMenu popupTable;
     private MyPopupListener popupListenerTabla;
-    private ArrayList<Client> clientList;
+    private ArrayList<Product> productsList;
     private ArrayList<Waiter> waitersList;
     private SimpleDateFormat formFecha;
 
@@ -170,7 +171,7 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener 
                 Invoice inv = app.getControl().getInvoiceByCode(fact);
 
                 pcs.firePropertyChange(AC_SHOW_INVOICE, inv, null);
-                
+
                 Permission perm = app.getControl().getPermissionByName("show-pedidos-module");
                 app.getGuiManager().showBasicPanel(app.getGuiManager().getPanelBasicPedidos(), perm);
 
@@ -197,20 +198,17 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener 
         regTipo.addActionListener(this);
         regTipo.setBackground(COLOR_BACKG);
 
-        clientList = app.getControl().getClientList("", "");
-        Client CTODOS = new Client(0);
-        CTODOS.setCellphone(__TODOS__);
-        clientList.add(0, CTODOS);
-        Client CLOCAL = new Client(1);
-        CLOCAL.setCellphone("__LOCAL__");
-        clientList.add(1, CLOCAL);
-        regCliente.setActionCommand(ACTION_SEARCH);
-        regCliente.addActionListener(this);
-        regCliente.setText((clientList.toArray()));
-        regCliente.setBackground(COLOR_BACKG);
+        productsList = app.getControl().getProductsList("", "name");
+        Product PTODOS = new Product(0);
+        PTODOS.setName(__TODOS__);
+        productsList.add(0, PTODOS);
+        regProduct.setActionCommand(ACTION_SEARCH);
+        regProduct.addActionListener(this);
+        regProduct.setText((productsList.toArray()));
+        regProduct.setBackground(COLOR_BACKG);
 
 //        String[] ESTADOS = {__TODOS__, ST_ENTREGADO, ST_DEVUELTO, ST_DESPACHADO, ST_FACTURADO};
-        waitersList = app.getControl().getWaiterslList("", "");
+        waitersList = app.getControl().getWaiterslList("", "name");
         Waiter WTODOS = new Waiter();
         WTODOS.setName(__TODOS__);
         waitersList.add(0, WTODOS);
@@ -318,7 +316,7 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener 
         regPeriodo = new com.bacon.gui.util.Registro(BoxLayout.Y_AXIS, "Periodo", new Object[0]);
         lbPeriodo = new javax.swing.JLabel();
         regMesero = new com.bacon.gui.util.Registro(BoxLayout.Y_AXIS, "Estado", new String[0]);
-        regCliente = new com.bacon.gui.util.Registro(BoxLayout.Y_AXIS, "Cliente", new String[0]);
+        regProduct = new com.bacon.gui.util.Registro(BoxLayout.Y_AXIS, "Producto", new String[0]);
         btConfig = new javax.swing.JButton();
         btUpdate = new javax.swing.JButton();
         btFilters = new javax.swing.JToggleButton();
@@ -352,7 +350,7 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener 
                 .addGap(9, 9, 9)
                 .addComponent(regMesero, javax.swing.GroupLayout.PREFERRED_SIZE, 176, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(regCliente, javax.swing.GroupLayout.PREFERRED_SIZE, 176, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(regProduct, javax.swing.GroupLayout.PREFERRED_SIZE, 176, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(regPeriodo, javax.swing.GroupLayout.PREFERRED_SIZE, 176, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -372,7 +370,7 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener 
                     .addComponent(tfBuscar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(regTipo, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(regMesero, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(regCliente, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(regProduct, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(regPeriodo, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(lbPeriodo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jLabel1)
@@ -382,7 +380,7 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener 
                 .addContainerGap(26, Short.MAX_VALUE))
         );
 
-        pnFiltersLayout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {btBuscar, regCliente, regMesero, regPeriodo, regTipo, tfBuscar});
+        pnFiltersLayout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {btBuscar, regMesero, regPeriodo, regProduct, regTipo, tfBuscar});
 
         tableList.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -512,16 +510,16 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener 
 
     public void filtradoSQL() {
         int tipo = regTipo.getSelected();
-        int selCliente = regCliente.getSelected();
-        long cliente = selCliente > 1 ? Long.parseLong(regCliente.getText()) : selCliente;
+        int selProduct = regProduct.getSelected();
+        long product = ((Product) regProduct.getSelectedItem()).getId();
 
         int mesero = regMesero.getSelected();
 
-        buscarFacturas(mesero, cliente, tipo);
+        buscarFacturas(mesero, product, tipo);
     }
 
     private void activarFiltros(boolean activar) {
-        regCliente.setEnabled(activar);
+        regProduct.setEnabled(activar);
         regTipo.setEnabled(activar);
         regMesero.setEnabled(activar);
     }
@@ -539,19 +537,19 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener 
 
     }
 
-    private void buscarFacturas(int idMesero, long idClient, int idTipo) {
+    private void buscarFacturas(int idMesero, long idProd, int idTipo) {
 //        String date = "( fecha BETWEEN '" + app.DF.format(dIni) + "' AND '" + app.DF.format(dFin) + "')";
 
         String query = "";
         if (filtroActivado) {
-            String tipo = idTipo == 0 ? "" : "deliveryType=" + idTipo + "";
-            String mesero = idMesero == 0 ? "" : !tipo.isEmpty() ? " AND idMesero=" + idMesero + "" : "idMesero=" + idMesero;
-            String cliente = (idClient < 1) ? "" : !mesero.isEmpty() ? " AND " + "idClient=" + idClient : "idClient=" + idClient;
-            query = tipo + mesero + cliente;
+            String tipo = idTipo == 0 ? "" : "i.deliveryType=" + idTipo + "";
+            String mesero = idMesero == 0 ? "" : !tipo.isEmpty() ? " AND i.idMesero=" + idMesero + "" : "i.idMesero=" + idMesero;
+            String prod = (idProd < 1) ? "" : !mesero.isEmpty() ? " AND " + "p.id=" + idProd : "p.id=" + idProd;
+            query = tipo + mesero + prod;
         }
 
         query = !queryDate.isEmpty() ? (!query.isEmpty() ? (queryDate + " AND " + query) : queryDate) : !query.isEmpty() ? query : "";
-
+        System.out.println("query = " + query);
         populateTabla(query);
     }
 
@@ -575,7 +573,7 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener 
             protected Object doInBackground() throws Exception {
                 model.setRowCount(0);
 
-                ArrayList<Invoice> invoiceslList = app.getControl().getInvoiceslList(query, "sale_date DESC");
+                ArrayList<Invoice> invoiceslList = app.getControl().getInvoicesLiteWhitProduct(query);
                 BigDecimal total = new BigDecimal(0);
                 double servicio = 0;
                 int totalProducts = 0;
@@ -586,27 +584,31 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener 
                     Table table = app.getControl().getTableByID(invoice.getTable());
                     if (invoice.getStatus() != Invoice.ST_ANULADA) {
                         total = total.add(invoice.getValor());
-                        totalProducts += invoice.getProducts().size();
+//                        totalProducts += invoice.getProducts().size();
                         servicio += invoice.getValueService();
                     } else {
                         anuladas++;
                     }
+                    try {
+                        model.addRow(new Object[]{
+                            invoice.getFactura(),
+                            app.DF_FULL2.format(invoice.getFecha()),
+                            Invoice.STATUSES[invoice.getStatus()],
+                            invoice.getCiclo(),
+                            invoice.getTipoEntrega() + ":" + MyConstants.TIPO_PEDIDO[invoice.getTipoEntrega() - 1],
+                            invoice.getIdCliente() == 1 ? "LOCAL" : invoice.getIdCliente(),
+                            table != null ? table.getName() : "-",
+                            waiter != null ? waiter.getName() : "-",
+                            invoice.getValor(),
+                            invoice.getValor().doubleValue() * invoice.getPorcService() / 100.0
+                        });
 
-                    model.addRow(new Object[]{
-                        invoice.getFactura(),
-                        app.DF_FULL2.format(invoice.getFecha()),
-                        Invoice.STATUSES[invoice.getStatus()],
-                        invoice.getCiclo(),
-                        invoice.getTipoEntrega() + ":" + MyConstants.TIPO_PEDIDO[invoice.getTipoEntrega() - 1],
-                        invoice.getIdCliente() == 1 ? "LOCAL" : invoice.getIdCliente(),
-                        table != null ? table.getName() : "-",
-                        waiter != null ? waiter.getName() : "-",
-                        invoice.getValor(),
-                        invoice.getValor().doubleValue() * invoice.getPorcService() / 100.0
-                    });
+                        model.setRowEditable(model.getRowCount() - 1, false);
+                        model.setCellEditable(model.getRowCount() - 1, model.getColumnCount() - 1, true);
 
-                    model.setRowEditable(model.getRowCount() - 1, false);
-                    model.setCellEditable(model.getRowCount() - 1, model.getColumnCount() - 1, true);
+                    } catch (Exception e) {
+                        
+                    }
 
                 }
 
@@ -641,9 +643,9 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener 
     private javax.swing.JLabel lbPeriodo;
     private javax.swing.JLabel lbStatus;
     private javax.swing.JPanel pnFilters;
-    private com.bacon.gui.util.Registro regCliente;
     private com.bacon.gui.util.Registro regMesero;
     private com.bacon.gui.util.Registro regPeriodo;
+    private com.bacon.gui.util.Registro regProduct;
     private com.bacon.gui.util.Registro regTipo;
     private javax.swing.JTable tableList;
     private javax.swing.JTextField tfBuscar;

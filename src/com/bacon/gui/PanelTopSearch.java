@@ -13,6 +13,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import javax.swing.BoxLayout;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -45,6 +46,7 @@ public class PanelTopSearch extends PanelCaptura implements ActionListener {
         btCustomProduct.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "add1.png", 18, 18)));
         btCustomProduct.setActionCommand(AC_ADD_CUSTOM_PRODUCT);
         btCustomProduct.addActionListener(this);
+        btCustomProduct.setEnabled(false);
 
         regSearch.setFontCampo(font1);
 
@@ -69,7 +71,7 @@ public class PanelTopSearch extends PanelCaptura implements ActionListener {
         btView1.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "packing1.png", 20, 20)));
         btView1.setActionCommand(AC_SELECT_VIEW1);
         btView1.addActionListener(this);
-        btView1.setSelected(true);
+        
 //        btView1.setForeground(colorLocal);
 
         btView2.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "packing2.png", 20, 20)));
@@ -77,7 +79,26 @@ public class PanelTopSearch extends PanelCaptura implements ActionListener {
         btView2.addActionListener(this);
 //        btView2.setForeground(colorDelivery);
 
+        btView2.setSelected(true);
+
+
+        lbSort.setText("");
+        lbSort.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "view-filter.png", 20, 20)));
+        
+        DefaultComboBoxModel model = new DefaultComboBoxModel();
+        model.addElement("----");
+        model.addElement("Alfabetico");        
+        model.addElement("Precio");
+        model.addElement("Rating");        
+        cbSort.setModel(model);
+        cbSort.setActionCommand(AC_CHANGE_SORT);
+        cbSort.addActionListener(this);
+        
+        cbSort.setEnabled(false);
+        lbSort.setEnabled(false);
+
     }
+    public static final String AC_CHANGE_SORT = "AC_CHANGE_SORT";
     public static final String AC_SELECT_VIEW2 = "AC_SELECT_VIEW2";
     public static final String AC_SELECT_VIEW1 = "AC_SELECT_VIEW1";
     public static final String AC_ADD_CUSTOM_PRODUCT = "AC_ADD_CUSTOM_PRODUCT";
@@ -110,12 +131,16 @@ public class PanelTopSearch extends PanelCaptura implements ActionListener {
         btCustomProduct = new javax.swing.JButton();
         btView2 = new javax.swing.JToggleButton();
         btView1 = new javax.swing.JToggleButton();
+        cbSort = new javax.swing.JComboBox<>();
+        lbSort = new javax.swing.JLabel();
 
         setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
         buttonGroup1.add(btView2);
 
         buttonGroup1.add(btView1);
+
+        lbSort.setText("jLabel1");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -126,7 +151,11 @@ public class PanelTopSearch extends PanelCaptura implements ActionListener {
                 .addComponent(regSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 190, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, 0)
                 .addComponent(btBuscar, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 223, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 109, Short.MAX_VALUE)
+                .addComponent(lbSort)
+                .addGap(3, 3, 3)
+                .addComponent(cbSort, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btCustomProduct, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btView1, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -138,17 +167,19 @@ public class PanelTopSearch extends PanelCaptura implements ActionListener {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(4, 4, 4)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(btView1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                .addComponent(btBuscar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(regSearch, javax.swing.GroupLayout.DEFAULT_SIZE, 32, Short.MAX_VALUE))
-                            .addComponent(btView2, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(btCustomProduct, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                    .addComponent(cbSort, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btBuscar, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btCustomProduct, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btView1, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btView2, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(regSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lbSort))
+                .addGap(2, 2, 2))
         );
+
+        layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {btBuscar, btCustomProduct, btView1, btView2, cbSort, lbSort, regSearch});
+
     }// </editor-fold>//GEN-END:initComponents
 
 
@@ -158,6 +189,8 @@ public class PanelTopSearch extends PanelCaptura implements ActionListener {
     private javax.swing.JToggleButton btView1;
     private javax.swing.JToggleButton btView2;
     private javax.swing.ButtonGroup buttonGroup1;
+    private javax.swing.JComboBox<String> cbSort;
+    private javax.swing.JLabel lbSort;
     private com.bacon.gui.util.Registro regSearch;
     // End of variables declaration//GEN-END:variables
 
@@ -180,6 +213,8 @@ public class PanelTopSearch extends PanelCaptura implements ActionListener {
             
             PanelPedido panelPedido = app.getGuiManager().getPanelPedido();
             app.getGuiManager().showPanelAddOtherProduct(panelPedido);
+        }else if(AC_CHANGE_SORT.equals(e.getActionCommand())){
+            pcs.firePropertyChange(AC_CHANGE_SORT, null, cbSort.getSelectedItem());
         }
 
     }

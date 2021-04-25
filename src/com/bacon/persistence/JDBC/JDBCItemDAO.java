@@ -134,6 +134,7 @@ public class JDBCItemDAO implements ItemDAO {
                 item.setStockMin(rs.getDouble("stockMin"));
                 item.setAverage(rs.getBigDecimal("average"));
                 item.setInit(rs.getDouble("init"));
+                item.setOnlyDelivery(rs.getBoolean("onlyDelivery"));
                 item.setCreatedTime(rs.getDate("createdTime"));
                 item.setUpdateTime(rs.getDate("lastUpdatedTime"));
                 item.setUser(rs.getString("user"));
@@ -171,6 +172,7 @@ public class JDBCItemDAO implements ItemDAO {
                 item.getStockMin(),
                 item.getAverage(),
                 item.getInit(),
+                item.isOnlyDelivery(),
                 item.getUser()
             };
             ps = sqlStatements.buildSQLStatement(conn, ADD_ITEM_KEY, parameters);
@@ -250,17 +252,12 @@ public class JDBCItemDAO implements ItemDAO {
             conn = dataSource.getConnection();
             conn.setAutoCommit(false);
             Object[] parameters = {
-                item.getName(),
-                item.getQuantity(),
-                item.getMeasure(),
                 item.getCost(),
-                item.getPrice(),
-                item.getLocation(),
+                item.getPrice(),                
                 item.getStock(),
                 item.getStockMin(),
-                item.getAverage(),
-                item.getInit(),
-                item.getUser()
+                item.isOnlyDelivery(),
+                item.getId()
             };
             update = sqlStatements.buildSQLStatement(conn, UPDATE_ITEM_KEY, parameters);
             update.executeUpdate();

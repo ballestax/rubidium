@@ -84,12 +84,15 @@ public class PanelModPedidos extends PanelCapturaMod
 
         panelLeft = new Box(BoxLayout.Y_AXIS);
         JScrollPane scp = new JScrollPane(panelLeft);
+        scp.getVerticalScrollBar().setUnitIncrement(30);
         pnCont.add(scp, BorderLayout.CENTER);
         splitPane.setLeftComponent(pnCont);
 
         pnPedido = app.getGuiManager().getPanelPedido();
 
         splitPane.setRightComponent(pnPedido);
+        
+        
 
         loadAllProducts();
 

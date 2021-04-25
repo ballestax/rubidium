@@ -24,6 +24,7 @@ import com.bacon.domain.Rol;
 import com.bacon.domain.Table;
 import com.bacon.domain.User;
 import com.bacon.domain.Waiter;
+import com.bacon.gui.PanelPedido;
 import com.bacon.persistence.JDBC.JDBCAdditionalDAO;
 import com.bacon.persistence.JDBC.JDBCClientDAO;
 import com.bacon.persistence.JDBC.JDBCConciliacionDAO;
@@ -566,8 +567,28 @@ public class Control {
             return null;
         }
     }
+    
+    public ArrayList<Invoice> getInvoicesLitelList(String where, String order) {
+        try {
+            JDBCInvoiceDAO invoiceDAO = (JDBCInvoiceDAO) DAOFactory.getInstance().getInvoiceDAO();
+            return invoiceDAO.getInvoiceLiteList(where, order);
+        } catch (DAOException ex) {
+            logger.error("Error getting Invoices list.", ex);
+            return null;
+        }
+    }
 
     public ArrayList<Invoice> getInvoiceslList(String where, String order) {
+        try {
+            JDBCInvoiceDAO invoiceDAO = (JDBCInvoiceDAO) DAOFactory.getInstance().getInvoiceDAO();
+            return invoiceDAO.getInvoiceList(where, order);
+        } catch (DAOException ex) {
+            logger.error("Error getting Invoices list.", ex);
+            return null;
+        }
+    }
+
+    public ArrayList<Invoice> getInvoiceslListWhitProducts(String where, String order) {
         try {
             JDBCInvoiceDAO invoiceDAO = (JDBCInvoiceDAO) DAOFactory.getInstance().getInvoiceDAO();
             return invoiceDAO.getInvoiceList(where, order);
@@ -762,7 +783,7 @@ public class Control {
             return null;
         }
     }
-    
+
     public ArrayList<Category> getAllCategoriesList() {
         try {
             JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
@@ -809,9 +830,32 @@ public class Control {
         }
     }
 
+    public boolean updateItem(Item item) {
+        try {
+            JDBCItemDAO itemDAO = (JDBCItemDAO) DAOFactory.getInstance().getItemDAO();
+            itemDAO.updateItem(item);
+            return true;
+        } catch (DAOException ex) {
+            logger.error("Error updating Item pres.", ex);
+            return false;
+        }
+    }
+
     public boolean updateItemPres(Item item) {
         try {
             JDBCItemDAO itemDAO = (JDBCItemDAO) DAOFactory.getInstance().getItemDAO();
+            itemDAO.updateItemPres(item);
+            return true;
+        } catch (DAOException ex) {
+            logger.error("Error updating Item pres.", ex);
+            return false;
+        }
+    }
+
+    public boolean updateItemAll(Item item) {
+        try {
+            JDBCItemDAO itemDAO = (JDBCItemDAO) DAOFactory.getInstance().getItemDAO();
+            itemDAO.updateItem(item);
             itemDAO.updateItemPres(item);
             return true;
         } catch (DAOException ex) {
@@ -968,6 +1012,31 @@ public class Control {
         }
     }
 
+    public void restoreInventory(List<ProductoPed> listProductoPeds, int tipo) {
+        List<ProductoPed> list = listProductoPeds;
+
+        for (int idx = 0; idx < list.size(); idx++) {
+            ProductoPed pPed = list.get(idx);
+            HashMap<Integer, HashMap> mData = null;
+            if (pPed.hasPresentation()) {
+                mData = app.getControl().checkInventory(pPed.getPresentation().getId());
+            } else {
+                mData = app.getControl().checkInventoryProduct(pPed.getProduct().getId());
+            }
+            for (Integer key : mData.keySet()) {
+                HashMap data = mData.get(key);
+                int id = Integer.parseInt(data.get("id").toString());
+                double quantity = Double.parseDouble(data.get("quantity").toString());
+                boolean isLocal = tipo == PanelPedido.TIPO_LOCAL;
+                boolean isOnlyDel = Boolean.parseBoolean(data.get("onlyDelivery").toString());
+                double val = quantity * pPed.getCantidad() * (isLocal && isOnlyDel ? 0 : 1);
+                app.getControl().addItemToInventory(id, val);
+                logger.debug("Update inventory: " + pPed.getProduct().getName() + ":: " + data.get("name") + "-> idItem:" + id + "[" + val + "]");
+            }
+
+        }
+    }
+
     public ArrayList<Object[]> getProductsOutInventoryList(long idProd, Date start) {
         try {
             JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
@@ -1020,8 +1089,8 @@ public class Control {
 
             JDBCInvoiceDAO invoiceDAO = (JDBCInvoiceDAO) DAOFactory.getInstance().getInvoiceDAO();
             ArrayList<Invoice> invoiceByQuery = invoiceDAO.getInvoiceByQuery(query);
-            
-            return !invoiceByQuery.isEmpty()?invoiceByQuery.get(0):null;
+
+            return !invoiceByQuery.isEmpty() ? invoiceByQuery.get(0) : null;
         } catch (DAOException ex) {
             logger.error("Error getting invoice.", ex);
             GUIManager.showErrorMessage(null, "Error consultando factura", "Error");
@@ -1030,4 +1099,33 @@ public class Control {
 
     }
 
+    public ArrayList<Invoice> getInvoicesLiteWhitProduct(String querycomp) {
+        try {
+
+            String query = "select i.id, i.code, i.sale_date, i.deliveryType, i.value, "
+                    + "i.numDeliverys, i.valueDelivery, i.discount, i.idClient, "
+                    + "i.idMesero, i.mesa,i.ciclo, i.notes, i.isservice, i.service_porc, "
+                    + "i.status, i.lastUpdatedTime, p.id, p.name "
+                    + "from invoices i, invoice_product ip, products p"
+                    + " WHERE i.id  = ip.id_invoice AND p.id = ip.id_product ??2"
+                    + " GROUP BY i.code"
+                    + " ORDER  BY i.sale_date DESC";
+
+//            query = query.replace("??1", (idProd <= 0 ? "" : "AND p.id=" + String.valueOf(idProd)));
+            query = query.replace("??2", querycomp.isEmpty() ? "" : "AND " + querycomp);
+
+            System.out.println("query = " + query);
+
+            JDBCInvoiceDAO invoiceDAO = (JDBCInvoiceDAO) DAOFactory.getInstance().getInvoiceDAO();
+            ArrayList<Invoice> invoiceByQuery = invoiceDAO.getInvoiceByQuery(query);
+
+            return invoiceByQuery;
+
+        } catch (Exception ex) {
+            logger.error("Error getting invoice.", ex);
+            GUIManager.showErrorMessage(null, "Error consultando facturas", "Error");
+            return null;
+
+        }
+    }
 }

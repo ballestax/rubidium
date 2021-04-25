@@ -7,7 +7,10 @@ package com.bacon.gui;
 
 import com.bacon.Aplication;
 import com.bacon.Configuration;
+import com.bacon.domain.Presentation;
 import com.bacon.domain.Product;
+import com.bacon.domain.ProductoPed;
+import static com.bacon.gui.PanelCustomPedido.AC_CUSTOM_ADD;
 import static com.bacon.gui.PanelProduct2.AC_ADD_CUSTOM;
 import static com.bacon.gui.PanelProduct2.AC_ADD_QUICK;
 import java.awt.Color;
@@ -15,12 +18,20 @@ import java.awt.Font;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
+import javax.swing.SwingUtilities;
+import jfxtras.scene.menu.CirclePopupMenu;
 import org.dz.PanelCapturaMod;
+import org.jfree.util.PaintUtilities;
 
 /**
  *
@@ -30,9 +41,12 @@ public class PanelProduct extends PanelCapturaMod implements ActionListener {
 
     private Product product;
     private final Aplication app;
+    private JPopupMenu popPres;
 
     /**
      * Creates new form PanelProduct
+     * @param app
+     * @param product
      */
     public PanelProduct(Aplication app, Product product) {
         this.app = app;
@@ -51,29 +65,35 @@ public class PanelProduct extends PanelCapturaMod implements ActionListener {
 
         ImageIcon icon = null;
         try {
-            icon = new ImageIcon(app.getImgManager().getBufImagen(path + "/" + image, 70, 70));
+            icon = new ImageIcon(app.getImgManager().getBufImagen(path + "/" + image, 65, 65));
         } catch (Exception e) {
-            icon = new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "no-photo.png", 70, 70));
+            icon = new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "no-photo.png", 65, 65));
         }
 
-        Font font1 = new Font("Sans", 1, 13);
+        Font font1 = new Font("Sans", 1, 12);
         Font font2 = new Font("Serif", 2, 10);
-        Font font3 = new Font("Tahoma", 1, 13);
+        Font font3 = new Font("Tahoma", 1, 14);
 
         NumberFormat NF = DecimalFormat.getCurrencyInstance();
         NF.setMaximumFractionDigits(0);
 
         Color color = new Color(125, 11, 7);
 
+        int MAX_LENGTH = 20;
+        String pName = product.getName();
+        if (pName.length() > MAX_LENGTH) {
+            pName = pName.substring(0, MAX_LENGTH) + "..";
+        }
+        lbName.setText(pName.toUpperCase());
+        lbName.setToolTipText(product.getName().toUpperCase());
         lbName.setFont(font1);
         lbName.setForeground(Color.blue.darker().darker());
-        lbName.setText(product.getName().toUpperCase());
         lbName.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createMatteBorder(0, 0, 1, 0, color),
                 BorderFactory.createEmptyBorder(2, 2, 2, 2)
         ));
 
-        lbCategory.setBorder(BorderFactory.createLineBorder(color, 1, true));
+        lbCategory.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, color));
         lbCategory.setForeground(color.darker().darker());
         lbCategory.setFont(font2);
         lbCategory.setText(product.getCategory().toUpperCase());
@@ -95,12 +115,44 @@ public class PanelProduct extends PanelCapturaMod implements ActionListener {
         btAddCustom.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "process-accept.png", 15, 15)));
         btAddCustom.addActionListener(this);
 
+        popPres = new JPopupMenu();
+        
+        ArrayList<Presentation> presList = app.getControl().getPresentationsByProduct(product.getId());
+
+                
+        for (Presentation press : presList) {
+            String html = "<html><font color='#610034'size=4>"+press.getName().toUpperCase()+"</font> [<font color='#3d0021'>"+app.DCFORM_P.format(press.getPrice())+"</font>]</html>";
+            JMenuItem item = new JMenuItem(html);
+            item.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(4,2,2,2), BorderFactory.createMatteBorder(0, 0, 1, 0, Color.DARK_GRAY)));
+            popPres.add(item);
+            item.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    ProductoPed prod = new ProductoPed(product);
+                    prod.setPresentation(press);                    
+                    pcs.firePropertyChange(AC_CUSTOM_ADD, new Object[]{1, press.getPrice()}, prod);
+                }
+            });
+        }
+        
+
+        btAddCustom.addMouseListener(new MouseAdapter() {
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if (SwingUtilities.isRightMouseButton(e)) {
+                    popPres.show(btAddCustom, 0, 0);
+                }
+            }
+
+        });
+
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         if (AC_ADD_QUICK.equals(e.getActionCommand())) {
-            
+
             pcs.firePropertyChange(AC_ADD_QUICK, null, product);
         } else if (AC_ADD_CUSTOM.equals(e.getActionCommand())) {
             app.getGuiManager().showCustomPedido(product, app);

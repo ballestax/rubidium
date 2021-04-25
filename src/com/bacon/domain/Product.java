@@ -146,6 +146,10 @@ public class Product {
 
     @Override
     public String toString() {
+        return id + ": " + name;
+    }
+
+    public String toStringFull() {
         return "Product ["
                 + "\nid:" + id
                 + "\nname:" + name

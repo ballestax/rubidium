@@ -51,6 +51,7 @@ import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
+import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingWorker;
@@ -71,6 +72,7 @@ import org.bx.gui.MyDefaultTableModel;
 import org.dz.MyDialogEsc;
 import org.dz.PanelCapturaMod;
 import org.dz.TextFormatter;
+import org.jsoup.Jsoup;
 import org.ocpsoft.prettytime.Duration;
 import org.ocpsoft.prettytime.PrettyTime;
 
@@ -444,7 +446,7 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
 
         ArrayList<Table> tables = app.getControl().getTableslList("", "");
 
-        ArrayList<Waiter> waiters = app.getControl().getWaiterslList("", "");
+        ArrayList<Waiter> waiters = app.getControl().getWaiterslList("status=1", "name");
 
         org.balx.TextFormato tForm = new TextFormato();
         regCelular.setDocument(tForm.getLimitadorNumeros());
@@ -471,6 +473,20 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
 
         lbTicket.setVisible(false);
         lbFactura.setText("<html><font>" + calculateProximoRegistro() + "</font></html>");
+        
+        lbFactura.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                System.out.println(e);
+                if(e.getClickCount()==2){
+                    String fact = lbFactura.getText();
+                    String text = Jsoup.parse(fact).text();                    
+                    regCelular.setText(text);
+                }
+            }
+            
+        
+        });
     }
     public static final String AC_CHECK_RECOGIDO = "AC_CHECK_RECOGIDO";
 
@@ -742,7 +758,7 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
                 inv.setStatus(Invoice.ST_ANULADA);
                 app.getControl().updateInvoice(inv);
                 List<ProductoPed> list = inv.getProducts();
-                app.getControl().restoreInventory(list);
+                app.getControl().restoreInventory(list, inv.getTipoEntrega());
 
                 lbFactura.setText(calculateProximoRegistro());
 
@@ -869,6 +885,7 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
+        logger.info(evt.getPropertyName()+":"+evt.getPropagationId());
         if (PanelProduct2.AC_ADD_QUICK.equals(evt.getPropertyName())) {
             Product prod = (Product) evt.getNewValue();
             Presentation pres = app.getControl().getPresentationsByDefault(prod.getId());
@@ -1104,8 +1121,8 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
         stb.append("<tbody>");
         for (Integer next : keys) {
             Item item = app.getControl().getItemWhere("id=" + next);
-            Double cant = simpInv.get(next);
-            String color = item.getQuantity() >= cant ? "#00ff32" : "#ff4400";
+            Double cant = (item.isOnlyDelivery() && tipo == TIPO_LOCAL) ? 0 : simpInv.get(next);
+            String color = (item.isOnlyDelivery() && tipo == TIPO_LOCAL) ? "#ff30a5" : (item.getQuantity() >= cant) ? "#00ff32" : "#ff4400";
             stb.append("<tr>")
                     .append("<td><font size=+1 color=").append(color).append(">").append(item.getName().toUpperCase()).append("</font></td>")
                     .append("<td><font size=+1> ").append(item.getQuantity()).append("</font></td>")
@@ -1119,6 +1136,7 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
     }
 
     private synchronized boolean checkAllInventory() {
+
         HashMap<Integer, Double> simpInv = checkInventory();
         Set<Integer> keys = simpInv.keySet();
 
@@ -1128,7 +1146,9 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
             Item item = app.getControl().getItemWhere("id=" + next);
             Double cant = simpInv.get(next);
             band = item.getQuantity() < cant;
-            if (band) {
+            if (tipo != TIPO_LOCAL && band) {
+                return false;
+            } else if (!item.isOnlyDelivery() && band) {
                 return false;
             }
         }
@@ -1439,6 +1459,8 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
             case ENTREGA_PARA_LLEVAR:
                 invoice.setTipoEntrega(TIPO_PARA_LLEVAR);
                 invoice.setValorDelivery(BigDecimal.ZERO);
+                invoice.setIdWaitress(0);
+                invoice.setTable(0);
                 break;
         }
 
@@ -2137,6 +2159,7 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
             if (!cellphone.isEmpty()) {
                 Client client = app.getControl().getClient(cellphone);
                 regDireccion.setText(client.getAddresses().get(0).toString());
+                ((JTextField) regDireccion.getComponent()).setCaretPosition(0);
             }
         }
 

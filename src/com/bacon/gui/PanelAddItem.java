@@ -94,7 +94,7 @@ public class PanelAddItem extends PanelCaptura implements ActionListener, Proper
         btSave.addActionListener(this);
         
         btUpdate.setFont(new Font("Sans", 1, 11));
-        btUpdate.setText("Save");
+        btUpdate.setText("Actualizar");
 //        btUpdate.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "save.png", 24, 24)));
         btUpdate.setActionCommand(AC_UPDATE_ITEM);
         btUpdate.addActionListener(this);
@@ -122,10 +122,13 @@ public class PanelAddItem extends PanelCaptura implements ActionListener, Proper
         tableProducts.getColumnModel().getColumn(0).setHeaderRenderer(listaSeleccion);
         tableProducts.getColumnModel().getColumn(0).setCellEditor(tableProducts.getDefaultEditor(Boolean.class));
         
+        chOnlyDelivery.setText("Solo domicilios");
+        chOnlyDelivery.setFont(font);
+        
         loadProducts();
         
     }
-    public static final String AC_SAVE_ITEM = "AC_SAVE_ITEM";
+    public static final String AC_SAVE_ITEM = "AC_SAVE_ITEM";           
     public static final String AC_UPDATE_ITEM = "AC_UPDATE_ITEM";
     
     private void loadProducts() {
@@ -204,6 +207,8 @@ public class PanelAddItem extends PanelCaptura implements ActionListener, Proper
             regCost.setEnabled(false);
             regPrice.setText(String.valueOf(item.getPrice()));
             regPrice.setEnabled(false);
+            chOnlyDelivery.setSelected(item.isOnlyDelivery());
+            chOnlyDelivery.setEnabled(false);
             
             ArrayList<Object[]> presentations = app.getControl().getPresentationsByItem(item.getId());
 
@@ -263,6 +268,8 @@ public class PanelAddItem extends PanelCaptura implements ActionListener, Proper
         chSaveExit = new javax.swing.JCheckBox();
         regLocation = new org.dz.Registro(BoxLayout.X_AXIS, "Locacion", new Object[1], acAddLocation,widthLabel);
         btUpdate = new javax.swing.JButton();
+        chOnlyDelivery = new javax.swing.JCheckBox();
+        jLabel1 = new javax.swing.JLabel();
 
         regName.setNextFocusableComponent(regMeseure);
 
@@ -284,6 +291,8 @@ public class PanelAddItem extends PanelCaptura implements ActionListener, Proper
         regMeseure.setLabelFont(new Font("arial",0,11));
         regLocation.setNextFocusableComponent(regQuantity);
 
+        chOnlyDelivery.setText("jCheckBox1");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -293,9 +302,9 @@ public class PanelAddItem extends PanelCaptura implements ActionListener, Proper
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(regMeseure, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(regStockMin, javax.swing.GroupLayout.DEFAULT_SIZE, 169, Short.MAX_VALUE)
+                        .addComponent(regStockMin, javax.swing.GroupLayout.DEFAULT_SIZE, 185, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(regStockMax, javax.swing.GroupLayout.DEFAULT_SIZE, 168, Short.MAX_VALUE))
+                        .addComponent(regStockMax, javax.swing.GroupLayout.DEFAULT_SIZE, 184, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(regCost, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -305,13 +314,17 @@ public class PanelAddItem extends PanelCaptura implements ActionListener, Proper
                     .addComponent(labelInfo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addComponent(chSaveExit)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(btUpdate, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(49, 49, 49)
+                        .addComponent(btUpdate, javax.swing.GroupLayout.DEFAULT_SIZE, 106, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btSave, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(regLocation, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(btSave, javax.swing.GroupLayout.DEFAULT_SIZE, 106, Short.MAX_VALUE))
+                    .addComponent(regLocation, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(chOnlyDelivery, javax.swing.GroupLayout.PREFERRED_SIZE, 159, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 516, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 484, Short.MAX_VALUE)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -337,7 +350,11 @@ public class PanelAddItem extends PanelCaptura implements ActionListener, Proper
                             .addComponent(regCost, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(regPrice, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(labelInfo, javax.swing.GroupLayout.PREFERRED_SIZE, 117, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(chOnlyDelivery)
+                            .addComponent(jLabel1))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(labelInfo, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(btSave, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -351,7 +368,9 @@ public class PanelAddItem extends PanelCaptura implements ActionListener, Proper
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btSave;
     private javax.swing.JButton btUpdate;
+    private javax.swing.JCheckBox chOnlyDelivery;
     private javax.swing.JCheckBox chSaveExit;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel labelInfo;
     private org.dz.Registro regCost;
@@ -365,6 +384,19 @@ public class PanelAddItem extends PanelCaptura implements ActionListener, Proper
     private javax.swing.JTable tableProducts;
     // End of variables declaration//GEN-END:variables
 
+    
+    public void modoActualizarItem(){
+        btSave.setVisible(false);
+        btUpdate.setVisible(true);
+        chOnlyDelivery.setEnabled(true);
+    }
+    
+    public void modoNuevoItem(){
+        btSave.setVisible(true);
+        btUpdate.setVisible(false);
+    }
+    
+    
     @Override
     public void reset() {
         regName.setText("");
@@ -382,6 +414,8 @@ public class PanelAddItem extends PanelCaptura implements ActionListener, Proper
         regStockMin.setText("");
         regStockMin.setEnabled(true);
         regLocation.setEnabled(true);
+        chOnlyDelivery.setEnabled(true);
+        chOnlyDelivery.setSelected(false);
         
         for (int i = 0; i < tableProducts.getRowCount(); ++i) {
             model.setValueAt(Boolean.FALSE, i, 0);
@@ -407,7 +441,7 @@ public class PanelAddItem extends PanelCaptura implements ActionListener, Proper
         } else if (AC_UPDATE_ITEM.equals(e.getActionCommand())) {
             Item item = parseItem();
             if (item != null) {
-                app.getControl().updateItemPres(item);
+                app.getControl().updateItemAll(item);
 
 //                Item item1 = app.getControl().getItemWhere("name='"+item.getName()+"'");
 //                pcs.firePropertyChange(AC_ADD_ITEM, null, item);
@@ -486,6 +520,7 @@ public class PanelAddItem extends PanelCaptura implements ActionListener, Proper
             }
             
             item.setInit(item.getQuantity());
+            item.setOnlyDelivery(chOnlyDelivery.isSelected());
 //            item.setLocation(0);
             item.setAverage(BigDecimal.ZERO);
             item.setUser(app.getUser().getUsername().toLowerCase());

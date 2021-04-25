@@ -13,11 +13,16 @@ import java.awt.Font;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
+import javax.swing.SwingUtilities;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.dz.PanelCapturaMod;
@@ -31,6 +36,7 @@ public class PanelProduct2 extends PanelCapturaMod implements ActionListener {
     private Product product;
     private final Aplication app;
     public static final Logger logger = Logger.getLogger(PanelProduct2.class.getCanonicalName());
+    private JPopupMenu popPres;
 
     /**
      * Creates new form PanelProduct
@@ -57,10 +63,10 @@ public class PanelProduct2 extends PanelCapturaMod implements ActionListener {
         try {
             icon = new ImageIcon(app.getImgManager().getBufImagen(path + "/" + image, 100, 100));
         } catch (Exception e) {
-            icon = new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons()+"no-photo.png", 100, 100));
+            icon = new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "no-photo.png", 100, 100));
         }
 
-        Font font1 = new Font("Tahoma", 1, 16);
+        Font font1 = new Font("Tahoma", 1, 15);
         Font font2 = new Font("Serif", 2, 11);
         Font font3 = new Font("Sans", 1, 16);
         Font font4 = new Font("Tahoma", 2, 11);
@@ -73,7 +79,14 @@ public class PanelProduct2 extends PanelCapturaMod implements ActionListener {
         lbImage.setIcon(icon);
 
         lbName.setFont(font1);
-        lbName.setText(product.getName().toUpperCase());
+
+        int MAX_LENGTH = 22;
+        String pName = product.getName();
+        if (pName.length() > MAX_LENGTH) {
+            pName = pName.substring(0, MAX_LENGTH) + "..";
+        }
+        lbName.setText(pName.toUpperCase());
+        lbName.setToolTipText(product.getName().toUpperCase());
         lbName.setOpaque(true);
         lbName.setForeground(Color.blue.darker().darker());
         lbName.setBorder(BorderFactory.createCompoundBorder(
@@ -112,16 +125,41 @@ public class PanelProduct2 extends PanelCapturaMod implements ActionListener {
         btAddCustom.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "process-accept.png", 15, 15)));
         btAddCustom.addActionListener(this);
 
+        popPres = new JPopupMenu();
+
+        popPres.add(new JMenuItem("Opcion1"));
+        popPres.add(new JMenuItem("Opcion2"));
+        popPres.add(new JMenuItem("Opcion3"));
+
+        btAddCustom.addMouseListener(new MouseAdapter() {
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                System.out.println("e = " + e);
+                
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                System.out.println(e);
+                if (SwingUtilities.isRightMouseButton(e)) {
+                    popPres.show(btAddCustom, 0, 0);
+                }
+            }
+
+        });
+
     }
     public static final String AC_ADD_CUSTOM = "AC_ADD_CUSTOM";
     public static final String AC_ADD_QUICK = "AC_ADD_QUICK";
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (AC_ADD_QUICK.equals(e.getActionCommand())) {            
+        if (AC_ADD_QUICK.equals(e.getActionCommand())) {
             pcs.firePropertyChange(AC_ADD_QUICK, null, product);
         } else if (AC_ADD_CUSTOM.equals(e.getActionCommand())) {
             app.getGuiManager().showCustomPedido(product, app);
+
         }
     }
 

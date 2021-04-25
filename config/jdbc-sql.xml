@@ -43,7 +43,7 @@
                     |GET_CATEGORIES_SORTED|GET_ALL_CATEGORIES
                     |CREATE_EXPENSES_INCOMES_TABLE|ADD_EXPENSE_INCOME|GET_EXPENSE_INCOME
                     |GET_INVOICE_BY_PRODUCT
-                    |CREATE_INVENTORY_TABLE|GET_ITEM|ADD_ITEM
+                    |CREATE_INVENTORY_TABLE|GET_ITEM|ADD_ITEM|UPDATE_ITEM
                     |ADD_UNIT|GET_UNIT|UPDATE_UNIT|DELETE_UNIT|CREATE_UNITS_TABLE
                     |CREATE_INVENTORY_PRODUCT_TABLE|ADD_INVENTORY_PRODUCT|CHECK_INVENTORY|CHECK_INVENTORY_PRODUCT
                     |ADD_INVENTORY_PRESENTATION|DELETE_ITEM_PRES
@@ -55,6 +55,7 @@
                     |GET_ITEM_PRESENTATIONS
                     |GET_PRODUCTS_SALES
                     |GET_LAST_INVOICE_BY_CLIENT
+                    |ADD_PAYMENT|GET_PAYMENT|UPDATE_PAYMENT|DELETE_PAYMENT|CREATE_PAYMENTS_TABLE
                     
                     ) #REQUIRED
                     
@@ -1340,6 +1341,7 @@
                 stockMin DECIMAL(12,2),                
                 average DECIMAL(20,2),
                 init DECIMAL(12,2),
+                onlyDelivery TINYINT(1),
                 createdTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 lastUpdatedTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                 user VARCHAR(25) NOT NULL DEFAULT 'USER_DF',
@@ -1380,7 +1382,7 @@
         
         <SQLStatement method="ADD_ITEM">
             <SQLFragment>
-                INSERT INTO inventory (name,quantity,measure,cost,price,location,stock,stockmin,average,init,user) VALUES (?,?,?,?,?,?,?,?,?,?,?);
+                INSERT INTO inventory (name,quantity,measure,cost,price,location,stock,stockmin,average,init,onlyDelivery,user) VALUES (?,?,?,?,?,?,?,?,?,?,?,?);
             </SQLFragment>            
         </SQLStatement>
         
@@ -1400,6 +1402,18 @@
             <SQLFragment>
                 DELETE FROM inventory_product WHERE item_id = ?;                
             </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="UPDATE_ITEM">
+            <SQLFragment>
+                UPDATE inventory SET                 
+                cost=?,
+                price=?,
+                stock=?,
+                stockMin=?,
+                onlyDelivery=? 
+                WHERE id = ?
+            </SQLFragment>            
         </SQLStatement>
         
         
@@ -1450,7 +1464,7 @@
         
         <SQLStatement method="CHECK_INVENTORY">
             <SQLFragment>
-                SELECT i.id, i.name, pp.name as pres, i.measure, i.quantity as exist, ip.presentation_id as idPres, ip.quantity 
+                SELECT i.id, i.name, pp.name as pres, i.measure, i.quantity as exist, ip.presentation_id as idPres, ip.quantity, i.onlyDelivery 
                 FROM inventory i, inventory_product ip, presentation_product pp 
                 WHERE i.id=ip.item_id AND pp.id=ip.presentation_id AND ip.presentation_id=?
             </SQLFragment>
@@ -1458,7 +1472,7 @@
         
         <SQLStatement method="CHECK_INVENTORY_PRODUCT">
             <SQLFragment>
-                SELECT i.id, i.name, p.name as pres, i.measure, i.quantity as exist, ip.presentation_id as idPres, ip.quantity 
+                SELECT i.id, i.name, p.name as pres, i.measure, i.quantity as exist, ip.presentation_id as idPres, ip.quantity, i.onlyDelivery 
                 FROM inventory i, products p, inventory_product ip 
                 WHERE i.id=ip.item_id AND p.id=ip.product_id AND ip.product_id=?
             </SQLFragment>
@@ -1690,6 +1704,54 @@
                 SELECT * from invoices where idClient=? ORDER BY code DESC LIMIT 1
             </SQLFragment>            
         </SQLStatement>
+        
+        
+        <SQLStatement method="CREATE_PAYMENTS_TABLE">
+            <SQLFragment>
+                CREATE TABLE payments(
+                id INTEGER AUTO_INCREMENT,
+                name VARCHAR(255) NOT NULL UNIQUE,
+                zorder INTEGER,
+                PRIMARY KEY (id)
+                )ENGINE=InnoDB DEFAULT CHARSET=latin1;
+            </SQLFragment>
+        </SQLStatement>	
+        
+        <SQLStatement method="ADD_PAYMENT">
+            <SQLFragment>
+                INSERT INTO payments (name,zorder) VALUES (?,?);
+            </SQLFragment>
+        </SQLStatement>        
+        
+        <SQLStatement method="GET_PAYMENT">
+            <SQLFragment>
+                SELECT
+            </SQLFragment>
+            <SQLFragment>
+                * FROM payments
+            </SQLFragment>
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                WHERE {where}
+            </SQLFragment>    
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                ORDER BY {orderby}
+            </SQLFragment>        
+        </SQLStatement>
+        
+        <SQLStatement method="DELETE_PAYMENT">
+            <SQLFragment>
+                DELETE FROM payments WHERE name = ?;
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="UPDATE_PAYMENT">
+            <SQLFragment>
+                UPDATE payments SET 
+                name=?,
+                zorder=?
+                WHERE name = ?;
+            </SQLFragment>
+        </SQLStatement> 
         
     </DAOStatements>
 </DAOConfiguration>

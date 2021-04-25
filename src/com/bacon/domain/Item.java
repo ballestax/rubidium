@@ -25,6 +25,8 @@ public class Item {
     private double init;
     private double stockMin;
     private double stock;
+    
+    private boolean onlyDelivery;
 
     private List<Object[]> presentations;
 
@@ -202,6 +204,15 @@ public class Item {
     public   BigDecimal getCostTotal() {
         return getCost().multiply(new BigDecimal(getQuantity()));
     }
+
+    public boolean isOnlyDelivery() {
+        return onlyDelivery;
+    }
+
+    public void setOnlyDelivery(boolean onlyDelivery) {
+        this.onlyDelivery = onlyDelivery;
+    }
+    
     
 
 }

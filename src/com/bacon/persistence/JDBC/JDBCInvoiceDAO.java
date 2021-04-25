@@ -14,6 +14,7 @@ import com.bacon.domain.OtherProduct;
 import com.bacon.domain.Presentation;
 import com.bacon.domain.Product;
 import com.bacon.domain.ProductoPed;
+import com.bacon.gui.PanelPedido;
 import static com.bacon.persistence.JDBC.JDBCUtilDAO.ADD_INVENTORY_QUANTITY_KEY;
 import static com.bacon.persistence.JDBC.JDBCUtilDAO.GET_MAX_ID_KEY;
 import com.bacon.persistence.SQLExtractor;
@@ -331,6 +332,64 @@ public class JDBCInvoiceDAO implements InvoiceDAO {
         }
         return invoices;
     }
+    
+     public ArrayList<Invoice> getInvoiceLiteList(String where, String orderBy) throws DAOException {
+
+        String retrieveProd;
+        ArrayList<Invoice> invoices = new ArrayList<>();
+        try {
+            SQLExtractor sqlExtractorWhere = new SQLExtractor(where, SQLExtractor.Type.WHERE);
+            SQLExtractor sqlExtractorOrderBy = new SQLExtractor(orderBy, SQLExtractor.Type.ORDER_BY);
+            Map<String, String> namedParams = new HashMap<>();
+            namedParams.put(NAMED_PARAM_WHERE, sqlExtractorWhere.extractWhere());
+            namedParams.put(NAMED_PARAM_ORDER_BY, sqlExtractorOrderBy.extractOrderBy());
+       
+
+            retrieveProd = sqlStatements.getSQLString(GET_INVOICE_KEY, namedParams);
+
+        } catch (SQLException e) {
+            throw new DAOException("Could not properly retrieve the Invoice List", e);
+        } catch (IOException e) {
+            throw new DAOException("Could not properly retrieve the Invoice List", e);
+        }
+
+        Connection conn = null;
+        PreparedStatement retrieve = null;
+        ResultSet rs = null;
+        Invoice invoice = null;
+        try {
+            conn = dataSource.getConnection();
+            retrieve = conn.prepareStatement(retrieveProd);
+            rs = retrieve.executeQuery();
+            while (rs.next()) {
+                invoice = new Invoice();
+                invoice.setId(rs.getLong(1));
+                invoice.setFactura(rs.getString(2));
+                invoice.setFecha(rs.getDate(3));
+                invoice.setTipoEntrega(rs.getInt(4));
+                invoice.setValor(rs.getBigDecimal(5));
+                invoice.setNumDeliverys(rs.getInt(6));
+                invoice.setValorDelivery(rs.getBigDecimal(7));
+                invoice.setDescuento(rs.getDouble(8));
+                invoice.setIdCliente(rs.getLong(9));
+                invoice.setIdWaitress(rs.getInt(10));
+                invoice.setTable(rs.getInt(11));
+                invoice.setCiclo(rs.getLong(12));
+                invoice.setNota(rs.getString(13));
+                invoice.setService(rs.getBoolean(14));
+                invoice.setPorcService(rs.getDouble(15));
+                invoice.setStatus(rs.getInt(16));
+                invoices.add(invoice);
+            }
+        } catch (SQLException e) {
+            throw new DAOException("Could not proper retrieve the Invoice: " + e);
+        } finally {
+            DBManager.closeResultSet(rs);
+            DBManager.closeStatement(retrieve);
+            DBManager.closeConnection(conn);
+        }
+        return invoices;
+    }
 
     public ArrayList<Invoice> getInvoiceList(String where, String orderBy) throws DAOException {
         String retrieveProd;
@@ -492,6 +551,68 @@ public class JDBCInvoiceDAO implements InvoiceDAO {
         return invoices;
     }
 
+    public ArrayList<Invoice> getInvoiceListWhitProducts(String where, String orderBy) throws DAOException {
+        String retrieveProd;
+        ArrayList<Invoice> invoices = new ArrayList<>();
+        try {
+            SQLExtractor sqlExtractorWhere = new SQLExtractor(where, SQLExtractor.Type.WHERE);
+            SQLExtractor sqlExtractorOrderBy = new SQLExtractor(orderBy, SQLExtractor.Type.ORDER_BY);
+            Map<String, String> namedParams = new HashMap<>();
+            namedParams.put(NAMED_PARAM_WHERE, sqlExtractorWhere.extractWhere());
+            namedParams.put(NAMED_PARAM_ORDER_BY, sqlExtractorOrderBy.extractOrderBy());
+            retrieveProd = sqlStatements.getSQLString(GET_INVOICE_KEY, namedParams);
+
+        } catch (SQLException e) {
+            throw new DAOException("Could not properly retrieve the Invoice List", e);
+        } catch (IOException e) {
+            throw new DAOException("Could not properly retrieve the Invoice List", e);
+        }
+
+        Connection conn = null;
+        PreparedStatement retrieve = null;
+        ResultSet rs = null, rs1 = null, rs2 = null, rs3 = null, rsx = null;
+        Invoice invoice = null;
+        try {
+            conn = dataSource.getConnection();
+            retrieve = conn.prepareStatement(retrieveProd);
+            rs = retrieve.executeQuery();
+            while (rs.next()) {
+                invoice = new Invoice();
+                invoice.setId(rs.getLong(1));
+                invoice.setFactura(rs.getString(2));
+                invoice.setFecha(rs.getDate(3));
+                invoice.setTipoEntrega(rs.getInt(4));
+                invoice.setValor(rs.getBigDecimal(5));
+                invoice.setNumDeliverys(rs.getInt(6));
+                invoice.setValorDelivery(rs.getBigDecimal(7));
+                invoice.setDescuento(rs.getDouble(8));
+                invoice.setIdCliente(rs.getLong(9));
+                invoice.setIdWaitress(rs.getInt(10));
+                invoice.setTable(rs.getInt(11));
+                invoice.setCiclo(rs.getLong(12));
+                invoice.setNota(rs.getString(13));
+                invoice.setService(rs.getBoolean(14));
+                invoice.setPorcService(rs.getDouble(15));
+                invoice.setStatus(rs.getInt(16));
+
+                invoice.addProduct(new ProductoPed(new Product(rs.getInt(18), rs.getString(19), 0, "")));
+
+                invoices.add(invoice);
+            }
+        } catch (SQLException e) {
+            throw new DAOException("Could not proper retrieve the Invoice: " + e);
+        } finally {
+            DBManager.closeResultSet(rs3);
+            DBManager.closeResultSet(rs2);
+            DBManager.closeResultSet(rsx);
+            DBManager.closeResultSet(rs1);
+            DBManager.closeResultSet(rs);
+            DBManager.closeStatement(retrieve);
+            DBManager.closeConnection(conn);
+        }
+        return invoices;
+    }
+
     @Override
     public void addInvoice(Invoice invoice) throws DAOException {
         if (invoice == null) {
@@ -555,11 +676,16 @@ public class JDBCInvoiceDAO implements InvoiceDAO {
                 //fix issue para productos sin presentacion
                 if (mData != null && !mData.isEmpty()) {
 //                    double exist = Double.parseDouble(data.get("exist").toString());
+
                     Set<Integer> keys = mData.keySet();
                     for (Integer key : keys) {
                         HashMap data = mData.get(key);
+                        boolean onlyDelivery = Boolean.parseBoolean(data.get("onlyDelivery").toString());
                         double quant = Double.parseDouble(data.get("quantity").toString());
                         double res = (quant * product.getCantidad() * -1);
+                        if (invoice.getTipoEntrega() == PanelPedido.TIPO_LOCAL && onlyDelivery) {
+                            res=0;
+                        }
                         Object[] parameterx = {
                             res,
                             data.get("id")
@@ -1007,6 +1133,50 @@ public class JDBCInvoiceDAO implements InvoiceDAO {
             DBManager.closeStatement(ps);
             DBManager.closeConnection(conn);
         }
+    }
+
+    public ArrayList<Invoice> getInvoiceLiteByQuery(String query) throws DAOException {
+
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        Invoice invoice = null;
+        ArrayList<Invoice> invoices = new ArrayList<>();
+        try {
+            conn = dataSource.getConnection();
+            ps = conn.prepareStatement(query);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                invoice = new Invoice();
+                invoice.setId(rs.getLong(1));
+                invoice.setFactura(rs.getString(2));
+                invoice.setFecha(rs.getDate(3));
+                invoice.setTipoEntrega(rs.getInt(4));
+                invoice.setValor(rs.getBigDecimal(5));
+                invoice.setNumDeliverys(rs.getInt(6));
+                invoice.setValorDelivery(rs.getBigDecimal(7));
+                invoice.setDescuento(rs.getDouble(8));
+                invoice.setIdCliente(rs.getLong(9));
+                invoice.setIdWaitress(rs.getInt(10));
+                invoice.setTable(rs.getInt(11));
+                invoice.setCiclo(rs.getLong(12));
+                invoice.setNota(rs.getString(13));
+                invoice.setService(rs.getBoolean(14));
+                invoice.setPorcService(rs.getDouble(15));
+                invoice.setStatus(rs.getInt(16));
+                invoices.add(invoice);
+
+                invoice.addProduct(new ProductoPed(new Product(rs.getInt(18), rs.getString(19), 0, "")));
+
+            }
+        } catch (SQLException e) {
+            throw new DAOException("Could not properly retrieve the Invoice: " + e);
+        } finally {
+            DBManager.closeResultSet(rs);
+            DBManager.closeStatement(ps);
+            DBManager.closeConnection(conn);
+        }
+        return invoices;
     }
 
 }

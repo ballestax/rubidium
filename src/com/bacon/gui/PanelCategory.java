@@ -29,13 +29,14 @@ import org.dz.PanelCapturaMod;
  * @author lrod
  */
 public class PanelCategory extends PanelCapturaMod implements PropertyChangeListener {
-    
+
     private final Aplication app;
     private Category category;
     private ArrayList<Product> products;
     public static final Logger logger = Logger.getLogger(PanelCategory.class.getCanonicalName());
     private int oldSize;
     private int view;
+    private String selectedSort;
 
     /**
      * Creates new form PanelCategory
@@ -52,27 +53,27 @@ public class PanelCategory extends PanelCapturaMod implements PropertyChangeList
         initComponents();
         createComponents();
     }
-    
+
     private void createComponents() {
         lbTitle.setText(category.getName());
         lbTitle.setOpaque(true);
         lbTitle.setBorder(BorderFactory.createEtchedBorder());
         lbTitle.setBackground(new Color(84, 36, 0, 130));
-        
+
         lbTitle.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
             }
         });
-        
+
         lbTitle.setVisible(false);
-        
-        showView1();
-        
+
+        showView2();
+
         oldSize = products.size();
     }
-    
-    public void setProducts(ArrayList<Product> products) {        
+
+    public void setProducts(ArrayList<Product> products) {
         this.products = products;
         if (products == null) {
             pnItems.removeAll();
@@ -84,13 +85,13 @@ public class PanelCategory extends PanelCapturaMod implements PropertyChangeList
             showView2();
         }
     }
-    
+
     public void showView2() {
         view = 2;
         app.getGuiManager().setWaitCursor();
         pnItems.removeAll();
         pnItems.setLayout(new GridBagLayout());
-        
+
         if (products != null) {
             int COLS = 3;
             int LX = products.size() / COLS;
@@ -104,57 +105,58 @@ public class PanelCategory extends PanelCapturaMod implements PropertyChangeList
                     }
                     Product prod = products.get(c);
                     PanelProduct pnProd = new PanelProduct(app, prod);
-                    pnProd.addPropertyChangeListener(this);
+//                    pnProd.addPropertyChangeListener(this);
+                    pnProd.addPropertyChangeListener(app.getGuiManager().getPanelPedido());
                     pnItems.add(pnProd, new GridBagConstraints(j, i, 1, 1, 0.1, 0, GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL, new Insets(2, 2, 2, 2), 0, 0));
                     c++;
                 }
             }
             pnItems.add(Box.createVerticalGlue(), new GridBagConstraints(j + 1, i, 1, 1, 0, 0.1, GridBagConstraints.SOUTH, GridBagConstraints.BOTH, new Insets(1, 1, 1, 1), 1, 1));
-            
+
         }
         pnItems.updateUI();
         app.getGuiManager().setDefaultCursor();
     }
-    
+
     public void showView1() {
         view = 1;
         app.getGuiManager().setWaitCursor();
         pnItems.removeAll();
         pnItems.setLayout(new GridLayout(0, 2, 10, 10));
-        
+
         if (products != null) {
             for (int i = 0; i < products.size(); i++) {
-                Product prod = products.get(i);                
+                Product prod = products.get(i);
                 PanelProduct2 pnProd = new PanelProduct2(app, prod);
                 pnProd.addPropertyChangeListener(this);
                 pnItems.add(pnProd);
             }
         }
-        
+
         pnItems.add(Box.createVerticalGlue());
         pnItems.add(Box.createVerticalGlue());
         pnItems.updateUI();
         app.getGuiManager().setDefaultCursor();
     }
-    
+
     public void resizePanel() {
-        
+
         if (pnItems != null) {
             int width = pnItems.getWidth();
-            
+
             if (oldSize != products.size()) {
                 if (width > 0) {
                     int h = 120 * ((products.size() + 1) / 2);
-                    
+
                     pnItems.setSize(width, h);
                 }
             }
         }
     }
-    
+
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        
+
         if (null != evt.getPropertyName()) {
             switch (evt.getPropertyName()) {
                 case PanelProduct2.AC_ADD_QUICK:
@@ -166,10 +168,22 @@ public class PanelCategory extends PanelCapturaMod implements PropertyChangeList
                 case PanelTopSearch.AC_SELECT_VIEW2:
                     showView2();
                     break;
+                case PanelTopSearch.AC_CHANGE_SORT:
+                    showView2();
+                    break;
                 default:
                     break;
             }
         }
+    }
+
+    public void changeSort(String sort) {
+
+        if (!selectedSort.equals(sort)) {
+
+            selectedSort = sort;
+        }
+
     }
 
     /**

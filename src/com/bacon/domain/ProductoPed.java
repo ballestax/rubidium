@@ -22,13 +22,14 @@ public class ProductoPed {
 
     public ProductoPed() {
         this(new Product());
-
+        this.precio = 0;
     }
 
     public ProductoPed(Product producto) {
         this.producto = producto;
         adicionales = new ArrayList<>();
         exclusiones = new ArrayList<>();
+        this.precio = producto.getPrice();
     }
 
     public Product getProduct() {
@@ -141,6 +142,7 @@ public class ProductoPed {
 
     public void setPresentation(Presentation presentation) {
         this.presentation = presentation;
+        this.precio = presentation.getPrice();
     }
 
     public boolean hasPresentation() {

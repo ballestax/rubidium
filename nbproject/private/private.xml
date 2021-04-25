@@ -12,28 +12,10 @@
     </editor-bookmarks>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
+            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/gui/PanelCash.java</file>
             <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/Aplication.java</file>
-            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/gui/PanelConfigTicket.java</file>
-            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/gui/PanelReportSales.java</file>
-            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/gui/PanelSelCategory.java</file>
             <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/config/jdbc-sql.xml</file>
-            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/gui/PanelAdminConfig.java</file>
-            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/gui/PanelModPedidos.java</file>
-            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/gui/PanelPedido.java</file>
-            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/PrinterService.java</file>
-            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/gui/PanelCategory.java</file>
-            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/Control.java</file>
-            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/persistence/JDBC/JDBCProductDAO.java</file>
-            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/gui/PanelReportProductDetail.java</file>
-            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/Configuration.java</file>
-            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/GUIManager.java</file>
-            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/gui/PanelConfigOthers.java</file>
-            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/gui/PanelListPedidos.java</file>
-            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/gui/PanelConfirmPedido.java</file>
             <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/persistence/JDBC/JDBCUtilDAO.java</file>
-            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/config/logging.properties</file>
-            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/MyConstants.java</file>
-            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/persistence/JDBC/JDBCInvoiceDAO.java</file>
         </group>
     </open-files>
 </project-private>

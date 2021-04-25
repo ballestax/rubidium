@@ -17,6 +17,7 @@ import com.bacon.gui.GuiPanelNewUser;
 import com.bacon.gui.GuiPanelSelProduct;
 import com.bacon.gui.util.JStatusbar;
 import com.bacon.gui.PanelAccess;
+import com.bacon.gui.PanelAddExtra;
 import com.bacon.gui.PanelAddItem;
 import com.bacon.gui.PanelAddProduct;
 import com.bacon.gui.PanelAdminBackup;
@@ -134,6 +135,7 @@ public class GUIManager {
     private PanelNewLocation pnNewLocation;
     private PanelDownItem panelDownItem;
     private PanelConfigTicket pnConfigTicket;
+    private PanelAddExtra panelAddExtra;
 
     private GUIManager() {
 
@@ -352,6 +354,13 @@ public class GUIManager {
             panelAddProduct = new PanelAddProduct(app, null);
         }
         return panelAddProduct;
+    }
+    
+    public PanelAddExtra getPanelAddExtra() {
+        if (panelAddExtra == null) {
+            panelAddExtra = new PanelAddExtra(app, null);
+        }
+        return panelAddExtra;
     }
 
     public PanelAddItem getPanelAddItem() {
@@ -1013,6 +1022,27 @@ public class GUIManager {
         setDefaultCursor();
         dialog.setVisible(true);
     }
+    
+    public void showPanelAddExtra(PropertyChangeListener listener) {
+        setWaitCursor();
+        JDialog dialog = new MyDialogEsc();
+        dialog.setModal(true);
+        int w = 350;
+        int h = 400;
+        dialog.setPreferredSize(new Dimension(w, h));
+
+        if (!getPanelAddExtra().containsListener(listener)) {
+            getPanelAddExtra().addPropertyChangeListener(listener);
+        }
+        getPanelAddExtra().reset();
+        dialog.setResizable(false);
+        dialog.add(getPanelAddExtra());
+        dialog.setTitle("Agregar entrada/salida.");
+        dialog.pack();
+        dialog.setLocationRelativeTo(getFrame());
+        setDefaultCursor();
+        dialog.setVisible(true);
+    }
 
     public void showPanelAddOtherProduct(PropertyChangeListener listener) {
         setWaitCursor();
@@ -1045,13 +1075,18 @@ public class GUIManager {
         if (!getPanelAddItem().containsListener(listener)) {
             getPanelAddItem().addPropertyChangeListener(listener);
         }
+
         getPanelAddItem().reset();
+        String title = "Agregar item al inventario.";
+        getPanelAddItem().modoNuevoItem();
         if (item != null) {
             getPanelAddItem().setItem(item);
-        }
+            getPanelAddItem().modoActualizarItem();
+            title = "Actualizar item.";
+        } 
 //        dialog.setResizable(false);
         dialog.add(getPanelAddItem());
-        dialog.setTitle("Agregar item al inventario.");
+        dialog.setTitle(title);
         dialog.pack();
         dialog.setLocationRelativeTo(getFrame());
         setDefaultCursor();
@@ -1160,12 +1195,11 @@ public class GUIManager {
         return pnConfigOthers;
     }
 
-     public PanelConfigTicket getPanelConfigTicket() {
+    public PanelConfigTicket getPanelConfigTicket() {
         if (pnConfigTicket == null) {
             pnConfigTicket = new PanelConfigTicket(app);
         }
         return pnConfigTicket;
     }
 
-    
 }

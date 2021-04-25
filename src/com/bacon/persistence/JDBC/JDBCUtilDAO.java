@@ -116,6 +116,12 @@ public class JDBCUtilDAO implements UtilDAO {
     public static final String GET_UNIT_KEY = "GET_UNIT";
     public static final String DELETE_UNIT_KEY = "DELETE_UNIT";
     public static final String UPDATE_UNIT_KEY = "UPDATE_UNIT";
+    
+    public static final String CREATE_PAYMENTS_TABLE_KEY = "CREATE_PAYMENTS_TABLE";
+    public static final String ADD_PAYMENT_KEY = "ADD_PAYMENT";
+    public static final String GET_PAYMENT_KEY = "GET_PAYMENT";
+    public static final String DELETE_PAYMENT_KEY = "DELETE_PAYMENT";
+    public static final String UPDATE_PAYMENT_KEY = "UPDATE_PAYMENT";
 
     public static final String CREATE_INVENTORY_PRODUCT_TABLE_KEY = "CREATE_INVENTORY_PRODUCT_TABLE";
     public static final String UPDATE_INVENTORY_QUANTITY_KEY = "UPDATE_INVENTORY_QUANTITY";
@@ -192,6 +198,9 @@ public class JDBCUtilDAO implements UtilDAO {
 
         TABLE_NAME = "units";
         createTable(TABLE_NAME, CREATE_UNITS_TABLE_KEY);
+        
+        TABLE_NAME = "payments";
+        createTable(TABLE_NAME, CREATE_PAYMENTS_TABLE_KEY);
 
         TABLE_NAME = "inventory_product";
         createTable(TABLE_NAME, CREATE_INVENTORY_PRODUCT_TABLE_KEY);
@@ -1324,6 +1333,7 @@ public class JDBCUtilDAO implements UtilDAO {
                 data.put("exist", rs.getDouble("exist"));
                 data.put("idPres", rs.getInt("idPres"));
                 data.put("quantity", rs.getDouble("quantity"));
+                data.put("onlyDelivery", rs.getBoolean("onlyDelivery"));
                 mData.put(id, data);
             }
         } catch (SQLException | IOException e) {
@@ -1357,6 +1367,7 @@ public class JDBCUtilDAO implements UtilDAO {
                 data.put("exist", rs.getDouble("exist"));
                 data.put("idPres", rs.getInt("idPres"));
                 data.put("quantity", rs.getDouble("quantity"));
+                data.put("onlyDelivery", rs.getBoolean("onlyDelivery"));
                 mData.put(id, data);
             }
         } catch (SQLException | IOException e) {
@@ -1578,5 +1589,114 @@ public class JDBCUtilDAO implements UtilDAO {
             DBManager.closeConnection(conn);
         }
         return list;
+    
+        
+    }  
+        public void addPayment(String payment) throws DAOException {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        try {
+            conn = dataSource.getConnection();
+            conn.setAutoCommit(false);
+            Object[] parameters = {
+                payment
+            };
+            ps = sqlStatements.buildSQLStatement(conn, ADD_PAYMENT_KEY, parameters);
+            ps.executeUpdate();
+            conn.commit();
+        } catch (SQLException e) {
+            DBManager.rollbackConn(conn);
+            throw new DAOException("Cannot add Payment", e);
+        } catch (IOException e) {
+            DBManager.rollbackConn(conn);
+            throw new DAOException("Cannot add Payment", e);
+        } finally {
+            DBManager.closeStatement(ps);
+            DBManager.closeConnection(conn);
+        }
+    }
+
+    public ArrayList<String> getPaymentList(String where, String orderBy) throws DAOException {
+        String retrievePayment;
+        ArrayList<String> payments = new ArrayList<>();
+        try {
+            SQLExtractor sqlExtractorWhere = new SQLExtractor(where, SQLExtractor.Type.WHERE);
+            SQLExtractor sqlExtractorOrderBy = new SQLExtractor(orderBy, SQLExtractor.Type.ORDER_BY);
+            Map<String, String> namedParams = new HashMap<>();
+            namedParams.put(NAMED_PARAM_WHERE, sqlExtractorWhere.extractWhere());
+            namedParams.put(NAMED_PARAM_ORDER_BY, sqlExtractorOrderBy.extractOrderBy());
+            retrievePayment = sqlStatements.getSQLString(GET_PAYMENT_KEY, namedParams);
+
+        } catch (SQLException e) {
+            throw new DAOException("Could not properly retrieve the Paymentes List", e);
+        } catch (IOException e) {
+            throw new DAOException("Could not properly retrieve the Paymentes List", e);
+        }
+
+        Connection conn = null;
+        PreparedStatement retrieve = null;
+        ResultSet rs = null;
+        String payment = null;
+        try {
+            conn = dataSource.getConnection();
+            retrieve = conn.prepareStatement(retrievePayment);
+            rs = retrieve.executeQuery();
+
+            while (rs.next()) {
+                payment = rs.getString(2);
+                payments.add(payment);
+            }
+        } catch (SQLException e) {
+            throw new DAOException("Could not proper retrieve the Payment: " + e);
+        } finally {
+            DBManager.closeResultSet(rs);
+            DBManager.closeStatement(retrieve);
+            DBManager.closeConnection(conn);
+        }
+        return payments;
+    }
+
+    public void deletePayment(String name) throws DAOException {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        try {
+            conn = dataSource.getConnection();
+            conn.setAutoCommit(false);
+            Object[] parameters = {name};
+            ps = sqlStatements.buildSQLStatement(conn, DELETE_PAYMENT_KEY, parameters);
+            ps.executeUpdate();
+            conn.commit();
+        } catch (SQLException e) {
+            DBManager.rollbackConn(conn);
+            throw new DAOException("Cannot delete the unidad", e);
+        } catch (IOException e) {
+            throw new DAOException("Cannot delete the unidad", e);
+        } finally {
+            DBManager.closeStatement(ps);
+            DBManager.closeConnection(conn);
+        }
+    }
+
+    public void updatePayment(String payment, String id) throws DAOException {
+        Connection conn = null;
+        PreparedStatement update = null;
+        String idPayment = "'" + payment + "'";
+        try {
+            conn = dataSource.getConnection();
+            conn.setAutoCommit(false);
+            Object[] parameters = {
+                payment,
+                id
+            };
+            update = sqlStatements.buildSQLStatement(conn, UPDATE_PAYMENT_KEY, parameters);
+            update.executeUpdate();
+            conn.commit();
+        } catch (SQLException | IOException e) {
+            DBManager.rollbackConn(conn);
+            throw new DAOException("Could not properly update the Payment", e);
+        } finally {
+            DBManager.closeStatement(update);
+            DBManager.closeConnection(conn);
+        }
     }
 }
