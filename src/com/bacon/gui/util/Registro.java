@@ -205,6 +205,24 @@ public class Registro extends JComponent implements Reseteable, CaretListener {
         inicializar(null);
     }
 
+    public Registro(int axis, String stLabel, String stCampo, int width, int widthLabel, AbstractAction action) {
+        super();
+        box = new Box(axis);
+        bordered = true;
+        docLim = null;
+        fontCampoDefault = new Font("Tahoma", 1, 14);
+        fontLabelDefault = new Font("Arial", 0, 11);
+        this.axis = axis;
+        this.stLabel = stLabel;
+        this.stCampo = stCampo;
+        this.width = width;
+        this.action = action;
+        this.widthLabel = widthLabel;
+        fontLabel = fontLabelDefault;
+        fontCampo = fontCampoDefault;
+        inicializar(null);
+    }
+
     public Registro(int axis, String stLabel, JComponent campo) {
         super();
         box = new Box(axis);
@@ -406,7 +424,19 @@ public class Registro extends JComponent implements Reseteable, CaretListener {
         }
     }
 
+    public void setComponent(JComponent component) {
+        inicializar(component);
+        this.updateUI();
+    }
+
+    public void setAction(AbstractAction action) {
+        this.action = action;
+        inicializar(campo);
+    }
+
     private void inicializar(JComponent componente) {
+        removeAll();
+        box.removeAll();
         setLayout(new BorderLayout());
         UIManager.put("ComboBox.disabledBackground", Color.white);
         UIManager.put("ComboBox.disabledForeground", new Color(100, 100, 100));
@@ -429,8 +459,10 @@ public class Registro extends JComponent implements Reseteable, CaretListener {
             campo = componente;
             if (campo instanceof JTextField) {
                 ((JTextField) campo).addCaretListener(this);
-            } else if (campo instanceof MyDatePickerImp) {                
+            } else if (campo instanceof MyDatePickerImp) {
                 ((MyDatePickerImp) campo).addCaretListener(this);
+            } else if (campo instanceof JTextArea) {
+                ((JTextArea) campo).addCaretListener(this);
             }
         }
         campo.setFont(fontCampo);
@@ -460,10 +492,14 @@ public class Registro extends JComponent implements Reseteable, CaretListener {
 
         box.add(label);
         boolean conIcono = false;
+
+        int heigh = getHeight();
+        heigh = heigh > 0 ? heigh : 32;
+
         Box boxH = null;
         if (action != null) {
             JButton icono = new JButton(action);
-            icono.setPreferredSize(new Dimension(18, 18));
+            icono.setPreferredSize(new Dimension(heigh, heigh));
             boxH = new Box(0);
             boxH.add(campo);
             boxH.add(icono);
@@ -492,8 +528,7 @@ public class Registro extends JComponent implements Reseteable, CaretListener {
 
                                 StringSelection testData;
 
-                                String tmp = st.replaceAll("\\s+","");                                
-                                
+                                String tmp = st.replaceAll("\\s+", "");
 
                                 //  Add some test data
                                 testData = new StringSelection(tmp);
@@ -568,6 +603,10 @@ public class Registro extends JComponent implements Reseteable, CaretListener {
         if (campo instanceof JTextField) {
             return ((JTextField) campo).getText();
         }
+
+        if (campo instanceof JTextArea) {
+            return ((JTextArea) campo).getText();
+        }
         if (campo instanceof JComboBox) {
             JComboBox cb = ((JComboBox) campo);
             if (cb.getSelectedItem() != null) {
@@ -609,6 +648,13 @@ public class Registro extends JComponent implements Reseteable, CaretListener {
             ((JComboBox) campo).setSelectedItem(text);
         } else if (campo instanceof MyDatePickerImp) {
             ((MyDatePickerImp) campo).setText(text);
+        } else if (campo instanceof JTextArea) {
+            ((JTextArea) campo).setText(text);
+        } else if (campo instanceof JScrollPane) {
+            try {
+                ((JTextArea) (((JScrollPane) campo).getViewport().getComponent(0))).setText(text);
+            } catch (Exception e) {
+            }
         }
     }
 
@@ -652,6 +698,12 @@ public class Registro extends JComponent implements Reseteable, CaretListener {
         }
     }
 
+    public void setSelected(Object object) {
+        if (campo instanceof JComboBox) {
+            ((JComboBox) campo).setSelectedItem(object);
+        }
+    }
+
     public void setLabelFont(Font fontLabel) {
         this.fontLabel = fontLabel;
         label.setFont(fontLabel);
@@ -683,6 +735,9 @@ public class Registro extends JComponent implements Reseteable, CaretListener {
     public void addCaretListener(CaretListener caretListener) {
         if (campo instanceof JTextField) {
             ((JTextField) campo).addCaretListener(caretListener);
+        }
+        if (campo instanceof JTextArea) {
+            ((JTextArea) campo).addCaretListener(caretListener);
         }
     }
 
@@ -809,6 +864,15 @@ public class Registro extends JComponent implements Reseteable, CaretListener {
             ((JComboBox) campo).setForeground(foreground);
         } else if (campo instanceof MyDatePickerImp) {
             ((MyDatePickerImp) campo).setEditable(editable);
+        } else if (campo instanceof JTextArea) {
+            Color background = ((JTextArea) campo).getBackground();
+            ((JTextArea) campo).setEditable(editable);
+            ((JTextArea) campo).setBackground(background);
+            if (editable) {
+                ((JTextArea) campo).setForeground(Color.black);
+            } else {
+                ((JTextArea) campo).setForeground(new Color(100, 100, 100));
+            }
         }
     }
 
@@ -876,6 +940,8 @@ public class Registro extends JComponent implements Reseteable, CaretListener {
     public void setPadding(int top, int left, int botton, int right) {
         if (campo instanceof JTextField || campo instanceof UpperCaseTextField) {
             ((JTextField) campo).setMargin(new Insets(top, left, botton, right));
+        } else if (campo instanceof JTextArea) {
+            ((JTextArea) campo).setMargin(new Insets(top, left, botton, right));
         }
     }
 

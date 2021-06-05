@@ -110,6 +110,7 @@ public class JDBCUtilDAO implements UtilDAO {
 
     public static final String GET_CATEGORIES_SORTED_KEY = "GET_CATEGORIES_SORTED";
     public static final String GET_ALL_CATEGORIES_KEY = "GET_ALL_CATEGORIES";
+    public static final String GET_CATEGORY_KEY = "GET_CATEGORY";
 
     public static final String CREATE_UNITS_TABLE_KEY = "CREATE_UNITS_TABLE";
     public static final String ADD_UNIT_KEY = "ADD_UNIT";
@@ -1173,6 +1174,41 @@ public class JDBCUtilDAO implements UtilDAO {
             DBManager.closeConnection(conn);
         }
         return categories;
+    }
+    
+    public Category getCategory(String name) throws DAOException {
+        String retrieveList;
+        try {
+            SQLExtractor sqlExtractorWhere = new SQLExtractor("p.category='"+name+"'", SQLExtractor.Type.WHERE);
+            
+            Map<String, String> namedParams = new HashMap<>();
+            namedParams.put(NAMED_PARAM_WHERE, sqlExtractorWhere.extractWhere());            
+            retrieveList = sqlStatements.getSQLString(GET_CATEGORY_KEY, namedParams);
+        } catch (SQLException e) {
+            throw new DAOException("Could not properly retrieve the Category", e);
+        } catch (IOException e) {
+            throw new DAOException("Could not properly retrieve the Category", e);
+        }        
+        
+        Connection conn = null;
+        PreparedStatement retrieve = null;
+        ResultSet rs = null;
+        Category category = null;
+        try {
+            conn = dataSource.getConnection();
+            retrieve = conn.prepareStatement(retrieveList);
+            rs = retrieve.executeQuery();
+            while (rs.next()) {
+                category = new Category(rs.getString(1));                
+            }
+        } catch (SQLException e) {
+            throw new DAOException("Could not properly retrieve the categories list: " + e);
+        } finally {
+            DBManager.closeResultSet(rs);
+            DBManager.closeStatement(retrieve);
+            DBManager.closeConnection(conn);
+        }
+        return category;
     }
     
     public ArrayList<Category> getAllCategories() throws DAOException {

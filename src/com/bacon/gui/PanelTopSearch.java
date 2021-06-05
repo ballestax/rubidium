@@ -7,6 +7,7 @@ package com.bacon.gui;
 
 import com.bacon.MyConstants;
 import com.bacon.Aplication;
+import com.bacon.Configuration;
 import com.bacon.domain.Product;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -71,9 +72,8 @@ public class PanelTopSearch extends PanelCaptura implements ActionListener {
         btView1.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "packing1.png", 20, 20)));
         btView1.setActionCommand(AC_SELECT_VIEW1);
         btView1.addActionListener(this);
-        
-//        btView1.setForeground(colorLocal);
 
+//        btView1.setForeground(colorLocal);
         btView2.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "packing2.png", 20, 20)));
         btView2.setActionCommand(AC_SELECT_VIEW2);
         btView2.addActionListener(this);
@@ -81,22 +81,25 @@ public class PanelTopSearch extends PanelCaptura implements ActionListener {
 
         btView2.setSelected(true);
 
-
         lbSort.setText("");
         lbSort.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "view-filter.png", 20, 20)));
-        
+
         DefaultComboBoxModel model = new DefaultComboBoxModel();
         model.addElement("----");
-        model.addElement("Alfabetico");        
-        model.addElement("Precio");
-        model.addElement("Rating");        
+        model.addElement(PanelCategory.ORDEN_ALPHA);
+        model.addElement(PanelCategory.ORDEN_PRICE);
+//        model.addElement(PanelCategory.ORDEN_RATING); 
+
+        String prop = app.getConfiguration().getProperty(Configuration.PROD_ORDER, "----");
+
+        model.setSelectedItem(prop);
+
         cbSort.setModel(model);
         cbSort.setActionCommand(AC_CHANGE_SORT);
         cbSort.addActionListener(this);
-        
-        cbSort.setEnabled(false);
-        lbSort.setEnabled(false);
 
+//        cbSort.setEnabled(false);
+//        lbSort.setEnabled(false);
     }
     public static final String AC_CHANGE_SORT = "AC_CHANGE_SORT";
     public static final String AC_SELECT_VIEW2 = "AC_SELECT_VIEW2";
@@ -203,17 +206,18 @@ public class PanelTopSearch extends PanelCaptura implements ActionListener {
         if (AC_CLEAR_FIELD.equals(e.getActionCommand())) {
             regSearch.setText("");
             regSearch.getComponent().requestFocus();
-            
+
         } else if (AC_SELECT_VIEW1.equals(e.getActionCommand())) {
             pcs.firePropertyChange(AC_SELECT_VIEW1, null, null);
 
         } else if (AC_SELECT_VIEW2.equals(e.getActionCommand())) {
             pcs.firePropertyChange(AC_SELECT_VIEW2, null, null);
-        } else if(AC_ADD_CUSTOM_PRODUCT.equals(e.getActionCommand())){
-            
+        } else if (AC_ADD_CUSTOM_PRODUCT.equals(e.getActionCommand())) {
+
             PanelPedido panelPedido = app.getGuiManager().getPanelPedido();
             app.getGuiManager().showPanelAddOtherProduct(panelPedido);
-        }else if(AC_CHANGE_SORT.equals(e.getActionCommand())){
+        } else if (AC_CHANGE_SORT.equals(e.getActionCommand())) {
+            app.getConfiguration().setProperty(Configuration.PROD_ORDER, cbSort.getSelectedItem().toString(), true);            
             pcs.firePropertyChange(AC_CHANGE_SORT, null, cbSort.getSelectedItem());
         }
 

@@ -440,6 +440,16 @@ public class Control {
         }
     }
 
+    public Product getProductById(long id) {
+        try {
+            JDBCProductDAO prodDAO = (JDBCProductDAO) DAOFactory.getInstance().getProductDAO();
+            return prodDAO.getProductBy("id=" + String.valueOf(id));
+        } catch (DAOException ex) {
+            logger.error("Error getting Products list.", ex);
+            return null;
+        }
+    }
+
     public ArrayList<Ingredient> getIngredientList(String where) {
         try {
             JDBCIngredientDAO ingDAO = (JDBCIngredientDAO) DAOFactory.getInstance().getIngredientDAO();
@@ -567,7 +577,7 @@ public class Control {
             return null;
         }
     }
-    
+
     public ArrayList<Invoice> getInvoicesLitelList(String where, String order) {
         try {
             JDBCInvoiceDAO invoiceDAO = (JDBCInvoiceDAO) DAOFactory.getInstance().getInvoiceDAO();
@@ -783,6 +793,17 @@ public class Control {
             return null;
         }
     }
+    
+    public Category getCategory(String name) {
+        try {
+            JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
+            return utilDAO.getCategory(name);
+        } catch (DAOException ex) {
+            logger.error("Error getting Categories list.", ex);
+            return null;
+        }
+    }
+    
 
     public ArrayList<Category> getAllCategoriesList() {
         try {
@@ -1096,7 +1117,6 @@ public class Control {
             GUIManager.showErrorMessage(null, "Error consultando factura", "Error");
             return null;
         }
-
     }
 
     public ArrayList<Invoice> getInvoicesLiteWhitProduct(String querycomp) {
@@ -1114,8 +1134,7 @@ public class Control {
 //            query = query.replace("??1", (idProd <= 0 ? "" : "AND p.id=" + String.valueOf(idProd)));
             query = query.replace("??2", querycomp.isEmpty() ? "" : "AND " + querycomp);
 
-            System.out.println("query = " + query);
-
+//            System.out.println("query = " + query);
             JDBCInvoiceDAO invoiceDAO = (JDBCInvoiceDAO) DAOFactory.getInstance().getInvoiceDAO();
             ArrayList<Invoice> invoiceByQuery = invoiceDAO.getInvoiceByQuery(query);
 
@@ -1128,4 +1147,5 @@ public class Control {
 
         }
     }
+
 }

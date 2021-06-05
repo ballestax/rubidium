@@ -9,7 +9,6 @@ import com.bacon.Aplication;
 import com.bacon.MyConstants;
 import com.bacon.domain.Cycle;
 import com.bacon.domain.Invoice;
-import com.bacon.domain.ProductoPed;
 import com.bacon.domain.Table;
 import com.bacon.domain.Waiter;
 import java.awt.Color;
@@ -27,7 +26,6 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.EventObject;
-import java.util.List;
 import javax.swing.AbstractCellEditor;
 import javax.swing.BorderFactory;
 import static javax.swing.BorderFactory.createLineBorder;
@@ -47,7 +45,6 @@ import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import org.apache.log4j.Logger;
 import org.bx.gui.MyDefaultTableModel;
-import org.bx.gui.MyPopupListener;
 import org.dz.PanelCapturaMod;
 
 /**
@@ -131,7 +128,7 @@ public class PanelCash extends PanelCapturaMod implements ActionListener, Proper
                 int r = tableInvoices.getSelectedRow();
                 String fact = tableInvoices.getValueAt(r, 0).toString();
                 Invoice inv = app.getControl().getInvoiceByCode(fact);
-                showPayInvoice();
+                showPayInvoice(inv);
             }
 
         });
@@ -241,14 +238,15 @@ public class PanelCash extends PanelCapturaMod implements ActionListener, Proper
     private static final String AC_REVIEW_INVOICE = "AC_REVIEW_INVOICE";
     private static final String AC_FILTER = "AC_FILTER";
 
-    private void showPayInvoice() throws HeadlessException {
-        StringBuilder msg = new StringBuilder();
-        msg.append("<html>");
-        msg.append("</html>");
-        int opt = JOptionPane.showConfirmDialog(null, msg, "Advertencia", JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
-        if (opt == JOptionPane.OK_OPTION) {
-
-        }
+    private void showPayInvoice(Invoice inv) throws HeadlessException {
+//        StringBuilder msg = new StringBuilder();
+//        msg.append("<html>");
+//        msg.append("</html>");
+//        int opt = JOptionPane.showConfirmDialog(null, msg, "Advertencia", JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
+//        if (opt == JOptionPane.OK_OPTION) {
+//
+//        }
+        app.getGuiManager().showPanelPayInvoice(inv);
     }
 
     public void loadCycle() {
@@ -307,7 +305,7 @@ public class PanelCash extends PanelCapturaMod implements ActionListener, Proper
                 filter += idWaiter == 0 ? "" : " AND idMesero=" + idWaiter;
 
                 ArrayList<Invoice> invoiceslList = app.getControl().getInvoicesLitelList("ciclo=" + cycle.getId() + filter, "sale_date DESC");
-                
+
                 total = new BigDecimal(0);
                 int totalProducts = 0;
                 int anuladas = 0;
@@ -417,6 +415,7 @@ public class PanelCash extends PanelCapturaMod implements ActionListener, Proper
         lbEnd = new javax.swing.JLabel();
         lbStatus = new javax.swing.JLabel();
         btRefresh = new javax.swing.JButton();
+        btRefresh1 = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         tableInvoices = new javax.swing.JTable();
         lbFacturas = new javax.swing.JLabel();
@@ -480,6 +479,8 @@ public class PanelCash extends PanelCapturaMod implements ActionListener, Proper
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(lbEnd, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(btRefresh1, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(btRefresh, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         jPanel1Layout.setVerticalGroup(
@@ -499,7 +500,9 @@ public class PanelCash extends PanelCapturaMod implements ActionListener, Proper
                     .addComponent(jSeparator1))
                 .addGap(5, 5, 5))
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addComponent(btRefresh, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btRefresh, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btRefresh1, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(0, 0, Short.MAX_VALUE))
         );
 
@@ -676,6 +679,7 @@ public class PanelCash extends PanelCapturaMod implements ActionListener, Proper
     private javax.swing.JButton btAddExtra;
     private javax.swing.JButton btNewCiclo;
     private javax.swing.JButton btRefresh;
+    private javax.swing.JButton btRefresh1;
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
@@ -754,7 +758,7 @@ public class PanelCash extends PanelCapturaMod implements ActionListener, Proper
                 String code = model.getValueAt(row, 0).toString();
                 Invoice invoice = app.getControl().getInvoiceByCode(code);
                 if (AC_PAY_INVOICE.equals(e.getActionCommand())) {
-                    showPayInvoice();
+                    showPayInvoice(invoice);
                 } else if (AC_REVIEW_INVOICE.equals(e.getActionCommand())) {
                     app.getGuiManager().reviewFacture(invoice);
                 }

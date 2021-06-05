@@ -40,7 +40,7 @@
                     |CREATE_CYCLES_TABLE|GET_CYCLE|ADD_CYCLE|DELETE_CYCLE|UPDATE_CYCLE
                     |CREATE_OTHER_PRODUCTS_TABLE|GET_OTHER_PRODUCT|ADD_OTHER_PRODUCT|DELETE_OTHER_PRODUCT
                     |CREATE_INVOICE_OTHER_PRODUCT_TABLE|ADD_INVOICE_OTHER_PRODUCT
-                    |GET_CATEGORIES_SORTED|GET_ALL_CATEGORIES
+                    |GET_CATEGORIES_SORTED|GET_ALL_CATEGORIES|GET_CATEGORY
                     |CREATE_EXPENSES_INCOMES_TABLE|ADD_EXPENSE_INCOME|GET_EXPENSE_INCOME
                     |GET_INVOICE_BY_PRODUCT
                     |CREATE_INVENTORY_TABLE|GET_ITEM|ADD_ITEM|UPDATE_ITEM
@@ -1137,9 +1137,13 @@
                 SELECT ps.id, ps.product_id, ps.serie,ps.name,ps.price,ps.isdefault,ps.isenabled
                 FROM presentation_product ps
                 WHERE 
-                ps.product_id = ?
+                ps.product_id = ? AND ps.isenabled=1
+                ORDER BY
+                ps.price, ps.name
             </SQLFragment>
         </SQLStatement>
+        
+        
         
         <SQLStatement method="GET_PRESENTATION_BY_DEFAULT">
             <SQLFragment>
@@ -1281,13 +1285,29 @@
             </SQLFragment>
         </SQLStatement>
         
-         <SQLStatement method="GET_ALL_CATEGORIES">
+        <SQLStatement method="GET_ALL_CATEGORIES">
             <SQLFragment>
                 SELECT p.category
                 FROM products p
                 GROUP BY p.category
                 ORDER BY p.category DESC                
             </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="GET_CATEGORY">
+            <SQLFragment>
+                SELECT p.category
+                FROM products p
+            </SQLFragment>
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                WHERE {where}
+            </SQLFragment>    
+            <SQLFragment>
+                GROUP BY p.category
+                ORDER BY p.category DESC
+            </SQLFragment>
+                            
+            
         </SQLStatement>
 
 

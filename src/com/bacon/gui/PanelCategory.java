@@ -38,6 +38,11 @@ public class PanelCategory extends PanelCapturaMod implements PropertyChangeList
     private int view;
     private String selectedSort;
 
+    public static final String ORDEN_ID = "ORDEN_ID";
+    public static final String ORDEN_ALPHA = "ALFABETICO";
+    public static final String ORDEN_PRICE = "PRECIO";
+    public static final String ORDEN_RATING = "RATING";
+
     /**
      * Creates new form PanelCategory
      *
@@ -50,6 +55,7 @@ public class PanelCategory extends PanelCapturaMod implements PropertyChangeList
         pcs = new PropertyChangeSupport(this);
         this.category = category;
         this.products = products;
+        this.selectedSort = "1";
         initComponents();
         createComponents();
     }
@@ -169,7 +175,7 @@ public class PanelCategory extends PanelCapturaMod implements PropertyChangeList
                     showView2();
                     break;
                 case PanelTopSearch.AC_CHANGE_SORT:
-                    showView2();
+                    changeSort(evt.getNewValue().toString());
                     break;
                 default:
                     break;
@@ -178,12 +184,23 @@ public class PanelCategory extends PanelCapturaMod implements PropertyChangeList
     }
 
     public void changeSort(String sort) {
-
+        System.out.println("sort = " + sort);
         if (!selectedSort.equals(sort)) {
-
             selectedSort = sort;
+            if (selectedSort.equalsIgnoreCase(ORDEN_ALPHA)) {
+                setProducts(app.getControl().getProductsList("enabled=1", "name"));
+            } else if (selectedSort.equalsIgnoreCase(ORDEN_PRICE)) {
+                setProducts(app.getControl().getProductsList("enabled=1", "price, name"));
+            } else {
+                setProducts(app.getControl().getProductsList("enabled=1", ""));
+            }
+
         }
 
+    }
+
+    public String getSelectedSort() {
+        return selectedSort;
     }
 
     /**

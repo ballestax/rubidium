@@ -46,6 +46,8 @@ import com.bacon.gui.PanelNewConciliacion;
 import com.bacon.gui.PanelNewCycle;
 import com.bacon.gui.PanelNewLocation;
 import com.bacon.gui.PanelOtherProduct;
+import com.bacon.gui.PanelPayInvoice;
+import com.bacon.gui.PanelProducts;
 import com.bacon.gui.PanelReportSales;
 import com.bacon.gui.PanelSelCategory;
 import com.bacon.gui.PanelSelItem;
@@ -136,6 +138,9 @@ public class GUIManager {
     private PanelDownItem panelDownItem;
     private PanelConfigTicket pnConfigTicket;
     private PanelAddExtra panelAddExtra;
+    private PanelPayInvoice panelPayInvoice;
+    private PanelBasic panelBasicProducts;
+    private PanelProducts panelProducts;
 
     private GUIManager() {
 
@@ -251,6 +256,13 @@ public class GUIManager {
         }
         return panelCash;
     }
+    
+    private PanelProducts getPanelProducts() {
+        if (panelProducts == null) {
+            panelProducts = new PanelProducts(app);
+        }
+        return panelProducts;
+    }
 
     private PanelReportSales getPanelReports() {
         if (panelReportSales == null) {
@@ -296,6 +308,15 @@ public class GUIManager {
             panelBasicCash = new PanelBasic(app, "Caja", icon, getPanelCash(null));
         }
         return panelBasicCash;
+    }
+    
+    
+    public PanelBasic getPanelBasicProducts() {
+        if (panelBasicProducts == null) {
+            ImageIcon icon = new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "shopping-bag-purple.png", 30, 30));
+            panelBasicProducts = new PanelBasic(app, "Productos", icon, getPanelProducts());
+        }
+        return panelBasicProducts;
     }
 
     public PanelBasic getPanelBasicReports() {
@@ -355,7 +376,7 @@ public class GUIManager {
         }
         return panelAddProduct;
     }
-    
+
     public PanelAddExtra getPanelAddExtra() {
         if (panelAddExtra == null) {
             panelAddExtra = new PanelAddExtra(app, null);
@@ -368,6 +389,13 @@ public class GUIManager {
             panelAddItem = new PanelAddItem(app);
         }
         return panelAddItem;
+    }
+
+    public PanelPayInvoice getPanelPayInvoice(Invoice inv) {
+        if (panelPayInvoice == null) {
+            panelPayInvoice = new PanelPayInvoice(app, inv);
+        }
+        return panelPayInvoice;
     }
 
     public PanelOtherProduct getPanelOtherProduct() {
@@ -574,6 +602,11 @@ public class GUIManager {
             if (user != null && perm != null && app.getControl().hasPermission(user, perm)) {
                 toolbar.add((app.getAction(Aplication.ACTION_SHOW_INVENTORY)));
             }
+            
+//            perm = app.getControl().getPermissionByName("show-products-module");
+//            if (user != null && app.getControl().hasPermission(user, perm)) {
+//                toolbar.add((app.getAction(Aplication.ACTION_SHOW_PRODUCTS)));
+//            }
 
             perm = app.getControl().getPermissionByName("show-admin-module");
             if (user != null && app.getControl().hasPermission(user, perm)) {
@@ -967,6 +1000,24 @@ public class GUIManager {
         dialog.setVisible(true);
     }
 
+    public void showPanelPayInvoice(Invoice invoice) {
+        setWaitCursor();
+        JDialog dialog = getDialog(true);
+//        dialog.setUndecorated(true);
+//        int w = 360;
+//        int h = 200;
+//        dialog.setPreferredSize(new Dimension(w, h));
+        PanelPayInvoice pPayInvoice = new PanelPayInvoice(app, invoice);
+//        ppayInvoice.addPropertyChangeListener(getPanelPedido());
+        dialog.add(pPayInvoice);
+//        dialog.setResizable(false);
+//        dialog.setTitle();
+        dialog.pack();
+        dialog.setLocationRelativeTo(getFrame());
+        setDefaultCursor();
+        dialog.setVisible(true);
+    }
+
     public void showPanelNewCycle(PropertyChangeListener listener) {
         setWaitCursor();
         JDialog dialog = getDialog(true);
@@ -1022,7 +1073,7 @@ public class GUIManager {
         setDefaultCursor();
         dialog.setVisible(true);
     }
-    
+
     public void showPanelAddExtra(PropertyChangeListener listener) {
         setWaitCursor();
         JDialog dialog = new MyDialogEsc();
@@ -1083,7 +1134,7 @@ public class GUIManager {
             getPanelAddItem().setItem(item);
             getPanelAddItem().modoActualizarItem();
             title = "Actualizar item.";
-        } 
+        }
 //        dialog.setResizable(false);
         dialog.add(getPanelAddItem());
         dialog.setTitle(title);

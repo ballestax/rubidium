@@ -13,7 +13,7 @@ public class Invoice {
 
     private Long id;
     private Long ciclo;
-    private String factura;    
+    private String factura;
     private Date fecha;
     private Long idCliente;
     private BigDecimal valor;
@@ -57,6 +57,10 @@ public class Invoice {
 
     public BigDecimal getValor() {
         return valor;
+    }
+
+    public BigDecimal getValorTotal() {
+        return valor.add(valorDelivery).add(BigDecimal.valueOf(getValueService()));
     }
 
     public void setValor(BigDecimal valor) {
@@ -194,7 +198,5 @@ public class Invoice {
     public void setNumDeliverys(int numDeliverys) {
         this.numDeliverys = numDeliverys;
     }
-    
-    
 
 }

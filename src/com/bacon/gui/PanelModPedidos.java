@@ -68,13 +68,10 @@ public class PanelModPedidos extends PanelCapturaMod
 
         categorys = app.getControl().getCategoriesList();
         int MAX = app.getConfiguration().getProperty(Configuration.MAX_CATEGORIES_LIST, 5);
-        if(categorys.size()<MAX){
+        if (categorys.size() < MAX) {
             categorys = app.getControl().getAllCategoriesList();
         }
         categorys.add(0, new Category("TODO"));
-        
-        
-        
 
         panelSelCategory.setCategories(categorys);
 
@@ -91,8 +88,6 @@ public class PanelModPedidos extends PanelCapturaMod
         pnPedido = app.getGuiManager().getPanelPedido();
 
         splitPane.setRightComponent(pnPedido);
-        
-        
 
         loadAllProducts();
 
@@ -104,7 +99,14 @@ public class PanelModPedidos extends PanelCapturaMod
     }
 
     private void loadAllProducts() {
-        productsList = app.getControl().getProductsList("enabled=1", "");
+        String order = app.getConfiguration().getProperty(Configuration.PROD_ORDER, "----");
+        String orderBy = "";
+        if (PanelCategory.ORDEN_ALPHA.equalsIgnoreCase(order)) {
+            orderBy = "name";
+        } else if (PanelCategory.ORDEN_PRICE.equalsIgnoreCase(order)) {
+            orderBy = "price, name";
+        }
+        productsList = app.getControl().getProductsList("enabled=1", orderBy);
     }
 
     /**
@@ -147,7 +149,13 @@ public class PanelModPedidos extends PanelCapturaMod
             String cat = evt.getPropertyName().substring(8).toLowerCase();
             ArrayList<Product> productsList = this.productsList;
             if (!"TODO".equalsIgnoreCase(cat)) {
-                productsList = app.getControl().getProductsList("category='" + cat + "' AND enabled=1", "");
+                String orderBy = "";
+                if (PanelCategory.ORDEN_ALPHA.equalsIgnoreCase(panelCategory.getSelectedSort())) {
+                    orderBy = "name";
+                } else if (PanelCategory.ORDEN_PRICE.equalsIgnoreCase(panelCategory.getSelectedSort())) {
+                    orderBy = "price, name";
+                }
+                productsList = app.getControl().getProductsList("category='" + cat + "' AND enabled=1", orderBy);
             }
             panelCategory.setProducts(productsList);
             panelLeft.updateUI();

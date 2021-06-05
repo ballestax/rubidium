@@ -65,6 +65,7 @@ public final class Aplication implements ActionListener, PropertyChangeListener,
     public static final String ACTION_SHOW_CASH = "acShowCash";
     public static final String ACTION_SHOW_REPORTS = "acShowReports";
     public static final String ACTION_SHOW_INVENTORY = "acShowInventory";
+    public static final String ACTION_SHOW_PRODUCTS = "acShowProducts";
 
     public static final String ACTION_RETURN_TO_MENU = "acReturnToMenu";
     public static final String ACTION_CLOSE_SESION = "acCLoseSesion";
@@ -74,7 +75,7 @@ public final class Aplication implements ActionListener, PropertyChangeListener,
     public static final String PREFERENCES = "";
     public static final String DATABASE = "baconapp";
     public static final String WORK_FOLDER = "baconapp";
-    public static final String DB_USER = "nait";
+    public static final String DB_USER = "root";
     public static boolean INSTALL_DB = false;
     private static final boolean messaged = true;
     public static final String DEFAULT_EXPORT_DIR = "";
@@ -119,6 +120,7 @@ public final class Aplication implements ActionListener, PropertyChangeListener,
     private ProgAction acShowOrderList;
     private ProgAction acShowReports;
     private ProgAction acShowInventory;
+    private ProgAction acShowProducts;
 
     public Aplication() {
 
@@ -219,7 +221,7 @@ public final class Aplication implements ActionListener, PropertyChangeListener,
 //        verifyLicTime();
         configDatabase();
         getGuiManager().configurar();
-        
+
     }
 
     private boolean getTimeServer() {
@@ -460,6 +462,16 @@ public final class Aplication implements ActionListener, PropertyChangeListener,
         acShowInventory.setSmallIcon(new ImageIcon(imgManager.getImagen(getFolderIcons() + "Inventory-maintenance.png", 25, 25)));
         acShowInventory.setLargeIcon(new ImageIcon(imgManager.getImagen(getFolderIcons() + "Inventory-maintenance.png", 32, 32)));
 
+        acShowProducts = new ProgAction("Products",
+                null, "Ver modulo productos", 'p') {
+            public void actionPerformed(ActionEvent e) {
+                Permission perm = getControl().getPermissionByName("show-products-module");
+                getGuiManager().showBasicPanel(getGuiManager().getPanelBasicProducts(), perm);
+            }
+        };
+        acShowProducts.setSmallIcon(new ImageIcon(imgManager.getImagen(getFolderIcons() + "shopping-bag-purple.png", 25, 25)));
+        acShowProducts.setLargeIcon(new ImageIcon(imgManager.getImagen(getFolderIcons() + "shopping-bag-purple.png", 32, 32)));
+
         acCerrarSesion = new ProgAction("Cerrar secion",
                 null, "Cerrar la sesion del usuario actual", 'x') {
             public void actionPerformed(ActionEvent e) {
@@ -497,6 +509,9 @@ public final class Aplication implements ActionListener, PropertyChangeListener,
 
             case ACTION_SHOW_REPORTS:
                 return acShowReports;
+
+            case ACTION_SHOW_PRODUCTS:
+                return acShowProducts;
 
             case ACTION_SHOW_INVENTORY:
                 return acShowInventory;

@@ -33,7 +33,7 @@
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Component id="pnFilters" min="-2" max="-2" attributes="0"/>
               <EmptySpace min="-2" max="-2" attributes="0"/>
-              <Component id="jScrollPane1" pref="286" max="32767" attributes="0"/>
+              <Component id="jScrollPane1" pref="300" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="lbStatus" min="-2" pref="29" max="-2" attributes="0"/>
           </Group>
@@ -56,23 +56,25 @@
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace min="-2" max="-2" attributes="0"/>
                   <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace max="-2" attributes="0"/>
+                  <EmptySpace min="-2" max="-2" attributes="0"/>
                   <Component id="tfBuscar" min="-2" pref="120" max="-2" attributes="0"/>
                   <EmptySpace min="-2" pref="1" max="-2" attributes="0"/>
                   <Component id="btBuscar" min="-2" pref="30" max="-2" attributes="0"/>
-                  <EmptySpace max="-2" attributes="0"/>
+                  <EmptySpace min="-2" max="-2" attributes="0"/>
                   <Component id="btFilters" min="-2" pref="29" max="-2" attributes="0"/>
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Component id="regTipo" min="-2" pref="176" max="-2" attributes="0"/>
-                  <EmptySpace min="-2" pref="9" max="-2" attributes="0"/>
-                  <Component id="regMesero" min="-2" pref="176" max="-2" attributes="0"/>
                   <EmptySpace min="-2" max="-2" attributes="0"/>
-                  <Component id="regProduct" min="-2" pref="176" max="-2" attributes="0"/>
+                  <Component id="regTipo" min="-2" pref="150" max="-2" attributes="0"/>
+                  <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
+                  <Component id="regMesero" min="-2" pref="150" max="-2" attributes="0"/>
+                  <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
+                  <Component id="regProduct" min="-2" pref="150" max="-2" attributes="0"/>
+                  <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
+                  <Component id="regPeriodo" min="-2" pref="150" max="-2" attributes="0"/>
                   <EmptySpace min="-2" max="-2" attributes="0"/>
-                  <Component id="regPeriodo" min="-2" pref="176" max="-2" attributes="0"/>
+                  <Component id="regDate" min="-2" pref="150" max="-2" attributes="0"/>
                   <EmptySpace min="-2" max="-2" attributes="0"/>
-                  <Component id="lbPeriodo" pref="143" max="32767" attributes="0"/>
-                  <EmptySpace min="-2" pref="34" max="-2" attributes="0"/>
+                  <Component id="lbPeriodo" pref="147" max="32767" attributes="0"/>
+                  <EmptySpace min="-2" max="-2" attributes="0"/>
                   <Component id="btUpdate" min="-2" pref="30" max="-2" attributes="0"/>
                   <EmptySpace min="-2" max="-2" attributes="0"/>
                   <Component id="btConfig" min="-2" pref="30" max="-2" attributes="0"/>
@@ -96,8 +98,9 @@
                       <Component id="btConfig" alignment="2" min="-2" pref="29" max="-2" attributes="0"/>
                       <Component id="btUpdate" alignment="2" min="-2" pref="29" max="-2" attributes="0"/>
                       <Component id="btFilters" alignment="2" min="-2" pref="31" max="-2" attributes="0"/>
+                      <Component id="regDate" linkSize="1" alignment="2" min="-2" pref="29" max="-2" attributes="0"/>
                   </Group>
-                  <EmptySpace pref="26" max="32767" attributes="0"/>
+                  <EmptySpace max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -147,6 +150,12 @@
         <Component class="javax.swing.JButton" name="btUpdate">
         </Component>
         <Component class="javax.swing.JToggleButton" name="btFilters">
+        </Component>
+        <Component class="com.bacon.gui.util.Registro" name="regDate">
+          <AuxValues>
+            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.bacon.gui.util.Registro(BoxLayout.Y_AXIS, &quot;Fecha&quot;, datePick1)"/>
+            <AuxValue name="JavaCodeGenerator_CreateCodePre" type="java.lang.String" value="datePick1 = new MyDatePickerImp(new Date(), true);"/>
+          </AuxValues>
         </Component>
       </SubComponents>
     </Container>

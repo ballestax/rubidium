@@ -10,6 +10,7 @@ import com.bacon.domain.Product;
 import com.bacon.domain.ProductoPed;
 import com.bacon.domain.Table;
 import com.bacon.domain.Waiter;
+import com.bacon.gui.util.MyDatePickerImp;
 import com.bacon.gui.util.MyPopupListener;
 import java.awt.Color;
 import java.awt.Component;
@@ -20,12 +21,14 @@ import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.math.BigDecimal;
 import java.text.Format;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.EventObject;
 import java.util.List;
+import java.util.logging.Level;
 import javax.swing.AbstractCellEditor;
 import javax.swing.BorderFactory;
 import static javax.swing.BorderFactory.createLineBorder;
@@ -71,6 +74,7 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener 
     public static final String PERIODO_MES = "MES";
     public static final String PERIODO_SEMANA = "SEMANA";
     public static final String PERIODO_DIA = "DIA";
+    public static final String PERIODO_OTRO_DIA = "OTRO DIA";
     public static final String PERIODO_HISTORICO = "HISTORICO";
     public static final String PERIODO_FECHA = "FECHA";
 
@@ -86,6 +90,7 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener 
     private ArrayList<Product> productsList;
     private ArrayList<Waiter> waitersList;
     private SimpleDateFormat formFecha;
+    private MyDatePickerImp datePick1;
 
     public static final Logger logger = Logger.getLogger(PanelListPedidos.class.getCanonicalName());
 
@@ -105,6 +110,11 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener 
     private void createComponents() {
 
         formFecha = new SimpleDateFormat("dd MMMM yyyy");
+
+        datePick1.addPropertyChangeListener(this);
+
+        regDate.setActionCommand(AC_CHANGE_DATE);
+        regDate.addActionListener(this);
 
         jLabel1.setText("Buscar");
 
@@ -218,7 +228,7 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener 
         regMesero.addActionListener(this);
         regMesero.setBackground(COLOR_BACKG);
 
-        String[] PERIODOS = {PERIODO_DIA, PERIODO_SEMANA, PERIODO_MES, PERIODO_HISTORICO};
+        String[] PERIODOS = {PERIODO_DIA, PERIODO_OTRO_DIA, PERIODO_SEMANA, PERIODO_MES, PERIODO_HISTORICO};
         regPeriodo.setText(PERIODOS);
         regPeriodo.setActionCommand(ACTION_SEL_PERIODO);
         regPeriodo.addActionListener(this);
@@ -278,12 +288,14 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener 
 //        dpInicio.addPropertyChangeListener(this);
 //        dpInicio.setVisible(false);
 //        tablaInventario.setFont(Aplication.DEFAULT_FONT_TF.deriveFont(13));
+        regDate.setVisible(false);
         queryDate = "";
         filtroActivado = false;
         activarFiltros(filtroActivado);
         updateConfig();
 
     }
+    private static final String AC_CHANGE_DATE = "AC_CHANGE_DATE";
 
     public void updateConfig() {
         String periodoDF = app.getConfiguration().getProperty(Configuration.PN_ENTRADA_PERIODO, PERIODO_DIA);
@@ -320,6 +332,8 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener 
         btConfig = new javax.swing.JButton();
         btUpdate = new javax.swing.JButton();
         btFilters = new javax.swing.JToggleButton();
+        datePick1 = new MyDatePickerImp(new Date(), true);
+        regDate = new com.bacon.gui.util.Registro(BoxLayout.Y_AXIS, "Fecha", datePick1);
         jScrollPane1 = new javax.swing.JScrollPane();
         tableList = new javax.swing.JTable();
         lbStatus = new javax.swing.JLabel();
@@ -346,16 +360,18 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener 
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btFilters, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(regTipo, javax.swing.GroupLayout.PREFERRED_SIZE, 176, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(9, 9, 9)
-                .addComponent(regMesero, javax.swing.GroupLayout.PREFERRED_SIZE, 176, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(regTipo, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(6, 6, 6)
+                .addComponent(regMesero, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(6, 6, 6)
+                .addComponent(regProduct, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(6, 6, 6)
+                .addComponent(regPeriodo, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(regProduct, javax.swing.GroupLayout.PREFERRED_SIZE, 176, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(regDate, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(regPeriodo, javax.swing.GroupLayout.PREFERRED_SIZE, 176, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(lbPeriodo, javax.swing.GroupLayout.DEFAULT_SIZE, 147, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(lbPeriodo, javax.swing.GroupLayout.DEFAULT_SIZE, 143, Short.MAX_VALUE)
-                .addGap(34, 34, 34)
                 .addComponent(btUpdate, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btConfig, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -376,11 +392,12 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener 
                     .addComponent(jLabel1)
                     .addComponent(btConfig, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btUpdate, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btFilters, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(26, Short.MAX_VALUE))
+                    .addComponent(btFilters, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(regDate, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        pnFiltersLayout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {btBuscar, regMesero, regPeriodo, regProduct, regTipo, tfBuscar});
+        pnFiltersLayout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {btBuscar, regDate, regMesero, regPeriodo, regProduct, regTipo, tfBuscar});
 
         tableList.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -415,7 +432,7 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener 
                 .addContainerGap()
                 .addComponent(pnFilters, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 286, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(lbStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
@@ -428,7 +445,9 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener 
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        if (MyDatePickerImp.DATE_CHANGED.equals(evt.getPropertyName())) {
+            makeTitle();
+        }
     }
 
     @Override
@@ -448,10 +467,13 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener 
             activarFiltros(selected);
             filtroActivado = selected;
             filtradoSQL();
+        } else if (AC_CHANGE_DATE.equals(e.getActionCommand())) {
+            makeTitle();
         } else if (ACTION_SEL_PERIODO.equals(e.getActionCommand())) {
             String selPeriodo = regPeriodo.getText();
             saveConfig(selPeriodo);
             Calendar cal = Calendar.getInstance();
+            regDate.setVisible(false);
             if (null != selPeriodo) {
                 switch (selPeriodo) {
                     case PERIODO_DIA: {
@@ -463,6 +485,26 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener 
                         lbPeriodo.setText("<html><p color=gray>Hoy:<p color=blue size=+1>" + date.toUpperCase() + "<html>");
                         break;
                     }
+
+                    case PERIODO_OTRO_DIA: {
+                        regDate.setVisible(true);
+                        String fecha = regDate.getText();
+                        Date date = new Date();
+                        try {
+                            date = MyDatePickerImp.formatDate.parse(fecha);
+                        } catch (ParseException ex) {
+                            java.util.logging.Logger.getLogger(PanelListPedidos.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                        cal.setTime(date);
+                        String stDate = new SimpleDateFormat("dd MMMM yyyy (EEE)").format(cal.getTime());
+                        String today = app.DF_SQL.format(cal.getTime());
+                        cal.add(Calendar.DATE, 1);
+                        String added = app.DF_SQL.format(cal.getTime());
+                        queryDate = "sale_date >='" + today + "' AND sale_date<'" + added + "'";
+                        lbPeriodo.setText("<html><p color=gray>Dia:<p color=blue size=+1>" + stDate.toUpperCase() + "<html>");
+                        break;
+                    }
+
                     case PERIODO_SEMANA: {
                         int dayOfTheWeek = cal.get(Calendar.DAY_OF_WEEK);
                         cal.add(Calendar.DAY_OF_WEEK, Calendar.SUNDAY - dayOfTheWeek);
@@ -522,6 +564,19 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener 
         regProduct.setEnabled(activar);
         regTipo.setEnabled(activar);
         regMesero.setEnabled(activar);
+    }
+
+    public void makeTitle() {
+        String fecha = regDate.getText();
+        Date date = new Date();
+        try {
+            date = MyDatePickerImp.formatDate.parse(fecha);
+        } catch (ParseException ex) {
+            java.util.logging.Logger.getLogger(PanelListPedidos.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        String stDate = new SimpleDateFormat("dd MMMM yyyy (EEE)").format(date.getTime());
+
+        lbPeriodo.setText("<html><p color=gray>Dia:<p color=blue size=+1>" + stDate.toUpperCase() + "<html>");
     }
 
     protected void saveConfig(String selPeriodo) {
@@ -607,7 +662,7 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener 
                         model.setCellEditable(model.getRowCount() - 1, model.getColumnCount() - 1, true);
 
                     } catch (Exception e) {
-                        
+
                     }
 
                 }
@@ -624,6 +679,11 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener 
             @Override
             protected void done() {
                 app.getGuiManager().setDefaultCursor();
+            }
+
+            @Override
+            protected void process(List chunks) {
+                super.process(chunks); //To change body of generated methods, choose Tools | Templates.
             }
 
         };
@@ -643,6 +703,7 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener 
     private javax.swing.JLabel lbPeriodo;
     private javax.swing.JLabel lbStatus;
     private javax.swing.JPanel pnFilters;
+    private com.bacon.gui.util.Registro regDate;
     private com.bacon.gui.util.Registro regMesero;
     private com.bacon.gui.util.Registro regPeriodo;
     private com.bacon.gui.util.Registro regProduct;

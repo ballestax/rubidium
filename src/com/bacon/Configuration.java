@@ -31,12 +31,12 @@ public class Configuration {
     public static final String DATABASE_URL = "db.url";
     public static final String DATABASE_USER = "db.user";
     public static final String DATABASE_PASSWORD = "db.pass";
-    
+
     public static final String DINST = "cf.dinst";
     public static final String CUS = "cf.cus";
     public static final String BACKUP_LAST_DIR = "bck.lastdir";
     public static final String BACKUP_LIST = "bck.list";
-    public static final String DATABASE_STATION = "db.station";    
+    public static final String DATABASE_STATION = "db.station";
     public static final String PRINTER_SELECTED = "cf.printer";
     public static final String DELIVERY_VALUE = "cf.delivery";
     public static final String PREFIX_INVOICES = "cf.prefix";
@@ -52,17 +52,17 @@ public class Configuration {
     public static final String INVOICE_OUT_STOCK = "cf.invoiceoutstock";
     public static final String DOCUMENT_NAME = "cf.documentname";
     public static final String CLIENT_NAME = "cf.clientname";
-    
+    public static final String PROD_ORDER = "cf.order";
+
     public static final String BS_ID = "cf.tck.id";
     public static final String BS_NAME = "cf.tck.name";
     public static final String BS_ADDRESS = "cf.tck.address";
     public static final String BS_PHONE = "cf.tck.phone";
     public static final String BS_CUSTOM_TOP = "cf.tck.custom1";
     public static final String BS_CUSTOM_BOTTON = "cf.tck.custom2";
-    
-    
+
     private StandardPBEStringEncryptor encryptor;
-    
+
     private static final Logger logger = Logger.getLogger(Configuration.class.getCanonicalName());
 
     private Configuration() {
@@ -83,7 +83,7 @@ public class Configuration {
 
     private void loadDefault() {
         logger.debug("Loading default configuration..");
-        
+
         save();
     }
 
@@ -139,7 +139,7 @@ public class Configuration {
             File arc = new File(path + File.separator + NAME);
             FileOutputStream fos = new FileOutputStream(arc);
             configuration.store(fos, "Configuration " + Aplication.TITLE);
-            logger.debug("Configuration file saved: "+path);
+            logger.debug("Configuration file saved: " + path);
         } catch (IOException e) {
             logger.debug("Error saving configuration.", e);
         }

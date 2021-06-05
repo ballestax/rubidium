@@ -5,6 +5,8 @@
  */
 package com.bacon.domain;
 
+import java.util.Objects;
+
 /**
  *
  * @author lrod
@@ -29,5 +31,27 @@ public class Category {
     public String toString() {
         return name;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        }
+        if (!(obj instanceof Category)) {
+            return false;
+        }
+        Category cat = (Category) obj;
+        return name.equalsIgnoreCase(cat.getName());
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 89 * hash + Objects.hashCode(this.name);
+        return hash;
+    }
+    
+    
+    
 
 }
