@@ -3,7 +3,6 @@ package com.bacon.gui;
 import com.bacon.Aplication;
 import com.bacon.Configuration;
 import com.bacon.MyConstants;
-import com.bacon.domain.Client;
 import com.bacon.domain.Invoice;
 import com.bacon.domain.Permission;
 import com.bacon.domain.Product;
@@ -368,9 +367,9 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener 
                 .addGap(6, 6, 6)
                 .addComponent(regPeriodo, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(regDate, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(lbPeriodo, javax.swing.GroupLayout.DEFAULT_SIZE, 147, Short.MAX_VALUE)
+                .addComponent(regDate, javax.swing.GroupLayout.PREFERRED_SIZE, 124, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(lbPeriodo, javax.swing.GroupLayout.DEFAULT_SIZE, 167, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btUpdate, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -446,7 +445,8 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         if (MyDatePickerImp.DATE_CHANGED.equals(evt.getPropertyName())) {
-            makeTitle();
+            makeQueryOtherDay(Calendar.getInstance());
+            filtradoSQL();
         }
     }
 
@@ -468,7 +468,8 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener 
             filtroActivado = selected;
             filtradoSQL();
         } else if (AC_CHANGE_DATE.equals(e.getActionCommand())) {
-            makeTitle();
+            makeQueryOtherDay(Calendar.getInstance());
+            filtradoSQL();
         } else if (ACTION_SEL_PERIODO.equals(e.getActionCommand())) {
             String selPeriodo = regPeriodo.getText();
             saveConfig(selPeriodo);
@@ -488,20 +489,7 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener 
 
                     case PERIODO_OTRO_DIA: {
                         regDate.setVisible(true);
-                        String fecha = regDate.getText();
-                        Date date = new Date();
-                        try {
-                            date = MyDatePickerImp.formatDate.parse(fecha);
-                        } catch (ParseException ex) {
-                            java.util.logging.Logger.getLogger(PanelListPedidos.class.getName()).log(Level.SEVERE, null, ex);
-                        }
-                        cal.setTime(date);
-                        String stDate = new SimpleDateFormat("dd MMMM yyyy (EEE)").format(cal.getTime());
-                        String today = app.DF_SQL.format(cal.getTime());
-                        cal.add(Calendar.DATE, 1);
-                        String added = app.DF_SQL.format(cal.getTime());
-                        queryDate = "sale_date >='" + today + "' AND sale_date<'" + added + "'";
-                        lbPeriodo.setText("<html><p color=gray>Dia:<p color=blue size=+1>" + stDate.toUpperCase() + "<html>");
+                        makeQueryOtherDay(cal);
                         break;
                     }
 
@@ -550,13 +538,32 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener 
 
     }
 
+    private void makeQueryOtherDay(Calendar cal) {        
+        String fecha = regDate.getText();
+        Date date = new Date();
+        try {
+            date = MyDatePickerImp.formatDate.parse(fecha);
+            System.out.println("date = " + date);
+        } catch (ParseException ex) {
+            java.util.logging.Logger.getLogger(PanelListPedidos.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        cal.setTime(date);
+        
+        String stDate = new SimpleDateFormat("dd MMMM yyyy (EEE)").format(cal.getTime());
+        
+        String today = app.DF_SQL.format(cal.getTime());
+        cal.add(Calendar.DATE, 1);
+        String added = app.DF_SQL.format(cal.getTime());
+        queryDate = "sale_date >='" + today + "' AND sale_date<'" + added + "'";        
+        
+        lbPeriodo.setText("<html><p color=gray>Dia:<p color=blue size=+1>" + stDate.toUpperCase() + "<html>");
+    }
+
     public void filtradoSQL() {
         int tipo = regTipo.getSelected();
         int selProduct = regProduct.getSelected();
         long product = ((Product) regProduct.getSelectedItem()).getId();
-
         int mesero = regMesero.getSelected();
-
         buscarFacturas(mesero, product, tipo);
     }
 
@@ -564,19 +571,6 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener 
         regProduct.setEnabled(activar);
         regTipo.setEnabled(activar);
         regMesero.setEnabled(activar);
-    }
-
-    public void makeTitle() {
-        String fecha = regDate.getText();
-        Date date = new Date();
-        try {
-            date = MyDatePickerImp.formatDate.parse(fecha);
-        } catch (ParseException ex) {
-            java.util.logging.Logger.getLogger(PanelListPedidos.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        String stDate = new SimpleDateFormat("dd MMMM yyyy (EEE)").format(date.getTime());
-
-        lbPeriodo.setText("<html><p color=gray>Dia:<p color=blue size=+1>" + stDate.toUpperCase() + "<html>");
     }
 
     protected void saveConfig(String selPeriodo) {
@@ -589,22 +583,18 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener 
             }
         };
         sw.execute();
-
     }
 
     private void buscarFacturas(int idMesero, long idProd, int idTipo) {
 //        String date = "( fecha BETWEEN '" + app.DF.format(dIni) + "' AND '" + app.DF.format(dFin) + "')";
-
         String query = "";
         if (filtroActivado) {
-            String tipo = idTipo == 0 ? "" : "i.deliveryType=" + idTipo + "";
+            String tipo = idTipo == 0 ? "" : "i.deliveryType=" + idTipo + " ";
             String mesero = idMesero == 0 ? "" : !tipo.isEmpty() ? " AND i.idMesero=" + idMesero + "" : "i.idMesero=" + idMesero;
-            String prod = (idProd < 1) ? "" : !mesero.isEmpty() ? " AND " + "p.id=" + idProd : "p.id=" + idProd;
+            String prod = (idProd < 1) ? "" : !mesero.isEmpty() ? " AND " + "p.id=" + idProd : (!tipo.isEmpty()? "AND p.id=": " p.id=") + idProd;
             query = tipo + mesero + prod;
         }
-
-        query = !queryDate.isEmpty() ? (!query.isEmpty() ? (queryDate + " AND " + query) : queryDate) : !query.isEmpty() ? query : "";
-        System.out.println("query = " + query);
+        query = !queryDate.isEmpty() ? (!query.isEmpty() ? (queryDate + " AND " + query) : queryDate) : !query.isEmpty() ? query : "";        
         populateTabla(query);
     }
 
@@ -628,7 +618,7 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener 
             protected Object doInBackground() throws Exception {
                 model.setRowCount(0);
 
-                ArrayList<Invoice> invoiceslList = app.getControl().getInvoicesLiteWhitProduct(query);
+                    ArrayList<Invoice> invoiceslList = app.getControl().getInvoicesLiteWhitProduct(query);
                 BigDecimal total = new BigDecimal(0);
                 double servicio = 0;
                 int totalProducts = 0;
