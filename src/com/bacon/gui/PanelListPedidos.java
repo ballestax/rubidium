@@ -3,6 +3,8 @@ package com.bacon.gui;
 import com.bacon.Aplication;
 import com.bacon.Configuration;
 import com.bacon.MyConstants;
+import com.bacon.ProgAction;
+import com.bacon.domain.Cycle;
 import com.bacon.domain.Invoice;
 import com.bacon.domain.Permission;
 import com.bacon.domain.Product;
@@ -32,6 +34,7 @@ import javax.swing.AbstractCellEditor;
 import javax.swing.BorderFactory;
 import static javax.swing.BorderFactory.createLineBorder;
 import javax.swing.BoxLayout;
+import javax.swing.DefaultListSelectionModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -46,6 +49,8 @@ import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableRowSorter;
@@ -53,12 +58,13 @@ import org.apache.log4j.Logger;
 import org.balx.Utiles;
 import org.bx.gui.MyDefaultTableModel;
 import org.dz.PanelCapturaMod;
+import org.jfree.util.PaintUtilities;
 
 /**
  *
  * @author lrod
  */
-public class PanelListPedidos extends PanelCapturaMod implements ActionListener {
+public class PanelListPedidos extends PanelCapturaMod implements ActionListener, ListSelectionListener {
 
     private final Aplication app;
     private MyDefaultTableModel model;
@@ -76,7 +82,7 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener 
     public static final String PERIODO_OTRO_DIA = "OTRO DIA";
     public static final String PERIODO_HISTORICO = "HISTORICO";
     public static final String PERIODO_FECHA = "FECHA";
-
+    public static final String PERIODO_CICLO = "CICLO";
     public static final String ST_FACTURADO = "FACTURADO";
     public static final String ST_ENTREGADO = "ENTREGADO";
     public static final String ST_DEVUELTO = "DEVUELTO";
@@ -92,6 +98,10 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener 
     private MyDatePickerImp datePick1;
 
     public static final Logger logger = Logger.getLogger(PanelListPedidos.class.getCanonicalName());
+    private ProgAction acSearchCycle;
+    private JTextField tfCycle;
+    private String selPeriodo;
+    private String colSelection;
 
 //    private org.dz.MyDatePickerImp dpFinal;
 //    private org.dz.MyDatePickerImp dpInicio;
@@ -112,6 +122,8 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener 
 
         datePick1.addPropertyChangeListener(this);
 
+        colSelection = PaintUtilities.colorToString(tableList.getSelectionBackground().darker());
+
         regDate.setActionCommand(AC_CHANGE_DATE);
         regDate.addActionListener(this);
 
@@ -122,9 +134,35 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener 
         tableList.setModel(model);
         tableList.setRowHeight(24);
 
+        tfCycle = new JTextField();
+        tfCycle.addActionListener(this);
+        tfCycle.setActionCommand(AC_SEARCH_CYCLE);
+        acSearchCycle = new ProgAction("",
+                new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "search.png", 12, 12)),
+                "s", 's') {
+            @Override
+            public void actionPerformed(ActionEvent ev) {
+                String stCycle = tfCycle.getText();
+                if (stCycle.isEmpty()) {
+                    regDate.setBorderToError();
+                    return;
+                }
+                regDate.setBorderToNormal();
+                Cycle cycle = app.getControl().getCycle(Integer.valueOf(stCycle));
+                if (cycle != null) {
+                    makeTitleCycle(cycle);
+                    filtradoSQL();
+                } else {
+                    makeTitleCycle(null);
+                    clearTable();
+                }
+            }
+        };
+
         COLOR_BACKG = Utiles.colorAleatorio(125, 255).brighter();
 
         tableList.getTableHeader().setBackground(COLOR_BACKG);
+        tableList.getTableHeader().setReorderingAllowed(false);
 
         TablaCellRenderer tRenderer = new TablaCellRenderer(true, app.getDCFORM_P());
 
@@ -190,6 +228,11 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener 
 
         tableList.addMouseListener(popupListenerTabla);
 
+        DefaultListSelectionModel selModel = new DefaultListSelectionModel();
+        selModel.addListSelectionListener(this);
+
+        tableList.setSelectionModel(selModel);
+
         btBuscar.setText("");
         btBuscar.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "delete.png", 18, 18)));
         btBuscar.setActionCommand(ACTION_CLEAR_SEARCH);
@@ -227,7 +270,7 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener 
         regMesero.addActionListener(this);
         regMesero.setBackground(COLOR_BACKG);
 
-        String[] PERIODOS = {PERIODO_DIA, PERIODO_OTRO_DIA, PERIODO_SEMANA, PERIODO_MES, PERIODO_HISTORICO};
+        String[] PERIODOS = {PERIODO_DIA, PERIODO_OTRO_DIA, PERIODO_SEMANA, PERIODO_MES, PERIODO_HISTORICO, PERIODO_CICLO};
         regPeriodo.setText(PERIODOS);
         regPeriodo.setActionCommand(ACTION_SEL_PERIODO);
         regPeriodo.addActionListener(this);
@@ -288,12 +331,18 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener 
 //        dpInicio.setVisible(false);
 //        tablaInventario.setFont(Aplication.DEFAULT_FONT_TF.deriveFont(13));
         regDate.setVisible(false);
+
+        lbStatus.setBackground(new Color(252, 220, 224));
+        lbStatus1.setBackground(new Color(252, 220, 224));
+
         queryDate = "";
         filtroActivado = false;
         activarFiltros(filtroActivado);
         updateConfig();
 
     }
+    private static final String AC_SEARCH_CYCLE = "AC_SEARCH_CYCLE";
+
     private static final String AC_CHANGE_DATE = "AC_CHANGE_DATE";
 
     public void updateConfig() {
@@ -336,6 +385,7 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener 
         jScrollPane1 = new javax.swing.JScrollPane();
         tableList = new javax.swing.JTable();
         lbStatus = new javax.swing.JLabel();
+        lbStatus1 = new javax.swing.JLabel();
 
         pnFilters.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
@@ -359,17 +409,17 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener 
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btFilters, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(regTipo, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(6, 6, 6)
-                .addComponent(regMesero, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(6, 6, 6)
-                .addComponent(regProduct, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(6, 6, 6)
-                .addComponent(regPeriodo, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(regTipo, javax.swing.GroupLayout.PREFERRED_SIZE, 121, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(regMesero, javax.swing.GroupLayout.PREFERRED_SIZE, 121, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(regProduct, javax.swing.GroupLayout.PREFERRED_SIZE, 184, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(regPeriodo, javax.swing.GroupLayout.PREFERRED_SIZE, 138, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(regDate, javax.swing.GroupLayout.PREFERRED_SIZE, 124, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(lbPeriodo, javax.swing.GroupLayout.DEFAULT_SIZE, 167, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(lbPeriodo, javax.swing.GroupLayout.DEFAULT_SIZE, 209, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btUpdate, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -409,9 +459,16 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener 
         jScrollPane1.setViewportView(tableList);
 
         lbStatus.setBackground(new java.awt.Color(147, 153, 165));
-        lbStatus.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
-        lbStatus.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        lbStatus.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        lbStatus.setBorder(javax.swing.BorderFactory.createCompoundBorder(javax.swing.BorderFactory.createMatteBorder(1, 1, 1, 0, new java.awt.Color(0, 0, 0)), javax.swing.BorderFactory.createEmptyBorder(1, 5, 1, 1)));
+        lbStatus.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
         lbStatus.setOpaque(true);
+
+        lbStatus1.setBackground(new java.awt.Color(147, 153, 165));
+        lbStatus1.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        lbStatus1.setBorder(javax.swing.BorderFactory.createCompoundBorder(javax.swing.BorderFactory.createMatteBorder(1, 0, 1, 1, new java.awt.Color(0, 0, 0)), javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 5)));
+        lbStatus1.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
+        lbStatus1.setOpaque(true);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -420,9 +477,12 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener 
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lbStatus, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(pnFilters, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jScrollPane1))
+                    .addComponent(jScrollPane1)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(lbStatus, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(0, 0, 0)
+                        .addComponent(lbStatus1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -433,13 +493,50 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener 
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(lbStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(lbStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lbStatus1, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)))
         );
     }// </editor-fold>//GEN-END:initComponents
 
     private void loadPedidos() {
         log.debug("On funcion loadPedidos");
         populateTabla(queryDate);
+    }
+
+    private void clearTable() {
+        model.setRowCount(0);
+    }
+
+    @Override
+    public void valueChanged(ListSelectionEvent e) {
+        int[] selectedRows = tableList.getSelectedRows();
+        double total = 0, service = 0;
+
+        for (int selectedRow : selectedRows) {
+            String status = tableList.getValueAt(selectedRow, 2).toString();  //STATUS
+//            if (!Invoice.STATUSES[Invoice.ST_ANULADA].equalsIgnoreCase(status)) {
+            double valInvoice = Double.parseDouble(tableList.getValueAt(selectedRow, 8).toString());
+            double servInvoice = Double.parseDouble(tableList.getValueAt(selectedRow, 9).toString());
+
+            total += valInvoice;
+            service += servInvoice;
+//            }
+        }
+        makeStatusLabelSelecteds(selectedRows.length, total, service);
+    }
+
+    private void makeStatusLabelSelecteds(int rows, double tot, double serv) {
+
+        if (rows > 0) {
+            lbStatus.setText("<html>  <font color=" + colSelection + ">Selección</font> [<font color=blue>" + (rows)
+                    + "</font> pedidos]  "
+                    + "Servicio: <font color=green>" + app.DCFORM_P.format(serv)
+                    + "</font> - Total: <font color=blue>" + app.DCFORM_P.format(tot) + "</font></html>");
+        } else {
+            lbStatus.setText("");
+        }
+
     }
 
     @Override
@@ -454,12 +551,19 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener 
     public void actionPerformed(ActionEvent e) {
         if (ACTION_SEARCH.equals(e.getActionCommand())) {
             filtradoSQL();
+        } else if (AC_SEARCH_CYCLE.equals(e.getActionCommand())) {
+            acSearchCycle.actionPerformed(new ActionEvent(tfCycle, tfCycle.hashCode(), AC_SEARCH_CYCLE));
         } else if (ACTION_UPDATE_LIST.equals(e.getActionCommand())) {
             btFilters.setSelected(false);
             updateCombos();
             activarFiltros(false);
             log.debug("Call from updatin list filtro");
-            loadPedidos();
+            if (PERIODO_CICLO.equals(selPeriodo)) {
+                filtradoSQL();
+            } else {
+                loadPedidos();
+            }
+
         } else if (ACTION_CLEAR_SEARCH.equals(e.getActionCommand())) {
             tfBuscar.setText("");
         } else if (ACTION_ACTIVATE_FILTER.equals(e.getActionCommand())) {
@@ -471,7 +575,7 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener 
             makeQueryOtherDay(Calendar.getInstance());
             filtradoSQL();
         } else if (ACTION_SEL_PERIODO.equals(e.getActionCommand())) {
-            String selPeriodo = regPeriodo.getText();
+            selPeriodo = regPeriodo.getText();
             saveConfig(selPeriodo);
             Calendar cal = Calendar.getInstance();
             regDate.setVisible(false);
@@ -489,7 +593,24 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener 
 
                     case PERIODO_OTRO_DIA: {
                         regDate.setVisible(true);
+                        regDate.setLabelText("Fecha");
+                        regDate.setAction(null);
+                        regDate.setComponent(datePick1);
                         makeQueryOtherDay(cal);
+                        break;
+                    }
+
+                    case PERIODO_CICLO: {
+                        regDate.setVisible(true);
+                        regDate.setComponent(tfCycle);
+                        regDate.setLabelText("Ciclo");
+                        regDate.setAction(acSearchCycle);
+                        if (tfCycle.getText().trim().isEmpty()) {
+                            Cycle lastCycle = app.getControl().getLastCycle();
+                            tfCycle.setText(String.valueOf(lastCycle.getId()));
+                            makeTitleCycle(lastCycle);
+                        }
+
                         break;
                     }
 
@@ -538,33 +659,50 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener 
 
     }
 
-    private void makeQueryOtherDay(Calendar cal) {        
+    private void makeTitleCycle(Cycle cycle) {
+        if (cycle != null) {
+            String date1 = app.DF_FULL2.format(cycle.getInit());
+            String date2 = "---";
+            if (cycle.getEnd() != null) {
+                date2 = app.DF_FULL2.format(cycle.getEnd());
+            }
+            lbPeriodo.setText("<html><p color=gray>Ciclo: [<span color=black>" + cycle.getId() + "<span>]<p color=blue size=+1>" + date1 + " / " + date2 + "<html>");
+        } else {
+            String ciclo = tfCycle.getText();
+            lbPeriodo.setText("<html><p color=gray>Ciclo: [<span color=black>" + ciclo + "<span>]<p color=blue size=+1>No existe<html>");
+        }
+    }
+
+    private void makeQueryOtherDay(Calendar cal) {
         String fecha = regDate.getText();
         Date date = new Date();
         try {
             date = MyDatePickerImp.formatDate.parse(fecha);
-            System.out.println("date = " + date);
         } catch (ParseException ex) {
             java.util.logging.Logger.getLogger(PanelListPedidos.class.getName()).log(Level.SEVERE, null, ex);
         }
         cal.setTime(date);
-        
+
         String stDate = new SimpleDateFormat("dd MMMM yyyy (EEE)").format(cal.getTime());
-        
+
         String today = app.DF_SQL.format(cal.getTime());
         cal.add(Calendar.DATE, 1);
         String added = app.DF_SQL.format(cal.getTime());
-        queryDate = "sale_date >='" + today + "' AND sale_date<'" + added + "'";        
-        
+        queryDate = "sale_date >='" + today + "' AND sale_date<'" + added + "'";
+
         lbPeriodo.setText("<html><p color=gray>Dia:<p color=blue size=+1>" + stDate.toUpperCase() + "<html>");
     }
 
     public void filtradoSQL() {
         int tipo = regTipo.getSelected();
-        int selProduct = regProduct.getSelected();
         long product = ((Product) regProduct.getSelectedItem()).getId();
-        int mesero = regMesero.getSelected();
-        buscarFacturas(mesero, product, tipo);
+        Waiter mesero = (Waiter) regMesero.getSelectedItem();
+        if (PERIODO_CICLO.equals(selPeriodo)) {
+            int ciclo = Integer.parseInt(regDate.getText());
+            buscarFacturasByCycle(mesero.getId(), product, tipo, ciclo);
+        } else {
+            buscarFacturas(mesero.getId(), product, tipo);
+        }
     }
 
     private void activarFiltros(boolean activar) {
@@ -591,24 +729,42 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener 
         if (filtroActivado) {
             String tipo = idTipo == 0 ? "" : "i.deliveryType=" + idTipo + " ";
             String mesero = idMesero == 0 ? "" : !tipo.isEmpty() ? " AND i.idMesero=" + idMesero + "" : "i.idMesero=" + idMesero;
-            String prod = (idProd < 1) ? "" : !mesero.isEmpty() ? " AND " + "p.id=" + idProd : (!tipo.isEmpty()? "AND p.id=": " p.id=") + idProd;
+            String prod = (idProd < 1) ? "" : !mesero.isEmpty() ? " AND " + "p.id=" + idProd : (!tipo.isEmpty() ? "AND p.id=" : " p.id=") + idProd;
             query = tipo + mesero + prod;
         }
-        query = !queryDate.isEmpty() ? (!query.isEmpty() ? (queryDate + " AND " + query) : queryDate) : !query.isEmpty() ? query : "";        
+        query = !queryDate.isEmpty() ? (!query.isEmpty() ? (queryDate + " AND " + query) : queryDate) : !query.isEmpty() ? query : "";
+        populateTabla(query);
+    }
+
+    private void buscarFacturasByCycle(int idMesero, long idProd, int idTipo, int cycle) {
+//        String date = "( fecha BETWEEN '" + app.DF.format(dIni) + "' AND '" + app.DF.format(dFin) + "')";
+        String query = "";
+        if (filtroActivado) {
+            String tipo = idTipo == 0 ? "" : "i.deliveryType=" + idTipo + " ";
+            String mesero = idMesero == 0 ? "" : !tipo.isEmpty() ? " AND i.idMesero=" + idMesero + "" : "i.idMesero=" + idMesero;
+            String prod = (idProd < 1) ? "" : !mesero.isEmpty() ? " AND " + "p.id=" + idProd : (!tipo.isEmpty() ? "AND p.id=" : " p.id=") + idProd;
+            query = tipo + mesero + prod;
+        }
+        String queryCycle = "i.ciclo=" + cycle;
+        query = !query.isEmpty() ? (query + " AND " + queryCycle) : queryCycle;
         populateTabla(query);
     }
 
     private void updateCombos() {
-//        String text = cbProveedor.getText();
-//        proveedorList = app.getControl().getProveedorList("", "");
-//        Proveedor TODOS = new Proveedor(0L);
-//        TODOS.setRazonSocial(__TODOS__);
-//        proveedorList.add(0, TODOS);
-//        cbProveedor.setText(proveedorList.toArray());
-//        try {
-//            cbProveedor.setText(text);
-//        } catch (Exception e) {
-//        }
+
+        regTipo.setSelected(0);
+
+        productsList = app.getControl().getProductsList("", "name");
+        Product PTODOS = new Product(0);
+        PTODOS.setName(__TODOS__);
+        productsList.add(0, PTODOS);
+        regProduct.setText((productsList.toArray()));
+
+        waitersList = app.getControl().getWaiterslList("", "name");
+        Waiter WTODOS = new Waiter();
+        WTODOS.setName(__TODOS__);
+        waitersList.add(0, WTODOS);
+        regMesero.setText(waitersList.toArray());
     }
 
     private void populateTabla(String query) {
@@ -618,7 +774,7 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener 
             protected Object doInBackground() throws Exception {
                 model.setRowCount(0);
 
-                    ArrayList<Invoice> invoiceslList = app.getControl().getInvoicesLiteWhitProduct(query);
+                ArrayList<Invoice> invoiceslList = app.getControl().getInvoicesLiteWhitProduct(query);
                 BigDecimal total = new BigDecimal(0);
                 double servicio = 0;
                 int totalProducts = 0;
@@ -629,7 +785,7 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener 
                     Table table = app.getControl().getTableByID(invoice.getTable());
                     if (invoice.getStatus() != Invoice.ST_ANULADA) {
                         total = total.add(invoice.getValor());
-//                        totalProducts += invoice.getProducts().size();
+                        totalProducts += invoice.getNumItems();
                         servicio += invoice.getValueService();
                     } else {
                         anuladas++;
@@ -657,11 +813,11 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener 
 
                 }
 
-                lbStatus.setText("<html><font color=blue>" + (invoiceslList.size() - anuladas)
+                lbStatus1.setText("<html>[ <font color=blue>" + (invoiceslList.size() - anuladas)
                         + "</font> pedidos - <font color=blue>" + totalProducts
-                        + "</font> productos. "
+                        + "</font> productos ]  "
                         + "Servicio: <font color=green>" + app.DCFORM_P.format(servicio)
-                        + "</font> - Total: <font color=blue>" + app.DCFORM_P.format(total.doubleValue()) + "</font></html>");
+                        + "</font> - Total: <font color=blue>" + app.DCFORM_P.format(total.doubleValue()) + "</font>  </html>");
 
                 return true;
             }
@@ -692,6 +848,7 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener 
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lbPeriodo;
     private javax.swing.JLabel lbStatus;
+    private javax.swing.JLabel lbStatus1;
     private javax.swing.JPanel pnFilters;
     private com.bacon.gui.util.Registro regDate;
     private com.bacon.gui.util.Registro regMesero;

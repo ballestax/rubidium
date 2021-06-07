@@ -737,7 +737,13 @@ public class Control {
     public Cycle getCycle(int id) {
         try {
             JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
-            return utilDAO.getCyclesList("id=" + id, "").get(0);
+            ArrayList<Cycle> cyclesList = utilDAO.getCyclesList("id=" + id, "");
+            if (!cyclesList.isEmpty()) {
+                return cyclesList.get(0);
+            } else {
+                return null;
+            }
+
         } catch (DAOException ex) {
             String msg = "Error getting cycle";
             logger.error(msg, ex);
@@ -793,7 +799,7 @@ public class Control {
             return null;
         }
     }
-    
+
     public Category getCategory(String name) {
         try {
             JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
@@ -803,7 +809,6 @@ public class Control {
             return null;
         }
     }
-    
 
     public ArrayList<Category> getAllCategoriesList() {
         try {

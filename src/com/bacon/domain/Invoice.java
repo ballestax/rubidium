@@ -29,11 +29,13 @@ public class Invoice {
     private boolean service;
     private double porcService;
     private int status;
+    private int numItems;
     public static final String[] STATUSES = {"NORMAL", "ANULADA"};
     public static final int ST_NORMAL = 0;
     public static final int ST_ANULADA = 1;
 
     public Invoice() {
+        numItems = 0;
         status = ST_NORMAL;
         products = new ArrayList<>();
         otherProducts = new ArrayList<>();
@@ -119,12 +121,20 @@ public class Invoice {
         return products;
     }
 
+    public int calculateNumItems() {
+        int nItems = 0;
+        nItems = products.stream().map((product) -> product.getCantidad()).reduce(nItems, Integer::sum);
+        return nItems;
+    }
+
     public void addProduct(ProductoPed product) {
         this.products.add(product);
+        numItems += product.getCantidad();
     }
 
     public void setProducts(List<ProductoPed> products) {
         this.products = products;
+        this.numItems = calculateNumItems();
     }
 
     public Long getCiclo() {
@@ -197,6 +207,10 @@ public class Invoice {
 
     public void setNumDeliverys(int numDeliverys) {
         this.numDeliverys = numDeliverys;
+    }
+
+    public int getNumItems() {
+        return numItems;
     }
 
 }

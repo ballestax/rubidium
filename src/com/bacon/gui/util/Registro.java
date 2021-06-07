@@ -670,9 +670,9 @@ public class Registro extends JComponent implements Reseteable, CaretListener {
         }
     }
 
-    public void setText(Object[] text) {
+    public void setText(Object[] object) {
         if (campo instanceof JComboBox) {
-            ((JComboBox) campo).setModel(new DefaultComboBoxModel<>(text));
+            ((JComboBox) campo).setModel(new DefaultComboBoxModel<>(object));
         }
     }
 
@@ -717,7 +717,8 @@ public class Registro extends JComponent implements Reseteable, CaretListener {
     }
 
     public void setLabelText(String labelText) {
-        label.setText(labelText);
+        this.stLabel = labelText;
+        label.setText(this.stLabel);
     }
 
     public void setCampoFont(Font fontCampo) {
@@ -950,8 +951,8 @@ public class Registro extends JComponent implements Reseteable, CaretListener {
     protected Border bordeEditing;
     private JLabel label;
     private JComponent campo;
-    private final String stCampo;
-    private final String stLabel;
+    private String stCampo;
+    private String stLabel;
     private boolean bordered;
     private int width;
     private int widthLabel;

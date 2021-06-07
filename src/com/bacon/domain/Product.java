@@ -146,7 +146,7 @@ public class Product {
 
     @Override
     public String toString() {
-        return id + ": " + name;
+        return name.toUpperCase();
     }
 
     public String toStringFull() {
