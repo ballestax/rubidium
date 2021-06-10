@@ -31,6 +31,7 @@ public class LabelInfo extends Box {
         super(BoxLayout.Y_AXIS);
 
         setPreferredSize(dim);
+        setMinimumSize(dim);
 
         this.title = title;
         this.quantity = quantity;
@@ -44,12 +45,13 @@ public class LabelInfo extends Box {
 
         setOpaque(true);
         setBackground(colorBackground);
+        setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
 
         createComponents();
     }
 
     public void setColor(Color color) {
-
+        
         colorBackground = color.brighter().brighter();
         colorBorder = color.darker();
         
@@ -59,11 +61,13 @@ public class LabelInfo extends Box {
     private void createComponents() {
         labelTitle = new JLabel(title);
         labelTitle.setOpaque(true);
+        
 
         labelQuantity = new JLabel(DCFORM_P.format(quantity.doubleValue()));
         labelQuantity.setOpaque(true);
 
         labelQuantity.setHorizontalAlignment(SwingConstants.RIGHT);
+        labelQuantity.setMinimumSize(new Dimension(150, 18));
         labelQuantity.setPreferredSize(new Dimension(150, 18));
 
         refreshColor();
@@ -88,5 +92,11 @@ public class LabelInfo extends Box {
         this.quantity = quantity;
         labelQuantity.setText(DCFORM_P.format(quantity.doubleValue()));
     }
+
+    public Double getQuantity() {
+        return quantity;
+    }
+    
+    
 
 }

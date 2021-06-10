@@ -8,6 +8,7 @@ import static com.bacon.MyConstants.FILTER_NUM_INT_LESS;
 import static com.bacon.MyConstants.FILTER_NUM_INT_LESS_EQUAL;
 import com.bacon.domain.Invoice;
 import com.bacon.gui.util.MyDatePickerImp;
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.ComponentOrientation;
 import java.awt.Dimension;
@@ -33,6 +34,11 @@ import org.bx.gui.MyDefaultTableModel;
 import org.dz.PanelCapturaMod;
 import org.dz.TextFormatter;
 import java.util.Collections;
+import java.util.List;
+import javax.swing.DefaultListSelectionModel;
+import javax.swing.JPanel;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 
@@ -40,7 +46,7 @@ import javax.swing.event.TableModelListener;
  *
  * @author lrod
  */
-public class PanelReportSales extends PanelCapturaMod implements ActionListener {
+public class PanelReportSales extends PanelCapturaMod implements ActionListener, ListSelectionListener {
 
     private final Aplication app;
     private FormatRenderer formatRenderer;
@@ -82,9 +88,12 @@ public class PanelReportSales extends PanelCapturaMod implements ActionListener 
     private String query;
 
     private LabelInfo lbInfTotal, lbInfDelivery, lbInfService;
+    private JLabel labelStatus;
 
     /**
      * Creates new form PanelReportSales
+     *
+     * @param app
      */
     public PanelReportSales(Aplication app) {
         this.app = app;
@@ -122,13 +131,20 @@ public class PanelReportSales extends PanelCapturaMod implements ActionListener 
         modelo = new MyDefaultTableModel(colNamesSal, 0);
         tableReport.setModel(modelo);
         tableReport.setRowHeight(24);
+        tableReport.getTableHeader().setReorderingAllowed(false);
+
+        DefaultListSelectionModel selModel = new DefaultListSelectionModel();
+        selModel.addListSelectionListener(this);
+
+        tableReport.setSelectionModel(selModel);
+
         modelo.addTableModelListener(new TableModelListener() {
 
             @Override
             public void tableChanged(TableModelEvent e) {
-                sumColumn(7, lbInfTotal);
-                sumColumn(8, lbInfService);
-                sumColumn(9, lbInfDelivery);
+//                sumColumn(7, lbInfTotal);
+//                sumColumn(8, lbInfService);
+//                sumColumn(9, lbInfDelivery);
             }
         });
 //        tableReport.getColumnModel().getColumn(4).setCellRenderer(formatRenderer);
@@ -208,17 +224,23 @@ public class PanelReportSales extends PanelCapturaMod implements ActionListener 
 
         Dimension dim = new Dimension(120, 35);
         lbInfTotal = new LabelInfo("Total", 0, dim);
-        
+
         lbInfService = new LabelInfo("Servicio", 0, dim);
         lbInfService.setColor(Color.cyan);
+
         lbInfDelivery = new LabelInfo("Domicilio", 0, dim);
-        lbInfDelivery.setColor(Color.magenta);
-        
-        pnLabels.setLayout(new FlowLayout(FlowLayout.RIGHT));
+        lbInfDelivery.setColor(Color.YELLOW);
+
+        pnBottonBar.setLayout(new BorderLayout());
+
+        JPanel pnLabels = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         pnLabels.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
         pnLabels.add(lbInfTotal);
         pnLabels.add(lbInfService);
         pnLabels.add(lbInfDelivery);
+        labelStatus = new JLabel("");
+        pnBottonBar.add(pnLabels, BorderLayout.EAST);
+        pnBottonBar.add(labelStatus, BorderLayout.WEST);
 
         opcionHoy();
 
@@ -361,10 +383,14 @@ public class PanelReportSales extends PanelCapturaMod implements ActionListener 
         if (MyConstants.TIPO_REPORTE[0].equals(tipo)) {
             regCategory.setVisible(false);
             regProduct.setVisible(false);
+            lbInfDelivery.setVisible(true);
+            lbInfService.setVisible(true);
 
         } else if (MyConstants.TIPO_REPORTE[1].equals(tipo)) {
             regCategory.setVisible(true);
             regProduct.setVisible(true);
+            lbInfDelivery.setVisible(false);
+            lbInfService.setVisible(false);
         }
         makeTitle();
     }
@@ -454,6 +480,9 @@ public class PanelReportSales extends PanelCapturaMod implements ActionListener 
     private void populateTabla(ArrayList list, String tipo, int ini) {
         modelo.setRowCount(0);
         tableReport.setRowSorter(null);
+        lbInfTotal.setQuantity(0.0);
+        lbInfDelivery.setQuantity(0.0);
+        lbInfService.setQuantity(0.0);
         if (tipo.equals(MyConstants.TIPO_REPORTE[0])) {  // VENTAS Y COMPRAS
             modelo.setColumnIdentifiers(colNamesSal);
 
@@ -461,19 +490,19 @@ public class PanelReportSales extends PanelCapturaMod implements ActionListener 
             regCategory.setText(new String[]{});
             regProduct.setText(new String[]{});
 
-            SwingWorker sw = new SwingWorker() {
+            SwingWorker sw = new SwingWorker<Object, Object[]>() {
                 @Override
                 protected Object doInBackground() throws Exception {
                     for (int i = 0; i < list.size(); i++) {
                         Invoice inv = (Invoice) list.get(i);
                         double total = 0;
-                        if (tipo.equals(MyConstants.TIPO_REPORTE[0])) {  //VENTAS
 
-                            Invoice invoice = (Invoice) list.get(i);
+                        Invoice invoice = (Invoice) list.get(i);
 
-                            tableReport.getColumnModel().getColumn(7).setCellRenderer(formatRenderer);
-                            tableReport.getColumnModel().getColumn(8).setCellRenderer(formatRenderer);
-                            tableReport.getColumnModel().getColumn(9).setCellRenderer(formatRenderer);
+                        tableReport.getColumnModel().getColumn(7).setCellRenderer(formatRenderer);
+                        tableReport.getColumnModel().getColumn(8).setCellRenderer(formatRenderer);
+                        tableReport.getColumnModel().getColumn(9).setCellRenderer(formatRenderer);
+                        if (invoice.getStatus() != 1) {
                             modelo.addRow(new Object[]{
                                 ini + i,
                                 invoice.getFactura(),
@@ -486,14 +515,28 @@ public class PanelReportSales extends PanelCapturaMod implements ActionListener 
                                 invoice.getValorDelivery(),
                                 invoice.getValor().doubleValue() * invoice.getPorcService() / 100.0
                             });
-
-                        } else if (tipo.equals(MyConstants.TIPO_REPORTE[2])) { //COMPRAS
-
+                            publish(new Object[]{invoice.getValor().doubleValue(),
+                                invoice.getValorDelivery().doubleValue(),
+                                invoice.getValueService(),
+                            });
                         }
+
                         modelo.setRowEditable(modelo.getRowCount() - 1, false);
                     }
                     return true;
                 }
+
+                @Override
+                protected void process(List<Object[]> chunks) {
+                    for (Object chunk : chunks) {
+                        Object[] data = (Object[]) chunk;
+
+                        lbInfTotal.setQuantity(lbInfTotal.getQuantity() + (Double.parseDouble(data[0].toString())));
+                        lbInfDelivery.setQuantity(lbInfDelivery.getQuantity() + (Double.parseDouble(data[1].toString())));
+                        lbInfService.setQuantity(lbInfService.getQuantity() + (Double.parseDouble(data[2].toString())));
+                    };
+                }               
+                
 
                 @Override
                 protected void done() {
@@ -575,7 +618,7 @@ public class PanelReportSales extends PanelCapturaMod implements ActionListener 
         lbTitle = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         tableReport = new javax.swing.JTable();
-        pnLabels = new javax.swing.JPanel();
+        pnBottonBar = new javax.swing.JPanel();
         panelNav = new javax.swing.JPanel();
         btUpdate = new javax.swing.JButton();
         btFirstPage = new javax.swing.JButton();
@@ -655,8 +698,8 @@ public class PanelReportSales extends PanelCapturaMod implements ActionListener 
         ));
         jScrollPane1.setViewportView(tableReport);
 
-        pnLabels.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-        pnLabels.setLayout(new javax.swing.BoxLayout(pnLabels, javax.swing.BoxLayout.LINE_AXIS));
+        pnBottonBar.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        pnBottonBar.setLayout(new javax.swing.BoxLayout(pnBottonBar, javax.swing.BoxLayout.LINE_AXIS));
 
         panelNav.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
@@ -741,7 +784,7 @@ public class PanelReportSales extends PanelCapturaMod implements ActionListener 
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(pnLabels, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(pnBottonBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(pnFilters, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addComponent(lbTitle, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -762,7 +805,7 @@ public class PanelReportSales extends PanelCapturaMod implements ActionListener 
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 216, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(pnLabels, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(pnBottonBar, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
 
@@ -799,8 +842,8 @@ public class PanelReportSales extends PanelCapturaMod implements ActionListener 
     private javax.swing.JLabel lbFilas;
     private javax.swing.JLabel lbTitle;
     private javax.swing.JPanel panelNav;
+    private javax.swing.JPanel pnBottonBar;
     private javax.swing.JPanel pnFilters;
-    private javax.swing.JPanel pnLabels;
     private org.dz.Registro regCategory;
     private com.bacon.gui.util.Registro regDateP1;
     private com.bacon.gui.util.Registro regDateP2;
@@ -813,6 +856,55 @@ public class PanelReportSales extends PanelCapturaMod implements ActionListener 
     private javax.swing.JTextField tfBuscar;
     private javax.swing.JTextField tfFilas;
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    public void valueChanged(ListSelectionEvent e) {
+        int[] selectedRows = tableReport.getSelectedRows();
+        double val = 0, dom = 0, serv = 0;
+
+        String stTipo = regTipo.getText();
+        int tipoReporte = 0;
+        if (MyConstants.TIPO_REPORTE[0].equals(stTipo)) {
+            tipoReporte = 0;
+            for (int selectedRow : selectedRows) {
+                double _val = Double.parseDouble(tableReport.getValueAt(selectedRow, 7).toString());
+                double _dom = Double.parseDouble(tableReport.getValueAt(selectedRow, 8).toString());
+                double _serv = Double.parseDouble(tableReport.getValueAt(selectedRow, 9).toString());
+                val += _val;
+                dom += _dom;
+                serv += _serv;
+            }
+        } else if (MyConstants.TIPO_REPORTE[1].equals(stTipo)) {
+            tipoReporte = 1;
+            for (int selectedRow : selectedRows) {
+                double _val = Double.parseDouble(tableReport.getValueAt(selectedRow, 4).toString());
+                double _dom = Double.parseDouble(tableReport.getValueAt(selectedRow, 5).toString());
+                val += _val;
+                dom += _dom;
+            }
+        }
+        makeStatusLabelSelecteds(tipoReporte, selectedRows.length, val, dom, serv);
+    }
+
+    private void makeStatusLabelSelecteds(int tipo, int rows, double val, double dom, double serv) {
+        String colSelection = "#34f";
+        if (tipo == 0 && rows > 0) {
+            labelStatus.setText("<html>  <font color=" + colSelection + ">Selección</font> [<font color=blue>" + (rows)
+                    + "</font> pedidos]  "
+                    + "Total: <font color=green>" + app.DCFORM_P.format(val)
+                    + "</font> - Servicio: <font color=blue>" + app.DCFORM_P.format(serv) + "</font>"
+                    + " - Domicilios: <font color=blue>" + app.DCFORM_P.format(dom
+                    ) + "</font></html>");
+        } else if (tipo == 1 && rows > 0) {
+            labelStatus.setText("<html>  <font color=" + colSelection + ">Selección</font> [<font color=blue>" + (rows)
+                    + "</font> productos]  "
+                    + "Total: <font color=green>" + app.DCFORM_P.format(val)
+                    + "</font> - Cantidad: <font color=blue>" + app.DCFORM_P.format(dom)
+                    + "</font></html>");
+        } else {
+            labelStatus.setText("");
+        }
+    }
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
