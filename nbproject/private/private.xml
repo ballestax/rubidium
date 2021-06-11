@@ -12,9 +12,11 @@
     </editor-bookmarks>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/gui/PanelReportSales.java</file>
-            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/gui/PanelListPedidos.java</file>
-            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/gui/LabelInfo.java</file>
+            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/gui/PanelCategory.java</file>
+            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/gui/PanelTopSearch.java</file>
+            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/gui/GuiPanelSelProduct.java</file>
+            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/gui/PanelModPedidos.java</file>
+            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/gui/PanelPedido.java</file>
         </group>
     </open-files>
 </project-private>
