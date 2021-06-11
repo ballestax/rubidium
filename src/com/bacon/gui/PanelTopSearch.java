@@ -107,7 +107,7 @@ public class PanelTopSearch extends PanelCaptura implements ActionListener {
     public static final String AC_ADD_CUSTOM_PRODUCT = "AC_ADD_CUSTOM_PRODUCT";
 
     private void filtrar(String text, int filter) {
-        if (text.trim().length() > 1) {
+        if (text.trim().length() > 2) {
             String SCAPE = "LIKE \'%" + text.toLowerCase() + "%\'";
             ArrayList<Product> productsList = app.getControl().getProductsList("name " + SCAPE + " or category " + SCAPE, "");
 //            ArrayList<Product> productsList = app.getControl().getProductsList("name " + SCAPE);
