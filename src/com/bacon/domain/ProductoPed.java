@@ -141,8 +141,11 @@ public class ProductoPed {
     }
 
     public void setPresentation(Presentation presentation) {
+
         this.presentation = presentation;
-        this.precio = presentation.getPrice();
+        if (presentation != null) {
+            this.precio = presentation.getPrice();
+        }
     }
 
     public boolean hasPresentation() {
@@ -226,6 +229,5 @@ public class ProductoPed {
         hash = 97 * hash + (int) (Double.doubleToLongBits(this.precio) ^ (Double.doubleToLongBits(this.precio) >>> 32));
         return hash;
     }
-
 
 }
