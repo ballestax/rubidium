@@ -19,6 +19,8 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import org.apache.log4j.Logger;
@@ -32,7 +34,7 @@ public class PanelCategory extends PanelCapturaMod implements PropertyChangeList
 
     private final Aplication app;
     private Category category;
-    private ArrayList<Product> products;
+    private List<Product> products;
     public static final Logger logger = Logger.getLogger(PanelCategory.class.getCanonicalName());
     private int oldSize;
     private int view;
@@ -42,6 +44,8 @@ public class PanelCategory extends PanelCapturaMod implements PropertyChangeList
     public static final String ORDEN_ALPHA = "ALFABETICO";
     public static final String ORDEN_PRICE = "PRECIO";
     public static final String ORDEN_RATING = "RATING";
+    private HashMap<Long, PanelProduct> mapProdsV2;
+    private HashMap<Long, PanelProduct2> mapProdsV1;
 
     /**
      * Creates new form PanelCategory
@@ -55,8 +59,11 @@ public class PanelCategory extends PanelCapturaMod implements PropertyChangeList
         pcs = new PropertyChangeSupport(this);
         this.category = category;
         this.products = products;
-        this.selectedSort = "1";
+        this.selectedSort = null;
+        mapProdsV1 = new HashMap<>();
+        mapProdsV2 = new HashMap<>();
         initComponents();
+        createProductsCard(products);
         createComponents();
     }
 
@@ -79,7 +86,7 @@ public class PanelCategory extends PanelCapturaMod implements PropertyChangeList
         oldSize = products.size();
     }
 
-    public void setProducts(ArrayList<Product> products) {
+    public void setProducts(List<Product> products) {
         this.products = products;
         if (products == null) {
             pnItems.removeAll();
@@ -90,6 +97,22 @@ public class PanelCategory extends PanelCapturaMod implements PropertyChangeList
         } else {
             showView2();
         }
+    }
+
+    private void createProductsCard(List<Product> products) {
+        mapProdsV1.clear();
+        mapProdsV2.clear();
+        products.forEach((product) -> {
+            PanelProduct pnProd = new PanelProduct(app, product);
+            pnProd.addPropertyChangeListener(app.getGuiManager().getPanelPedido());
+            mapProdsV2.put(product.getId(), pnProd);
+
+            PanelProduct2 pnProd2 = new PanelProduct2(app, product);
+            pnProd.addPropertyChangeListener(this);
+            mapProdsV1.put(product.getId(), pnProd2);
+
+        });
+
     }
 
     public void showView2() {
@@ -109,15 +132,24 @@ public class PanelCategory extends PanelCapturaMod implements PropertyChangeList
                     if (c >= products.size()) {
                         break;
                     }
-                    Product prod = products.get(c);
-                    PanelProduct pnProd = new PanelProduct(app, prod);
-//                    pnProd.addPropertyChangeListener(this);
-                    pnProd.addPropertyChangeListener(app.getGuiManager().getPanelPedido());
-                    pnItems.add(pnProd, new GridBagConstraints(j, i, 1, 1, 0.1, 0, GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL, new Insets(2, 2, 2, 2), 0, 0));
+                    PanelProduct pnProd = mapProdsV2.get(products.get(c).getId());
+                    pnItems.add(pnProd,
+                            new GridBagConstraints(j, i, 1, 1,
+                                    0.1, 0,
+                                    GridBagConstraints.NORTH,
+                                    GridBagConstraints.HORIZONTAL,
+                                    new Insets(2, 2, 2, 2),
+                                    0, 0));
                     c++;
                 }
             }
-            pnItems.add(Box.createVerticalGlue(), new GridBagConstraints(j + 1, i, 1, 1, 0, 0.1, GridBagConstraints.SOUTH, GridBagConstraints.BOTH, new Insets(1, 1, 1, 1), 1, 1));
+            pnItems.add(Box.createVerticalGlue(),
+                    new GridBagConstraints(j + 1, i, 1, 1,
+                            0, 0.1,
+                            GridBagConstraints.SOUTH,
+                            GridBagConstraints.BOTH,
+                            new Insets(1, 1, 1, 1),
+                            1, 1));
 
         }
         pnItems.updateUI();
@@ -132,10 +164,8 @@ public class PanelCategory extends PanelCapturaMod implements PropertyChangeList
 
         if (products != null) {
             for (int i = 0; i < products.size(); i++) {
-                Product prod = products.get(i);
-                PanelProduct2 pnProd = new PanelProduct2(app, prod);
-                pnProd.addPropertyChangeListener(this);
-                pnItems.add(pnProd);
+                PanelProduct2 pnProd2 = mapProdsV1.get(products.get(i).getId());
+                pnItems.add(pnProd2);
             }
         }
 
@@ -177,26 +207,35 @@ public class PanelCategory extends PanelCapturaMod implements PropertyChangeList
                 case PanelTopSearch.AC_CHANGE_SORT:
                     changeSort(evt.getNewValue().toString());
                     break;
+                case PanelTopSearch.AC_REFRESH_PRODUCTS:
+                    System.out.println("Refreshin products");
+                    this.products = loadProductsFromDB(getSelectedSort());
+                    createProductsCard(products);
+                    setProducts(products);
+                    break;                    
                 default:
                     break;
             }
         }
     }
 
-    public void changeSort(String sort) {
-        System.out.println("sort = " + sort);
-        if (!selectedSort.equals(sort)) {
-            selectedSort = sort;
-            if (selectedSort.equalsIgnoreCase(ORDEN_ALPHA)) {
-                setProducts(app.getControl().getProductsList("enabled=1", "name"));
-            } else if (selectedSort.equalsIgnoreCase(ORDEN_PRICE)) {
-                setProducts(app.getControl().getProductsList("enabled=1", "price, name"));
-            } else {
-                setProducts(app.getControl().getProductsList("enabled=1", ""));
-            }
-
+    public void changeSort(String sort) {        
+        if (selectedSort==null  || !selectedSort.equals(sort)) {
+            setProducts(loadProductsFromDB(sort));
         }
+    }
 
+    private List<Product> loadProductsFromDB(String sort) {
+        selectedSort = sort;
+        List<Product> listProducts;
+        if (selectedSort.equalsIgnoreCase(ORDEN_ALPHA)) {
+            listProducts = app.getControl().getProductsList("enabled=1", "name");
+        } else if (selectedSort.equalsIgnoreCase(ORDEN_PRICE)) {
+            listProducts = app.getControl().getProductsList("enabled=1", "price, name");
+        } else {
+            listProducts = app.getControl().getProductsList("enabled=1", "");
+        }
+        return listProducts;
     }
 
     public String getSelectedSort() {

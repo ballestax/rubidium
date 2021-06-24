@@ -12,7 +12,7 @@ import java.util.Objects;
  *
  * @author lrod
  */
-public class Product {
+public class Product implements Comparable<Product>{
 
     private long id;
 
@@ -53,7 +53,7 @@ public class Product {
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.name = name.trim();
     }
 
     public String getCode() {
@@ -119,6 +119,8 @@ public class Product {
     public void setEnabled(boolean _enabled) {
         this._enabled = _enabled;
     }
+    
+    
 
     @Override
     public boolean equals(Object obj) {
@@ -157,6 +159,11 @@ public class Product {
                 + "\nprice:" + price
                 + "\ncategory:" + category
                 + "\n]";
+    }
+
+    @Override
+    public int compareTo(Product o) {
+        return Long.compare(id, o.id);
     }
 
 }
