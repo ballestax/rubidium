@@ -14,11 +14,15 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import org.apache.commons.lang3.StringUtils;
 import org.dz.PanelCapturaMod;
 
 /**
@@ -38,6 +42,8 @@ public class PanelModPedidos extends PanelCapturaMod
     private PanelTopSearch panelTopSearch;
     private PanelCategory panelCategory;
     private PanelSelCategory panelSelCategory;
+    private Comparator<Product> compAlpha;
+    private Comparator<Product> compPrice;
 
     /**
      * Creates new form PanelPedidos
@@ -55,6 +61,10 @@ public class PanelModPedidos extends PanelCapturaMod
         categorys = new ArrayList<>();
         categorys.add(new Category("Productos"));
         pnCont = new JPanel(new BorderLayout());
+
+        compAlpha = Comparator.comparing(product -> product.getName().toLowerCase());
+        compPrice = Comparator.comparing(Product::getPrice)
+                .thenComparing(product -> product.getName().toLowerCase());
 
         panelTop = new Box(BoxLayout.Y_AXIS);
 
@@ -147,17 +157,22 @@ public class PanelModPedidos extends PanelCapturaMod
             this.updateUI();
         } else if (evt.getPropertyName().startsWith(PanelSelCategory.SEL_CAT_)) {
             String cat = evt.getPropertyName().substring(8).toLowerCase();
-            ArrayList<Product> productsList = this.productsList;
-            if (!"TODO".equalsIgnoreCase(cat)) {
-                String orderBy = "";
-                if (PanelCategory.ORDEN_ALPHA.equalsIgnoreCase(panelCategory.getSelectedSort())) {
-                    orderBy = "name";
-                } else if (PanelCategory.ORDEN_PRICE.equalsIgnoreCase(panelCategory.getSelectedSort())) {
-                    orderBy = "price, name";
-                }
-                productsList = app.getControl().getProductsList("category='" + cat + "' AND enabled=1", orderBy);
+
+            Comparator<Product> comparator = Comparator.<Product>naturalOrder();
+            if (PanelCategory.ORDEN_ALPHA.equalsIgnoreCase(panelCategory.getSelectedSort())) {
+                comparator = compAlpha;
+            } else if (PanelCategory.ORDEN_PRICE.equalsIgnoreCase(panelCategory.getSelectedSort())) {
+                comparator = compPrice;
             }
-            panelCategory.setProducts(productsList);
+
+            List<Product> list = this.productsList;
+
+            if (!"TODO".equalsIgnoreCase(cat)) {
+                list = productsList.stream().filter(p -> p.getCategory().equalsIgnoreCase(cat)).sorted(comparator).collect(Collectors.toList());
+            } else {
+                list = productsList.stream().sorted(comparator).collect(Collectors.toList());
+            }
+            panelCategory.setProducts(list);
             panelLeft.updateUI();
         }
 

@@ -80,6 +80,10 @@ public class PanelTopSearch extends PanelCaptura implements ActionListener {
 //        btView2.setForeground(colorDelivery);
 
         btView2.setSelected(true);
+        
+        btRefresh.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "update.png", 20, 20)));
+        btRefresh.setActionCommand(AC_REFRESH_PRODUCTS);
+        btRefresh.addActionListener(this);
 
         lbSort.setText("");
         lbSort.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "view-filter.png", 20, 20)));
@@ -101,6 +105,7 @@ public class PanelTopSearch extends PanelCaptura implements ActionListener {
 //        cbSort.setEnabled(false);
 //        lbSort.setEnabled(false);
     }
+    public static final String AC_REFRESH_PRODUCTS = "AC_REFRESH_PRODUCTS";
     public static final String AC_CHANGE_SORT = "AC_CHANGE_SORT";
     public static final String AC_SELECT_VIEW2 = "AC_SELECT_VIEW2";
     public static final String AC_SELECT_VIEW1 = "AC_SELECT_VIEW1";
@@ -136,6 +141,7 @@ public class PanelTopSearch extends PanelCaptura implements ActionListener {
         btView1 = new javax.swing.JToggleButton();
         cbSort = new javax.swing.JComboBox<>();
         lbSort = new javax.swing.JLabel();
+        btRefresh = new javax.swing.JButton();
 
         setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
@@ -154,7 +160,7 @@ public class PanelTopSearch extends PanelCaptura implements ActionListener {
                 .addComponent(regSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 190, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, 0)
                 .addComponent(btBuscar, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 109, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 54, Short.MAX_VALUE)
                 .addComponent(lbSort)
                 .addGap(3, 3, 3)
                 .addComponent(cbSort, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -164,7 +170,9 @@ public class PanelTopSearch extends PanelCaptura implements ActionListener {
                 .addComponent(btView1, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, 0)
                 .addComponent(btView2, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btRefresh, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(6, 6, 6))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -177,7 +185,8 @@ public class PanelTopSearch extends PanelCaptura implements ActionListener {
                     .addComponent(btView1, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btView2, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(regSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lbSort))
+                    .addComponent(lbSort)
+                    .addComponent(btRefresh, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(2, 2, 2))
         );
 
@@ -189,6 +198,7 @@ public class PanelTopSearch extends PanelCaptura implements ActionListener {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btBuscar;
     private javax.swing.JButton btCustomProduct;
+    private javax.swing.JButton btRefresh;
     private javax.swing.JToggleButton btView1;
     private javax.swing.JToggleButton btView2;
     private javax.swing.ButtonGroup buttonGroup1;
@@ -219,7 +229,10 @@ public class PanelTopSearch extends PanelCaptura implements ActionListener {
         } else if (AC_CHANGE_SORT.equals(e.getActionCommand())) {
             app.getConfiguration().setProperty(Configuration.PROD_ORDER, cbSort.getSelectedItem().toString(), true);            
             pcs.firePropertyChange(AC_CHANGE_SORT, null, cbSort.getSelectedItem());
+        } else if (AC_REFRESH_PRODUCTS.equals(e.getActionCommand())) {                        
+            pcs.firePropertyChange(AC_REFRESH_PRODUCTS, null, null);
         }
+        
 
     }
 
