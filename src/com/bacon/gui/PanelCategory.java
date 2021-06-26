@@ -108,7 +108,7 @@ public class PanelCategory extends PanelCapturaMod implements PropertyChangeList
             mapProdsV2.put(product.getId(), pnProd);
 
             PanelProduct2 pnProd2 = new PanelProduct2(app, product);
-            pnProd.addPropertyChangeListener(this);
+            pnProd2.addPropertyChangeListener(this);
             mapProdsV1.put(product.getId(), pnProd2);
 
         });
