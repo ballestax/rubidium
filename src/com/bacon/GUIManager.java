@@ -413,10 +413,14 @@ public class GUIManager {
     }
 
     public PanelSelItem getPanelSelItem() {
+        return getPanelSelItem(null);
+    }
+    public PanelSelItem getPanelSelItem(Item item) {
         if (panelSelItem == null) {
-            panelSelItem = new PanelSelItem(app, null);
+            panelSelItem = new PanelSelItem(app, null);            
         }
-        panelSelItem.reset();
+        panelSelItem.reset();        
+        panelSelItem.setItem(item);
         return panelSelItem;
     }
 
@@ -1143,15 +1147,19 @@ public class GUIManager {
         setDefaultCursor();
         dialog.setVisible(true);
     }
-
+    
     public void showPanelSelItem(PropertyChangeListener listener) {
+        showPanelSelItem(null, listener);
+    }
+
+    public void showPanelSelItem(Item item, PropertyChangeListener listener) {
         setWaitCursor();
         JDialog dialog = new MyDialogEsc();
         dialog.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
         if (!getPanelSelItem().containsListener(listener)) {
             getPanelSelItem().addPropertyChangeListener(listener);
         }
-        dialog.add(getPanelSelItem());
+        dialog.add(getPanelSelItem(item));
         dialog.setTitle("Agregar item.");
         dialog.pack();
         dialog.setLocationRelativeTo(getFrame());

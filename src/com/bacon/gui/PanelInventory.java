@@ -147,7 +147,33 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
                 app.getGuiManager().showPanelAddItem(PanelInventory.this, item);
             }
         });
+        JMenuItem itemCargar = new JMenuItem("Cargar");
+        itemCargar.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int r = tableItems.getSelectedRow();
+                String id = tableItems.getValueAt(r, 0).toString();
+                Item item = app.getControl().getItemWhere("id=" + id);
+                app.getGuiManager().showPanelSelItem(item, PanelInventory.this);
+            }
+        });
+        
+        JMenuItem itemDescargar = new JMenuItem("Descargar");
+        itemDescargar.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int r = tableItems.getSelectedRow();
+                String id = tableItems.getValueAt(r, 0).toString();
+                Item item = app.getControl().getItemWhere("id=" + id);
+                app.getGuiManager().showPanelAddItem(PanelInventory.this, item);
+            }
+        });
+        
         popupTable.add(item1);
+        popupTable.add(itemCargar);
+        popupTable.add(itemDescargar);
         tableItems.addMouseListener(popupListenerTabla);
 
         pnDetail = new PanelReportProductDetail(app);
