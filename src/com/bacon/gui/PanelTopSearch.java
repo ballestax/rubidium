@@ -45,9 +45,9 @@ public class PanelTopSearch extends PanelCaptura implements ActionListener {
         btBuscar.addActionListener(this);
 
         btCustomProduct.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "add1.png", 18, 18)));
-        btCustomProduct.setActionCommand(AC_ADD_CUSTOM_PRODUCT);
+        btCustomProduct.setActionCommand(AC_SEND_PIN);
         btCustomProduct.addActionListener(this);
-        btCustomProduct.setEnabled(false);
+//        btCustomProduct.setEnabled(false);
 
         regSearch.setFontCampo(font1);
 
@@ -80,7 +80,7 @@ public class PanelTopSearch extends PanelCaptura implements ActionListener {
 //        btView2.setForeground(colorDelivery);
 
         btView2.setSelected(true);
-        
+
         btRefresh.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "update.png", 20, 20)));
         btRefresh.setActionCommand(AC_REFRESH_PRODUCTS);
         btRefresh.addActionListener(this);
@@ -105,6 +105,7 @@ public class PanelTopSearch extends PanelCaptura implements ActionListener {
 //        cbSort.setEnabled(false);
 //        lbSort.setEnabled(false);
     }
+    private static final String AC_SEND_PIN = "AC_SEND_PIN";
     public static final String AC_REFRESH_PRODUCTS = "AC_REFRESH_PRODUCTS";
     public static final String AC_CHANGE_SORT = "AC_CHANGE_SORT";
     public static final String AC_SELECT_VIEW2 = "AC_SELECT_VIEW2";
@@ -227,12 +228,14 @@ public class PanelTopSearch extends PanelCaptura implements ActionListener {
             PanelPedido panelPedido = app.getGuiManager().getPanelPedido();
             app.getGuiManager().showPanelAddOtherProduct(panelPedido);
         } else if (AC_CHANGE_SORT.equals(e.getActionCommand())) {
-            app.getConfiguration().setProperty(Configuration.PROD_ORDER, cbSort.getSelectedItem().toString(), true);            
+            app.getConfiguration().setProperty(Configuration.PROD_ORDER, cbSort.getSelectedItem().toString(), true);
             pcs.firePropertyChange(AC_CHANGE_SORT, null, cbSort.getSelectedItem());
-        } else if (AC_REFRESH_PRODUCTS.equals(e.getActionCommand())) {                        
+        } else if (AC_REFRESH_PRODUCTS.equals(e.getActionCommand())) {
             pcs.firePropertyChange(AC_REFRESH_PRODUCTS, null, null);
+        } else if (AC_SEND_PIN.equals(e.getActionCommand())) {
+            String propPrinter = app.getConfiguration().getProperty(Configuration.PRINTER_SELECTED);
+            app.getPrinterService().sendPulsePin(propPrinter);
         }
-        
 
     }
 
