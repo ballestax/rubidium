@@ -41,6 +41,8 @@ public class PanelDownItem extends PanelCaptura implements ActionListener, Caret
 
     public static final String ACTION_UPDATE_LIST = "ACTION_UPDATE_LIST";
     public static final String ACTION_NEW_PRODUCT = "ACTION_NEW_PRODUCT";
+    private Item selectedItem;
+    private boolean onlyOneItem;
 
     /**
      * Creates new form GuiSelProduct
@@ -145,13 +147,12 @@ public class PanelDownItem extends PanelCaptura implements ActionListener, Caret
 
     private void filtrar() {
         String text = tfFilter.getText();
-        ArrayList<Item> listItems = app.getControl().getItemList("", "");
+        ArrayList<Item> listItems = app.getControl().getItemList("", "name");
 //        }
         if (filtroActivo) {
             ArrayList<Item> listFiltered = new ArrayList();
             for (int i = 0; i < listItems.size(); i++) {
-                if (listItems.get(i).getName().toUpperCase().contains(text.toUpperCase())) {
-                    System.out.println(listItems.get(i).getName());
+                if (listItems.get(i).getName().toUpperCase().contains(text.toUpperCase())) {                    
                     listFiltered.add(listItems.get(i));
                 }
             }
@@ -175,24 +176,35 @@ public class PanelDownItem extends PanelCaptura implements ActionListener, Caret
             }
         };
         sw.execute();
+    }
 
+    public void setItem(Item item) {
+        selectedItem = item;
+        if (item != null) {
+            onlyOneItem = true;
+            enableOnlyOneItem(true);
+            showResumen(selectedItem);
+            tfCantidad.requestFocus();
+        }
     }
 
     public Item getItem() {
         int row = tabla.getSelectedRow();
+        Item item = null;
+        item = app.getControl().getItemWhere("id=" + modelo.getValueAt(row, 0));
         boolean valido = true;
         if (row == -1) {
             tabla.setBorder(bordeError);
-            valido = false;
-        }
+            valido = false;        }
         if (tfCantidad.getText().trim().isEmpty()) {
             tfCantidad.setBorder(bordeError);
             valido = false;
         }
         
-        Item item = null;
+        
+        
         if (valido) {
-            item = app.getControl().getItemWhere("id=" + modelo.getValueAt(row, 0));
+            
             try {
                 item.setQuantity(Integer.parseInt(tfCantidad.getText()));
 //                item.setPrice(new BigDecimal(tfValorUnit.getText()));
@@ -201,6 +213,21 @@ public class PanelDownItem extends PanelCaptura implements ActionListener, Caret
             }
         }
         return item;
+    }
+
+    public Item getSelectedItem() {
+        boolean valido = true;
+        if (tfCantidad.getText().trim().isEmpty()) {
+            tfCantidad.setBorder(bordeError);
+            valido = false;
+        }
+        if (valido || selectedItem != null) {
+            try {
+                selectedItem.setQuantity(Integer.parseInt(tfCantidad.getText()));
+            } catch (Exception e) {
+            }
+        }
+        return selectedItem;
     }
 
     /**
@@ -405,7 +432,9 @@ public class PanelDownItem extends PanelCaptura implements ActionListener, Caret
 //        cbCategory.setSelectedIndex(0);
         tabla.setBorder(bordeNormal);
         tfFilter.requestFocus();
-        populateModel(app.getControl().getItemList("", ""));
+        populateModel(app.getControl().getItemList("", "name"));
+        onlyOneItem = false;
+        enableOnlyOneItem(false);
     }
 
     @Override
@@ -417,20 +446,20 @@ public class PanelDownItem extends PanelCaptura implements ActionListener, Caret
 
     @Override
     public void valueChanged(ListSelectionEvent e) {
-        if (tabla.getSelectedRow() != -1) {
-            tabla.scrollRectToVisible(tabla.getCellRect(tabla.getSelectedRow(), 0, false));
+        int row = tabla.getSelectedRow();
+        if (row != -1) {
+            tabla.scrollRectToVisible(tabla.getCellRect(row, 0, false));
             tabla.setBorder(bordeNormal);
-            showResumen();
+            selectedItem = app.getControl().getItemWhere("id=" + modelo.getValueAt(row, 0));
+            showResumen(selectedItem);
         } else {
             lbResumen.setText("<html>Item:</html>");
         }
     }
 
-    public void showResumen() {
-        int row = tabla.getSelectedRow();
-        Item item = app.getControl().getItemWhere("id=" + tabla.getValueAt(row, 0));
+    public void showResumen(Item item) {
         double quantity = item.getQuantity();
-        if (row != -1) {
+        if (item != null) {
             double cantidad = 0;
             boolean pass = true;
             try {
@@ -439,7 +468,7 @@ public class PanelDownItem extends PanelCaptura implements ActionListener, Caret
             } catch (Exception e) {
             }
             lbResumen.setText("<html><table cellspacing=1 border=0>"
-                    + "<tr><td>Item: </td><td colspan=5><font color=blue size=+1>" + tabla.getValueAt(row, 1).toString().toUpperCase() + "</td></tr>"
+                    + "<tr><td>Item: </td><td colspan=5><font color=blue size=+1>" + selectedItem.getName().toUpperCase() + "</td></tr>"
                     + "<tr><td>Existencias: </td><td><font color=blue size=+1>" + quantity + "</font></td></tr>"
                     + "<tr><td>Cantidad: </td><td><font color=" + (pass ? "blue" : "red") + " size=+1>" + cantidad + "</font></td></tr></table></html>");
         }
@@ -448,7 +477,7 @@ public class PanelDownItem extends PanelCaptura implements ActionListener, Caret
     @Override
     public void caretUpdate(CaretEvent e) {
         if (e.getSource().equals(tfCantidad)) {
-            showResumen();
+            showResumen(selectedItem);
         }
     }
 
@@ -462,7 +491,7 @@ public class PanelDownItem extends PanelCaptura implements ActionListener, Caret
         } else if (PanelListPedidos.ACTION_CLEAR_SEARCH.equals(e.getActionCommand())) {
             tfFilter.setText("");
         } else if (AC_ADD_ITEM_TO_TABLE.equals(e.getActionCommand())) {
-            Item item = getItem();
+            Item item = onlyOneItem ? getSelectedItem() : getItem();
             if (item != null) {
                 app.getControl().addItemToInventory(item.getId(), item.getQuantity() * -1);
                 app.getControl().addInventoryRegister(item, 2, item.getQuantity());
@@ -470,5 +499,11 @@ public class PanelDownItem extends PanelCaptura implements ActionListener, Caret
                 getRootPane().getParent().setVisible(false);
             }
         }
+    }
+
+    private void enableOnlyOneItem(boolean enable) {
+        jScrollPane1.setVisible(!enable);
+        jPanel2.setVisible(!enable);
+        btUpdate.setEnabled(!enable);
     }
 }

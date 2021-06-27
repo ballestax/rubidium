@@ -167,7 +167,7 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
                 int r = tableItems.getSelectedRow();
                 String id = tableItems.getValueAt(r, 0).toString();
                 Item item = app.getControl().getItemWhere("id=" + id);
-                app.getGuiManager().showPanelAddItem(PanelInventory.this, item);
+                app.getGuiManager().showPanelDownItem(item, PanelInventory.this);
             }
         });
         

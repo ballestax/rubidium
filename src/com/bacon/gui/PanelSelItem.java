@@ -154,12 +154,12 @@ public class PanelSelItem extends PanelCaptura implements ActionListener, CaretL
     }
 
     public void updateListaProducts() {
-        populateModel(app.getControl().getItemList("", ""));
+        populateModel(app.getControl().getItemList("", "name"));
     }
 
     private void filtrar() {
         String text = tfFilter.getText();
-        ArrayList<Item> listItems = app.getControl().getItemList("", "");
+        ArrayList<Item> listItems = app.getControl().getItemList("", "name");
 //        }
         if (filtroActivo) {
             ArrayList<Item> listFiltered = new ArrayList();
@@ -466,7 +466,7 @@ public class PanelSelItem extends PanelCaptura implements ActionListener, CaretL
 //        cbCategory.setSelectedIndex(0);
         tabla.setBorder(bordeNormal);
         tfFilter.requestFocus();
-        populateModel(app.getControl().getItemList("", ""));
+        populateModel(app.getControl().getItemList("", "name"));
         onlyOneItem = false;
         enableOnlyOneItem(false);
     }
