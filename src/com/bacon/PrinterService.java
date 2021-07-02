@@ -372,5 +372,32 @@ public class PrinterService {
             java.util.logging.Logger.getLogger(PanelPedido.class.getName()).log(Level.ALL.SEVERE, null, ex);
         }
     }
-
+    
+    public void sendPulsePin(String printerName) {        
+        PrintService printService = PrinterOutputStream.getPrintServiceByName(printerName);
+        EscPos escpos;
+         try {
+            escpos = new EscPos(new PrinterOutputStream(printService));            
+//            escpos.pulsePin(EscPos.PinConnector.Pin_2, 150, 175);            
+            escpos.write(27).write(112).write(0).write(25).write(250);
+            escpos.close();            
+        } catch (IOException ex) {
+            java.util.logging.Logger.getLogger(PrintService.class.getName()).log(Level.SEVERE, null, ex);
+        }        
+    }
+    
+    public void sendPulsePin(String printerName, List<Integer> data) {        
+        PrintService printService = PrinterOutputStream.getPrintServiceByName(printerName);
+        EscPos escpos;
+         try {
+            escpos = new EscPos(new PrinterOutputStream(printService));            
+             for (Integer value : data) {
+                 escpos.write(value);
+             }
+            escpos.close();            
+        } catch (IOException ex) {
+            java.util.logging.Logger.getLogger(PrintService.class.getName()).log(Level.SEVERE, null, ex);
+        }        
+    }
+    
 }
