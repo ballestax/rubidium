@@ -2,9 +2,13 @@ package com.bacon.gui;
 
 import com.bacon.Aplication;
 import com.bacon.GUIManager;
+import com.bacon.ProgAction;
 import com.bacon.domain.Item;
+import com.bacon.domain.Presentation;
+import com.bacon.domain.Product;
 import com.bacon.gui.util.MyPopupListener;
 import static com.bacon.gui.PanelSelItem.AC_ADD_ITEM_TO_TABLE;
+import com.bacon.gui.util.Registro;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -37,20 +41,29 @@ import org.dz.PanelCapturaMod;
 import java.awt.Desktop;
 import java.io.File;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Collectors;
+import javax.swing.BoxLayout;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import org.dz.MyDialogEsc;
 
 /**
  *
  * @author lrod
  */
 public class PanelInventory extends PanelCapturaMod implements ActionListener, ListSelectionListener {
-
+    
     private final Aplication app;
     private MyDefaultTableModel model;
     private PanelReportProductDetail pnDetail;
     public static final Logger logger = Logger.getLogger(PanelInventory.class.getCanonicalName());
-
+    
     private JPopupMenu popupTable;
     private MyPopupListener popupListenerTabla;
+    private Registro regSearch;
+    private Registro regFilters;
 
     /**
      * Creates new form PanelReportSales
@@ -62,64 +75,112 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
         initComponents();
         createComponents();
     }
-
+    
     private void createComponents() {
-
+        
         panelButtons.setLayout(new FlowLayout(FlowLayout.LEFT));
-
+        
+        Font f = new Font("Sans", 1, 11);
+        
         JButton btAdd = new JButton("Agregar");
+        btAdd.setFont(f);
         btAdd.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "shopping-basket-add.png", 24, 24)));
         btAdd.setActionCommand(AC_SHOW_ADD_ITEM);
         btAdd.addActionListener(this);
-
+        
         JButton btLoad = new JButton("Cargar");
+        btLoad.setFont(f);
         btLoad.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "shopping-basket-accept.png", 24, 24)));
         btLoad.setActionCommand(AC_LOAD_ITEM);
         btLoad.addActionListener(this);
-
+        
         JButton btDesc = new JButton("Descargar");
+        btDesc.setFont(f);
         btDesc.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "shopping-basket-remove.png", 24, 24)));
         btDesc.setActionCommand(AC_DOWNLOAD_ITEM);
         btDesc.addActionListener(this);
-
+        
         JButton btRefresh = new JButton("Actualizar");
+        btRefresh.setFont(f);
         btRefresh.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "shopping-basket-refresh.png", 24, 24)));
         btRefresh.setActionCommand(AC_REFRESH_ITEMS);
         btRefresh.addActionListener(this);
-
+        
         JButton btConciliation = new JButton("Conciliar");
+        btConciliation.setFont(f);
         btConciliation.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "shopping-basket-prohibit.png", 24, 24)));
         btConciliation.setActionCommand(AC_ADD_CONCILIATION);
         btConciliation.addActionListener(this);
-
+        
         JButton btExport = new JButton("Exportar");
+        btExport.setFont(f);
         btExport.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "export-file.png", 24, 24)));
         btExport.setActionCommand(AC_EXPORT_TO);
         btExport.addActionListener(this);
-
+        
+        ImageIcon searchIcon = new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "search.png", 16, 16));
+        ImageIcon clearIcon = new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "cancel.png", 24, 24));
+        ProgAction actionSearch = new ProgAction("",
+                clearIcon, "", 's') {
+            @Override
+            public void actionPerformed(ActionEvent ev) {
+                cleanSearch();
+            }
+        };
+        regSearch = new Registro(BoxLayout.X_AXIS, "", "", 150, actionSearch);
+        regSearch.setLabelIcon(searchIcon);
+        regSearch.setLabelHorizontalAlignment(SwingConstants.RIGHT);
+        regSearch.getDocument().addDocumentListener(new DocumentListener() {
+            
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                filtrar();
+            }
+            
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                filtrar();
+            }
+            
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                filtrar();
+            }
+        });
+        
+        List filters = new ArrayList();
+        filters.add("TODOS");
+        filters.add("STOCK MINIMO");
+        filters.add("AGOTADOS");
+        
+        regFilters = new Registro(BoxLayout.X_AXIS, "Items", new String[1], 50);
+        regFilters.setText(filters.toArray());
+        
+        panelButtons.add(regSearch);
+//        panelButtons.add(regFilters);
         panelButtons.add(btAdd);
         panelButtons.add(btLoad);
         panelButtons.add(btDesc);
         panelButtons.add(btRefresh);
         panelButtons.add(btConciliation);
         panelButtons.add(btExport);
-
+        
         String[] colNames = new String[]{"N°", "Item", "Cantidad", "Medida", "Cost", "Price", "Min", "Cost. Total"};
-
+        
         model = new MyDefaultTableModel(colNames, 0);
         tableItems.setModel(model);
         tableItems.setRowHeight(24);
         tableItems.setFont(new Font("Tahoma", 0, 16));
-
+        
         DefaultListSelectionModel selectionModel = new DefaultListSelectionModel();
         selectionModel.addListSelectionListener(this);
-
+        
         tableItems.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tableItems.setSelectionModel(selectionModel);
-
+        
         TablaCellRenderer tRenderer = new TablaCellRenderer(true, app.getDCFORM_P());
-
-        int[] colW = new int[]{5, 120, 20, 20, 20, 20, 10, 30};
+        
+        int[] colW = new int[]{4, 150, 20, 10, 20, 20, 10, 30};
         for (int i = 0; i < colW.length; i++) {
             tableItems.getColumnModel().getColumn(i).setMinWidth(colW[i]);
             tableItems.getColumnModel().getColumn(i).setPreferredWidth(colW[i]);
@@ -138,18 +199,18 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
         popupListenerTabla = new MyPopupListener(popupTable, true);
         JMenuItem item1 = new JMenuItem("Ver");
         item1.addActionListener(new ActionListener() {
-
+            
             @Override
             public void actionPerformed(ActionEvent e) {
                 int r = tableItems.getSelectedRow();
                 String id = tableItems.getValueAt(r, 0).toString();
-                Item item = app.getControl().getItemWhere("id=" + id);
-                app.getGuiManager().showPanelAddItem(PanelInventory.this, item);
+                showPanelEditItem(id);
             }
+            
         });
         JMenuItem itemCargar = new JMenuItem("Cargar");
         itemCargar.addActionListener(new ActionListener() {
-
+            
             @Override
             public void actionPerformed(ActionEvent e) {
                 int r = tableItems.getSelectedRow();
@@ -161,7 +222,7 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
         
         JMenuItem itemDescargar = new JMenuItem("Descargar");
         itemDescargar.addActionListener(new ActionListener() {
-
+            
             @Override
             public void actionPerformed(ActionEvent e) {
                 int r = tableItems.getSelectedRow();
@@ -171,18 +232,83 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
             }
         });
         
+        JMenuItem itemLinks = new JMenuItem("Enlaces");
+        itemLinks.addActionListener(new ActionListener() {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int r = tableItems.getSelectedRow();
+                String id = tableItems.getValueAt(r, 0).toString();
+                Item item = app.getControl().getItemWhere("id=" + id);
+                ArrayList<Object[]> presentations = app.getControl().getPresentationsByItem(item.getId());
+                StringBuilder htmlText = new StringBuilder("<html>");
+                
+                if (!presentations.isEmpty()) {
+                    htmlText.append("<table  width=\"100%\" cellspacing=\"0\" border=\"1\">");
+                    htmlText.append("<tr bgcolor=\"#A4C1FF\">");
+                    htmlText.append("<td>Producto</td><td>Presentación</td><td>Cantidad</td></tr>");
+                } else {
+                    htmlText.append("<br><br><font color=red size=+1>  El item: <STRONG>").append(item.getName().toUpperCase()).append("</STRONG> no tiene enlaces.  </font><br><br>");
+                }
+                
+                for (Object[] presentation : presentations) {
+                    Object[] data = presentation;
+                    long idPres = Long.parseLong(data[0].toString());
+                    long idProd = Long.parseLong(data[1].toString());
+                    String quantity = data[2].toString();
+                    Product prod = app.getControl().getProductById(idProd);
+                    if (idPres == 0) {
+                        htmlText.append("<tr><td>").append(prod.getName().toUpperCase()).append("<td>---")
+                                .append("<td>").append(quantity).append("</tr>");
+                    } else {
+                        Presentation press = app.getControl().getPresentationsById(idPres);
+                        if (press != null && press.isEnabled()) {
+                            Product productById = app.getControl().getProductByPressId((idPres));
+                            htmlText.append("<tr><td>").append(productById.getName().toUpperCase()).append("<td>")
+                                    .append(press.getName().toUpperCase()).append("<td>").append(quantity).append("</tr>");
+                        }
+                    }
+                }
+                htmlText.append("</table></html>");
+                
+                JLabel labelInfo = new JLabel(htmlText.toString());
+                labelInfo.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+                JButton btModificar = new JButton("Modificar");
+//                btModificar.setBorder(BorderFactory.createEmptyBorder(0, 10, 5, 10));
+                btModificar.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        showPanelEditItem(String.valueOf(item.getId()));
+                    }
+                    
+                });
+                
+                MyDialogEsc dialog = new MyDialogEsc(app.getGuiManager().getFrame());
+                dialog.setTitle(item.getName().toUpperCase());
+                dialog.setLayout(new BorderLayout());
+                dialog.add(labelInfo, BorderLayout.CENTER);
+                dialog.add(btModificar, BorderLayout.SOUTH);
+                dialog.pack();
+                dialog.setLocationRelativeTo(null);
+                dialog.setVisible(true);
+                
+            }
+        });
+        
         popupTable.add(item1);
         popupTable.add(itemCargar);
         popupTable.add(itemDescargar);
+        popupTable.add(itemLinks);
+        
         tableItems.addMouseListener(popupListenerTabla);
-
+        
         pnDetail = new PanelReportProductDetail(app);
-
+        
         jPanel1.setLayout(new BorderLayout());
         jPanel1.add(pnDetail);
-
+        
         populateTable();
-
+        
     }
     public static final String AC_EXPORT_TO = "AC_EXPORT_TO";
     public static final String AC_ADD_CONCILIATION = "AC_ADD_CONCILIATION";
@@ -190,11 +316,31 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
     public static final String AC_LOAD_ITEM = "AC_LOAD_ITEM";
     public static final String AC_SHOW_ADD_ITEM = "AC_SHOW_ADD_ITEM";
     public static final String AC_DOWNLOAD_ITEM = "AC_DOWNLOAD_ITEM";
-
+    
+    private void showPanelEditItem(String id) {
+        Item item = app.getControl().getItemWhere("id=" + id);
+        app.getGuiManager().showPanelAddItem(PanelInventory.this, item);
+    }
+    
+    private void cleanSearch() {
+        regSearch.setText("");
+    }
+    
+    private void filtrar() {
+        String text = regSearch.getText();
+        ArrayList<Item> listItems = app.getControl().getItemList("", "name");
+        
+        List<Item> listFiltered = listItems.stream().filter(item -> item.getName().toUpperCase().contains(text.toUpperCase())).collect(Collectors.toList());
+        
+        populateTable(listFiltered);
+    }
+    
     private void populateTable() {
-
-        ArrayList<Item> itemList = app.getControl().getItemList("", "name");
-
+        populateTable(app.getControl().getItemList("", "name"));
+    }
+    
+    private void populateTable(List<Item> itemList) {
+        
         SwingWorker sw = new SwingWorker() {
             @Override
             protected Object doInBackground() throws Exception {
@@ -314,15 +460,17 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
             populateTable();
         }
     }
-
+    
     @Override
     public void actionPerformed(ActionEvent e) {
         if (AC_SHOW_ADD_ITEM.equals(e.getActionCommand())) {
             app.getGuiManager().showPanelAddItem(this, null);
+//        } else if (AC_SHOW_EDIT_ITEM.equals(e.getActionCommand())) {
+
         } else if (AC_LOAD_ITEM.equals(e.getActionCommand())) {
             app.getGuiManager().showPanelSelItem(this);
         } else if (AC_REFRESH_ITEMS.equals(e.getActionCommand())) {
-            populateTable();
+            filtrar();
         } else if (AC_ADD_CONCILIATION.equals(e.getActionCommand())) {
             app.getGuiManager().showPanelConciliacion(true);
         } else if (AC_DOWNLOAD_ITEM.equals(e.getActionCommand())) {
@@ -336,7 +484,6 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
                     try {
                         String tipo = "Inventario";
                         String file = app.getDirDocuments() + File.separator + "Reporte_" + tipo + "_" + app.getFormatoFecha().format(new Date()) + ".xlsx";
-                        System.err.println(file);
                         app.getXlsManager().exportarTabla(model, "Reporte " + tipo, file, PanelInventory.this);
                         Desktop.getDesktop().open(new File(file));
                     } catch (Exception ex) {
@@ -348,7 +495,7 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
             tarea.execute();
         }
     }
-
+    
     @Override
     public void valueChanged(ListSelectionEvent e) {
         int row = tableItems.getSelectedRow();
@@ -363,16 +510,16 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
             logger.error(ex.getMessage());
         }
     }
-
+    
     public class TablaCellRenderer extends JLabel implements TableCellRenderer {
-
+        
         boolean isBordered = true;
         private boolean agotada, warning;
         private int status;
 //        protected enum status {Color.black; Color.blue; Color.orange; Color.red};
         private final Format formatter;
         private final Color ORANGE = new Color(244, 145, 0);
-
+        
         public TablaCellRenderer(boolean isBordered, Format formatter) {
             super();
             this.isBordered = isBordered;
@@ -382,13 +529,13 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
             setFont(new Font("tahoma", 1, 14));
             setOpaque(true);
         }
-
+        
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
             int r = table.convertRowIndexToModel(row);
             int col = 2;
             int col2 = 6;
-
+            
             if (value != null) {
                 if (formatter != null) {
                     try {
@@ -398,13 +545,13 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
                     }
                 }
                 setText(value.toString().toUpperCase());
-
+                
                 double cant = 0;
                 double min = 0;
                 try {
                     cant = Double.parseDouble(model.getValueAt(r, col).toString());
                     min = Double.parseDouble(model.getValueAt(r, col2).toString());
-
+                    
                 } catch (Exception e) {
                 }
                 agotada = cant <= 0;
@@ -427,5 +574,5 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
             return this;
         }
     }
-
+    
 }

@@ -152,7 +152,7 @@ public class PanelDownItem extends PanelCaptura implements ActionListener, Caret
         if (filtroActivo) {
             ArrayList<Item> listFiltered = new ArrayList();
             for (int i = 0; i < listItems.size(); i++) {
-                if (listItems.get(i).getName().toUpperCase().contains(text.toUpperCase())) {                    
+                if (listItems.get(i).getName().toUpperCase().contains(text.toUpperCase())) {
                     listFiltered.add(listItems.get(i));
                 }
             }
@@ -195,39 +195,44 @@ public class PanelDownItem extends PanelCaptura implements ActionListener, Caret
         boolean valido = true;
         if (row == -1) {
             tabla.setBorder(bordeError);
-            valido = false;        }
-        if (tfCantidad.getText().trim().isEmpty()) {
+            valido = false;
+        }
+        if (tfCantidad.getText().trim().isEmpty()
+                || Integer.parseInt(tfCantidad.getText()) < 1
+                || Integer.parseInt(tfCantidad.getText()) > item.getQuantity()) {
             tfCantidad.setBorder(bordeError);
             valido = false;
         }
-        
-        
-        
         if (valido) {
-            
+
             try {
                 item.setQuantity(Integer.parseInt(tfCantidad.getText()));
 //                item.setPrice(new BigDecimal(tfValorUnit.getText()));
                 nota = tfNota.getText();
             } catch (NumberFormatException e) {
             }
+            return item;
         }
-        return item;
+        return null;
     }
 
     public Item getSelectedItem() {
         boolean valido = true;
-        if (tfCantidad.getText().trim().isEmpty()) {
+        Item localItem = selectedItem;
+        if (tfCantidad.getText().trim().isEmpty()
+                || Integer.parseInt(tfCantidad.getText()) < 1
+                || Integer.parseInt(tfCantidad.getText()) > selectedItem.getQuantity()) {
             tfCantidad.setBorder(bordeError);
             valido = false;
         }
-        if (valido || selectedItem != null) {
+        if (valido && selectedItem != null) {
             try {
-                selectedItem.setQuantity(Integer.parseInt(tfCantidad.getText()));
+                localItem.setQuantity(Integer.parseInt(tfCantidad.getText()));
             } catch (Exception e) {
             }
+            return localItem;
         }
-        return selectedItem;
+        return null;
     }
 
     /**
@@ -458,8 +463,8 @@ public class PanelDownItem extends PanelCaptura implements ActionListener, Caret
     }
 
     public void showResumen(Item item) {
-        double quantity = item.getQuantity();
         if (item != null) {
+            double quantity = item.getQuantity();
             double cantidad = 0;
             boolean pass = true;
             try {
@@ -493,6 +498,10 @@ public class PanelDownItem extends PanelCaptura implements ActionListener, Caret
         } else if (AC_ADD_ITEM_TO_TABLE.equals(e.getActionCommand())) {
             Item item = onlyOneItem ? getSelectedItem() : getItem();
             if (item != null) {
+                System.out.println(selectedItem.getQuantity() + "::" + item.getQuantity());
+                if (selectedItem.getQuantity() < item.getQuantity()) {
+                    tfCantidad.setBorder(bordeError);
+                }
                 app.getControl().addItemToInventory(item.getId(), item.getQuantity() * -1);
                 app.getControl().addInventoryRegister(item, 2, item.getQuantity());
                 pcs.firePropertyChange(AC_ADD_ITEM_TO_TABLE, null, item);

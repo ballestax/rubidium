@@ -41,6 +41,7 @@ public class JDBCProductDAO implements ProductDAO {
     protected static final String UPDATE_PRODUCT_KEY = "UPDATE_PRODUCT";
     protected static final String GET_PRODUCT_KEY = "GET_PRODUCT";
     protected static final String DELETE_PRODUCT_KEY = "DELETE_PRODUCT";
+    protected static final String GET_PRODUCT_BY_PRESS_ID_KEY = "GET_PRODUCT_BY_PRESS_ID";
     
     public JDBCProductDAO(DataSource dataSource, SQLLoader sqlStatements) throws DAOException {
         this.dataSource = dataSource;
@@ -297,6 +298,48 @@ public class JDBCProductDAO implements ProductDAO {
             DBManager.closeConnection(conn);
         }
         return productos;
+    }
+    
+    public Product getProductByPressID(String where) throws DAOException {
+        String stRetrieve;
+        try {
+            SQLExtractor sqlExtractorWhere = new SQLExtractor(where, SQLExtractor.Type.WHERE);;
+            Map<String, String> namedParams = new HashMap<String, String>();
+            namedParams.put(NAMED_PARAM_WHERE, sqlExtractorWhere.extractWhere());
+            stRetrieve = sqlStatements.getSQLString(GET_PRODUCT_BY_PRESS_ID_KEY, namedParams);            
+        } catch (SQLException e) {
+            throw new DAOException("Could not properly retrieve the producto", e);
+        } catch (IOException e) {
+            throw new DAOException("Could not properly retrieve the producto", e);
+        }
+        Connection conn = null;
+        PreparedStatement retrieve = null;
+        ResultSet rs = null;
+        Product producto = null;
+        try {
+            conn = dataSource.getConnection();
+            retrieve = conn.prepareStatement(stRetrieve);
+            rs = retrieve.executeQuery();
+            while (rs.next()) {
+                producto = new Product();
+                producto.setId(rs.getInt(1));
+                producto.setName(rs.getString(2));
+                producto.setCode(rs.getString(3));                
+                producto.setDescription(rs.getString(4));
+                producto.setPrice(rs.getBigDecimal(5).doubleValue());
+                producto.setImage(rs.getString(6));
+                producto.setCategory(rs.getString(7));
+                producto.setVariablePrice(rs.getBoolean(8));
+                producto.setEnabled(rs.getBoolean(9));
+            }
+        } catch (SQLException e) {
+            throw new DAOException("Could not properly retrieve the Product: " + e);
+        } finally {
+            DBManager.closeResultSet(rs);
+            DBManager.closeStatement(retrieve);
+            DBManager.closeConnection(conn);
+        }
+        return producto;
     }
     
 }

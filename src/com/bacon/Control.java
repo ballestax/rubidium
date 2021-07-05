@@ -450,6 +450,16 @@ public class Control {
         }
     }
 
+    public Product getProductByPressId(long pressID) {
+        try {
+            JDBCProductDAO prodDAO = (JDBCProductDAO) DAOFactory.getInstance().getProductDAO();
+            return prodDAO.getProductByPressID("pp.id=" + pressID);
+        } catch (DAOException ex) {
+            logger.error("Error getting Products list.", ex);
+            return null;
+        }
+    }
+
     public ArrayList<Ingredient> getIngredientList(String where) {
         try {
             JDBCIngredientDAO ingDAO = (JDBCIngredientDAO) DAOFactory.getInstance().getIngredientDAO();
@@ -707,6 +717,16 @@ public class Control {
             return utilDAO.getPresentationsByProduct(idProduct);
         } catch (DAOException ex) {
             logger.error("Error getting Presentations list.", ex);
+            return null;
+        }
+    }
+
+    public Presentation getPresentationsById(long idPres) {
+        try {
+            JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
+            return utilDAO.getPresentationByID(idPres);
+        } catch (DAOException ex) {
+            logger.error("Error getting Presentation.", ex);
             return null;
         }
     }

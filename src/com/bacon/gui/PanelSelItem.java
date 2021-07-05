@@ -210,17 +210,27 @@ public class PanelSelItem extends PanelCaptura implements ActionListener, CaretL
 
     public Item getSelectedItem() {
         boolean valido = true;
-        if (tfCantidad.getText().trim().isEmpty()) {
+        if (tfCantidad.getText().trim().isEmpty()
+                || Integer.parseInt(tfCantidad.getText()) < 1) {
             tfCantidad.setBorder(bordeError);
             valido = false;
         }
-        if (valido || selectedItem != null) {
+        if (tfValorUnit.getText().trim().isEmpty()) {
+            tfValorUnit.setBorder(bordeError);
+            valido = false;
+        }
+        if (tfValorTotal.getText().trim().isEmpty()) {
+            tfValorTotal.setBorder(bordeError);
+            valido = false;
+        }
+        if (valido && selectedItem != null) {
             try {
                 selectedItem.setQuantity(Integer.parseInt(tfCantidad.getText()));
             } catch (Exception e) {
             }
+            return selectedItem;
         }
-        return selectedItem;
+        return null;
     }
 
     public Item getItem() {
@@ -230,7 +240,8 @@ public class PanelSelItem extends PanelCaptura implements ActionListener, CaretL
             tabla.setBorder(bordeError);
             valido = false;
         }
-        if (tfCantidad.getText().trim().isEmpty()) {
+        if (tfCantidad.getText().trim().isEmpty()
+                || Integer.parseInt(tfCantidad.getText()) < 1) {
             tfCantidad.setBorder(bordeError);
             valido = false;
         }
@@ -500,15 +511,20 @@ public class PanelSelItem extends PanelCaptura implements ActionListener, CaretL
 
     private void updateResumen() {
         double cantidad = 0, precio = 0, total = 0;
+        String suma = "";
         try {
             cantidad = Double.parseDouble(tfCantidad.getText());
             precio = Double.parseDouble(tfValorUnit.getText());
             total = cantidad * precio;
-
+            double res = selectedItem.getQuantity() + cantidad;
+            suma = String.valueOf(selectedItem.getQuantity()) + "<font color=red>+</font>" + cantidad + "<font color=red>=</font><font color=#2a9d8f>" + res + "</font>";
         } catch (Exception e) {
+            if(selectedItem!=null)
+            suma = "<font color=#2a9d8f>" + selectedItem.getQuantity() + "</font>";
         }
         lbResumen.setText("<html><table cellspacing=1 border=0>"
-                + "<tr><td>Producto: </td><td colspan=5><font color=blue size=+1>" + selectedItem.getName().toUpperCase() + "</td></tr>"
+                + "<tr><td>Producto: </td><td colspan=5><font color=blue size=+1>" + selectedItem.getName().toUpperCase() + ""
+                + " <font color=red size=+1>(</font>" + suma + "<font color=red size=+1>)</font></tr>"
                 + "<tr><td>Cantidad: </td><td><font color=blue size=+1>" + cantidad + "</font></td>"
                 + "<td>Precio:</td><td><font color=blue size=+1>" + app.getDCFORM_P().format(precio) + "</font></td>"
                 + "<td>Total:</td><td><font color=blue size=+1>" + app.getDCFORM_P().format(total) + "</font></td></tr></table></html>");
@@ -523,9 +539,12 @@ public class PanelSelItem extends PanelCaptura implements ActionListener, CaretL
                 cantidad = Double.parseDouble(tfCantidad.getText());
                 precio = Double.parseDouble(tfValorUnit.getText());
                 total = cantidad * precio;
+                if (cantidad==0){
+                    tfValorUnit.setText(String.valueOf(selectedItem.getPrice()));
+                }
                 tfValorTotal.setText(app.getDCFORM_W().format(total));
             } catch (Exception ex) {
-//                tfValorTotal.setText("");
+
             }
             updateResumen();
         } else if (e.getSource().equals(tfValorUnit)) {
@@ -534,6 +553,9 @@ public class PanelSelItem extends PanelCaptura implements ActionListener, CaretL
                 cantidad = Double.parseDouble(tfCantidad.getText());
                 precio = Double.parseDouble(tfValorUnit.getText());
                 total = cantidad * precio;
+                if (Double.isNaN(Double.parseDouble(tfValorUnit.getText()))) {
+                    tfValorUnit.setText(getSelectedItem().getPrice().toString());
+                }
                 tfValorTotal.setText(app.getDCFORM_W().format(total));
             } catch (Exception ex) {
                 tfValorTotal.setText("");
@@ -544,7 +566,10 @@ public class PanelSelItem extends PanelCaptura implements ActionListener, CaretL
             try {
                 cantidad = Double.parseDouble(tfCantidad.getText());
                 total = Double.parseDouble(tfValorTotal.getText());
-                precio = total / cantidad;
+                precio = selectedItem.getPrice().doubleValue();
+                if (cantidad != 0) {
+                    precio = total / cantidad;
+                }
                 tfValorUnit.setText(app.getDCFORM_W().format(precio));
             } catch (Exception ex) {
                 tfValorUnit.setText("");
