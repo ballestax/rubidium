@@ -389,8 +389,8 @@ public class PanelCash extends PanelCapturaMod implements ActionListener, Proper
     public void propertyChange(PropertyChangeEvent evt) {
         logger.debug("last:" + evt.getPropertyName() + ":" + evt.getPropagationId());
         if (AC_NEW_CYCLE.equals(evt.getPropertyName())) {
-            Cycle cycle = (Cycle) evt.getNewValue();
-            this.cycle = cycle;
+            Cycle lastCycle = app.getControl().getLastCycle();
+            this.cycle = lastCycle;
             showCycle(cycle);
         }
 

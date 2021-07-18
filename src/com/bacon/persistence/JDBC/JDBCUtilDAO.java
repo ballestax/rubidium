@@ -28,6 +28,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -80,6 +81,11 @@ public class JDBCUtilDAO implements UtilDAO {
     public static final String GET_CYCLE_KEY = "GET_CYCLE";
     public static final String UPDATE_CYCLE_KEY = "UPDATE_CYCLE";
 
+    public static final String CREATE_INVENTORY_SNAPSHOT_TABLE_KEY = "CREATE_INVENTORY_SNAPSHOT_TABLE";
+    public static final String ADD_INVENTARY_SNAPSHOT_ITEM_KEY = "ADD_INVENTORY_SNAPSHOT_ITEM";
+    public static final String GET_INVENTORY_SNAPSHOT_ITEM_KEY = "GET_INVENTORY_SNAPSHOT_ITEM";
+    public static final String COUNT_ITEM_SNAP_EVENT_KEY = "COUNT_ITEM_SNAP_EVENT";
+
     public static final String CREATE_INVOICE_PRODUCT_TABLE_KEY = "CREATE_INVOICE_PRODUCT_TABLE";
     public static final String CREATE_ADDITIONAL_PRODUCT_TABLE_KEY = "CREATE_ADDITIONAL_PRODUCT_TABLE";
     public static final String ADD_ADDITIONAL_PRODUCT_KEY = "ADD_ADDITIONAL_PRODUCT";
@@ -118,7 +124,7 @@ public class JDBCUtilDAO implements UtilDAO {
     public static final String GET_UNIT_KEY = "GET_UNIT";
     public static final String DELETE_UNIT_KEY = "DELETE_UNIT";
     public static final String UPDATE_UNIT_KEY = "UPDATE_UNIT";
-    
+
     public static final String CREATE_PAYMENTS_TABLE_KEY = "CREATE_PAYMENTS_TABLE";
     public static final String ADD_PAYMENT_KEY = "ADD_PAYMENT";
     public static final String GET_PAYMENT_KEY = "GET_PAYMENT";
@@ -200,7 +206,7 @@ public class JDBCUtilDAO implements UtilDAO {
 
         TABLE_NAME = "units";
         createTable(TABLE_NAME, CREATE_UNITS_TABLE_KEY);
-        
+
         TABLE_NAME = "payments";
         createTable(TABLE_NAME, CREATE_PAYMENTS_TABLE_KEY);
 
@@ -209,6 +215,9 @@ public class JDBCUtilDAO implements UtilDAO {
 
         TABLE_NAME = "inventory_register";
         createTable(TABLE_NAME, CREATE_INVENTORY_REGISTER_TABLE_KEY);
+
+        TABLE_NAME = "inventory_snapshot";
+        createTable(TABLE_NAME, CREATE_INVENTORY_SNAPSHOT_TABLE_KEY);
 
     }
 
@@ -881,7 +890,7 @@ public class JDBCUtilDAO implements UtilDAO {
         }
         return fecha;
     }
-    
+
     public Date getLastEntrada(String tabla, String field) throws DAOException {
         String retrieve;
         try {
@@ -912,8 +921,8 @@ public class JDBCUtilDAO implements UtilDAO {
         }
         return fecha;
     }
-    
-     public Object getMaxValue(String tabla, String field) throws DAOException {
+
+    public Object getMaxValue(String tabla, String field) throws DAOException {
         String retrieve;
         try {
             Map<String, String> namedParams = new HashMap<String, String>();
@@ -1011,7 +1020,7 @@ public class JDBCUtilDAO implements UtilDAO {
         }
         return pres;
     }
-    
+
     public Presentation getPresentation(long id) throws DAOException {
         Presentation pres = null;
         Connection conn = null;
@@ -1044,7 +1053,7 @@ public class JDBCUtilDAO implements UtilDAO {
         }
         return pres;
     }
-    
+
     public Presentation getPresentationByID(long id) throws DAOException {
         Presentation pres = null;
         Connection conn = null;
@@ -1077,7 +1086,6 @@ public class JDBCUtilDAO implements UtilDAO {
         }
         return pres;
     }
-    
 
     public void addCycle(Cycle cycle) throws DAOException {
         if (cycle == null) {
@@ -1099,6 +1107,47 @@ public class JDBCUtilDAO implements UtilDAO {
             throw new DAOException("Cannot add Cycle", e);
         } finally {
             DBManager.closeStatement(ps);
+            DBManager.closeConnection(conn);
+        }
+    }
+
+    public void addCycleAndCreateSnapshot(Cycle cycle) throws DAOException {
+        if (cycle == null) {
+            throw new IllegalArgumentException("Null Cycle");
+        }
+        Connection conn = null;
+        PreparedStatement ps = null, ps2 = null;
+        try {
+            conn = dataSource.getConnection();
+            conn.setAutoCommit(false);
+            Object[] parameters = {
+                cycle.getInitialBalance()
+            };
+            ps = sqlStatements.buildSQLStatement(conn, ADD_CYCLE_KEY, parameters, Statement.RETURN_GENERATED_KEYS);
+            ps.executeUpdate();
+
+            long cycleId = 0;
+            try ( ResultSet generatedKeys = ps.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    cycleId = generatedKeys.getLong(1);
+                }
+            }
+
+            Statement statement = conn.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            ResultSet rs = statement.executeQuery("SELECT * FROM inventory WHERE snapshot=1");
+
+            while (rs.next()) {
+                Object[] parameters2 = {rs.getLong("id"), cycleId, rs.getDouble("quantity"), 0, 0, 0};
+                ps2 = sqlStatements.buildSQLStatement(conn, ADD_INVENTARY_SNAPSHOT_ITEM_KEY, parameters2);
+                ps2.executeUpdate();
+            }
+            conn.commit();
+        } catch (SQLException | IOException e) {
+            DBManager.rollbackConn(conn);
+            throw new DAOException("Cannot add Cycle", e);
+        } finally {
+            DBManager.closeStatement(ps);
+            DBManager.closeStatement(ps2);
             DBManager.closeConnection(conn);
         }
     }
@@ -1243,21 +1292,21 @@ public class JDBCUtilDAO implements UtilDAO {
         }
         return categories;
     }
-    
+
     public Category getCategory(String name) throws DAOException {
         String retrieveList;
         try {
-            SQLExtractor sqlExtractorWhere = new SQLExtractor("p.category='"+name+"'", SQLExtractor.Type.WHERE);
-            
+            SQLExtractor sqlExtractorWhere = new SQLExtractor("p.category='" + name + "'", SQLExtractor.Type.WHERE);
+
             Map<String, String> namedParams = new HashMap<>();
-            namedParams.put(NAMED_PARAM_WHERE, sqlExtractorWhere.extractWhere());            
+            namedParams.put(NAMED_PARAM_WHERE, sqlExtractorWhere.extractWhere());
             retrieveList = sqlStatements.getSQLString(GET_CATEGORY_KEY, namedParams);
         } catch (SQLException e) {
             throw new DAOException("Could not properly retrieve the Category", e);
         } catch (IOException e) {
             throw new DAOException("Could not properly retrieve the Category", e);
-        }        
-        
+        }
+
         Connection conn = null;
         PreparedStatement retrieve = null;
         ResultSet rs = null;
@@ -1267,7 +1316,7 @@ public class JDBCUtilDAO implements UtilDAO {
             retrieve = conn.prepareStatement(retrieveList);
             rs = retrieve.executeQuery();
             while (rs.next()) {
-                category = new Category(rs.getString(1));                
+                category = new Category(rs.getString(1));
             }
         } catch (SQLException e) {
             throw new DAOException("Could not properly retrieve the categories list: " + e);
@@ -1278,7 +1327,7 @@ public class JDBCUtilDAO implements UtilDAO {
         }
         return category;
     }
-    
+
     public ArrayList<Category> getAllCategories() throws DAOException {
         String retrieveList;
         try {
@@ -1552,7 +1601,7 @@ public class JDBCUtilDAO implements UtilDAO {
             Map<String, String> namedParams = new HashMap<>();
             namedParams.put(NAMED_PARAM_WHERE, sqlExtractorWhere.extractWhere());
             namedParams.put(NAMED_PARAM_ORDER_BY, sqlExtractorOrderBy.extractOrderBy());
-            retrieveEvent = sqlStatements.getSQLString(GET_INVENTORY_EVENT_LIST_KEY, namedParams);            
+            retrieveEvent = sqlStatements.getSQLString(GET_INVENTORY_EVENT_LIST_KEY, namedParams);
         } catch (SQLException | IOException e) {
             throw new DAOException("Could not properly retrieve the events List", e);
         }
@@ -1593,7 +1642,7 @@ public class JDBCUtilDAO implements UtilDAO {
         Object[] parameters = {idProd, Aplication.DF_SQL_TS.format(start), new Date()};
         try {
             conn = dataSource.getConnection();
-            retrieve = sqlStatements.buildSQLStatement(conn, GET_PRODUCTS_OUT_INVENTORY_KEY, parameters);            
+            retrieve = sqlStatements.buildSQLStatement(conn, GET_PRODUCTS_OUT_INVENTORY_KEY, parameters);
             rs = retrieve.executeQuery();
             while (rs.next()) {
                 int id = rs.getInt("id");
@@ -1616,10 +1665,10 @@ public class JDBCUtilDAO implements UtilDAO {
         Connection conn = null;
         PreparedStatement retrieve = null;
         ResultSet rs = null;
-        Object[] parameters = {idPres, idItem,  Aplication.DF_SQL_TS.format(start), new Date(),};
+        Object[] parameters = {idPres, idItem, Aplication.DF_SQL_TS.format(start), new Date(),};
         try {
             conn = dataSource.getConnection();
-            retrieve = sqlStatements.buildSQLStatement(conn, GET_PRESENTATIONS_OUT_INVENTORY_KEY, parameters);            
+            retrieve = sqlStatements.buildSQLStatement(conn, GET_PRESENTATIONS_OUT_INVENTORY_KEY, parameters);
             rs = retrieve.executeQuery();
             while (rs.next()) {
                 int id = rs.getInt("prod_id");
@@ -1692,10 +1741,10 @@ public class JDBCUtilDAO implements UtilDAO {
             DBManager.closeConnection(conn);
         }
         return list;
-    
-        
-    }  
-        public void addPayment(String payment) throws DAOException {
+
+    }
+
+    public void addPayment(String payment) throws DAOException {
         Connection conn = null;
         PreparedStatement ps = null;
         try {
@@ -1801,5 +1850,101 @@ public class JDBCUtilDAO implements UtilDAO {
             DBManager.closeStatement(update);
             DBManager.closeConnection(conn);
         }
+    }
+
+    public ArrayList<Map> getItemSnapshotList(String where, String orderBy) throws DAOException {
+        String retrieve;
+        ArrayList<Map> snapItems = new ArrayList<>();
+        try {
+            SQLExtractor sqlExtractorWhere = new SQLExtractor(where, SQLExtractor.Type.WHERE);
+            SQLExtractor sqlExtractorOrderBy = new SQLExtractor(orderBy, SQLExtractor.Type.ORDER_BY);
+            Map<String, String> namedParams = new HashMap<>();
+            namedParams.put(NAMED_PARAM_WHERE, sqlExtractorWhere.extractWhere());
+            namedParams.put(NAMED_PARAM_ORDER_BY, sqlExtractorOrderBy.extractOrderBy());
+            retrieve = sqlStatements.getSQLString(GET_INVENTORY_SNAPSHOT_ITEM_KEY, namedParams);
+
+        } catch (SQLException e) {
+            throw new DAOException("Could not properly retrieve the Unites List", e);
+        } catch (IOException e) {
+            throw new DAOException("Could not properly retrieve the Unites List", e);
+        }
+
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        Map dataItemSnap = null;
+        try {
+            conn = dataSource.getConnection();
+            ps = conn.prepareStatement(retrieve);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                dataItemSnap = new HashMap();
+                dataItemSnap.put("id", rs.getLong("s.id"));
+                dataItemSnap.put("item_id", rs.getLong("s.item_id"));
+                dataItemSnap.put("cycle_id", rs.getLong("s.cycle_id"));
+                dataItemSnap.put("quantity", rs.getDouble("s.quantity"));
+                dataItemSnap.put("ins", rs.getDouble("s.ins"));
+                dataItemSnap.put("outs", rs.getDouble("s.outs"));
+                dataItemSnap.put("sales", rs.getDouble("s.sales"));
+                dataItemSnap.put("name", rs.getString("i.name"));
+                snapItems.add(dataItemSnap);
+            }
+        } catch (SQLException e) {
+            throw new DAOException("Could not proper retrieve the snap items: " + e);
+        } finally {
+            DBManager.closeResultSet(rs);
+            DBManager.closeStatement(ps);
+            DBManager.closeConnection(conn);
+        }
+        return snapItems;
+    }
+
+    public Map countItemSnapEvents(long idItem, int EVENT, long idCycle) throws DAOException {
+        String retrieve;
+        ArrayList<Map> snapItems = new ArrayList<>();
+
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        Map dataItemSnap = null;
+
+        try {
+            SQLExtractor sqlExtractorWhere = new SQLExtractor("id=" + idCycle, SQLExtractor.Type.WHERE);
+            SQLExtractor sqlExtractorOrderBy = new SQLExtractor("id", SQLExtractor.Type.ORDER_BY);
+            Map<String, String> namedParams = new HashMap<>();
+            namedParams.put(NAMED_PARAM_WHERE, sqlExtractorWhere.extractWhere());
+            namedParams.put(NAMED_PARAM_ORDER_BY, sqlExtractorOrderBy.extractOrderBy());
+            retrieve = sqlStatements.getSQLString(GET_CYCLE_KEY, namedParams);
+//            System.out.println("retrieve :: " + retrieve);
+
+            conn = dataSource.getConnection();
+            ps = conn.prepareStatement(retrieve);
+            rs = ps.executeQuery();
+            rs.last();
+            Date dInit = rs.getTimestamp("init");
+            Date dEnd = new Date();
+            Object[] parameters = {idItem, EVENT, dInit, dEnd};
+
+            ps = sqlStatements.buildSQLStatement(conn, COUNT_ITEM_SNAP_EVENT_KEY, parameters);
+
+            rs = ps.executeQuery();
+//            System.out.println("::"+ps);
+            while (rs.next()) {
+                dataItemSnap = new HashMap();
+                dataItemSnap.put("item_id", idItem);
+                dataItemSnap.put("sum", rs.getDouble("sum"));
+
+            }
+        } catch (SQLException e) {
+            throw new DAOException("Could not proper retrieve the snap items: " + e);
+        } catch (IOException ex) {
+            throw new DAOException("Could not proper retrieve the snap items: " + ex);
+        } finally {
+            DBManager.closeResultSet(rs);
+            DBManager.closeStatement(ps);
+            DBManager.closeConnection(conn);
+        }
+        return dataItemSnap;
     }
 }

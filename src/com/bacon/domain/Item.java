@@ -25,8 +25,9 @@ public class Item {
     private double init;
     private double stockMin;
     private double stock;
-    
+
     private boolean onlyDelivery;
+    private boolean snapshot;
 
     private List<Object[]> presentations;
 
@@ -200,8 +201,8 @@ public class Item {
         hash = 97 * hash + Objects.hashCode(this.name);
         return hash;
     }
-    
-    public   BigDecimal getCostTotal() {
+
+    public BigDecimal getCostTotal() {
         return getCost().multiply(new BigDecimal(getQuantity()));
     }
 
@@ -212,7 +213,13 @@ public class Item {
     public void setOnlyDelivery(boolean onlyDelivery) {
         this.onlyDelivery = onlyDelivery;
     }
-    
-    
+
+    public boolean isSnapshot() {
+        return snapshot;
+    }
+
+    public void setSnapshot(boolean snapshot) {
+        this.snapshot = snapshot;
+    }
 
 }

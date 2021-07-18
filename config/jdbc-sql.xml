@@ -54,8 +54,10 @@
                     |GET_PRODUCTS_OUT_INVENTORY|GET_PRESENTATIONS_OUT_INVENTORY
                     |GET_ITEM_PRESENTATIONS
                     |GET_PRODUCTS_SALES
-                    |GET_LAST_INVOICE_BY_CLIENT
+                    |GET_LAST_INVOICE_BY_CLIENT 
                     |ADD_PAYMENT|GET_PAYMENT|UPDATE_PAYMENT|DELETE_PAYMENT|CREATE_PAYMENTS_TABLE
+                    |CREATE_INVENTORY_SNAPSHOT_TABLE|ADD_INVENTORY_SNAPSHOT_ITEM|GET_INVENTORY_SNAPSHOT_ITEM
+                    |COUNT_ITEM_SNAP_EVENT
                     
                     ) #REQUIRED
                     
@@ -1373,6 +1375,7 @@
                 average DECIMAL(20,2),
                 init DECIMAL(12,2),
                 onlyDelivery TINYINT(1),
+                snapshot TINYINT(1),
                 createdTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 lastUpdatedTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                 user VARCHAR(25) NOT NULL DEFAULT 'USER_DF',
@@ -1413,7 +1416,7 @@
         
         <SQLStatement method="ADD_ITEM">
             <SQLFragment>
-                INSERT INTO inventory (name,quantity,measure,cost,price,location,stock,stockmin,average,init,onlyDelivery,user) VALUES (?,?,?,?,?,?,?,?,?,?,?,?);
+                INSERT INTO inventory (name,quantity,measure,cost,price,location,stock,stockmin,average,init,onlyDelivery,snapshot,user) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?);
             </SQLFragment>            
         </SQLStatement>
         
@@ -1442,7 +1445,8 @@
                 price=?,
                 stock=?,
                 stockMin=?,
-                onlyDelivery=? 
+                onlyDelivery=?,
+                snapshot=? 
                 WHERE id = ?
             </SQLFragment>            
         </SQLStatement>
@@ -1783,6 +1787,51 @@
                 WHERE name = ?;
             </SQLFragment>
         </SQLStatement> 
+        
+        <SQLStatement method="CREATE_INVENTORY_SNAPSHOT_TABLE">            
+            <SQLFragment>
+                CREATE TABLE inventory_snapshot(
+                id INTEGER AUTO_INCREMENT,
+                item_id INTEGER NOT NULL,                
+                cycle_id INTEGER NOT NULL,
+                quantity DECIMAL(12,2),
+                ins DECIMAL(12,2),
+                outs DECIMAL(12,2),
+                sales DECIMAL(12,2),
+                lastUpdatedTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                PRIMARY KEY (id),
+                FOREIGN KEY (item_id) REFERENCES inventory(id) ON DELETE CASCADE ON UPDATE CASCADE,                
+                FOREIGN KEY (cycle_id) REFERENCES cycles(id) ON DELETE CASCADE ON UPDATE CASCADE
+                )ENGINE=InnoDB DEFAULT CHARSET=latin1;
+            </SQLFragment>
+        </SQLStatement>
+        
+        
+        <SQLStatement method="ADD_INVENTORY_SNAPSHOT_ITEM">
+            <SQLFragment>
+                INSERT INTO inventory_snapshot (item_id, cycle_id,quantity,ins,outs,sales) VALUES (?,?,?,?,?,?);
+            </SQLFragment>            
+        </SQLStatement>
+        
+        <SQLStatement method="GET_INVENTORY_SNAPSHOT_ITEM">
+            <SQLFragment>
+                SELECT s.id, s.item_id, s.cycle_id, s.quantity, i.name, s.ins, s.outs,s.sales FROM inventory_snapshot s, inventory i
+            </SQLFragment>            
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                WHERE i.id= s.item_id AND {where} 
+            </SQLFragment>
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                ORDER BY {orderby}
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="COUNT_ITEM_SNAP_EVENT">
+            <SQLFragment>
+                SELECT sum(ir.quantity) as sum FROM inventory_register ir WHERE ir.idItem=? AND ir.event=? AND (lastUpdatedTime BETWEEN ? AND ?)
+            </SQLFragment>            
+        </SQLStatement>
+            
+        
         
     </DAOStatements>
 </DAOConfiguration>

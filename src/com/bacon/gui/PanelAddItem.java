@@ -125,6 +125,9 @@ public class PanelAddItem extends PanelCaptura implements ActionListener, Proper
         chOnlyDelivery.setText("Solo domicilios");
         chOnlyDelivery.setFont(font);
         
+        chSnapShot.setText("Snapshot");
+        chSnapShot.setFont(font);
+        
         loadProducts();
         
     }
@@ -209,6 +212,8 @@ public class PanelAddItem extends PanelCaptura implements ActionListener, Proper
             regPrice.setEnabled(false);
             chOnlyDelivery.setSelected(item.isOnlyDelivery());
             chOnlyDelivery.setEnabled(false);
+            chSnapShot.setSelected(item.isSnapshot());
+            chSnapShot.setEnabled(false);
             
             ArrayList<Object[]> presentations = app.getControl().getPresentationsByItem(item.getId());
 
@@ -270,6 +275,7 @@ public class PanelAddItem extends PanelCaptura implements ActionListener, Proper
         btUpdate = new javax.swing.JButton();
         chOnlyDelivery = new javax.swing.JCheckBox();
         jLabel1 = new javax.swing.JLabel();
+        chSnapShot = new javax.swing.JCheckBox();
 
         regName.setNextFocusableComponent(regMeseure);
 
@@ -292,6 +298,8 @@ public class PanelAddItem extends PanelCaptura implements ActionListener, Proper
         regLocation.setNextFocusableComponent(regQuantity);
 
         chOnlyDelivery.setText("jCheckBox1");
+
+        chSnapShot.setText("jCheckBox1");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -322,7 +330,9 @@ public class PanelAddItem extends PanelCaptura implements ActionListener, Proper
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(chOnlyDelivery, javax.swing.GroupLayout.PREFERRED_SIZE, 159, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(28, 28, 28)
+                        .addComponent(chSnapShot, javax.swing.GroupLayout.PREFERRED_SIZE, 159, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 484, Short.MAX_VALUE)
                 .addContainerGap())
@@ -352,7 +362,8 @@ public class PanelAddItem extends PanelCaptura implements ActionListener, Proper
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(chOnlyDelivery)
-                            .addComponent(jLabel1))
+                            .addComponent(jLabel1)
+                            .addComponent(chSnapShot))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(labelInfo, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -370,6 +381,7 @@ public class PanelAddItem extends PanelCaptura implements ActionListener, Proper
     private javax.swing.JButton btUpdate;
     private javax.swing.JCheckBox chOnlyDelivery;
     private javax.swing.JCheckBox chSaveExit;
+    private javax.swing.JCheckBox chSnapShot;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel labelInfo;
@@ -389,6 +401,7 @@ public class PanelAddItem extends PanelCaptura implements ActionListener, Proper
         btSave.setVisible(false);
         btUpdate.setVisible(true);
         chOnlyDelivery.setEnabled(true);
+        chSnapShot.setEnabled(true);
     }
     
     public void modoNuevoItem(){
@@ -416,6 +429,8 @@ public class PanelAddItem extends PanelCaptura implements ActionListener, Proper
         regLocation.setEnabled(true);
         chOnlyDelivery.setEnabled(true);
         chOnlyDelivery.setSelected(false);
+        chSnapShot.setEnabled(true);
+        chSnapShot.setSelected(false);
         
         for (int i = 0; i < tableProducts.getRowCount(); ++i) {
             model.setValueAt(Boolean.FALSE, i, 0);
@@ -521,6 +536,7 @@ public class PanelAddItem extends PanelCaptura implements ActionListener, Proper
             
             item.setInit(item.getQuantity());
             item.setOnlyDelivery(chOnlyDelivery.isSelected());
+            item.setSnapshot(chSnapShot.isSelected());
 //            item.setLocation(0);
             item.setAverage(BigDecimal.ZERO);
             item.setUser(app.getUser().getUsername().toLowerCase());

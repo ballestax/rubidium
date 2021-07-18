@@ -46,6 +46,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import org.apache.log4j.Logger;
 
@@ -753,6 +754,20 @@ public class Control {
             return false;
         }
     }
+    
+    public boolean addCycleAndSnapshot(Cycle cycle) {
+        try {
+            JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
+            utilDAO.addCycleAndCreateSnapshot(cycle);
+            return true;
+        } catch (DAOException ex) {
+            String msg = "Error adding cycle";
+            logger.error(msg, ex);
+            GUIManager.showErrorMessage(null, msg, "Error");
+            return false;
+        }
+    }
+    
 
     public Cycle getCycle(int id) {
         try {
@@ -857,6 +872,26 @@ public class Control {
             return itemDAO.getItemList(where, order);
         } catch (DAOException ex) {
             logger.error("Error getting Item list.", ex);
+            return null;
+        }
+    }
+    
+    public ArrayList<Map> getItemSnapshotList(String where, String order) {
+        try {
+            JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
+            return utilDAO.getItemSnapshotList(where, order);
+        } catch (DAOException ex) {
+            logger.error("Error getting Item Snapshot list.", ex);
+            return null;
+        }
+    }
+    
+    public Map countItemSnap(long idItem, int EVENT, long idCycle ) {
+        try {
+            JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
+            return utilDAO.countItemSnapEvents(idItem, EVENT, idCycle);
+        } catch (DAOException ex) {
+            logger.error("Error getting Item Snapshot count.", ex);
             return null;
         }
     }
