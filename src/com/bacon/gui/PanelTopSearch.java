@@ -13,6 +13,9 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
@@ -114,10 +117,12 @@ public class PanelTopSearch extends PanelCaptura implements ActionListener {
 
     private void filtrar(String text, int filter) {
         if (text.trim().length() > 2) {
-            String SCAPE = "LIKE \'%" + text.toLowerCase() + "%\'";
-            ArrayList<Product> productsList = app.getControl().getProductsList("name " + SCAPE + " or category " + SCAPE, "");
-//            ArrayList<Product> productsList = app.getControl().getProductsList("name " + SCAPE);
-            pcs.firePropertyChange(AC_FILTER_PRODUCTS, null, productsList);
+//            String SCAPE = "LIKE \'%" + text.toLowerCase() + "%\'";
+//            ArrayList<Product> productsList = app.getControl().getProductsList("name " + SCAPE + " or category " + SCAPE, "");
+            List<Product> listFiltered = app.getControl().getProductsList("enabled=1", "name").stream()
+                    .filter(p -> p.getName().toLowerCase().contains(text.toLowerCase()) || p.getCategory().toLowerCase().contains(text.toLowerCase())).collect(Collectors.toList());
+//            ArrayList<Product> productsList = app.getControl().getProductsList("name " + SCAPE); 
+            pcs.firePropertyChange(AC_FILTER_PRODUCTS, null, listFiltered);
         } else {
             pcs.firePropertyChange(AC_FILTER_PRODUCTS, null, null);
         }
@@ -210,14 +215,14 @@ public class PanelTopSearch extends PanelCaptura implements ActionListener {
 
     @Override
     public void reset() {
+        regSearch.setText("");
+        regSearch.getComponent().requestFocus();
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         if (AC_CLEAR_FIELD.equals(e.getActionCommand())) {
-            regSearch.setText("");
-            regSearch.getComponent().requestFocus();
-
+            reset();
         } else if (AC_SELECT_VIEW1.equals(e.getActionCommand())) {
             pcs.firePropertyChange(AC_SELECT_VIEW1, null, null);
 

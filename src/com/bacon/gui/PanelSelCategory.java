@@ -42,8 +42,9 @@ public class PanelSelCategory extends PanelCaptura implements ActionListener {
 
         boxContainer = new Box(BoxLayout.X_AXIS);
 
-        int MAX = app.getConfiguration().getProperty(Configuration.MAX_CATEGORIES_LIST, 5);
-
+        app.getConfiguration().setProperty(Configuration.MAX_CATEGORIES_LIST, "6", true);
+        int MAX = app.getConfiguration().getProperty(Configuration.MAX_CATEGORIES_LIST, 5);        
+        
         if (categories != null) {
             for (int i = 0; i < categories.size() && i <= MAX; i++) {
                 JButton btCategory = new JButton();

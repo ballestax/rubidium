@@ -560,10 +560,7 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener,
             log.debug("Call from updatin list filtro");
             if (PERIODO_CICLO.equals(selPeriodo)) {
                 filtradoSQL();
-            } else {
-                loadPedidos();
             }
-
         } else if (ACTION_CLEAR_SEARCH.equals(e.getActionCommand())) {
             tfBuscar.setText("");
         } else if (ACTION_ACTIVATE_FILTER.equals(e.getActionCommand())) {
@@ -825,11 +822,6 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener,
             @Override
             protected void done() {
                 app.getGuiManager().setDefaultCursor();
-            }
-
-            @Override
-            protected void process(List chunks) {
-                super.process(chunks); //To change body of generated methods, choose Tools | Templates.
             }
 
         };

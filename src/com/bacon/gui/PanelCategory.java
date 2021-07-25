@@ -133,6 +133,7 @@ public class PanelCategory extends PanelCapturaMod implements PropertyChangeList
                         break;
                     }
                     PanelProduct pnProd = mapProdsV2.get(products.get(c).getId());
+                    if(pnProd!=null)
                     pnItems.add(pnProd,
                             new GridBagConstraints(j, i, 1, 1,
                                     0.1, 0,

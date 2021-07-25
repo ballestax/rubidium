@@ -823,8 +823,6 @@ public class JDBCInvoiceDAO implements InvoiceDAO {
 
     public ArrayList<Invoice> getInvoiceByQuery(String query) throws DAOException {
         
-        System.out.println("query = " + query);
-
         Connection conn = null;
         PreparedStatement ps = null;
         ResultSet rs = null, rs1 = null, rs2 = null, rs3 = null, rsx = null;
