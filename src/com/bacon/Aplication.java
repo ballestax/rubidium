@@ -54,7 +54,7 @@ import org.balx.Imagenes;
 public final class Aplication implements ActionListener, PropertyChangeListener, ListSelectionListener {
 
     public static final String TITLE = "Bacon 57 Burger";
-    public static final String VERSION = "1.1"; // 22/July/2020
+    public static final String VERSION = "2.0"; // 17/July/2021
     public static final String ACTION_CANCEL_PANEL = "acCancelPanel";
     public static final String ACTION_EXIT_APP = "acExitApp";
     public static final String ACTION_SHOW_PREFERENCES = "acShowPreferences";
@@ -81,7 +81,7 @@ public final class Aplication implements ActionListener, PropertyChangeListener,
     public static final String DEFAULT_EXPORT_DIR = "";
 
     //Correr la aplicacion con configuracion de servidor local
-    private static boolean local = true;
+    private static boolean local = !true;
 
     public DateFormat DF = new SimpleDateFormat("dd-MM-yyyy");
     public DateFormat DF_FULL = new SimpleDateFormat("dd MMMM yyyy hh:mm");
