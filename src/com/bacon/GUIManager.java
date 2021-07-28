@@ -413,18 +413,27 @@ public class GUIManager {
     }
 
     public PanelSelItem getPanelSelItem() {
+        return getPanelSelItem(null);
+    }
+    public PanelSelItem getPanelSelItem(Item item) {
         if (panelSelItem == null) {
-            panelSelItem = new PanelSelItem(app, null);
+            panelSelItem = new PanelSelItem(app, null);            
         }
         panelSelItem.reset();
+        panelSelItem.setItem(item);
         return panelSelItem;
     }
 
     public PanelDownItem getPanelDownItem() {
+        return getPanelDownItem(null);
+    }
+    
+    public PanelDownItem getPanelDownItem(Item item) {
         if (panelDownItem == null) {
             panelDownItem = new PanelDownItem(app, null);
         }
         panelDownItem.reset();
+        panelDownItem.setItem(item);
         return panelDownItem;
     }
 
@@ -1143,15 +1152,19 @@ public class GUIManager {
         setDefaultCursor();
         dialog.setVisible(true);
     }
-
+    
     public void showPanelSelItem(PropertyChangeListener listener) {
+        showPanelSelItem(null, listener);
+    }
+
+    public void showPanelSelItem(Item item, PropertyChangeListener listener) {
         setWaitCursor();
         JDialog dialog = new MyDialogEsc();
         dialog.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
         if (!getPanelSelItem().containsListener(listener)) {
             getPanelSelItem().addPropertyChangeListener(listener);
         }
-        dialog.add(getPanelSelItem());
+        dialog.add(getPanelSelItem(item));
         dialog.setTitle("Agregar item.");
         dialog.pack();
         dialog.setLocationRelativeTo(getFrame());
@@ -1160,13 +1173,17 @@ public class GUIManager {
     }
 
     public void showPanelDownItem(PropertyChangeListener listener) {
+        showPanelDownItem(null, listener);
+    }
+    
+    public void showPanelDownItem(Item item, PropertyChangeListener listener) {
         setWaitCursor();
         JDialog dialog = new MyDialogEsc();
         dialog.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
-        if (!getPanelSelItem().containsListener(listener)) {
-            getPanelSelItem().addPropertyChangeListener(listener);
+        if (!getPanelDownItem().containsListener(listener)) {
+            getPanelDownItem().addPropertyChangeListener(listener);
         }
-        dialog.add(getPanelDownItem());
+        dialog.add(getPanelDownItem(item));
         dialog.setTitle("Descargar item.");
         dialog.pack();
         dialog.setLocationRelativeTo(getFrame());

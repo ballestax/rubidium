@@ -286,7 +286,7 @@ public class JDBCItemDAO implements ItemDAO {
             conn.setAutoCommit(false);
             
             Object[] parameters = {item.getId()};
-            System.out.println("deleting id:"+item.getId());
+//            System.out.println("deleting id:"+item.getId());
             ps = sqlStatements.buildSQLStatement(conn, DELETE_ITEM_PRES_KEY, parameters);
             ps.executeUpdate();
             

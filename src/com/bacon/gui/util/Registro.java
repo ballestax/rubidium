@@ -506,6 +506,9 @@ public class Registro extends JComponent implements Reseteable, CaretListener {
             conIcono = true;
         }
         box.add(((Component) (conIcono ? ((Component) (boxH)) : ((Component) (campo)))));
+//        System.out.println("campo:"+campo);
+//        if(campo instanceof JComboBox)
+//        System.out.println(((JComboBox)campo).getModel());
         add(box, BorderLayout.CENTER);
 
         if (popup) {
@@ -598,6 +601,14 @@ public class Registro extends JComponent implements Reseteable, CaretListener {
         return campo;
     }
 
+    public void setLabelIcon(ImageIcon labelIcon){
+        label.setIcon(labelIcon);
+    }
+    
+    public void setLabelHorizontalAlignment(int align){
+        label.setHorizontalAlignment(align);
+    }
+    
     public Object getObject() {
 
         if (campo instanceof JTextField) {

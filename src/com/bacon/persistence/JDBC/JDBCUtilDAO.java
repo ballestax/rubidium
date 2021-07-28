@@ -88,6 +88,7 @@ public class JDBCUtilDAO implements UtilDAO {
     public static final String CREATE_PRESENTATION_PRODUCT_TABLE_KEY = "CREATE_PRESENTATION_PRODUCT_TABLE";
     public static final String ADD_PRESENTATION_PRODUCT_KEY = "ADD_PRESENTATION_PRODUCT";
     public static final String GET_PRESENTATION_BY_DEFAULT_KEY = "GET_PRESENTATION_BY_DEFAULT";
+    public static final String GET_PRESENTATION_KEY = "GET_PRESENTATION";
 
     public static final String CREATE_OTHER_PRODUCTS_TABLE_KEY = "CREATE_OTHER_PRODUCTS_TABLE";
     public static final String ADD_OTHER_PRODUCT_KEY = "ADD_OTHER_PRODUCT";
@@ -1010,6 +1011,73 @@ public class JDBCUtilDAO implements UtilDAO {
         }
         return pres;
     }
+    
+    public Presentation getPresentation(long id) throws DAOException {
+        Presentation pres = null;
+        Connection conn = null;
+        PreparedStatement retrieve = null;
+        ResultSet rs = null;
+        Object[] parameters = {id, 1};
+        try {
+            conn = dataSource.getConnection();
+            retrieve = sqlStatements.buildSQLStatement(conn, GET_PRESENTATION_BY_DEFAULT_KEY, parameters);
+
+            rs = retrieve.executeQuery();
+            while (rs.next()) {
+                pres = new Presentation();
+                pres.setId(rs.getInt(1));
+                pres.setIDProd(rs.getInt(2));
+                pres.setSerie(rs.getInt(3));
+                pres.setName(rs.getString(4));
+                pres.setPrice(rs.getDouble(5));
+                pres.setDefault(rs.getBoolean(6));
+                pres.setEnabled(rs.getBoolean(7));
+            }
+        } catch (SQLException e) {
+            throw new DAOException("Could not properly retrieve the presentations list: " + e);
+        } catch (IOException e) {
+            throw new DAOException("Could not properly retrieve the presentations list: " + e);
+        } finally {
+            DBManager.closeResultSet(rs);
+            DBManager.closeStatement(retrieve);
+            DBManager.closeConnection(conn);
+        }
+        return pres;
+    }
+    
+    public Presentation getPresentationByID(long id) throws DAOException {
+        Presentation pres = null;
+        Connection conn = null;
+        PreparedStatement retrieve = null;
+        ResultSet rs = null;
+        Object[] parameters = {id};
+        try {
+            conn = dataSource.getConnection();
+            retrieve = sqlStatements.buildSQLStatement(conn, GET_PRESENTATION_KEY, parameters);
+
+            rs = retrieve.executeQuery();
+            while (rs.next()) {
+                pres = new Presentation();
+                pres.setId(rs.getInt(1));
+                pres.setIDProd(rs.getInt(2));
+                pres.setSerie(rs.getInt(3));
+                pres.setName(rs.getString(4));
+                pres.setPrice(rs.getDouble(5));
+                pres.setDefault(rs.getBoolean(6));
+                pres.setEnabled(rs.getBoolean(7));
+            }
+        } catch (SQLException e) {
+            throw new DAOException("Could not properly retrieve the presentations list: " + e);
+        } catch (IOException e) {
+            throw new DAOException("Could not properly retrieve the presentations list: " + e);
+        } finally {
+            DBManager.closeResultSet(rs);
+            DBManager.closeStatement(retrieve);
+            DBManager.closeConnection(conn);
+        }
+        return pres;
+    }
+    
 
     public void addCycle(Cycle cycle) throws DAOException {
         if (cycle == null) {
@@ -1476,7 +1544,7 @@ public class JDBCUtilDAO implements UtilDAO {
     }
 
     public ArrayList<InventoryEvent> getRegisterEventList(String where, String orderBy) throws DAOException {
-        String retrieveUnit;
+        String retrieveEvent;
         ArrayList<InventoryEvent> events = new ArrayList<>();
         try {
             SQLExtractor sqlExtractorWhere = new SQLExtractor(where, SQLExtractor.Type.WHERE);
@@ -1484,8 +1552,7 @@ public class JDBCUtilDAO implements UtilDAO {
             Map<String, String> namedParams = new HashMap<>();
             namedParams.put(NAMED_PARAM_WHERE, sqlExtractorWhere.extractWhere());
             namedParams.put(NAMED_PARAM_ORDER_BY, sqlExtractorOrderBy.extractOrderBy());
-            retrieveUnit = sqlStatements.getSQLString(GET_INVENTORY_EVENT_LIST_KEY, namedParams);
-
+            retrieveEvent = sqlStatements.getSQLString(GET_INVENTORY_EVENT_LIST_KEY, namedParams);            
         } catch (SQLException | IOException e) {
             throw new DAOException("Could not properly retrieve the events List", e);
         }
@@ -1496,7 +1563,7 @@ public class JDBCUtilDAO implements UtilDAO {
         InventoryEvent event = null;
         try {
             conn = dataSource.getConnection();
-            retrieve = conn.prepareStatement(retrieveUnit);
+            retrieve = conn.prepareStatement(retrieveEvent);
             rs = retrieve.executeQuery();
 
             while (rs.next()) {

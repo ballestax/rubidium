@@ -25,7 +25,7 @@
                     |CREATE_CONFIG_TABLE|GET_CONFIG|DELETE_CONFIG|UPDATE_CONFIG|EXIST_CONFIG
                     |ADD_CONFIG
                     |EXIST_CLAVE|GET_MAX_ID|COUNT_TABLE2
-                    |CREATE_PRODUCTS_TABLE|ADD_PRODUCT|GET_PRODUCT|DELETE_PRODUCT|UPDATE_PRODUCT
+                    |CREATE_PRODUCTS_TABLE|ADD_PRODUCT|GET_PRODUCT|DELETE_PRODUCT|UPDATE_PRODUCT|GET_PRODUCT_BY_PRESS_ID
                     |CREATE_INGREDIENTS_TABLE|ADD_INGREDIENT|GET_INGREDIENT|DELETE_INGREDIENT|UPDATE_INGREDIENT
                     |CREATE_PRODUCT_INGREDIENT_TABLE|GET_INGREDIENTS_BY_PRODUCT
                     |CREATE_ADDITIONALS_TABLE|ADD_ADDITIONAL|GET_ADDITIONAL|DELETE_ADDITIONAL|UPDATE_ADDITIONAL
@@ -704,6 +704,19 @@
             </SQLFragment>
         </SQLStatement> 
         
+        <SQLStatement method="GET_PRODUCT_BY_PRESS_ID">
+            <SQLFragment>
+                SELECT
+                p.id,p.name,p.code,p.description,p.price,p.variable,p.image,p.category,p.enabled
+            </SQLFragment>
+            <SQLFragment>
+                FROM products p, presentation_product pp
+            </SQLFragment>
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                WHERE p.id=pp.product_id AND {where}
+            </SQLFragment>
+        </SQLStatement>
+        
         <SQLStatement method="CREATE_INGREDIENTS_TABLE">
             <SQLFragment>
                 CREATE TABLE ingredients(
@@ -1142,9 +1155,7 @@
                 ps.price, ps.name
             </SQLFragment>
         </SQLStatement>
-        
-        
-        
+                
         <SQLStatement method="GET_PRESENTATION_BY_DEFAULT">
             <SQLFragment>
                 SELECT ps.id, ps.product_id, ps.serie,ps.name,ps.price,ps.isdefault,ps.isenabled

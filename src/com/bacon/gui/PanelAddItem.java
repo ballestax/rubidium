@@ -219,7 +219,7 @@ public class PanelAddItem extends PanelCaptura implements ActionListener, Proper
                 int idPres = Integer.parseInt(pres[0].toString());
                 int idProd = Integer.parseInt(pres[1].toString());
                 String quantity = pres[2].toString();
-                System.out.println(Arrays.toString(pres));
+//                System.out.println(Arrays.toString(pres));
                 if (idPres == 0) {
                     for (int j = 0; j < model.getRowCount(); j++) {
                         int rProd = Integer.parseInt(model.getValueAt(j, 1).toString());

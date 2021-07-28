@@ -14,19 +14,30 @@ import com.bacon.domain.InventoryEvent;
 import com.bacon.domain.Item;
 import com.bacon.domain.Location;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Desktop;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.DateFormat;
+import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
+import javax.swing.BorderFactory;
+import static javax.swing.BorderFactory.createLineBorder;
+import javax.swing.JLabel;
+import javax.swing.JTable;
+import javax.swing.SwingConstants;
+import javax.swing.UIManager;
+import javax.swing.table.TableCellRenderer;
 
 import org.apache.log4j.Logger;
 import org.bx.gui.MyDefaultTableModel;
@@ -52,6 +63,11 @@ public class PanelReportProductDetail extends PanelCapturaMod implements ActionL
     private String codigoProd;
     private String HTMLPDF;
 
+    public enum Status {
+        INICIAL, VENTA, ENTRADA, SALIDA, CONC
+    };
+    EnumMap<Status, Color> statusMap = new EnumMap<Status, Color>(Status.class);
+
     /**
      * Creates new form PnProductDetail
      *
@@ -64,21 +80,28 @@ public class PanelReportProductDetail extends PanelCapturaMod implements ActionL
     }
 
     private void createComponent() {
+        statusMap.put(Status.INICIAL, Color.black);
+        statusMap.put(Status.VENTA, Color.blue);
+        statusMap.put(Status.ENTRADA, Color.green.darker());
+        statusMap.put(Status.SALIDA, Color.red);
+        statusMap.put(Status.CONC, Color.magenta.darker());
 
-        colsWidth = new float[]{1.5f, 1.5f, 3.0f, 1.0f, 1.0f};
-        colsWidthInt = new int[]{20, 20, 200, 30, 30};
-        colsALign = new int[]{0, 0, 0, 0, 2};
-        String[] cols = {"Tipo", "Fecha", "Codigo", "Locacion", "Cantidad"};
+        colsWidth = new float[]{1.5f, 2f, 3.0f, 1.0f};
+        colsWidthInt = new int[]{20, 50, 200, 30};
+        colsALign = new int[]{0, 0, 0, 2};
+        String[] cols = {"Tipo", "Fecha", "Codigo", "Cantidad"};
         modeloTabla = new MyDefaultTableModel(cols, 0);
         tablaDetails.setModel(modeloTabla);
         tablaDetails.setRowHeight(24);
         FormatRenderer formatRenderer = new FormatRenderer(app.getDCFORM_P());
-        
+
+        TablaCellRenderer tRenderer = new TablaCellRenderer(true, app.getDCFORM_P());
         for (int i = 0; i < cols.length; i++) {
             tablaDetails.getColumnModel().getColumn(i).setMinWidth(colsWidthInt[i]);
             tablaDetails.getColumnModel().getColumn(i).setPreferredWidth(colsWidthInt[i]);
+            tablaDetails.getColumnModel().getColumn(i).setCellRenderer(new TablaCellRenderer(true, null));
         }
-        tablaDetails.getColumnModel().getColumn(4).setCellRenderer(formatRenderer);
+        tablaDetails.getColumnModel().getColumn(3).setCellRenderer(tRenderer);
 //        tablaDetails.getColumnModel().getColumn(5).setCellRenderer(formatRenderer);
 //        tablaDetails.getColumnModel().getColumn(6).setCellRenderer(formatRenderer);
     }
@@ -114,12 +137,13 @@ public class PanelReportProductDetail extends PanelCapturaMod implements ActionL
         String cat = "INVENTARIO";
 
 //        ArrayList<Object[]> entradaByProductList = app.getControl().getEntradaByProductList(item.getCodigo());
-        ArrayList<InventoryEvent> eventInList = app.getControl().getInventoryRegisterList("idItem=" + item.getId(), "lastUpdatedTime");
-        ArrayList<Conciliacion> conciliacionList = app.getControl().getConciliacionList("idItem=" + item.getId() + "", "fecha");
+        String queryDate = " AND (lastUpdatedTime between date_sub(now(),INTERVAL 5 DAY) and now())";
+        ArrayList<InventoryEvent> eventInList = app.getControl().getInventoryRegisterList("idItem=" + item.getId(), "lastUpdatedTime DESC");
+        ArrayList<Conciliacion> conciliacionList = app.getControl().getConciliacionList("idItem=" + item.getId() + "", "fecha DESC");
         ArrayList<Object[]> presentationsByItem = app.getControl().getPresentationsByItem(item.getId());
 
         modeloTabla.setRowCount(0);
-        modeloTabla.addRow(new Object[]{"INICIAL", "   ----------", "   ----------", "   ----------", cantIni, costoIni, cantIni * costoIni});
+        modeloTabla.addRow(new Object[]{"INICIAL", "   ----------", "   ----------", cantIni, costoIni, cantIni * costoIni});
         double entradas = 0;
         double salidas = 0;
 
@@ -128,23 +152,23 @@ public class PanelReportProductDetail extends PanelCapturaMod implements ActionL
             int idPres = Integer.parseInt(get[0].toString());
             int idProd = Integer.parseInt(get[1].toString());
 //            System.out.println(idPres + "  - " + idProd);
-            if (idPres == 0) {                
+            if (idPres == 0) {
                 ArrayList<Object[]> outProd = app.getControl().getProductsOutInventoryList(idProd, item.getCreatedTime());
                 for (int j = 0; j < outProd.size(); j++) {
                     Object[] data = outProd.get(j);
                     double quantity = Double.parseDouble(data[2].toString());
-                    modeloTabla.addRow(new Object[]{"VENTA", app.DF.format(item.getCreatedTime()), data[1].toString().toUpperCase(),
-                        "---", quantity});
+                    modeloTabla.addRow(new Object[]{"VENTA", app.DF_FULL2.format(item.getCreatedTime()), data[1].toString().toUpperCase(),
+                        quantity});
                     salidas += quantity;
                 }
             } else {
                 ArrayList<Object[]> outPres = app.getControl().getPresentationsOutInventoryList(idPres, item.getId(), item.getCreatedTime());
                 for (int j = 0; j < outPres.size(); j++) {
-                    Object[] data = outPres.get(j);                    
-                    double quantity = Double.parseDouble(data[3].toString());                    
-                    String name = (data[1].toString()+" <"+data[2].toString()+">").toUpperCase();
-                    modeloTabla.addRow(new Object[]{"VENTA", app.DF.format(item.getCreatedTime()), name,
-                        "---", quantity});
+                    Object[] data = outPres.get(j);
+                    double quantity = Double.parseDouble(data[3].toString());
+                    String name = (data[1].toString() + " <" + data[2].toString() + ">").toUpperCase();
+                    modeloTabla.addRow(new Object[]{"VENTA", app.DF_FULL2.format(item.getCreatedTime()), name,
+                        quantity});
                     salidas += quantity;
                 }
             }
@@ -156,11 +180,11 @@ public class PanelReportProductDetail extends PanelCapturaMod implements ActionL
             if (event.getEvent() == InventoryEvent.EVENT_IN) {
                 entradas += event.getQuantity();
                 String code = "E" + Utiles.getNumeroFormateado((int) event.getId(), 5);
-                modeloTabla.addRow(new Object[]{"ENTRADA", app.DF.format(event.getLastUpdate()), code, "---", event.getQuantity(), 0, 0});
+                modeloTabla.addRow(new Object[]{"ENTRADA", app.DF_FULL2.format(event.getLastUpdate()), code, event.getQuantity(), 0, 0});
             } else {
                 salidas += event.getQuantity();
                 String code = "S" + Utiles.getNumeroFormateado((int) event.getId(), 5);
-                modeloTabla.addRow(new Object[]{"SALIDA", app.DF.format(event.getLastUpdate()), code, "---", event.getQuantity(), 0, 0});
+                modeloTabla.addRow(new Object[]{"SALIDA", app.DF_FULL2.format(event.getLastUpdate()), code, event.getQuantity(), 0, 0});
             }
             modeloTabla.setRowEditable(modeloTabla.getRowCount() - 1, false);
         }
@@ -176,7 +200,7 @@ public class PanelReportProductDetail extends PanelCapturaMod implements ActionL
             Conciliacion conc = conciliacionList.get(i);
             double dif = conc.getConciliacion() - conc.getExistencias();
             conciliaciones += dif;
-            modeloTabla.addRow(new Object[]{"CONC.", app.DF.format(conc.getFecha()), conc.getCodigo(), locMap.get(conc.getLocacion()), dif, 0, 0});
+            modeloTabla.addRow(new Object[]{"CONC", app.DF_FULL2.format(conc.getFecha()), conc.getCodigo(), locMap.get(conc.getLocacion()), dif, 0, 0});
             modeloTabla.setRowEditable(modeloTabla.getRowCount() - 1, false);
         }
 
@@ -304,6 +328,60 @@ public class PanelReportProductDetail extends PanelCapturaMod implements ActionL
             } catch (Exception e) {
                 GUIManager.showErrorMessage(null, "Error: " + e.getMessage(), "Error");
             }
+        }
+    }
+
+    public class TablaCellRenderer extends JLabel implements TableCellRenderer {
+
+        boolean isBordered = true;
+        private String tipo;
+        private int status;
+
+        private final Format formatter;
+        private final Color ORANGE = new Color(244, 145, 0);
+
+        public TablaCellRenderer(boolean isBordered, Format formatter) {
+            super();
+            this.isBordered = isBordered;
+            this.formatter = formatter;
+//            setFont(new Font("tahoma", 0, 14));
+            setOpaque(true);
+        }
+
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            int r = table.convertRowIndexToModel(row);
+            int col = 0;
+            if (value != null) {
+                if (formatter != null) {
+                    try {
+                        setHorizontalAlignment(SwingConstants.RIGHT);
+                        value = formatter.format(value);
+                    } catch (IllegalArgumentException e) {
+                    }
+                }
+                setText(value.toString().toUpperCase());
+
+                try {
+                    tipo = modeloTabla.getValueAt(r, col).toString();
+                } catch (Exception e) {
+                }
+            }
+            if (isSelected) {
+                setForeground(statusMap.get(Status.valueOf(tipo)));
+                setBackground(tablaDetails.getSelectionBackground());
+                if (hasFocus) {
+                    setBorder(BorderFactory.createLineBorder(Color.darkGray));
+                } else {
+                    setBorder(createLineBorder(Color.lightGray));
+                }
+            } else {
+                setBackground(tablaDetails.getBackground());
+                setForeground(statusMap.get(Status.valueOf(tipo)));
+//                setBackground(agotada || warning ? getForeground().brighter().brighter().brighter() : tableItems.getBackground());
+                setBorder(UIManager.getBorder("Table.cellBorder"));
+            }
+            return this;
         }
     }
 
