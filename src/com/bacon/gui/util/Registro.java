@@ -29,6 +29,7 @@ public class Registro extends JComponent implements Reseteable, CaretListener {
     public static final int ERROR = 3;
     public boolean popup = false;
     private JPopupMenu menu;
+    private int height;
 
     public Registro() {
         super();
@@ -109,7 +110,7 @@ public class Registro extends JComponent implements Reseteable, CaretListener {
         fontCampoDefault = new Font("Tahoma", 1, 14);
         fontLabelDefault = new Font("Arial", 0, 11);
         this.axis = axis;
-        this.axis = axis;
+        this.height = 20;
         this.stLabel = stLabel;
         this.stCampo = stCampo;
         this.fontLabel = fontLabel;
@@ -126,7 +127,7 @@ public class Registro extends JComponent implements Reseteable, CaretListener {
         fontCampoDefault = new Font("Tahoma", 1, 14);
         fontLabelDefault = new Font("Arial", 0, 11);
         this.axis = axis;
-        this.axis = axis;
+        this.height = 20;
         this.stLabel = stLabel;
         this.stCampo = stCampo;
         this.action = action;
@@ -144,7 +145,7 @@ public class Registro extends JComponent implements Reseteable, CaretListener {
         fontCampoDefault = new Font("Tahoma", 1, 14);
         fontLabelDefault = new Font("Arial", 0, 11);
         this.axis = axis;
-        this.axis = axis;
+        this.height = 20;
         this.stLabel = stLabel;
         this.stCampo = stCampo;
         this.width = width;
@@ -161,6 +162,7 @@ public class Registro extends JComponent implements Reseteable, CaretListener {
         fontCampoDefault = new Font("Tahoma", 1, 14);
         fontLabelDefault = new Font("Arial", 0, 11);
         this.axis = axis;
+        this.height = 20;
         this.stLabel = stLabel;
         this.stCampo = stCampo;
         this.width = width;
@@ -179,6 +181,7 @@ public class Registro extends JComponent implements Reseteable, CaretListener {
         fontCampoDefault = new Font("Tahoma", 1, 14);
         fontLabelDefault = new Font("Arial", 0, 11);
         this.axis = axis;
+        this.height = 20;
         this.stLabel = stLabel;
         this.stCampo = stCampo;
         this.width = width;
@@ -196,6 +199,7 @@ public class Registro extends JComponent implements Reseteable, CaretListener {
         fontCampoDefault = new Font("Tahoma", 1, 14);
         fontLabelDefault = new Font("Arial", 0, 11);
         this.axis = axis;
+        this.height = 20;
         this.stLabel = stLabel;
         this.stCampo = stCampo;
         this.width = width;
@@ -213,6 +217,7 @@ public class Registro extends JComponent implements Reseteable, CaretListener {
         fontCampoDefault = new Font("Tahoma", 1, 14);
         fontLabelDefault = new Font("Arial", 0, 11);
         this.axis = axis;
+        this.height = 20;
         this.stLabel = stLabel;
         this.stCampo = stCampo;
         this.width = width;
@@ -231,6 +236,7 @@ public class Registro extends JComponent implements Reseteable, CaretListener {
         fontCampoDefault = new Font("Tahoma", 1, 14);
         fontLabelDefault = new Font("Arial", 0, 11);
         this.axis = axis;
+        this.height = 20;
         this.stLabel = stLabel;
         stCampo = "";
         fontLabel = fontLabelDefault;
@@ -246,6 +252,7 @@ public class Registro extends JComponent implements Reseteable, CaretListener {
         fontCampoDefault = new Font("Tahoma", 1, 14);
         fontLabelDefault = new Font("Arial", 0, 11);
         this.axis = axis;
+        this.height = 20;
         this.stLabel = stLabel;
         this.widthLabel = widthLabel;
         stCampo = "";
@@ -262,6 +269,7 @@ public class Registro extends JComponent implements Reseteable, CaretListener {
         fontCampoDefault = new Font("Tahoma", 1, 14);
         fontLabelDefault = new Font("Arial", 0, 11);
         this.axis = axis;
+        this.height = 20;
         this.stLabel = stLabel;
         stCampo = "";
         this.bordered = bordered;
@@ -278,6 +286,7 @@ public class Registro extends JComponent implements Reseteable, CaretListener {
         fontCampoDefault = new Font("Tahoma", 1, 14);
         fontLabelDefault = new Font("Arial", 0, 11);
         this.axis = axis;
+        this.height = 20;
         this.stLabel = stLabel;
         stCampo = "";
         bordered = true;
@@ -296,6 +305,7 @@ public class Registro extends JComponent implements Reseteable, CaretListener {
         fontCampoDefault = new Font("Tahoma", 1, 14);
         fontLabelDefault = new Font("Arial", 0, 11);
         this.axis = axis;
+        this.height = 20;
         this.stLabel = stLabel;
         stCampo = "";
         this.bordered = bordered;
@@ -313,6 +323,7 @@ public class Registro extends JComponent implements Reseteable, CaretListener {
         fontCampoDefault = new Font("Tahoma", 1, 14);
         fontLabelDefault = new Font("Arial", 0, 11);
         this.axis = axis;
+        this.height = 20;
         this.stLabel = stLabel;
         stCampo = "";
         bordered = false;
@@ -330,6 +341,7 @@ public class Registro extends JComponent implements Reseteable, CaretListener {
         fontCampoDefault = new Font("Tahoma", 1, 14);
         fontLabelDefault = new Font("Arial", 0, 11);
         this.axis = axis;
+        this.height = 20;
         this.stLabel = stLabel;
         stCampo = "";
         bordered = bordered;
@@ -347,6 +359,7 @@ public class Registro extends JComponent implements Reseteable, CaretListener {
         fontCampoDefault = new Font("Tahoma", 1, 14);
         fontLabelDefault = new Font("Arial", 0, 11);
         this.axis = axis;
+        this.height = 20;
         this.stLabel = stLabel;
         stCampo = "";
         fontCampo = fontCampoDefault;
@@ -364,6 +377,7 @@ public class Registro extends JComponent implements Reseteable, CaretListener {
         fontCampoDefault = new Font("Tahoma", 1, 14);
         fontLabelDefault = new Font("Arial", 0, 11);
         this.axis = axis;
+        this.height = 20;
         this.stLabel = stLabel;
         stCampo = "";
         this.bordered = bordered;
@@ -382,6 +396,7 @@ public class Registro extends JComponent implements Reseteable, CaretListener {
         fontCampoDefault = new Font("Tahoma", 1, 14);
         fontLabelDefault = new Font("Arial", 0, 11);
         this.axis = axis;
+        this.height = 20;
         this.stLabel = stLabel;
         stCampo = "";
         JComboBox combo = new JComboBox(opcs);
@@ -396,6 +411,7 @@ public class Registro extends JComponent implements Reseteable, CaretListener {
         fontCampoDefault = new Font("Tahoma", 1, 14);
         fontLabelDefault = new Font("Arial", 0, 11);
         this.axis = axis;
+        this.height = 20;
         this.stLabel = stLabel;
         stCampo = "";
         JComboBox combo = new JComboBox(opcs);
@@ -410,6 +426,7 @@ public class Registro extends JComponent implements Reseteable, CaretListener {
         fontCampoDefault = new Font("Tahoma", 1, 14);
         fontLabelDefault = new Font("Arial", 0, 11);
         this.axis = axis;
+        this.height = 20;
         this.widthLabel = widthlabel;
         this.stLabel = stLabel;
         stCampo = "";
@@ -434,6 +451,12 @@ public class Registro extends JComponent implements Reseteable, CaretListener {
         inicializar(campo);
     }
 
+    public void setHeight(int height) {
+        this.height = height;
+        inicializar(this.campo);
+        this.updateUI();
+    }
+    
     private void inicializar(JComponent componente) {
         removeAll();
         box.removeAll();
@@ -472,11 +495,13 @@ public class Registro extends JComponent implements Reseteable, CaretListener {
         } else {
             campo.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Color.black));
         }
-        campo.setPreferredSize(new Dimension(width, 20));
-        campo.setMinimumSize(new Dimension(width, 20));
+        if (!(campo instanceof JComboBox)) {
+            campo.setPreferredSize(new Dimension(width, height));
+            campo.setMinimumSize(new Dimension(width, height));
+        }
         if (widthLabel > 0) {
-            label.setPreferredSize(new Dimension(widthLabel, 20));
-            label.setMinimumSize(new Dimension(widthLabel, 20));
+            label.setPreferredSize(new Dimension(widthLabel, height));
+            label.setMinimumSize(new Dimension(widthLabel, height));
         }
 
         FocusListener focusListeners[] = campo.getFocusListeners();
@@ -601,14 +626,14 @@ public class Registro extends JComponent implements Reseteable, CaretListener {
         return campo;
     }
 
-    public void setLabelIcon(ImageIcon labelIcon){
+    public void setLabelIcon(ImageIcon labelIcon) {
         label.setIcon(labelIcon);
     }
-    
-    public void setLabelHorizontalAlignment(int align){
+
+    public void setLabelHorizontalAlignment(int align) {
         label.setHorizontalAlignment(align);
     }
-    
+
     public Object getObject() {
 
         if (campo instanceof JTextField) {

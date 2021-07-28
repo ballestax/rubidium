@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
+import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.event.TableModelEvent;
@@ -128,7 +129,7 @@ public class PanelAddItem extends PanelCaptura implements ActionListener, Proper
         loadProducts();
         
     }
-    public static final String AC_SAVE_ITEM = "AC_SAVE_ITEM";           
+    public static final String AC_SAVE_ITEM = "AC_SAVE_ITEM";    
     public static final String AC_UPDATE_ITEM = "AC_UPDATE_ITEM";
     
     private void loadProducts() {
@@ -207,6 +208,7 @@ public class PanelAddItem extends PanelCaptura implements ActionListener, Proper
             regCost.setEnabled(false);
             regPrice.setText(String.valueOf(item.getPrice()));
             regPrice.setEnabled(false);
+            regTags.setText(item.getTagsSt());
             chOnlyDelivery.setSelected(item.isOnlyDelivery());
             chOnlyDelivery.setEnabled(false);
             
@@ -270,6 +272,7 @@ public class PanelAddItem extends PanelCaptura implements ActionListener, Proper
         btUpdate = new javax.swing.JButton();
         chOnlyDelivery = new javax.swing.JCheckBox();
         jLabel1 = new javax.swing.JLabel();
+        regTags = new org.dz.Registro(BoxLayout.X_AXIS, "Tags", new JTextArea(""), widthLabel);
 
         regName.setNextFocusableComponent(regMeseure);
 
@@ -322,7 +325,8 @@ public class PanelAddItem extends PanelCaptura implements ActionListener, Proper
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(chOnlyDelivery, javax.swing.GroupLayout.PREFERRED_SIZE, 159, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(regTags, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 484, Short.MAX_VALUE)
                 .addContainerGap())
@@ -349,6 +353,8 @@ public class PanelAddItem extends PanelCaptura implements ActionListener, Proper
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(regCost, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(regPrice, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(regTags, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(chOnlyDelivery)
@@ -381,21 +387,20 @@ public class PanelAddItem extends PanelCaptura implements ActionListener, Proper
     private org.dz.Registro regQuantity;
     private org.dz.Registro regStockMax;
     private org.dz.Registro regStockMin;
+    private org.dz.Registro regTags;
     private javax.swing.JTable tableProducts;
     // End of variables declaration//GEN-END:variables
 
-    
-    public void modoActualizarItem(){
+    public void modoActualizarItem() {
         btSave.setVisible(false);
         btUpdate.setVisible(true);
         chOnlyDelivery.setEnabled(true);
     }
     
-    public void modoNuevoItem(){
+    public void modoNuevoItem() {
         btSave.setVisible(true);
         btUpdate.setVisible(false);
     }
-    
     
     @Override
     public void reset() {
@@ -524,6 +529,7 @@ public class PanelAddItem extends PanelCaptura implements ActionListener, Proper
 //            item.setLocation(0);
             item.setAverage(BigDecimal.ZERO);
             item.setUser(app.getUser().getUsername().toLowerCase());
+            item.setTags(regTags.getText().toLowerCase());
             ArrayList<Object[]> selecteds = getSelecteds();
             for (int i = 0; i < selecteds.size(); i++) {
                 Object[] dat = selecteds.get(i);

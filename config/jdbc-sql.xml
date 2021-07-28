@@ -1373,6 +1373,7 @@
                 average DECIMAL(20,2),
                 init DECIMAL(12,2),
                 onlyDelivery TINYINT(1),
+                tags VARCHAR(255),
                 createdTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 lastUpdatedTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                 user VARCHAR(25) NOT NULL DEFAULT 'USER_DF',
@@ -1413,7 +1414,7 @@
         
         <SQLStatement method="ADD_ITEM">
             <SQLFragment>
-                INSERT INTO inventory (name,quantity,measure,cost,price,location,stock,stockmin,average,init,onlyDelivery,user) VALUES (?,?,?,?,?,?,?,?,?,?,?,?);
+                INSERT INTO inventory (name,quantity,measure,cost,price,location,stock,stockmin,average,init,onlyDelivery,tags,user) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?);
             </SQLFragment>            
         </SQLStatement>
         
@@ -1442,7 +1443,8 @@
                 price=?,
                 stock=?,
                 stockMin=?,
-                onlyDelivery=? 
+                onlyDelivery=?,
+                tags=?  
                 WHERE id = ?
             </SQLFragment>            
         </SQLStatement>
