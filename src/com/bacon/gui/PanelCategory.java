@@ -229,9 +229,9 @@ public class PanelCategory extends PanelCapturaMod implements PropertyChangeList
     private List<Product> loadProductsFromDB(String sort) {
         selectedSort = sort;
         List<Product> listProducts;
-        if (selectedSort.equalsIgnoreCase(ORDEN_ALPHA)) {
+        if (ORDEN_ALPHA.equalsIgnoreCase(selectedSort)) {
             listProducts = app.getControl().getProductsList("enabled=1", "name");
-        } else if (selectedSort.equalsIgnoreCase(ORDEN_PRICE)) {
+        } else if (ORDEN_PRICE.equalsIgnoreCase(selectedSort)) {
             listProducts = app.getControl().getProductsList("enabled=1", "price, name");
         } else {
             listProducts = app.getControl().getProductsList("enabled=1", "");

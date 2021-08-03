@@ -42,7 +42,9 @@ import java.awt.Desktop;
 import java.io.File;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Predicate;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.swing.BoxLayout;
 import javax.swing.event.DocumentEvent;
@@ -148,11 +150,19 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
             }
         });
 
+        List<String> tagsInventoryList = app.getControl().getTAGSInventoryList("");
+        
+        //split(,) la lista de tags de cada item, lo pasa a lowecase y filtra que no este vacio el string
+        Set<String> listTags = tagsInventoryList.stream().flatMap(Pattern.compile(",")::splitAsStream).map(tag-> tag.trim()).filter(tag -> !tag.isEmpty()).collect(Collectors.toSet());
+        
         List filters = new ArrayList();
         filters.add(FILTER_ITEM_TODOS);
         filters.add(FILTER_ITEM_STOCK_REGULAR);
         filters.add(FILTER_ITEM_STOCK_MINIMO);
         filters.add(FILTER_ITEM_AGOTADOS);
+        for (String listTag : listTags) {
+            filters.add(FILTER_ITEM_TAGS+listTag.toUpperCase());
+        }
 
         regFilters = new Registro(BoxLayout.X_AXIS, "Items", new String[1], 50);
         regFilters.setHeight(32);
@@ -315,6 +325,7 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
 
     }
     private static final String FILTER_ITEM_AGOTADOS = "AGOTADOS";
+    private static final String FILTER_ITEM_TAGS = "TAG: ";
     private static final String FILTER_ITEM_STOCK_REGULAR = "STOCK REGULAR";
     private static final String FILTER_ITEM_STOCK_MINIMO = "STOCK MINIMO";
     private static final String FILTER_ITEM_TODOS = "TODOS";
@@ -345,9 +356,12 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
     }
 
     private void filtrarItems(String filtro) {
+        System.out.println("Filtro:"+filtro );
+        System.out.println("::"+filtro.substring(5).toLowerCase());
         Predicate<Item> filterAgotados = itm -> itm.getQuantity() <= 0;
         Predicate<Item> filterMinimo = itm -> itm.getQuantity() <= itm.getStockMin();
         Predicate<Item> filterRegular = itm -> itm.getQuantity() > itm.getStockMin();
+        Predicate<Item> filterTags = itm -> itm.getTagsSt().contains(filtro.substring(5).toLowerCase());
 
         ArrayList<Item> listItems = app.getControl().getItemList("", "name");
         List<Item> listFiltered = listItems;
@@ -357,6 +371,9 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
             listFiltered = listItems.stream().filter(filterMinimo.and(filterAgotados.negate())).collect(Collectors.toList());
         } else if (FILTER_ITEM_STOCK_REGULAR.equals(filtro)) {
             listFiltered = listItems.stream().filter(filterRegular).collect(Collectors.toList());
+        } else if (FILTER_ITEM_TAGS.equals(filtro.substring(0, 5))) {
+            System.out.println("filter tags");
+            listFiltered = listItems.stream().filter(filterTags).collect(Collectors.toList());
         }
         populateTable(listFiltered);
     }

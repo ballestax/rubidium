@@ -56,6 +56,7 @@
                     |GET_PRODUCTS_SALES
                     |GET_LAST_INVOICE_BY_CLIENT
                     |ADD_PAYMENT|GET_PAYMENT|UPDATE_PAYMENT|DELETE_PAYMENT|CREATE_PAYMENTS_TABLE
+                    |GET_TAGS_INVENTORY_LIST
                     
                     ) #REQUIRED
                     
@@ -1785,6 +1786,15 @@
                 WHERE name = ?;
             </SQLFragment>
         </SQLStatement> 
+        
+        <SQLStatement method="GET_TAGS_INVENTORY_LIST">
+            <SQLFragment>
+                SELECT tags FROM inventory
+            </SQLFragment>
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                WHERE {where}
+            </SQLFragment>                    
+        </SQLStatement>
         
     </DAOStatements>
 </DAOConfiguration>

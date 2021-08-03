@@ -16,6 +16,8 @@ import java.beans.PropertyChangeListener;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JTextArea;
@@ -67,7 +69,7 @@ public class PanelAddItem extends PanelCaptura implements ActionListener, Proper
         regQuantity.setFontCampo(font);
         regQuantity.setDocument(TextFormatter.getDoubleLimiter());
         
-        ArrayList<String> units = app.getControl().getUnitsList("", "name");
+        List<String> units = app.getControl().getUnitsList("", "name").stream().map(name -> name.toUpperCase()).collect(Collectors.toList());
         regMeseure.setText(units.toArray());
         regMeseure.setFontCampo(font);
         
@@ -208,6 +210,7 @@ public class PanelAddItem extends PanelCaptura implements ActionListener, Proper
             regCost.setEnabled(false);
             regPrice.setText(String.valueOf(item.getPrice()));
             regPrice.setEnabled(false);
+            System.out.println("::"+item.getTagsSt());
             regTags.setText(item.getTagsSt());
             chOnlyDelivery.setSelected(item.isOnlyDelivery());
             chOnlyDelivery.setEnabled(false);
@@ -256,27 +259,26 @@ public class PanelAddItem extends PanelCaptura implements ActionListener, Proper
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        regName = new org.dz.Registro(BoxLayout.X_AXIS, "Nombre", "", widthLabel);
-        regMeseure = new org.dz.Registro(BoxLayout.X_AXIS, "Medida", new Object[1], acAddUnit,widthLabel);
-        regQuantity = new org.dz.Registro(BoxLayout.X_AXIS, "Cantidad", "", widthLabel);
-        regStockMax = new org.dz.Registro(BoxLayout.X_AXIS, "Stock max", "", widthLabel);
-        regStockMin = new org.dz.Registro(BoxLayout.X_AXIS, "Stock min", "", widthLabel);
+        regName = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Nombre", "", widthLabel);
+        regMeseure = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Medida", new Object[1], acAddUnit,widthLabel);
+        regQuantity = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Cantidad", "", widthLabel);
+        regStockMax = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Stock max", "", widthLabel);
+        regStockMin = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Stock min", "", widthLabel);
         jScrollPane1 = new javax.swing.JScrollPane();
         tableProducts = new javax.swing.JTable();
-        regPrice = new org.dz.Registro(BoxLayout.X_AXIS, "Precio", "", widthLabel);
-        regCost = new org.dz.Registro(BoxLayout.X_AXIS, "Costo", "", widthLabel);
+        regPrice = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Precio", "", widthLabel);
+        regCost = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Costo", "", widthLabel);
         labelInfo = new javax.swing.JLabel();
         btSave = new javax.swing.JButton();
         chSaveExit = new javax.swing.JCheckBox();
-        regLocation = new org.dz.Registro(BoxLayout.X_AXIS, "Locacion", new Object[1], acAddLocation,widthLabel);
+        regLocation = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Locacion", new Object[1], acAddLocation,widthLabel);
         btUpdate = new javax.swing.JButton();
         chOnlyDelivery = new javax.swing.JCheckBox();
         jLabel1 = new javax.swing.JLabel();
-        regTags = new org.dz.Registro(BoxLayout.X_AXIS, "Tags", new JTextArea(""), widthLabel);
+        regTags = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Tags", new JTextArea(""), widthLabel);
 
         regName.setNextFocusableComponent(regMeseure);
 
-        regMeseure.setLabelFont(new Font("arial",0,11));
         regMeseure.setNextFocusableComponent(regQuantity);
 
         tableProducts.setModel(new javax.swing.table.DefaultTableModel(
@@ -291,7 +293,6 @@ public class PanelAddItem extends PanelCaptura implements ActionListener, Proper
 
         chSaveExit.setText("jCheckBox1");
 
-        regMeseure.setLabelFont(new Font("arial",0,11));
         regLocation.setNextFocusableComponent(regQuantity);
 
         chOnlyDelivery.setText("jCheckBox1");
@@ -379,15 +380,15 @@ public class PanelAddItem extends PanelCaptura implements ActionListener, Proper
     private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel labelInfo;
-    private org.dz.Registro regCost;
-    private org.dz.Registro regLocation;
-    private org.dz.Registro regMeseure;
-    private org.dz.Registro regName;
-    private org.dz.Registro regPrice;
-    private org.dz.Registro regQuantity;
-    private org.dz.Registro regStockMax;
-    private org.dz.Registro regStockMin;
-    private org.dz.Registro regTags;
+    private com.bacon.gui.util.Registro regCost;
+    private com.bacon.gui.util.Registro regLocation;
+    private com.bacon.gui.util.Registro regMeseure;
+    private com.bacon.gui.util.Registro regName;
+    private com.bacon.gui.util.Registro regPrice;
+    private com.bacon.gui.util.Registro regQuantity;
+    private com.bacon.gui.util.Registro regStockMax;
+    private com.bacon.gui.util.Registro regStockMin;
+    private com.bacon.gui.util.Registro regTags;
     private javax.swing.JTable tableProducts;
     // End of variables declaration//GEN-END:variables
 
@@ -421,6 +422,8 @@ public class PanelAddItem extends PanelCaptura implements ActionListener, Proper
         regLocation.setEnabled(true);
         chOnlyDelivery.setEnabled(true);
         chOnlyDelivery.setSelected(false);
+        regTags.setText("");
+        regTags.setEnabled(true);
         
         for (int i = 0; i < tableProducts.getRowCount(); ++i) {
             model.setValueAt(Boolean.FALSE, i, 0);
