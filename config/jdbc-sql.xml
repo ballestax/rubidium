@@ -1793,7 +1793,10 @@
             </SQLFragment>
             <SQLFragment excludeIfNamedParamEmpty="TRUE">
                 WHERE {where}
-            </SQLFragment>                    
+            </SQLFragment>
+            <SQLFragment>
+                GROUP BY tags
+            </SQLFragment>
         </SQLStatement>
         
     </DAOStatements>

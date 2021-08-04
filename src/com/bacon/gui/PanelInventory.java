@@ -150,19 +150,7 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
             }
         });
 
-        List<String> tagsInventoryList = app.getControl().getTAGSInventoryList("");
-        
-        //split(,) la lista de tags de cada item, lo pasa a lowecase y filtra que no este vacio el string
-        Set<String> listTags = tagsInventoryList.stream().flatMap(Pattern.compile(",")::splitAsStream).map(tag-> tag.trim()).filter(tag -> !tag.isEmpty()).collect(Collectors.toSet());
-        
-        List filters = new ArrayList();
-        filters.add(FILTER_ITEM_TODOS);
-        filters.add(FILTER_ITEM_STOCK_REGULAR);
-        filters.add(FILTER_ITEM_STOCK_MINIMO);
-        filters.add(FILTER_ITEM_AGOTADOS);
-        for (String listTag : listTags) {
-            filters.add(FILTER_ITEM_TAGS+listTag.toUpperCase());
-        }
+        List filters = loadFilters();
 
         regFilters = new Registro(BoxLayout.X_AXIS, "Items", new String[1], 50);
         regFilters.setHeight(32);
@@ -262,7 +250,9 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
                     htmlText.append("<tr bgcolor=\"#A4C1FF\">");
                     htmlText.append("<td>Producto</td><td>Presentación</td><td>Cantidad</td></tr>");
                 } else {
-                    htmlText.append("<br><br><font color=red size=+1>  El item: <STRONG>").append(item.getName().toUpperCase()).append("</STRONG> no tiene enlaces.  </font><br><br>");
+                    htmlText.append("<br><br><font color=red size=+1>  El item: <STRONG>")
+                            .append(item.getName().toUpperCase())
+                            .append("</STRONG> no tiene enlaces.  </font><br><br>");
                 }
 
                 for (Object[] presentation : presentations) {
@@ -324,6 +314,24 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
         populateTable();
 
     }
+
+    private List loadFilters() {
+        List<String> tagsInventoryList = app.getControl().getTAGSInventoryList("");
+        Set<String> listTags = Set.of();
+        if (!tagsInventoryList.isEmpty()) {
+            //split(,) la lista de tags de cada item, lo pasa a lowecase y filtra que no este vacio el string
+            listTags = tagsInventoryList.stream().flatMap(Pattern.compile(",")::splitAsStream).map(tag -> tag.toLowerCase().trim()).filter(tag -> !tag.isEmpty()).collect(Collectors.toSet());
+        }
+        List filters = new ArrayList();
+        filters.add(FILTER_ITEM_TODOS);
+        filters.add(FILTER_ITEM_STOCK_REGULAR);
+        filters.add(FILTER_ITEM_STOCK_MINIMO);
+        filters.add(FILTER_ITEM_AGOTADOS);
+        for (String listTag : listTags) {
+            filters.add(FILTER_ITEM_TAGS + listTag.toUpperCase());
+        }
+        return filters;
+    }
     private static final String FILTER_ITEM_AGOTADOS = "AGOTADOS";
     private static final String FILTER_ITEM_TAGS = "TAG: ";
     private static final String FILTER_ITEM_STOCK_REGULAR = "STOCK REGULAR";
@@ -355,9 +363,7 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
         populateTable(listFiltered);
     }
 
-    private void filtrarItems(String filtro) {
-        System.out.println("Filtro:"+filtro );
-        System.out.println("::"+filtro.substring(5).toLowerCase());
+    private void filtrarItems(String filtro) {        
         Predicate<Item> filterAgotados = itm -> itm.getQuantity() <= 0;
         Predicate<Item> filterMinimo = itm -> itm.getQuantity() <= itm.getStockMin();
         Predicate<Item> filterRegular = itm -> itm.getQuantity() > itm.getStockMin();
@@ -371,8 +377,7 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
             listFiltered = listItems.stream().filter(filterMinimo.and(filterAgotados.negate())).collect(Collectors.toList());
         } else if (FILTER_ITEM_STOCK_REGULAR.equals(filtro)) {
             listFiltered = listItems.stream().filter(filterRegular).collect(Collectors.toList());
-        } else if (FILTER_ITEM_TAGS.equals(filtro.substring(0, 5))) {
-            System.out.println("filter tags");
+        } else if (FILTER_ITEM_TAGS.equals(filtro.substring(0, 5))) {            
             listFiltered = listItems.stream().filter(filterTags).collect(Collectors.toList());
         }
         populateTable(listFiltered);
@@ -513,6 +518,7 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
         } else if (AC_LOAD_ITEM.equals(e.getActionCommand())) {
             app.getGuiManager().showPanelSelItem(this);
         } else if (AC_REFRESH_ITEMS.equals(e.getActionCommand())) {
+            regFilters.setText(loadFilters().toArray());
             filtrar();
         } else if (AC_ADD_CONCILIATION.equals(e.getActionCommand())) {
             app.getGuiManager().showPanelConciliacion(true);
