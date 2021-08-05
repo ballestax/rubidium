@@ -1035,6 +1035,17 @@ public class Control {
             return null;
         }
     }
+    
+    public List<String> getTAGSInventoryList(String where) {
+        try {
+            JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
+            return utilDAO.getTagsInventoryList(where);
+        } catch (DAOException ex) {
+            logger.error("Error getting tags list.", ex);
+            GUIManager.showErrorMessage(null, "Error consultando lista de tags", "Error");
+            return null;
+        }
+    }
 
     public void restoreInventory(List<ProductoPed> listProductoPeds) {
         List<ProductoPed> list = listProductoPeds;

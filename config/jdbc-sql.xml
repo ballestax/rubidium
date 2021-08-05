@@ -56,6 +56,7 @@
                     |GET_PRODUCTS_SALES
                     |GET_LAST_INVOICE_BY_CLIENT
                     |ADD_PAYMENT|GET_PAYMENT|UPDATE_PAYMENT|DELETE_PAYMENT|CREATE_PAYMENTS_TABLE
+                    |GET_TAGS_INVENTORY_LIST
                     
                     ) #REQUIRED
                     
@@ -1373,6 +1374,7 @@
                 average DECIMAL(20,2),
                 init DECIMAL(12,2),
                 onlyDelivery TINYINT(1),
+                tags VARCHAR(255),
                 createdTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 lastUpdatedTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                 user VARCHAR(25) NOT NULL DEFAULT 'USER_DF',
@@ -1413,7 +1415,7 @@
         
         <SQLStatement method="ADD_ITEM">
             <SQLFragment>
-                INSERT INTO inventory (name,quantity,measure,cost,price,location,stock,stockmin,average,init,onlyDelivery,user) VALUES (?,?,?,?,?,?,?,?,?,?,?,?);
+                INSERT INTO inventory (name,quantity,measure,cost,price,location,stock,stockmin,average,init,onlyDelivery,tags,user) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?);
             </SQLFragment>            
         </SQLStatement>
         
@@ -1442,7 +1444,8 @@
                 price=?,
                 stock=?,
                 stockMin=?,
-                onlyDelivery=? 
+                onlyDelivery=?,
+                tags=?  
                 WHERE id = ?
             </SQLFragment>            
         </SQLStatement>
@@ -1783,6 +1786,18 @@
                 WHERE name = ?;
             </SQLFragment>
         </SQLStatement> 
+        
+        <SQLStatement method="GET_TAGS_INVENTORY_LIST">
+            <SQLFragment>
+                SELECT tags FROM inventory
+            </SQLFragment>
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                WHERE {where}
+            </SQLFragment>
+            <SQLFragment>
+                GROUP BY tags
+            </SQLFragment>
+        </SQLStatement>
         
     </DAOStatements>
 </DAOConfiguration>

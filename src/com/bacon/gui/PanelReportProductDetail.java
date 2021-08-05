@@ -115,6 +115,7 @@ public class PanelReportProductDetail extends PanelCapturaMod implements ActionL
             return;
         }
         Map<Integer, String> locMap = getLocationsMap();
+
         double cant = 0;
         double costoIni = 0;
         double cantIni = 0;
@@ -141,6 +142,8 @@ public class PanelReportProductDetail extends PanelCapturaMod implements ActionL
         ArrayList<InventoryEvent> eventInList = app.getControl().getInventoryRegisterList("idItem=" + item.getId(), "lastUpdatedTime DESC");
         ArrayList<Conciliacion> conciliacionList = app.getControl().getConciliacionList("idItem=" + item.getId() + "", "fecha DESC");
         ArrayList<Object[]> presentationsByItem = app.getControl().getPresentationsByItem(item.getId());
+
+        Color colorLinks = presentationsByItem.size() > 0 ? Color.blue : Color.red;
 
         modeloTabla.setRowCount(0);
         modeloTabla.addRow(new Object[]{"INICIAL", "   ----------", "   ----------", cantIni, costoIni, cantIni * costoIni});
@@ -221,7 +224,10 @@ public class PanelReportProductDetail extends PanelCapturaMod implements ActionL
 
         StringBuilder str = new StringBuilder();
         str.append("<html><table><tr>");
-        str.append("<td>Nombre:</td><td colspan=15 bgcolor=").append(color).append(">").append(item.getName().toUpperCase()).append("</td></tr>");
+        str.append("<td>Nombre:</td><td colspan=15 bgcolor=").append(color).append(">").append(item.getName().toUpperCase()).append("</td>");
+        str.append("<td border:1px ").append(Utiles.toHex(colorLinks)).append(" solid rowspan=3 bgcolor=").append(color).append("><font color=").append(Utiles.toHex(colorLinks)).append(" size=+1>")
+                .append(presentationsByItem.size())
+                .append("</font><br><font color=").append(Utiles.toHex(colorLinks)).append("> enlaces.</font>").append("</td></tr>");
         str.append("<tr><td>Codigo:</td><td colspan=4 bgcolor=").append(color).append(">").append(item.getId()).append("</td><td>  </td>");
         str.append("<td>Categoria:</td><td colspan=4 bgcolor=").append(color).append(">").append(cat).append("</td><td>  </td></tr>");
         str.append("<tr><td bgcolor=#cec5d3>Inicial:</td><td bgcolor=").append(color).append(">").append(item.getInit()).append("</td><td>  </td>");

@@ -17,7 +17,7 @@
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" attributes="0">
-              <EmptySpace min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
                   <Component id="regMeseure" alignment="0" max="32767" attributes="0"/>
                   <Group type="102" alignment="0" attributes="0">
@@ -46,8 +46,9 @@
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="jLabel1" max="32767" attributes="0"/>
                   </Group>
+                  <Component id="regTags" alignment="0" max="32767" attributes="0"/>
               </Group>
-              <EmptySpace min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
               <Component id="jScrollPane1" pref="484" max="32767" attributes="0"/>
               <EmptySpace min="-2" max="-2" attributes="0"/>
           </Group>
@@ -78,6 +79,8 @@
                           <Component id="regPrice" alignment="1" min="-2" pref="31" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
+                      <Component id="regTags" min="-2" pref="48" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="chOnlyDelivery" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="jLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -98,40 +101,39 @@
     </DimensionLayout>
   </Layout>
   <SubComponents>
-    <Component class="org.dz.Registro" name="regName">
+    <Component class="com.bacon.gui.util.Registro" name="regName">
       <Properties>
         <Property name="nextFocusableComponent" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
           <ComponentRef name="regMeseure"/>
         </Property>
       </Properties>
       <AuxValues>
-        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new org.dz.Registro(BoxLayout.X_AXIS, &quot;Nombre&quot;, &quot;&quot;, widthLabel)"/>
+        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, &quot;Nombre&quot;, &quot;&quot;, widthLabel)"/>
       </AuxValues>
     </Component>
-    <Component class="org.dz.Registro" name="regMeseure">
+    <Component class="com.bacon.gui.util.Registro" name="regMeseure">
       <Properties>
         <Property name="nextFocusableComponent" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
           <ComponentRef name="regQuantity"/>
         </Property>
       </Properties>
       <AuxValues>
-        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new org.dz.Registro(BoxLayout.X_AXIS, &quot;Medida&quot;, new Object[1], acAddUnit,widthLabel)"/>
-        <AuxValue name="JavaCodeGenerator_InitCodePre" type="java.lang.String" value="regMeseure.setLabelFont(new Font(&quot;arial&quot;,0,11));"/>
+        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, &quot;Medida&quot;, new Object[1], acAddUnit,widthLabel)"/>
       </AuxValues>
     </Component>
-    <Component class="org.dz.Registro" name="regQuantity">
+    <Component class="com.bacon.gui.util.Registro" name="regQuantity">
       <AuxValues>
-        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new org.dz.Registro(BoxLayout.X_AXIS, &quot;Cantidad&quot;, &quot;&quot;, widthLabel)"/>
+        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, &quot;Cantidad&quot;, &quot;&quot;, widthLabel)"/>
       </AuxValues>
     </Component>
-    <Component class="org.dz.Registro" name="regStockMax">
+    <Component class="com.bacon.gui.util.Registro" name="regStockMax">
       <AuxValues>
-        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new org.dz.Registro(BoxLayout.X_AXIS, &quot;Stock max&quot;, &quot;&quot;, widthLabel)"/>
+        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, &quot;Stock max&quot;, &quot;&quot;, widthLabel)"/>
       </AuxValues>
     </Component>
-    <Component class="org.dz.Registro" name="regStockMin">
+    <Component class="com.bacon.gui.util.Registro" name="regStockMin">
       <AuxValues>
-        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new org.dz.Registro(BoxLayout.X_AXIS, &quot;Stock min&quot;, &quot;&quot;, widthLabel)"/>
+        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, &quot;Stock min&quot;, &quot;&quot;, widthLabel)"/>
       </AuxValues>
     </Component>
     <Container class="javax.swing.JScrollPane" name="jScrollPane1">
@@ -156,14 +158,14 @@
         </Component>
       </SubComponents>
     </Container>
-    <Component class="org.dz.Registro" name="regPrice">
+    <Component class="com.bacon.gui.util.Registro" name="regPrice">
       <AuxValues>
-        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new org.dz.Registro(BoxLayout.X_AXIS, &quot;Precio&quot;, &quot;&quot;, widthLabel)"/>
+        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, &quot;Precio&quot;, &quot;&quot;, widthLabel)"/>
       </AuxValues>
     </Component>
-    <Component class="org.dz.Registro" name="regCost">
+    <Component class="com.bacon.gui.util.Registro" name="regCost">
       <AuxValues>
-        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new org.dz.Registro(BoxLayout.X_AXIS, &quot;Costo&quot;, &quot;&quot;, widthLabel)"/>
+        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, &quot;Costo&quot;, &quot;&quot;, widthLabel)"/>
       </AuxValues>
     </Component>
     <Component class="javax.swing.JLabel" name="labelInfo">
@@ -175,15 +177,14 @@
         <Property name="text" type="java.lang.String" value="jCheckBox1"/>
       </Properties>
     </Component>
-    <Component class="org.dz.Registro" name="regLocation">
+    <Component class="com.bacon.gui.util.Registro" name="regLocation">
       <Properties>
         <Property name="nextFocusableComponent" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
           <ComponentRef name="regQuantity"/>
         </Property>
       </Properties>
       <AuxValues>
-        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new org.dz.Registro(BoxLayout.X_AXIS, &quot;Locacion&quot;, new Object[1], acAddLocation,widthLabel)"/>
-        <AuxValue name="JavaCodeGenerator_InitCodePre" type="java.lang.String" value="regMeseure.setLabelFont(new Font(&quot;arial&quot;,0,11));"/>
+        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, &quot;Locacion&quot;, new Object[1], acAddLocation,widthLabel)"/>
       </AuxValues>
     </Component>
     <Component class="javax.swing.JButton" name="btUpdate">
@@ -194,6 +195,11 @@
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel1">
+    </Component>
+    <Component class="com.bacon.gui.util.Registro" name="regTags">
+      <AuxValues>
+        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, &quot;Tags&quot;, new JTextArea(&quot;&quot;), widthLabel)"/>
+      </AuxValues>
     </Component>
   </SubComponents>
 </Form>

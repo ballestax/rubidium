@@ -31,6 +31,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javax.sql.DataSource;
 import org.apache.log4j.Level;
@@ -128,7 +129,9 @@ public class JDBCUtilDAO implements UtilDAO {
     public static final String CREATE_INVENTORY_PRODUCT_TABLE_KEY = "CREATE_INVENTORY_PRODUCT_TABLE";
     public static final String UPDATE_INVENTORY_QUANTITY_KEY = "UPDATE_INVENTORY_QUANTITY";
     public static final String ADD_INVENTORY_QUANTITY_KEY = "ADD_INVENTORY_QUANTITY";
-
+    
+    public static final String GET_TAGS_INVENTORY_LIST_KEY = "GET_TAGS_INVENTORY_LIST";
+    
     public static final String CREATE_INVENTORY_REGISTER_TABLE_KEY = "CREATE_INVENTORY_REGISTER_TABLE";
     public static final String ADD_INVENTORY_EVENT_KEY = "ADD_INVENTORY_EVENT";
     public static final String GET_INVENTORY_EVENT_LIST_KEY = "GET_INVENTORY_EVENT_LIST";
@@ -1801,5 +1804,43 @@ public class JDBCUtilDAO implements UtilDAO {
             DBManager.closeStatement(update);
             DBManager.closeConnection(conn);
         }
+    }
+    
+    public List<String> getTagsInventoryList(String where) throws DAOException {
+        String retrievePayment;
+        List<String> tagsList = new ArrayList<>();
+        try {
+            SQLExtractor sqlExtractorWhere = new SQLExtractor(where, SQLExtractor.Type.WHERE);            
+            Map<String, String> namedParams = new HashMap<>();
+            namedParams.put(NAMED_PARAM_WHERE, sqlExtractorWhere.extractWhere());            
+            retrievePayment = sqlStatements.getSQLString(GET_TAGS_INVENTORY_LIST_KEY, namedParams);
+
+        } catch (SQLException e) {
+            throw new DAOException("Could not properly retrieve the tags List", e);
+        } catch (IOException e) {
+            throw new DAOException("Could not properly retrieve the tags List", e);
+        }
+
+        Connection conn = null;
+        PreparedStatement retrieve = null;
+        ResultSet rs = null;
+        String tags = null;
+        try {
+            conn = dataSource.getConnection();
+            retrieve = conn.prepareStatement(retrievePayment);
+            rs = retrieve.executeQuery();
+
+            while (rs.next()) {
+                tags = rs.getString("tags");
+                tagsList.add(tags);
+            }
+        } catch (SQLException e) {
+            throw new DAOException("Could not proper retrieve the Payment: " + e);
+        } finally {
+            DBManager.closeResultSet(rs);
+            DBManager.closeStatement(retrieve);
+            DBManager.closeConnection(conn);
+        }
+        return tagsList;
     }
 }

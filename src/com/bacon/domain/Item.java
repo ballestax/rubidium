@@ -4,8 +4,10 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  *
@@ -25,7 +27,7 @@ public class Item {
     private double init;
     private double stockMin;
     private double stock;
-    
+
     private boolean onlyDelivery;
 
     private List<Object[]> presentations;
@@ -34,13 +36,17 @@ public class Item {
     private Date updateTime;
     private String user;
 
+    private Set<String> tags;
+
     public Item() {
         this.presentations = new ArrayList<>();
+        this.tags = new HashSet<>();
     }
 
     public Item(long id) {
         this.id = id;
         this.presentations = new ArrayList<>();
+        this.tags = new HashSet<>();
     }
 
     public Item(long id, String code, String name, String medida) {
@@ -48,6 +54,7 @@ public class Item {
         this.name = name;
         this.measure = medida;
         this.presentations = new ArrayList<>();
+        this.tags = new HashSet<>();
     }
 
     public void setId(long id) {
@@ -166,6 +173,34 @@ public class Item {
         return presentations;
     }
 
+    public Set<String> getTags() {
+        return tags;
+    }
+
+    public String getTagsSt() {
+        StringBuilder stb = new StringBuilder();
+        for (String tag : tags) {
+            stb.append(tag).append(",");
+        }
+        stb.replace(stb.length()-1, stb.length(), "");  
+        return stb.toString();
+    }
+
+    public void setTags(Set<String> tags) {
+        this.tags = tags;
+    }
+
+    public void setTags(String tags) {
+        String[] split = tags.split(",");
+        for (String tag : split) {
+            addTag(tag.trim());
+        }
+    }
+
+    public void addTag(String tag) {
+        this.tags.add(tag);
+    }
+
     public void setPresentations(List<Object[]> presentations) {
         this.presentations = presentations;
     }
@@ -200,8 +235,8 @@ public class Item {
         hash = 97 * hash + Objects.hashCode(this.name);
         return hash;
     }
-    
-    public   BigDecimal getCostTotal() {
+
+    public BigDecimal getCostTotal() {
         return getCost().multiply(new BigDecimal(getQuantity()));
     }
 
@@ -212,7 +247,5 @@ public class Item {
     public void setOnlyDelivery(boolean onlyDelivery) {
         this.onlyDelivery = onlyDelivery;
     }
-    
-    
 
 }

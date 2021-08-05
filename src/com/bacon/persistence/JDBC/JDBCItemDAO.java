@@ -138,6 +138,7 @@ public class JDBCItemDAO implements ItemDAO {
                 item.setCreatedTime(rs.getDate("createdTime"));
                 item.setUpdateTime(rs.getDate("lastUpdatedTime"));
                 item.setUser(rs.getString("user"));
+                item.setTags(rs.getString("tags"));
                 items.add(item);
             }
         } catch (SQLException e) {
@@ -173,6 +174,7 @@ public class JDBCItemDAO implements ItemDAO {
                 item.getAverage(),
                 item.getInit(),
                 item.isOnlyDelivery(),
+                item.getTagsSt(),                
                 item.getUser()
             };
             ps = sqlStatements.buildSQLStatement(conn, ADD_ITEM_KEY, parameters);
@@ -257,6 +259,7 @@ public class JDBCItemDAO implements ItemDAO {
                 item.getStock(),
                 item.getStockMin(),
                 item.isOnlyDelivery(),
+                item.getTagsSt(),
                 item.getId()
             };
             update = sqlStatements.buildSQLStatement(conn, UPDATE_ITEM_KEY, parameters);
