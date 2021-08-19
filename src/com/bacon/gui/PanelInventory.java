@@ -40,6 +40,7 @@ import org.bx.gui.MyDefaultTableModel;
 import org.dz.PanelCapturaMod;
 import java.awt.Desktop;
 import java.io.File;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -317,7 +318,7 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
 
     private List loadFilters() {
         List<String> tagsInventoryList = app.getControl().getTAGSInventoryList("");
-        Set<String> listTags = Set.of();
+        Set<String> listTags = Collections.EMPTY_SET;
         if (!tagsInventoryList.isEmpty()) {
             //split(,) la lista de tags de cada item, lo pasa a lowecase y filtra que no este vacio el string
             listTags = tagsInventoryList.stream().flatMap(Pattern.compile(",")::splitAsStream).map(tag -> tag.toLowerCase().trim()).filter(tag -> !tag.isEmpty()).collect(Collectors.toSet());
