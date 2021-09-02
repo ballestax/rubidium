@@ -43,7 +43,7 @@ public class AppBasic {
                     GUIManager.showErrorMessage(null, ex, "Error al iniciar la aplicacion");
                 }
 
-            }
+                    }
         });//*/
 
     }

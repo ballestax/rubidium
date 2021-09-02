@@ -95,6 +95,27 @@ public class PanelConfigTicket extends javax.swing.JPanel implements ActionListe
         regText6.setLabelText("Personalizado2:");
         regFont6.setText(FONTS.values());
 
+        String propQualityEnabled = app.getConfiguration().getProperty(com.bacon.Configuration.BS_CUSTOM_QUALITY_ENABLED, "false");
+        boolean enabled = Boolean.parseBoolean(propQualityEnabled);
+        jCheckBox1.setText("Calidad del servicio");
+        jCheckBox1.setBackground(color1);
+        jCheckBox1.setSelected(enabled);
+        regText10.setEnabled(enabled);
+        regFont7.setEnabled(enabled);
+        jCheckBox1.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                boolean selected = jCheckBox1.isSelected();
+                regText10.setEnabled(selected);
+                regFont7.setEnabled(selected);
+            }
+        });
+
+        String propQualityService = app.getConfiguration().getProperty(com.bacon.Configuration.BS_CUSTOM_QUALITY_MSG, "");
+        regText10.setText(propQualityService);
+        regText10.setLabelText("Mensaje:");
+        regFont7.setText(FONTS.values());
+
         lbInfo7.setText("Consecutivo facturas");
         lbInfo7.setBackground(color1);
         ConfigDB config = app.getControl().getConfig(CF_FACTURA_INICIAL);
@@ -104,7 +125,7 @@ public class PanelConfigTicket extends javax.swing.JPanel implements ActionListe
         ConfigDB config1 = app.getControl().getConfig(CF_FACTURA_FINAL);
         regText8.setText(config1 != null ? config1.getValor() : "0");
         regText8.setLabelText("Final:");
-        
+
         ConfigDB config2 = app.getControl().getConfig(CF_FACTURA_ACTUAL);
         regText9.setText(config2 != null ? config2.getValor() : "0");
         regText9.setLabelText("Factura actual:");
@@ -113,7 +134,6 @@ public class PanelConfigTicket extends javax.swing.JPanel implements ActionListe
         btApply.setActionCommand(ACTION_APPLY);
         btApply.addActionListener(this);
     }
-    
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -149,6 +169,9 @@ public class PanelConfigTicket extends javax.swing.JPanel implements ActionListe
         regText7 = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Reg6", "",100);
         regText8 = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Reg6", "",100);
         regText9 = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Reg6", "",100);
+        regText10 = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Reg6", "",100);
+        regFont7 = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Fuente", new Object[0]);
+        jCheckBox1 = new javax.swing.JCheckBox();
 
         lbTitle.setBackground(java.awt.Color.lightGray);
         lbTitle.setOpaque(true);
@@ -182,6 +205,8 @@ public class PanelConfigTicket extends javax.swing.JPanel implements ActionListe
         lbInfo7.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         lbInfo7.setOpaque(true);
 
+        jCheckBox1.setText("jCheckBox1");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -190,6 +215,7 @@ public class PanelConfigTicket extends javax.swing.JPanel implements ActionListe
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jCheckBox1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(lbInfo1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
@@ -229,7 +255,11 @@ public class PanelConfigTicket extends javax.swing.JPanel implements ActionListe
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(regText8, javax.swing.GroupLayout.PREFERRED_SIZE, 212, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(regText9, javax.swing.GroupLayout.PREFERRED_SIZE, 212, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(regText9, javax.swing.GroupLayout.PREFERRED_SIZE, 212, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(regText10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(regFont7, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
 
@@ -276,6 +306,12 @@ public class PanelConfigTicket extends javax.swing.JPanel implements ActionListe
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(regText6, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(regFont6, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(4, 4, 4)
+                .addComponent(jCheckBox1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(regText10, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(regFont7, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(lbInfo7, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(2, 2, 2)
@@ -283,7 +319,7 @@ public class PanelConfigTicket extends javax.swing.JPanel implements ActionListe
                     .addComponent(regText7, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(regText8, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(regText9, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 17, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(btApply, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
@@ -293,6 +329,7 @@ public class PanelConfigTicket extends javax.swing.JPanel implements ActionListe
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btApply;
     private javax.swing.ButtonGroup buttonGroup1;
+    private javax.swing.JCheckBox jCheckBox1;
     private javax.swing.JLabel lbInfo1;
     private javax.swing.JLabel lbInfo2;
     private javax.swing.JLabel lbInfo3;
@@ -307,7 +344,9 @@ public class PanelConfigTicket extends javax.swing.JPanel implements ActionListe
     private com.bacon.gui.util.Registro regFont4;
     private com.bacon.gui.util.Registro regFont5;
     private com.bacon.gui.util.Registro regFont6;
+    private com.bacon.gui.util.Registro regFont7;
     private com.bacon.gui.util.Registro regText1;
+    private com.bacon.gui.util.Registro regText10;
     private com.bacon.gui.util.Registro regText2;
     private com.bacon.gui.util.Registro regText3;
     private com.bacon.gui.util.Registro regText4;
@@ -344,9 +383,15 @@ public class PanelConfigTicket extends javax.swing.JPanel implements ActionListe
 
             value = regText8.getText();
             app.getControl().addConfig(new ConfigDB(CF_FACTURA_FINAL, ConfigDB.INTEGER, value));
-            
+
             value = regText9.getText();
             app.getControl().addConfig(new ConfigDB(CF_FACTURA_ACTUAL, ConfigDB.INTEGER, value));
+
+            value = regText10.getText();
+            app.getConfiguration().setProperty(com.bacon.Configuration.BS_CUSTOM_QUALITY_MSG, value);
+
+            boolean selected = jCheckBox1.isSelected();
+            app.getConfiguration().setProperty(com.bacon.Configuration.BS_CUSTOM_QUALITY_ENABLED, Boolean.toString(selected));
 
             app.getConfiguration().save();
         }

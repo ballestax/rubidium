@@ -81,6 +81,8 @@ public class PrinterService {
             String BS_PHONE = app.getConfiguration().getProperty(Configuration.BS_PHONE);
             String BS_CUSTOM1 = app.getConfiguration().getProperty(Configuration.BS_CUSTOM_TOP);
             String BS_CUSTOM2 = app.getConfiguration().getProperty(Configuration.BS_CUSTOM_BOTTON);
+            String BS_QUALITY_MESSAGE = app.getConfiguration().getProperty(Configuration.BS_CUSTOM_QUALITY_MSG);
+            String BS_QUALITY_ENABLED = app.getConfiguration().getProperty(Configuration.BS_CUSTOM_QUALITY_ENABLED);
 
             // this wrapper uses esc/pos sequence: "ESC '*'"
             BitImageWrapper imageWrapper = new BitImageWrapper();
@@ -106,7 +108,7 @@ public class PrinterService {
 
             String cliente = app.getConfiguration().getProperty(Configuration.CLIENT_NAME, "LOCAL");
             if (invoice.getTipoEntrega() == PanelPedido.TIPO_LOCAL) {
-                escpos.writeLF(font3, "Cliente: "+ cliente);
+                escpos.writeLF(font3, "Cliente: " + cliente);
                 escpos.writeLF(font3, "Mesa:    " + (table != null ? table.getName() : "- - -"));
                 escpos.writeLF(font3, "Mesero:  " + (waiter != null ? waiter.getName().toUpperCase() : "- - -"));
             } else {
@@ -173,6 +175,11 @@ public class PrinterService {
             escpos.writeLF(String.format(formatInfo, "", "", "Total:", app.DCFORM_P.format(total)));
 
             escpos.writeLF(font2, "================================================");
+
+            if (Boolean.parseBoolean(BS_QUALITY_ENABLED)) {                
+                escpos.feed(1);
+                escpos.writeLF(font2, BS_QUALITY_MESSAGE);
+            }
 
             escpos.feed(1);
 
@@ -327,7 +334,7 @@ public class PrinterService {
             escpos.feed(1);
 
             String documento = app.getConfiguration().getProperty(Configuration.DOCUMENT_NAME, "Factura N°:");
-            escpos.writeLF(font3, String.format(documento+"  %1s", invoice.getFactura()));
+            escpos.writeLF(font3, String.format(documento + "  %1s", invoice.getFactura()));
             escpos.writeLF(font3, String.format("Fecha:       %1s", app.DF_FULL2.format(invoice.getFecha())));
 
             escpos.feed(1);
@@ -372,32 +379,32 @@ public class PrinterService {
             java.util.logging.Logger.getLogger(PanelPedido.class.getName()).log(Level.ALL.SEVERE, null, ex);
         }
     }
-    
-    public void sendPulsePin(String printerName) {        
+
+    public void sendPulsePin(String printerName) {
         PrintService printService = PrinterOutputStream.getPrintServiceByName(printerName);
         EscPos escpos;
-         try {
-            escpos = new EscPos(new PrinterOutputStream(printService));            
+        try {
+            escpos = new EscPos(new PrinterOutputStream(printService));
 //            escpos.pulsePin(EscPos.PinConnector.Pin_2, 150, 175);            
             escpos.write(27).write(112).write(0).write(25).write(250);
-            escpos.close();            
+            escpos.close();
         } catch (IOException ex) {
             java.util.logging.Logger.getLogger(PrintService.class.getName()).log(Level.SEVERE, null, ex);
-        }        
+        }
     }
-    
-    public void sendPulsePin(String printerName, List<Integer> data) {        
+
+    public void sendPulsePin(String printerName, List<Integer> data) {
         PrintService printService = PrinterOutputStream.getPrintServiceByName(printerName);
         EscPos escpos;
-         try {
-            escpos = new EscPos(new PrinterOutputStream(printService));            
-             for (Integer value : data) {
-                 escpos.write(value);
-             }
-            escpos.close();            
+        try {
+            escpos = new EscPos(new PrinterOutputStream(printService));
+            for (Integer value : data) {
+                escpos.write(value);
+            }
+            escpos.close();
         } catch (IOException ex) {
             java.util.logging.Logger.getLogger(PrintService.class.getName()).log(Level.SEVERE, null, ex);
-        }        
+        }
     }
-    
+
 }
