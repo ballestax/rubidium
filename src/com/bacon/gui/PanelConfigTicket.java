@@ -6,6 +6,7 @@
 package com.bacon.gui;
 
 import com.bacon.Aplication;
+import com.bacon.Configuration;
 import com.bacon.MyConstants;
 import static com.bacon.MyConstants.CF_FACTURA_ACTUAL;
 import static com.bacon.MyConstants.CF_FACTURA_FINAL;
@@ -42,6 +43,8 @@ public class PanelConfigTicket extends javax.swing.JPanel implements ActionListe
     }
 
     private void createComponents() {
+        
+        
 
         lbTitle.setText("Configurar Factura");
 
@@ -55,48 +58,60 @@ public class PanelConfigTicket extends javax.swing.JPanel implements ActionListe
 
         lbInfo1.setText("Nombre");
         lbInfo1.setBackground(color1);
-        String propName = app.getConfiguration().getProperty(com.bacon.Configuration.BS_NAME, "NOMBRE");
-        regText1.setText(propName);
+//        String propName = app.getConfiguration().getProperty(com.bacon.Configuration.BS_NAME, "NOMBRE");
+        ConfigDB config = app.getControl().getConfig(com.bacon.Configuration.BS_NAME);
+        regText1.setText(config != null ? config.getValor() : "NOMBRE");
         regText1.setLabelText("Nombre:");
         regFont1.setText(FONTS.values());
 
         lbInfo2.setText("Identificacion");
         lbInfo2.setBackground(color1);
         String propID = app.getConfiguration().getProperty(com.bacon.Configuration.BS_ID, "000000000");
-        regText2.setText(propID);
+        config = app.getControl().getConfig(com.bacon.Configuration.BS_ID);
+        regText2.setText(config != null ? config.getValor() : "000000000");
+//        regText2.setText(propID);
         regText2.setLabelText("Identificacion:");
         regFont2.setText(FONTS.values());
 
         lbInfo3.setText("Direccion");
         lbInfo3.setBackground(color1);
-        String propAddress = app.getConfiguration().getProperty(com.bacon.Configuration.BS_ADDRESS, "Direccion");
-        regText3.setText(propAddress);
-        regText3.setLabelText("Direccion");
+//        String propAddress = app.getConfiguration().getProperty(com.bacon.Configuration.BS_ADDRESS, "Direccion");
+        config = app.getControl().getConfig(com.bacon.Configuration.BS_ADDRESS);
+        regText3.setText(config != null ? config.getValor() : "Dirección");
+//        regText3.setText(propAddress);
+        regText3.setLabelText("Dirección");
         regFont3.setText(FONTS.values());
 
         lbInfo4.setText("Telefono");
         lbInfo4.setBackground(color1);
-        String propPhone = app.getConfiguration().getProperty(com.bacon.Configuration.BS_PHONE, "300000000");
-        regText4.setText(propPhone);
+//        String propPhone = app.getConfiguration().getProperty(com.bacon.Configuration.BS_PHONE, "300000000");
+        config = app.getControl().getConfig(com.bacon.Configuration.BS_PHONE);
+        regText4.setText(config != null ? config.getValor() : "3000000000");
+//        regText4.setText(propPhone);
         regText4.setLabelText("Telefono");
         regFont4.setText(FONTS.values());
 
         lbInfo5.setText("Personalizado 1");
         lbInfo5.setBackground(color1);
-        String propCustom1 = app.getConfiguration().getProperty(com.bacon.Configuration.BS_CUSTOM_TOP, "Personalizado 1");
-        regText5.setText(propCustom1);
+//        String propCustom1 = app.getConfiguration().getProperty(com.bacon.Configuration.BS_CUSTOM_TOP, "Personalizado 1");
+        config = app.getControl().getConfig(com.bacon.Configuration.BS_CUSTOM_TOP);
+        regText5.setText(config != null ? config.getValor() : "Personalizado 1");
+//        regText5.setText(propCustom1);
         regText5.setLabelText("Personalizado1:");
         regFont5.setText(FONTS.values());
 
         lbInfo6.setText("Personalizado 2");
         lbInfo6.setBackground(color1);
-        String propCustom2 = app.getConfiguration().getProperty(com.bacon.Configuration.BS_CUSTOM_BOTTON, "Personalizado 2");
-        regText6.setText(propCustom2);
+//        String propCustom2 = app.getConfiguration().getProperty(com.bacon.Configuration.BS_CUSTOM_BOTTON, "Personalizado 2");
+        config = app.getControl().getConfig(com.bacon.Configuration.BS_CUSTOM_BOTTON);
+        regText6.setText(config != null ? config.getValor() : "Personalizado 2");
+//        regText6.setText(propCustom2);
         regText6.setLabelText("Personalizado2:");
         regFont6.setText(FONTS.values());
 
-        String propQualityEnabled = app.getConfiguration().getProperty(com.bacon.Configuration.BS_CUSTOM_QUALITY_ENABLED, "false");
-        boolean enabled = Boolean.parseBoolean(propQualityEnabled);
+//        String propQualityEnabled = app.getConfiguration().getProperty(com.bacon.Configuration.BS_CUSTOM_QUALITY_ENABLED, "false");
+        config = app.getControl().getConfig(com.bacon.Configuration.BS_CUSTOM_QUALITY_ENABLED);
+        boolean enabled = Boolean.parseBoolean(config != null ? config.getValor() : "false");
         jCheckBox1.setText("Calidad del servicio");
         jCheckBox1.setBackground(color1);
         jCheckBox1.setSelected(enabled);
@@ -113,26 +128,31 @@ public class PanelConfigTicket extends javax.swing.JPanel implements ActionListe
             }
         });
 
-        String propQualityService = app.getConfiguration().getProperty(com.bacon.Configuration.BS_CUSTOM_QUALITY_MSG, "");
-        regText10.setText(propQualityService);
+//        String propQualityService = app.getConfiguration().getProperty(com.bacon.Configuration.BS_CUSTOM_QUALITY_MSG, "");
+        config = app.getControl().getConfig(com.bacon.Configuration.BS_CUSTOM_QUALITY_MSG);
+        regText10.setText(config != null ? config.getValor() : "");
+//        regText10.setText(propQualityService);
         regText10.setLabelText("Mensaje:");
-        String propQualityScale = app.getConfiguration().getProperty(com.bacon.Configuration.BS_CUSTOM_QUALITY_SCALE, "");
-        regText11.setText(propQualityScale);
+
+        config = app.getControl().getConfig(com.bacon.Configuration.BS_CUSTOM_QUALITY_SCALE);
+        regText11.setText(config != null ? config.getValor() : "");
+//        String propQualityScale = app.getConfiguration().getProperty(com.bacon.Configuration.BS_CUSTOM_QUALITY_SCALE, "");
+//        regText11.setText(propQualityScale);
         regText11.setLabelText("Escala:");
         regFont7.setText(FONTS.values());
 
         lbInfo7.setText("Consecutivo facturas");
         lbInfo7.setBackground(color1);
-        ConfigDB config = app.getControl().getConfig(CF_FACTURA_INICIAL);
+        config = app.getControl().getConfig(CF_FACTURA_INICIAL);
         regText7.setText(config != null ? config.getValor() : "0");
         regText7.setLabelText("Inicial:");
 
-        ConfigDB config1 = app.getControl().getConfig(CF_FACTURA_FINAL);
-        regText8.setText(config1 != null ? config1.getValor() : "0");
+        config = app.getControl().getConfig(CF_FACTURA_FINAL);
+        regText8.setText(config != null ? config.getValor() : "0");
         regText8.setLabelText("Final:");
 
-        ConfigDB config2 = app.getControl().getConfig(CF_FACTURA_ACTUAL);
-        regText9.setText(config2 != null ? config2.getValor() : "0");
+        config = app.getControl().getConfig(CF_FACTURA_ACTUAL);
+        regText9.setText(config != null ? config.getValor() : "0");
         regText9.setLabelText("Factura actual:");
 
         btApply.setText("Aplicar");
@@ -151,67 +171,183 @@ public class PanelConfigTicket extends javax.swing.JPanel implements ActionListe
 
         buttonGroup1 = new javax.swing.ButtonGroup();
         lbTitle = new javax.swing.JLabel();
-        lbInfo1 = new javax.swing.JLabel();
         btApply = new javax.swing.JButton();
-        regText1 = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "reg1", "", 100);
-        regFont1 = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Fuente", new Object[0]);
-        lbInfo2 = new javax.swing.JLabel();
-        regText2 = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Reg2", "",100);
-        regFont2 = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Fuente", new Object[0]);
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jPanel1 = new javax.swing.JPanel();
         lbInfo3 = new javax.swing.JLabel();
-        regText3 = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Reg3", "", 100);
-        regFont3 = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Fuente", new Object[0]);
-        lbInfo4 = new javax.swing.JLabel();
         regText4 = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Reg4", "",100);
-        regFont4 = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Fuente", new Object[0]);
-        lbInfo5 = new javax.swing.JLabel();
-        regText5 = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Reg5", "",100);
-        regFont5 = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Fuente", new Object[0]);
-        lbInfo6 = new javax.swing.JLabel();
-        regText6 = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Reg6", "",100);
-        regFont6 = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Fuente", new Object[0]);
-        lbInfo7 = new javax.swing.JLabel();
-        regText7 = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Reg6", "",100);
-        regText8 = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Reg6", "",100);
-        regText9 = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Reg6", "",100);
-        regText10 = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Reg6", "",100);
-        regFont7 = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Fuente", new Object[0]);
         jCheckBox1 = new javax.swing.JCheckBox();
+        regText7 = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Reg6", "",100);
+        lbInfo6 = new javax.swing.JLabel();
+        regText10 = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Reg6", "",100);
         regText11 = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Reg6", "",100);
+        lbInfo4 = new javax.swing.JLabel();
+        regText6 = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Reg6", "",100);
+        lbInfo2 = new javax.swing.JLabel();
+        lbInfo7 = new javax.swing.JLabel();
+        regText9 = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Reg6", "",100);
+        regFont6 = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Fuente", new Object[0]);
+        regFont3 = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Fuente", new Object[0]);
+        regFont7 = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Fuente", new Object[0]);
+        regText8 = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Reg6", "",100);
+        regText1 = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "reg1", "", 100);
+        regText2 = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Reg2", "",100);
+        regText3 = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Reg3", "", 100);
+        lbInfo5 = new javax.swing.JLabel();
+        regFont2 = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Fuente", new Object[0]);
+        regText5 = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Reg5", "",100);
+        lbInfo1 = new javax.swing.JLabel();
+        regFont4 = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Fuente", new Object[0]);
+        regFont5 = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Fuente", new Object[0]);
+        regFont1 = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Fuente", new Object[0]);
 
         lbTitle.setBackground(java.awt.Color.lightGray);
         lbTitle.setOpaque(true);
+
+        lbInfo3.setText("jLabel2");
+        lbInfo3.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        lbInfo3.setOpaque(true);
+
+        jCheckBox1.setText("jCheckBox1");
+
+        lbInfo6.setText("jLabel2");
+        lbInfo6.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        lbInfo6.setOpaque(true);
+
+        lbInfo4.setText("jLabel2");
+        lbInfo4.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        lbInfo4.setOpaque(true);
+
+        lbInfo2.setText("jLabel2");
+        lbInfo2.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        lbInfo2.setOpaque(true);
+
+        lbInfo7.setText("jLabel2");
+        lbInfo7.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        lbInfo7.setOpaque(true);
+
+        lbInfo5.setText("jLabel2");
+        lbInfo5.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        lbInfo5.setOpaque(true);
 
         lbInfo1.setBackground(new java.awt.Color(226, 175, 206));
         lbInfo1.setText("jLabel2");
         lbInfo1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         lbInfo1.setOpaque(true);
 
-        lbInfo2.setText("jLabel2");
-        lbInfo2.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-        lbInfo2.setOpaque(true);
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jCheckBox1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(lbInfo1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(regText1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(regFont1, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(lbInfo2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(regText2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(regFont2, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(lbInfo3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(regText3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(regFont3, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(lbInfo4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(regText4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(regFont4, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(lbInfo5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(regText5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(regFont5, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(lbInfo6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(regText6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(regFont6, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(lbInfo7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(regText7, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(regText8, javax.swing.GroupLayout.PREFERRED_SIZE, 212, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(regText9, javax.swing.GroupLayout.PREFERRED_SIZE, 212, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addComponent(regText10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(regFont7, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(regText11, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
+        );
 
-        lbInfo3.setText("jLabel2");
-        lbInfo3.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-        lbInfo3.setOpaque(true);
+        jPanel1Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {regText7, regText8, regText9});
 
-        lbInfo4.setText("jLabel2");
-        lbInfo4.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-        lbInfo4.setOpaque(true);
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(lbInfo1, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(2, 2, 2)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(regText1, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(regFont1, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(lbInfo2, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(2, 2, 2)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(regText2, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(regFont2, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(lbInfo3, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(2, 2, 2)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(regText3, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(regFont3, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(lbInfo4, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(2, 2, 2)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(regText4, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(regFont4, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(lbInfo5, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(2, 2, 2)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(regText5, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(regFont5, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(lbInfo6, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(2, 2, 2)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(regText6, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(regFont6, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(4, 4, 4)
+                .addComponent(jCheckBox1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(regText10, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(regFont7, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(2, 2, 2)
+                .addComponent(regText11, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(lbInfo7, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(2, 2, 2)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                    .addComponent(regText7, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(regText8, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(regText9, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap())
+        );
 
-        lbInfo5.setText("jLabel2");
-        lbInfo5.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-        lbInfo5.setOpaque(true);
-
-        lbInfo6.setText("jLabel2");
-        lbInfo6.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-        lbInfo6.setOpaque(true);
-
-        lbInfo7.setText("jLabel2");
-        lbInfo7.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-        lbInfo7.setOpaque(true);
-
-        jCheckBox1.setText("jCheckBox1");
+        jScrollPane1.setViewportView(jPanel1);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -221,114 +357,20 @@ public class PanelConfigTicket extends javax.swing.JPanel implements ActionListe
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jCheckBox1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(lbInfo1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(0, 578, Short.MAX_VALUE)
                         .addComponent(btApply, javax.swing.GroupLayout.PREFERRED_SIZE, 94, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(regText1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(regFont1, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(lbInfo2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(regText2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(regFont2, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(lbInfo3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(regText3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(regFont3, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(lbInfo4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(regText4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(regFont4, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(lbInfo5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(regText5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(regFont5, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(lbInfo6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(regText6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(regFont6, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(lbInfo7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(regText7, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(regText8, javax.swing.GroupLayout.PREFERRED_SIZE, 212, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(regText9, javax.swing.GroupLayout.PREFERRED_SIZE, 212, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(regText10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(regFont7, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(regText11, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 672, Short.MAX_VALUE))
                 .addContainerGap())
         );
-
-        layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {regText7, regText8, regText9});
-
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(6, 6, 6)
                 .addComponent(lbTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(lbInfo1, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(2, 2, 2)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(regText1, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(regFont1, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 536, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(lbInfo2, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(2, 2, 2)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(regText2, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(regFont2, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(lbInfo3, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(2, 2, 2)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(regText3, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(regFont3, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(lbInfo4, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(2, 2, 2)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(regText4, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(regFont4, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(lbInfo5, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(2, 2, 2)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(regText5, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(regFont5, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(lbInfo6, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(2, 2, 2)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(regText6, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(regFont6, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(4, 4, 4)
-                .addComponent(jCheckBox1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(regText10, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(regFont7, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(2, 2, 2)
-                .addComponent(regText11, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(lbInfo7, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(2, 2, 2)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
-                    .addComponent(regText7, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(regText8, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(regText9, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(btApply, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
@@ -339,6 +381,8 @@ public class PanelConfigTicket extends javax.swing.JPanel implements ActionListe
     private javax.swing.JButton btApply;
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JCheckBox jCheckBox1;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lbInfo1;
     private javax.swing.JLabel lbInfo2;
     private javax.swing.JLabel lbInfo3;
@@ -371,22 +415,27 @@ public class PanelConfigTicket extends javax.swing.JPanel implements ActionListe
     public void actionPerformed(ActionEvent e) {
         if (ACTION_APPLY.equals(e.getActionCommand())) {
             String value = regText1.getText();
-            app.getConfiguration().setProperty(com.bacon.Configuration.BS_NAME, value);
+            app.getControl().addConfig(new ConfigDB(Configuration.BS_NAME, ConfigDB.STRING, value));
 
             value = regText2.getText();
-            app.getConfiguration().setProperty(com.bacon.Configuration.BS_ID, value);
+//            app.getConfiguration().setProperty(com.bacon.Configuration.BS_ID, value);
+            app.getControl().addConfig(new ConfigDB(Configuration.BS_ID, ConfigDB.STRING, value));
 
             value = regText3.getText();
-            app.getConfiguration().setProperty(com.bacon.Configuration.BS_ADDRESS, value);
+//            app.getConfiguration().setProperty(com.bacon.Configuration.BS_ADDRESS, value);
+            app.getControl().addConfig(new ConfigDB(Configuration.BS_ADDRESS, ConfigDB.STRING, value));
 
             value = regText4.getText();
-            app.getConfiguration().setProperty(com.bacon.Configuration.BS_PHONE, value);
+            app.getControl().addConfig(new ConfigDB(Configuration.BS_PHONE, ConfigDB.STRING, value));
+//            app.getConfiguration().setProperty(com.bacon.Configuration.BS_PHONE, value);
 
             value = regText5.getText();
-            app.getConfiguration().setProperty(com.bacon.Configuration.BS_CUSTOM_TOP, value);
+            app.getControl().addConfig(new ConfigDB(Configuration.BS_CUSTOM_TOP, ConfigDB.STRING, value));
+//            app.getConfiguration().setProperty(com.bacon.Configuration.BS_CUSTOM_TOP, value);
 
             value = regText6.getText();
-            app.getConfiguration().setProperty(com.bacon.Configuration.BS_CUSTOM_BOTTON, value);
+            app.getControl().addConfig(new ConfigDB(Configuration.BS_CUSTOM_BOTTON, ConfigDB.STRING, value));
+//            app.getConfiguration().setProperty(com.bacon.Configuration.BS_CUSTOM_BOTTON, value);
 
             value = regText7.getText();
             app.getControl().addConfig(new ConfigDB(CF_FACTURA_INICIAL, ConfigDB.INTEGER, value));
@@ -398,13 +447,16 @@ public class PanelConfigTicket extends javax.swing.JPanel implements ActionListe
             app.getControl().addConfig(new ConfigDB(CF_FACTURA_ACTUAL, ConfigDB.INTEGER, value));
 
             value = regText10.getText();
-            app.getConfiguration().setProperty(com.bacon.Configuration.BS_CUSTOM_QUALITY_MSG, value);
-            
+            app.getControl().addConfig(new ConfigDB(Configuration.BS_CUSTOM_QUALITY_MSG, ConfigDB.STRING, value));
+//            app.getConfiguration().setProperty(com.bacon.Configuration.BS_CUSTOM_QUALITY_MSG, value);
+
             value = regText11.getText();
-            app.getConfiguration().setProperty(com.bacon.Configuration.BS_CUSTOM_QUALITY_SCALE, value);
+            app.getControl().addConfig(new ConfigDB(Configuration.BS_CUSTOM_QUALITY_SCALE, ConfigDB.STRING, value));
+//            app.getConfiguration().setProperty(com.bacon.Configuration.BS_CUSTOM_QUALITY_SCALE, value);
 
             boolean selected = jCheckBox1.isSelected();
-            app.getConfiguration().setProperty(com.bacon.Configuration.BS_CUSTOM_QUALITY_ENABLED, Boolean.toString(selected));
+            app.getControl().addConfig(new ConfigDB(Configuration.BS_CUSTOM_QUALITY_ENABLED, ConfigDB.BOOLEAN, String.valueOf(selected)));
+//            app.getConfiguration().setProperty(com.bacon.Configuration.BS_CUSTOM_QUALITY_ENABLED, Boolean.toString(selected));
 
             app.getConfiguration().save();
         }

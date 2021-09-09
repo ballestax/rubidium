@@ -6,6 +6,7 @@
 package com.bacon.gui;
 
 import com.bacon.Aplication;
+import com.bacon.domain.ConfigDB;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.BoxLayout;
@@ -41,8 +42,8 @@ public class PanelConfigOthers extends javax.swing.JPanel implements ActionListe
         lbInfo.setText("Valor del domicilio");
 
 //        exportDIR = property;
-        String delivery = app.getConfiguration().getProperty(com.bacon.Configuration.DELIVERY_VALUE, "0");
-        regDelivery.setText(delivery);
+        ConfigDB config = app.getControl().getConfig(com.bacon.Configuration.DELIVERY_VALUE);        
+        regDelivery.setText(config!=null?config.getValor():"0");
 
         lbInfo1.setText("Imprimir pedido previo");
         String printPrevius = app.getConfiguration().getProperty(com.bacon.Configuration.PRINT_PREV_DELIVERY, "false");
@@ -78,7 +79,7 @@ public class PanelConfigOthers extends javax.swing.JPanel implements ActionListe
 
 //        exportDIR = property;
         regPrefix.setLabelText("Prefijo");
-        String prefix = app.getConfiguration().getProperty(com.bacon.Configuration.PREFIX_INVOICES, "F");
+        String prefix = app.getConfiguration().getProperty(com.bacon.Configuration.PREFIX_INVOICES, "");
         regPrefix.setText(prefix);
         
         lbInfo5.setText("Numero de ceros a formatear consecutivo");
@@ -91,8 +92,8 @@ public class PanelConfigOthers extends javax.swing.JPanel implements ActionListe
         
         lbInfo6.setText("Nombre Documento ticket");
         regDocument.setLabelText("Nombre documento");
-        String nameDoc = app.getConfiguration().getProperty(com.bacon.Configuration.DOCUMENT_NAME, "Ticket N°:");        
-        regDocument.setText(nameDoc);
+        config = app.getControl().getConfig(com.bacon.Configuration.DOCUMENT_NAME);
+        regDocument.setText(config!=null? config.getValor(): "Ticket N°: ");
         
         
 
@@ -249,7 +250,7 @@ public class PanelConfigOthers extends javax.swing.JPanel implements ActionListe
     public void actionPerformed(ActionEvent e) {
         if (ACTION_APPLY.equals(e.getActionCommand())) {
             String value = regDelivery.getText();
-            app.getConfiguration().setProperty(com.bacon.Configuration.DELIVERY_VALUE, value);
+            app.getControl().addConfig(new ConfigDB(com.bacon.Configuration.DELIVERY_VALUE, ConfigDB.DOUBLE, value));
 
             boolean selected = regPrintPrev.isSelected();
             app.getConfiguration().setProperty(com.bacon.Configuration.PRINT_PREV_DELIVERY, String.valueOf(selected));
@@ -265,6 +266,9 @@ public class PanelConfigOthers extends javax.swing.JPanel implements ActionListe
             
             String ceros = regZeros.getText();
             app.getConfiguration().setProperty(com.bacon.Configuration.ZEROS_INVOICES, ceros);
+            
+            String docName = regDocument.getText();            
+            app.getControl().addConfig(new ConfigDB(com.bacon.Configuration.DOCUMENT_NAME, ConfigDB.STRING, docName));
 
             app.getConfiguration().save();
         }

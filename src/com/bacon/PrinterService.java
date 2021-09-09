@@ -2,6 +2,7 @@ package com.bacon;
 
 import com.bacon.domain.Additional;
 import com.bacon.domain.Client;
+import com.bacon.domain.ConfigDB;
 import com.bacon.domain.Ingredient;
 import com.bacon.domain.Invoice;
 import com.bacon.domain.Presentation;
@@ -118,8 +119,9 @@ public class PrinterService {
                 escpos.writeLF(font3, "Direccion: " + (client != null && !client.getAddresses().isEmpty() ? client.getAddresses().get(0) : "- - -"));
             }
             escpos.feed(1);
-            String documento = app.getConfiguration().getProperty(Configuration.DOCUMENT_NAME, "Factura N°:");
-            escpos.writeLF(font3, String.format(documento + " %1s %25.25s", invoice.getFactura(), app.DF_FULL.format(invoice.getFecha())));
+            ConfigDB config = app.getControl().getConfig(Configuration.DOCUMENT_NAME);
+            String docName = config != null ? config.getValor() : "Ticket N°:";
+            escpos.writeLF(font3, String.format(docName + " %1s %25.25s", invoice.getFactura(), app.DF_FULL.format(invoice.getFecha())));
             escpos.feed(1);
 
             String column1Format = "%3.3s";  // fixed size 3 characters, left aligned
@@ -338,14 +340,15 @@ public class PrinterService {
                     BS_NAME);
             escpos.feed(1);
 
-            String documento = app.getConfiguration().getProperty(Configuration.DOCUMENT_NAME, "Factura N°:");
-            escpos.writeLF(font3, String.format(documento + "  %1s", invoice.getFactura()));
+            ConfigDB config = app.getControl().getConfig(Configuration.DOCUMENT_NAME);
+            String docName = config != null ? config.getValor() : "Ticket N°:";            
+            escpos.writeLF(font3, String.format(docName + "  %1s", invoice.getFactura()));
             escpos.writeLF(font3, String.format("Fecha:       %1s", app.DF_FULL2.format(invoice.getFecha())));
 
             escpos.feed(1);
             if (invoice.getTipoEntrega() == PanelPedido.TIPO_LOCAL) {
-                escpos.writeLF(font3, "Mesero:   " + (waiter != null ? waiter.getName() : "- - -"));
-                escpos.writeLF(font3, "Mesa: " + (table != null ? table.getName() : "- - -"));
+                escpos.writeLF(font3, "Mesa:     " + (table != null ? table.getName() : "- - -"));
+                escpos.writeLF(font3, "Mesero:   " + (waiter != null ? waiter.getName().toUpperCase() : "- - -"));
             } else {
                 escpos.writeLF(font3, "Cliente:   " + (client != null ? client.getCellphone() : "- - -"));
                 escpos.writeLF(font3, "Direccion: " + (client != null && !client.getAddresses().isEmpty() ? client.getAddresses().get(0) : "- - -"));
