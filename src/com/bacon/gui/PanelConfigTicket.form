@@ -21,7 +21,7 @@
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
           <Component id="lbTitle" alignment="0" max="32767" attributes="0"/>
-          <Group type="102" alignment="0" attributes="0">
+          <Group type="102" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
                   <Component id="jCheckBox1" max="32767" attributes="0"/>
@@ -78,6 +78,7 @@
                       <EmptySpace type="unrelated" min="-2" max="-2" attributes="0"/>
                       <Component id="regFont7" min="-2" pref="139" max="-2" attributes="0"/>
                   </Group>
+                  <Component id="regText11" alignment="0" max="32767" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -137,6 +138,8 @@
                   <Component id="regText10" alignment="0" min="-2" pref="28" max="-2" attributes="0"/>
                   <Component id="regFont7" alignment="0" min="-2" pref="28" max="-2" attributes="0"/>
               </Group>
+              <EmptySpace min="-2" pref="2" max="-2" attributes="0"/>
+              <Component id="regText11" min="-2" pref="28" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="lbInfo7" min="-2" pref="25" max="-2" attributes="0"/>
               <EmptySpace min="-2" pref="2" max="-2" attributes="0"/>
@@ -332,6 +335,11 @@
       <Properties>
         <Property name="text" type="java.lang.String" value="jCheckBox1"/>
       </Properties>
+    </Component>
+    <Component class="com.bacon.gui.util.Registro" name="regText11">
+      <AuxValues>
+        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, &quot;Reg6&quot;, &quot;&quot;,100)"/>
+      </AuxValues>
     </Component>
   </SubComponents>
 </Form>

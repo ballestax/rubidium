@@ -101,12 +101,14 @@ public class PanelConfigTicket extends javax.swing.JPanel implements ActionListe
         jCheckBox1.setBackground(color1);
         jCheckBox1.setSelected(enabled);
         regText10.setEnabled(enabled);
+        regText11.setEnabled(enabled);
         regFont7.setEnabled(enabled);
         jCheckBox1.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 boolean selected = jCheckBox1.isSelected();
                 regText10.setEnabled(selected);
+                regText11.setEnabled(selected);
                 regFont7.setEnabled(selected);
             }
         });
@@ -114,6 +116,9 @@ public class PanelConfigTicket extends javax.swing.JPanel implements ActionListe
         String propQualityService = app.getConfiguration().getProperty(com.bacon.Configuration.BS_CUSTOM_QUALITY_MSG, "");
         regText10.setText(propQualityService);
         regText10.setLabelText("Mensaje:");
+        String propQualityScale = app.getConfiguration().getProperty(com.bacon.Configuration.BS_CUSTOM_QUALITY_SCALE, "");
+        regText11.setText(propQualityScale);
+        regText11.setLabelText("Escala:");
         regFont7.setText(FONTS.values());
 
         lbInfo7.setText("Consecutivo facturas");
@@ -172,6 +177,7 @@ public class PanelConfigTicket extends javax.swing.JPanel implements ActionListe
         regText10 = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Reg6", "",100);
         regFont7 = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Fuente", new Object[0]);
         jCheckBox1 = new javax.swing.JCheckBox();
+        regText11 = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Reg6", "",100);
 
         lbTitle.setBackground(java.awt.Color.lightGray);
         lbTitle.setOpaque(true);
@@ -259,7 +265,8 @@ public class PanelConfigTicket extends javax.swing.JPanel implements ActionListe
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addComponent(regText10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(regFont7, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(regFont7, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(regText11, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
 
@@ -312,6 +319,8 @@ public class PanelConfigTicket extends javax.swing.JPanel implements ActionListe
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(regText10, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(regFont7, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(2, 2, 2)
+                .addComponent(regText11, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(lbInfo7, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(2, 2, 2)
@@ -347,6 +356,7 @@ public class PanelConfigTicket extends javax.swing.JPanel implements ActionListe
     private com.bacon.gui.util.Registro regFont7;
     private com.bacon.gui.util.Registro regText1;
     private com.bacon.gui.util.Registro regText10;
+    private com.bacon.gui.util.Registro regText11;
     private com.bacon.gui.util.Registro regText2;
     private com.bacon.gui.util.Registro regText3;
     private com.bacon.gui.util.Registro regText4;
@@ -389,6 +399,9 @@ public class PanelConfigTicket extends javax.swing.JPanel implements ActionListe
 
             value = regText10.getText();
             app.getConfiguration().setProperty(com.bacon.Configuration.BS_CUSTOM_QUALITY_MSG, value);
+            
+            value = regText11.getText();
+            app.getConfiguration().setProperty(com.bacon.Configuration.BS_CUSTOM_QUALITY_SCALE, value);
 
             boolean selected = jCheckBox1.isSelected();
             app.getConfiguration().setProperty(com.bacon.Configuration.BS_CUSTOM_QUALITY_ENABLED, Boolean.toString(selected));

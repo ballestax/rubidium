@@ -83,6 +83,7 @@ public class PrinterService {
             String BS_CUSTOM2 = app.getConfiguration().getProperty(Configuration.BS_CUSTOM_BOTTON);
             String BS_QUALITY_MESSAGE = app.getConfiguration().getProperty(Configuration.BS_CUSTOM_QUALITY_MSG);
             String BS_QUALITY_ENABLED = app.getConfiguration().getProperty(Configuration.BS_CUSTOM_QUALITY_ENABLED);
+            String BS_QUALITY_SCALE = app.getConfiguration().getProperty(Configuration.BS_CUSTOM_QUALITY_SCALE);
 
             // this wrapper uses esc/pos sequence: "ESC '*'"
             BitImageWrapper imageWrapper = new BitImageWrapper();
@@ -176,9 +177,13 @@ public class PrinterService {
 
             escpos.writeLF(font2, "================================================");
 
-            if (Boolean.parseBoolean(BS_QUALITY_ENABLED)) {                
-                escpos.feed(1);
+            if (invoice.getTipoEntrega() == PanelPedido.TIPO_LOCAL && Boolean.parseBoolean(BS_QUALITY_ENABLED)) {
+                escpos.feed(2);
                 escpos.writeLF(font2, BS_QUALITY_MESSAGE);
+                escpos.writeLF(font2, "________________________________________________");
+//                escpos.writeLF(font2, "|    Buena      |     Regular   |     Mala     |");
+                escpos.writeLF(font2, BS_QUALITY_SCALE);
+                escpos.writeLF(font2, "________________________________________________");
             }
 
             escpos.feed(1);
@@ -338,10 +343,13 @@ public class PrinterService {
             escpos.writeLF(font3, String.format("Fecha:       %1s", app.DF_FULL2.format(invoice.getFecha())));
 
             escpos.feed(1);
-
-            escpos.writeLF(font3, "Cliente:   " + (client != null ? client.getCellphone() : "- - -"));
-            escpos.writeLF(font3, "Direccion: " + (client != null && !client.getAddresses().isEmpty() ? client.getAddresses().get(0) : "- - -"));
-
+            if (invoice.getTipoEntrega() == PanelPedido.TIPO_LOCAL) {
+                escpos.writeLF(font3, "Mesero:   " + (waiter != null ? waiter.getName() : "- - -"));
+                escpos.writeLF(font3, "Mesa: " + (table != null ? table.getName() : "- - -"));
+            } else {
+                escpos.writeLF(font3, "Cliente:   " + (client != null ? client.getCellphone() : "- - -"));
+                escpos.writeLF(font3, "Direccion: " + (client != null && !client.getAddresses().isEmpty() ? client.getAddresses().get(0) : "- - -"));
+            }
             escpos.feed(1);
 
             BigDecimal total = invoice.getValor();

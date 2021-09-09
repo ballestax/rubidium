@@ -61,6 +61,7 @@ public class Configuration {
     public static final String BS_CUSTOM_TOP = "cf.tck.custom1";
     public static final String BS_CUSTOM_BOTTON = "cf.tck.custom2";
     public static final String BS_CUSTOM_QUALITY_MSG = "cf.tck.quality_msg";
+    public static final String BS_CUSTOM_QUALITY_SCALE = "cf.tck.quality_scale";
     public static final String BS_CUSTOM_QUALITY_ENABLED = "cf.tck.quality_enabled";
 
     private StandardPBEStringEncryptor encryptor;
