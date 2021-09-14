@@ -207,8 +207,7 @@ public class PanelAdminUsers extends javax.swing.JPanel implements ActionListene
 //            System.err.println("users:"+items.size());
             model.setRowCount(0);
             for (int i = 0; i < items.size(); i++) {
-                User user = items.get(i);
-                System.out.println(app.getControl().getUseRole(user.getId()));
+                User user = items.get(i);                
                 model.addRow(new Object[]{
                     user.getId(),
                     user.getUsername(),

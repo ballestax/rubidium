@@ -242,6 +242,7 @@ public class PanelReportSales extends PanelCapturaMod implements ActionListener,
         pnBottonBar.add(pnLabels, BorderLayout.EAST);
         pnBottonBar.add(labelStatus, BorderLayout.WEST);
 
+        changeTipo();
         opcionHoy();
 
     }
@@ -380,13 +381,13 @@ public class PanelReportSales extends PanelCapturaMod implements ActionListener,
 
     private void changeTipo() {
         String tipo = regTipo.getText();
-        if (MyConstants.TIPO_REPORTE[0].equals(tipo)) {
+        if (MyConstants.TIPO_REPORTE[1].equals(tipo)) {
             regCategory.setVisible(false);
             regProduct.setVisible(false);
             lbInfDelivery.setVisible(true);
             lbInfService.setVisible(true);
 
-        } else if (MyConstants.TIPO_REPORTE[1].equals(tipo)) {
+        } else if (MyConstants.TIPO_REPORTE[0].equals(tipo)) {
             regCategory.setVisible(true);
             regProduct.setVisible(true);
             lbInfDelivery.setVisible(false);
@@ -438,7 +439,7 @@ public class PanelReportSales extends PanelCapturaMod implements ActionListener,
 
         setupNavegador();
 
-        if (MyConstants.TIPO_REPORTE[0].equals(TIPO)) {
+        if (MyConstants.TIPO_REPORTE[1].equals(TIPO)) {
             //filtrar tipos de registros
             int sel = regTipoReg.getSelected();
             String locQuery = query;
@@ -450,7 +451,7 @@ public class PanelReportSales extends PanelCapturaMod implements ActionListener,
             ArrayList<Invoice> salidaList = app.getControl().getInvoicesLitelList(locQuery, "sale_date", ini, fin);
             setupTable(colNamesSal, colAlignSal, colWidthSal);
             populateTabla(salidaList, TIPO, ini + 1);
-        } else if (MyConstants.TIPO_REPORTE[1].equals(TIPO)) {
+        } else if (MyConstants.TIPO_REPORTE[0].equals(TIPO)) {
             enableNav(false);
             ArrayList productSalesList = app.getControl().getProductsSales(start, end);
             setupTable(colNamesProd, colAlignProd, colWidthProd);
@@ -483,7 +484,7 @@ public class PanelReportSales extends PanelCapturaMod implements ActionListener,
         lbInfTotal.setQuantity(0.0);
         lbInfDelivery.setQuantity(0.0);
         lbInfService.setQuantity(0.0);
-        if (tipo.equals(MyConstants.TIPO_REPORTE[0])) {  // VENTAS Y COMPRAS
+        if (tipo.equals(MyConstants.TIPO_REPORTE[1])) {  // VENTAS Y COMPRAS
             modelo.setColumnIdentifiers(colNamesSal);
 
             //clear registers
@@ -547,7 +548,7 @@ public class PanelReportSales extends PanelCapturaMod implements ActionListener,
             tableReport.updateUI();
             sw.execute();
 
-        } else if (tipo.equals(MyConstants.TIPO_REPORTE[1])) {
+        } else if (tipo.equals(MyConstants.TIPO_REPORTE[0])) {
             modelo.setColumnIdentifiers(colNamesProd);
             HashSet catSet = new HashSet<>();
             HashSet prodSet = new HashSet<>();
@@ -864,7 +865,7 @@ public class PanelReportSales extends PanelCapturaMod implements ActionListener,
 
         String stTipo = regTipo.getText();
         int tipoReporte = 0;
-        if (MyConstants.TIPO_REPORTE[0].equals(stTipo)) {
+        if (MyConstants.TIPO_REPORTE[1].equals(stTipo)) {
             tipoReporte = 0;
             for (int selectedRow : selectedRows) {
                 double _val = Double.parseDouble(tableReport.getValueAt(selectedRow, 7).toString());
@@ -874,7 +875,7 @@ public class PanelReportSales extends PanelCapturaMod implements ActionListener,
                 dom += _dom;
                 serv += _serv;
             }
-        } else if (MyConstants.TIPO_REPORTE[1].equals(stTipo)) {
+        } else if (MyConstants.TIPO_REPORTE[0].equals(stTipo)) {
             tipoReporte = 1;
             for (int selectedRow : selectedRows) {
                 double _val = Double.parseDouble(tableReport.getValueAt(selectedRow, 4).toString());

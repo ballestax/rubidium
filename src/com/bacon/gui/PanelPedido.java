@@ -120,6 +120,7 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
     private boolean block;
     private JMenuItem itemDelete;
     private LinkMouseListener linkMouseListener;
+    private LabelFacturaMouseListener lbFacturaMouseListener;
     private boolean showDescuento;
     private ImageIcon iconOk;
     private ImageIcon iconWarning;
@@ -157,6 +158,7 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
         DCFORM_P.applyPattern("$ ###,###,###");
 
         linkMouseListener = new LinkMouseListener();
+        lbFacturaMouseListener = new LabelFacturaMouseListener();
 
         showDescuento = false;
 
@@ -472,20 +474,8 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
 
         lbTicket.setVisible(false);
         lbFactura.setText("<html><font>" + calculateProximoRegistro() + "</font></html>");
-        
-        lbFactura.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                System.out.println(e);
-                if(e.getClickCount()==2){
-                    String fact = lbFactura.getText();
-                    String text = Jsoup.parse(fact).text();                    
-                    regCelular.setText(text);
-                }
-            }
-            
-        
-        });
+
+        lbFactura.addMouseListener(lbFacturaMouseListener);
     }
     public static final String AC_CHECK_RECOGIDO = "AC_CHECK_RECOGIDO";
 
@@ -517,11 +507,17 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
             calcularValores();
             try {
                 if (verificarDatosFactura()) {
+                    lbFactura.removeMouseListener(lbFacturaMouseListener);
                     btConfirm.setEnabled(false);
                     popupTabla.remove(itemDelete);
                     block = true;
+                    btClear.setEnabled(false);
+                    btSearch.setEnabled(false);
+                    spNumDom.setEnabled(false);                    
+                    chRecogido.setEnabled(false);
                 }
             } catch (Exception ex) {
+                System.err.println(ex);
             }
 
         } else if (AC_CHANGE_DOMICILIO.equals(e.getActionCommand())) {
@@ -568,13 +564,15 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
             lastClient = null;
             btLastDelivery.setVisible(false);
 
-            lbFactura.setText("<html><font>" + calculateProximoRegistro() + "</font></html>");
+            lbFactura.setText("<html><font>" + calculateProximoRegistro() + "</font></html>"); 
+            lbFactura.addMouseListener(lbFacturaMouseListener);
 
             if (Boolean.valueOf(app.getConfiguration().getProperty(Configuration.PRINT_PREV_DELIVERY))) {
                 btPrint.setVisible(true);
             }
 
             lbTitle.setToolTipText(getInfoCiclo(app.getControl().getLastCycle()));
+            
 
             block = false;
         } else if (AC_SELECT_DELIVERY.equals(e.getActionCommand())) {
@@ -760,6 +758,7 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
                 app.getControl().restoreInventory(list, inv.getTipoEntrega());
 
                 lbFactura.setText(calculateProximoRegistro());
+                
 
                 enablePedido(true);
 
@@ -884,7 +883,7 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        logger.info(evt.getPropertyName()+":"+evt.getPropagationId());
+//        logger.info(evt.getPropertyName()+":"+evt.getPropagationId());
         if (PanelProduct2.AC_ADD_QUICK.equals(evt.getPropertyName())) {
             Product prod = (Product) evt.getNewValue();
             Presentation pres = app.getControl().getPresentationsByDefault(prod.getId());
@@ -1211,6 +1210,7 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
         btConfirm.setBackground(new Color(153, 255, 153));
         btConfirm.setActionCommand(AC_CONFIRMAR_PEDIDO);
         btConfirm.setText("CONFIRMAR");
+        
 
         lbCliente1.setVisible(false);
         calcularValores();
@@ -1266,16 +1266,16 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
 
         Long idClient = invoice.getIdCliente();
         Waiter waiter = app.getControl().getWaitressByID(invoice.getIdWaitress());
-        
 
         lbFactura.setText("<html><font>" + invoice.getFactura() + "</font></html>");
+        lbFactura.removeMouseListener(lbFacturaMouseListener);
 
         PrettyTime pt = new PrettyTime(new Locale("es"));
         String text = "<html><font size=-1 color=blue>" + app.DF_FULL3.format(invoice.getFecha()) + "</font><p><font color=red size=-2>" + pt.format(invoice.getFecha()) + "</font><html>";
 
         if (delivery == TIPO_LOCAL) {
             showLocal();
-            regMesa.setText(String.valueOf(invoice.getTable()));   
+            regMesa.setText(String.valueOf(invoice.getTable()));
             regMesera.setSelected(waiter);
 
             chServ.setSelected(invoice.isService());
@@ -1323,6 +1323,7 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
         tbListado.setEnabled(false);
         btPrint.setVisible(true);
         btPrint1.setVisible(true);
+        
         block = true;
 
         this.invoice = invoice;
@@ -1712,7 +1713,7 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
             Double value = Double.parseDouble(regDescuento.getText());
             desc = value;
         } catch (NumberFormatException e) {
-            System.err.println("ex.parse number: " + e.getMessage());
+            System.err.println("ex.parse number Discount: " + e.getMessage());
         }
         return desc;
     }
@@ -1723,7 +1724,7 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
             Double value = Double.parseDouble(regService.getText());
             serv = value;
         } catch (NumberFormatException e) {
-            System.err.println("ex.parse number: " + e.getMessage());
+            System.err.println("ex.parse number Service: " + e.getMessage());
         }
         return serv;
     }
@@ -1737,7 +1738,7 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
                 Double value = Double.parseDouble(tbListado.getValueAt(i, 3).toString());
                 valorProductos = value;
             } catch (Exception e) {
-                System.err.println("ex.parse number: " + e.getMessage());
+                System.err.println("ex.parse number Total: " + e.getMessage());
             }
             total += valorProductos;
         }
@@ -1752,7 +1753,7 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
             Double value = Double.parseDouble(modeloTb.getValueAt(row, 2).toString());
             total = cant * value;
         } catch (NumberFormatException e) {
-            System.err.println("ex.parse number: " + e.getMessage());
+            System.err.println("ex.parse number Price: " + e.getMessage());
         }
         return total;
     }
@@ -2163,7 +2164,18 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
                 ((JTextField) regDireccion.getComponent()).setCaretPosition(0);
             }
         }
+    }
 
+    private class LabelFacturaMouseListener extends MouseAdapter {
+
+        @Override
+        public void mouseClicked(MouseEvent e) {            
+            if (e.getClickCount() == 2) {
+                String fact = lbFactura.getText();
+                String text = Jsoup.parse(fact).text();
+                regCelular.setText(text);
+            }
+        }
     }
 
 }

@@ -90,7 +90,7 @@ public class ConfigDB {
                 try {
                     return DATE_FORMAT.parse(valor);
                 } catch (Exception e) {
-                    System.err.println(e.getMessage());
+                    System.err.println("CastValor:"+e.getMessage());
                     return null;
                 }
             case BOOLEAN:

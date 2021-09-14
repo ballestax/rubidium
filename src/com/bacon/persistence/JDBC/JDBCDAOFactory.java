@@ -95,8 +95,9 @@ public class JDBCDAOFactory extends DAOFactory {
 
             pass = properties.getProperty(PROPERTIES_DB_PASSWORD);
 
-            createDatabaseFromProperties();
             setupDataSource(properties);
+            createDatabaseFromProperties();
+            
 
             sqlStatements = new SQLLoader(file, dbName);
 
@@ -251,7 +252,7 @@ public class JDBCDAOFactory extends DAOFactory {
                     return;
                 }
             } catch (Exception e) {
-                System.err.println(e.getMessage());
+                logger.debug(e);
             }
             logger.debug("Creating database:" + Aplication.DATABASE);
             con = DriverManager.getConnection("jdbc:mysql://localhost:3306/?user=" + Aplication.DB_USER + "&password=" + String.copyValueOf(pass));

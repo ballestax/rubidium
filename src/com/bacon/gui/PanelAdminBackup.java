@@ -185,8 +185,8 @@ public class PanelAdminBackup extends PanelCaptura implements ActionListener, Ca
                 back.setSize(size);
                 model.addElemento(back);
             }
-        } catch (Exception e) {
-            System.err.println(e.getMessage());
+        } catch (IOException e) {
+            System.err.println("IOException:"+e.getMessage());
         }
     }
 
@@ -430,8 +430,8 @@ public class PanelAdminBackup extends PanelCaptura implements ActionListener, Ca
                         ArrayList<String> sql = org.bx.Utiles.splitArchivoEnLineas(selBackup.getPath(), true);
 //                        Arrays.toString(sql.toArray());
                         app.getCtrlBackup().restoreBackup(sql, this);
-                    } catch (Exception ex) {
-                        System.err.println(ex.getMessage());
+                    } catch (IOException ex) {
+                        System.err.println("Restoring backup:"+ex.getMessage());
                     }
                 }
             }
