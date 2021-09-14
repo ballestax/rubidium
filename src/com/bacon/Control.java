@@ -510,7 +510,7 @@ public class Control {
         }
     }
 
-    public ArrayList<Waiter> getWaiterslList(String where, String order) {
+    public ArrayList<Waiter> getWaitresslList(String where, String order) {
         try {
             JDBCUtilDAO addDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
             return addDAO.getWaitersList(where, order);
@@ -520,7 +520,7 @@ public class Control {
         }
     }
 
-    public Waiter getWaitersByID(int id) {
+    public Waiter getWaitressByID(int id) {
         try {
             JDBCUtilDAO addDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
             ArrayList<Waiter> waitersList = addDAO.getWaitersList("id=" + id, "");

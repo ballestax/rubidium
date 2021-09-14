@@ -42,11 +42,13 @@ import java.awt.Desktop;
 import java.io.File;
 import java.util.Collections;
 import java.util.Date;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.swing.BoxLayout;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -67,6 +69,9 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
     private MyPopupListener popupListenerTabla;
     private Registro regSearch;
     private Registro regFilters;
+    private Registro regTags;
+    private boolean filtered;
+    private List listFiltered;
 
     /**
      * Creates new form PanelReportSales
@@ -80,6 +85,8 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
     }
 
     private void createComponents() {
+
+        filtered = false;
 
         panelButtons.setLayout(new FlowLayout(FlowLayout.LEFT));
 
@@ -152,15 +159,22 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
         });
 
         List filters = loadFilters();
-
         regFilters = new Registro(BoxLayout.X_AXIS, "Items", new String[1], 50);
         regFilters.setHeight(32);
         regFilters.setText(filters.toArray());
         regFilters.setActionCommand(AC_CHANGE_ITEMS);
         regFilters.addActionListener(this);
 
+        Set tags = loadTags();
+        regTags = new Registro(BoxLayout.X_AXIS, "Tags", new String[1], 50);
+        regTags.setHeight(32);
+        regTags.setText(tags.toArray());
+        regTags.setActionCommand(AC_CHANGE_TAGS);
+        regTags.addActionListener(this);
+
         panelButtons.add(regSearch);
         panelButtons.add(regFilters);
+        panelButtons.add(regTags);
         panelButtons.add(btAdd);
         panelButtons.add(btLoad);
         panelButtons.add(btDesc);
@@ -316,29 +330,34 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
 
     }
 
-    private List loadFilters() {
+    private Set loadTags() {
         List<String> tagsInventoryList = app.getControl().getTAGSInventoryList("");
-        Set<String> listTags = Collections.EMPTY_SET;
+        tagsInventoryList.add(0, FILTER_ITEM_TODOS);
+        LinkedHashSet<String> listTags = new LinkedHashSet<>();
         if (!tagsInventoryList.isEmpty()) {
-            //split(,) la lista de tags de cada item, lo pasa a lowecase y filtra que no este vacio el string
-            listTags = tagsInventoryList.stream().flatMap(Pattern.compile(",")::splitAsStream).map(tag -> tag.toLowerCase().trim()).filter(tag -> !tag.isEmpty()).collect(Collectors.toSet());
+            //split(,) la lista de tags de cada item, lo pasa a lowercase y filtra que no este vacio el string
+            listTags = tagsInventoryList.stream().flatMap(Pattern.compile(",")::splitAsStream).filter(tag -> !tag.isEmpty()).map(tag -> FILTER_ITEM_TAGS + tag.toUpperCase().trim()).collect(Collectors.toCollection(LinkedHashSet::new));
         }
+        return listTags;
+    }
+
+    private List loadFilters() {
         List filters = new ArrayList();
         filters.add(FILTER_ITEM_TODOS);
         filters.add(FILTER_ITEM_STOCK_REGULAR);
         filters.add(FILTER_ITEM_STOCK_MINIMO);
+        filters.add(FILTER_ITEM_NO_AGOTADOS);
         filters.add(FILTER_ITEM_AGOTADOS);
-        for (String listTag : listTags) {
-            filters.add(FILTER_ITEM_TAGS + listTag.toUpperCase());
-        }
         return filters;
     }
     private static final String FILTER_ITEM_AGOTADOS = "AGOTADOS";
+    private static final String FILTER_ITEM_NO_AGOTADOS = "CON EXISTENCIAS";
     private static final String FILTER_ITEM_TAGS = "TAG: ";
     private static final String FILTER_ITEM_STOCK_REGULAR = "STOCK REGULAR";
     private static final String FILTER_ITEM_STOCK_MINIMO = "STOCK MINIMO";
     private static final String FILTER_ITEM_TODOS = "TODOS";
     private static final String AC_CHANGE_ITEMS = "AC_CHANGE_ITEMS";
+    private static final String AC_CHANGE_TAGS = "AC_CHANGE_TAGS";
     public static final String AC_EXPORT_TO = "AC_EXPORT_TO";
     public static final String AC_ADD_CONCILIATION = "AC_ADD_CONCILIATION";
     public static final String AC_REFRESH_ITEMS = "AC_REFRESH_ITEMS";
@@ -357,6 +376,10 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
 
     private void filtrar() {
         String text = regSearch.getText();
+        boolean enable = text.isEmpty();
+        regFilters.setEnabled(enable);
+        regTags.setEnabled(enable);
+
         ArrayList<Item> listItems = app.getControl().getItemList("", "name");
 
         List<Item> listFiltered = listItems.stream().filter(item -> item.getName().toUpperCase().contains(text.toUpperCase())).collect(Collectors.toList());
@@ -364,24 +387,64 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
         populateTable(listFiltered);
     }
 
-    private void filtrarItems(String filtro) {        
+    private void filtrarItems(String filtro) {
         Predicate<Item> filterAgotados = itm -> itm.getQuantity() <= 0;
         Predicate<Item> filterMinimo = itm -> itm.getQuantity() <= itm.getStockMin();
         Predicate<Item> filterRegular = itm -> itm.getQuantity() > itm.getStockMin();
-        Predicate<Item> filterTags = itm -> itm.getTagsSt().contains(filtro.substring(5).toLowerCase());
 
-        ArrayList<Item> listItems = app.getControl().getItemList("", "name");
-        List<Item> listFiltered = listItems;
+        List<Item> listItems;
+        if (filtered) {
+            listItems = listFiltered;
+        } else {
+            listItems = app.getControl().getItemList("", "name");
+        }
+        List listRes = new ArrayList();
         if (FILTER_ITEM_AGOTADOS.equals(filtro)) {
             listFiltered = listItems.stream().filter(filterAgotados).collect(Collectors.toList());
+            filtered = true;
         } else if (FILTER_ITEM_STOCK_MINIMO.equals(filtro)) {
             listFiltered = listItems.stream().filter(filterMinimo.and(filterAgotados.negate())).collect(Collectors.toList());
+            filtered = true;
         } else if (FILTER_ITEM_STOCK_REGULAR.equals(filtro)) {
             listFiltered = listItems.stream().filter(filterRegular).collect(Collectors.toList());
-        } else if (FILTER_ITEM_TAGS.equals(filtro.substring(0, 5))) {            
-            listFiltered = listItems.stream().filter(filterTags).collect(Collectors.toList());
+            filtered = true;
+        } else {
+            filtered = false;
+            listFiltered = app.getControl().getItemList("", "name");
         }
         populateTable(listFiltered);
+    }
+
+    private void filtrarItems() {
+
+        String filtro = regFilters.getText();
+        String tag = regTags.getText();
+
+        Predicate<Item> filterAgotados = itm -> itm.getQuantity() <= 0;
+        Predicate<Item> filterNoAgotados = itm -> itm.getQuantity() > 0;
+        Predicate<Item> filterMinimo = itm -> itm.getQuantity() <= itm.getStockMin();
+        Predicate<Item> filterRegular = itm -> itm.getQuantity() > itm.getStockMin();
+        Predicate<Item> filterTags = itm -> itm.getTagsSt().contains(tag.substring(5).toLowerCase());
+
+        ArrayList<Item> listItems = app.getControl().getItemList("", "name");
+        Stream<Item> stream = listItems.stream();
+
+        if (regFilters.getSelected() > 0) {
+            if (FILTER_ITEM_AGOTADOS.equals(filtro)) {
+                stream = stream.filter(filterAgotados);
+            } else if (FILTER_ITEM_NO_AGOTADOS.equals(filtro)) {
+                stream = stream.filter(filterNoAgotados);
+            } else if (FILTER_ITEM_STOCK_MINIMO.equals(filtro)) {
+                stream = stream.filter(filterMinimo.and(filterAgotados.negate()));
+            } else if (FILTER_ITEM_STOCK_REGULAR.equals(filtro)) {
+                stream = stream.filter(filterRegular);
+            }
+        }
+        if (regTags.getSelected() > 0) {
+            stream = stream.filter(filterTags);
+        }
+
+        populateTable(stream.collect(Collectors.toList()));
     }
 
     private void populateTable() {
@@ -394,8 +457,12 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
             @Override
             protected Object doInBackground() throws Exception {
                 model.setRowCount(0);
-                for (int i = 0; i < itemList.size(); i++) {
-                    Item item = itemList.get(i);
+                List<Item> localList = itemList;
+                if (filtered) {
+                    localList = listFiltered;
+                }
+                for (int i = 0; i < localList.size(); i++) {
+                    Item item = localList.get(i);
                     model.addRow(new Object[]{
                         item.getId(),
                         item.getName(),
@@ -526,8 +593,11 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
         } else if (AC_DOWNLOAD_ITEM.equals(e.getActionCommand())) {
             app.getGuiManager().showPanelDownItem(this);
         } else if (AC_CHANGE_ITEMS.equals(e.getActionCommand())) {
-            filtrarItems(regFilters.getText());
+            filtrarItems();
+        } else if (AC_CHANGE_TAGS.equals(e.getActionCommand())) {
+            filtrarItems();
         }
+
         if (e.getActionCommand().equals(AC_EXPORT_TO)) {
             System.out.println("exportando..");
             SwingWorker tarea = new SwingWorker() {
@@ -559,7 +629,9 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
             Item item = app.getControl().getItemWhere("id=" + id);
             pnDetail.showInfoProduct(item);
         } catch (Exception ex) {
-            logger.error(ex.getMessage());
+            System.err.println(ex.getMessage());
+//            logger.error(ex.getMessage());
+
         }
     }
 

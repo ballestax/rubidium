@@ -82,9 +82,9 @@
                   <Group type="102" alignment="0" attributes="0">
                       <Group type="103" groupAlignment="1" attributes="0">
                           <Group type="102" attributes="0">
-                              <Component id="regMesa" pref="177" max="32767" attributes="0"/>
-                              <EmptySpace min="-2" max="-2" attributes="0"/>
                               <Component id="regMesera" pref="177" max="32767" attributes="0"/>
+                              <EmptySpace min="-2" max="-2" attributes="0"/>
+                              <Component id="regMesa" pref="177" max="32767" attributes="0"/>
                           </Group>
                           <Group type="102" attributes="0">
                               <Component id="regCelular" min="-2" pref="244" max="-2" attributes="0"/>
@@ -134,8 +134,8 @@
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="1" attributes="0">
-                  <Component id="regMesa" min="-2" pref="30" max="-2" attributes="0"/>
                   <Component id="regMesera" min="-2" pref="30" max="-2" attributes="0"/>
+                  <Component id="regMesa" min="-2" pref="30" max="-2" attributes="0"/>
                   <Component id="lbCliente1" min="-2" pref="31" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
@@ -333,14 +333,14 @@
         </Component>
       </SubComponents>
     </Container>
-    <Component class="com.bacon.gui.util.Registro" name="regMesa">
-      <AuxValues>
-        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, &quot;Mesa&quot;,new String[1], 70)"/>
-      </AuxValues>
-    </Component>
     <Component class="com.bacon.gui.util.Registro" name="regMesera">
       <AuxValues>
-        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, &quot;Mesero&quot;,new String[1],70)"/>
+        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, &quot;Mesero&quot;,new String[1], 70)"/>
+      </AuxValues>
+    </Component>
+    <Component class="com.bacon.gui.util.Registro" name="regMesa">
+      <AuxValues>
+        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, &quot;Mesa&quot;,new String[1],70)"/>
       </AuxValues>
     </Component>
     <Component class="javax.swing.JButton" name="btSearch">

@@ -93,7 +93,7 @@ public class PanelCash extends PanelCapturaMod implements ActionListener, Proper
         regFilter1.setLabelText("Pedido");
         regFilter1.setText(new String[]{"--TODOS--", "LOCAL", "DOMICILIO", "PARA LLEVAR"});
 
-        ArrayList<Waiter> waiterslList = app.getControl().getWaiterslList("status=1", "name");
+        ArrayList<Waiter> waiterslList = app.getControl().getWaitresslList("status=1", "name");
         waiterslList.add(0, new Waiter("--TODOS--", 1));
         regFilter2.setText(waiterslList.toArray());
         regFilter2.setLabelText("Mesero");
@@ -312,7 +312,7 @@ public class PanelCash extends PanelCapturaMod implements ActionListener, Proper
                 int ct = 1;
                 for (int i = 0; i < invoiceslList.size(); i++) {
                     Invoice invoice = invoiceslList.get(i);
-                    Waiter waiter = app.getControl().getWaitersByID(invoice.getIdWaitress());
+                    Waiter waiter = app.getControl().getWaitressByID(invoice.getIdWaitress());
                     Table table = app.getControl().getTableByID(invoice.getTable());
                     if (invoice.getStatus() != Invoice.ST_ANULADA) {
                         total = total.add(invoice.getValor());

@@ -56,7 +56,7 @@ public class PrinterService {
         Table table = null;
         Client client = null;
         try {
-            waiter = app.getControl().getWaitersByID(invoice.getIdWaitress());
+            waiter = app.getControl().getWaitressByID(invoice.getIdWaitress());
             table = app.getControl().getTableByID(invoice.getTable());
 
             client = app.getControl().getClient(invoice.getIdCliente().toString());
@@ -210,7 +210,7 @@ public class PrinterService {
         Table table = null;
         Client client = null;
         try {
-            waiter = app.getControl().getWaitersByID(invoice.getIdWaitress());
+            waiter = app.getControl().getWaitressByID(invoice.getIdWaitress());
             table = app.getControl().getTableByID(invoice.getTable());
 
             client = app.getControl().getClient(invoice.getIdCliente().toString());
@@ -311,7 +311,7 @@ public class PrinterService {
         Table table = null;
         Client client = null;
         try {
-            waiter = app.getControl().getWaitersByID(invoice.getIdWaitress());
+            waiter = app.getControl().getWaitressByID(invoice.getIdWaitress());
             table = app.getControl().getTableByID(invoice.getTable());
 
             client = app.getControl().getClient(invoice.getIdCliente().toString());

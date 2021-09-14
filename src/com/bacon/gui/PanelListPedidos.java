@@ -260,7 +260,7 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener,
         regProduct.setBackground(COLOR_BACKG);
 
 //        String[] ESTADOS = {__TODOS__, ST_ENTREGADO, ST_DEVUELTO, ST_DESPACHADO, ST_FACTURADO};
-        waitersList = app.getControl().getWaiterslList("", "name");
+        waitersList = app.getControl().getWaitresslList("", "name");
         Waiter WTODOS = new Waiter();
         WTODOS.setName(__TODOS__);
         waitersList.add(0, WTODOS);
@@ -757,7 +757,7 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener,
         productsList.add(0, PTODOS);
         regProduct.setText((productsList.toArray()));
 
-        waitersList = app.getControl().getWaiterslList("", "name");
+        waitersList = app.getControl().getWaitresslList("", "name");
         Waiter WTODOS = new Waiter();
         WTODOS.setName(__TODOS__);
         waitersList.add(0, WTODOS);
@@ -778,7 +778,7 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener,
                 int anuladas = 0;
                 for (int i = 0; i < invoiceslList.size(); i++) {
                     Invoice invoice = invoiceslList.get(i);
-                    Waiter waiter = app.getControl().getWaitersByID(invoice.getIdWaitress());
+                    Waiter waiter = app.getControl().getWaitressByID(invoice.getIdWaitress());
                     Table table = app.getControl().getTableByID(invoice.getTable());
                     if (invoice.getStatus() != Invoice.ST_ANULADA) {
                         total = total.add(invoice.getValor());

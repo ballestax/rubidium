@@ -210,7 +210,6 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
             public void caretUpdate(CaretEvent e) {
                 calcularValores();
             }
-
         });
 
         spNumDom.setFont(font);
@@ -446,15 +445,15 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
 
         ArrayList<Table> tables = app.getControl().getTableslList("", "");
 
-        ArrayList<Waiter> waiters = app.getControl().getWaiterslList("status=1", "name");
+        ArrayList<Waiter> waiters = app.getControl().getWaitresslList("status=1", "name");
 
         org.balx.TextFormato tForm = new TextFormato();
         regCelular.setDocument(tForm.getLimitadorNumeros());
         regCelular.setActionCommand(AC_SEARCH_CLIENT);
         regCelular.addActionListener(this);
 
-        regMesa.setText(tables.toArray());
         regMesera.setText(waiters.toArray());
+        regMesa.setText(tables.toArray());
 
 //        regService.setEnabled(true);
         btPrint.setVisible((Boolean.valueOf(app.getConfiguration().getProperty(Configuration.PRINT_PREV_DELIVERY))));
@@ -548,8 +547,8 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
             enablePedido(true);
             clearPedido();
             btDelete.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "trash.png", 18, 18)));
-            regMesa.setEditable(true);
             regMesera.setEditable(true);
+            regMesa.setEditable(true);
             regCelular.setEditable(true);
             regDireccion.setEditable(true);
             btTogle1.setEnabled(true);
@@ -792,8 +791,8 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
     }
 
     private void enablePedido(boolean enable) {
-        regMesa.setEnabled(enable);
         regMesera.setEnabled(enable);
+        regMesa.setEnabled(enable);
         regCelular.setEditable(enable);
         regDireccion.setEditable(enable);
         tbListado.setEnabled(enable);
@@ -1266,6 +1265,8 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
         int delivery = invoice.getTipoEntrega();
 
         Long idClient = invoice.getIdCliente();
+        Waiter waiter = app.getControl().getWaitressByID(invoice.getIdWaitress());
+        
 
         lbFactura.setText("<html><font>" + invoice.getFactura() + "</font></html>");
 
@@ -1274,8 +1275,8 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
 
         if (delivery == TIPO_LOCAL) {
             showLocal();
-            regMesa.setText(String.valueOf(invoice.getTable()));
-            regMesera.setSelected(invoice.getIdWaitress() - 1);
+            regMesa.setText(String.valueOf(invoice.getTable()));   
+            regMesera.setSelected(waiter);
 
             chServ.setSelected(invoice.isService());
             regService.setText(String.valueOf(invoice.getPorcService()));
@@ -1491,8 +1492,8 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
             btPrint.setVisible(true);
             btPrint1.setVisible(true);
 
-            regMesa.setEditable(false);
             regMesera.setEditable(false);
+            regMesa.setEditable(false);
             regCelular.setEditable(false);
             regDireccion.setEditable(false);
             regDomicilio.setEditable(false);
@@ -1781,8 +1782,8 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
         btSearch.setVisible(true);
         btClear.setVisible(true);
 //        btLastDelivery.setVisible(true);
-        regMesa.setVisible(false);
         regMesera.setVisible(false);
+        regMesa.setVisible(false);
         regService.setVisible(false);
         tfService.setVisible(false);
         regDomicilio.setText(entregasDom);
@@ -1816,8 +1817,8 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
 
         lbTitle.setForeground(colorLocal.darker());
 //        this.setBackground(colorLocal.brighter());      
-        regMesa.setTint(colorLocal);
         regMesera.setTint(colorLocal);
+        regMesa.setTint(colorLocal);
 
         jScrollPane2.setBorder(BorderFactory.createLineBorder(colorLocal, 1, true));
         tbListado.getTableHeader().setBackground(colorLocal.brighter());
@@ -1832,8 +1833,8 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
         btSearch.setVisible(false);
         btLastDelivery.setVisible(false);
         btClear.setVisible(false);
-        regMesa.setVisible(true);
         regMesera.setVisible(true);
+        regMesa.setVisible(true);
         regService.setVisible(true);
         tfService.setVisible(true);
         chServ.setVisible(true);
@@ -1884,8 +1885,8 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
         jPanel1 = new javax.swing.JPanel();
         btTogle2 = new javax.swing.JToggleButton();
         btTogle1 = new javax.swing.JToggleButton();
-        regMesa = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Mesa",new String[1], 70);
-        regMesera = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Mesero",new String[1],70);
+        regMesera = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Mesero",new String[1], 70);
+        regMesa = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Mesa",new String[1],70);
         btSearch = new javax.swing.JButton();
         lbCliente = new javax.swing.JLabel();
         lbStatus = new javax.swing.JLabel();
@@ -2027,9 +2028,9 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(regMesa, javax.swing.GroupLayout.DEFAULT_SIZE, 177, Short.MAX_VALUE)
+                                .addComponent(regMesera, javax.swing.GroupLayout.DEFAULT_SIZE, 177, Short.MAX_VALUE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(regMesera, javax.swing.GroupLayout.DEFAULT_SIZE, 177, Short.MAX_VALUE))
+                                .addComponent(regMesa, javax.swing.GroupLayout.DEFAULT_SIZE, 177, Short.MAX_VALUE))
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(regCelular, javax.swing.GroupLayout.PREFERRED_SIZE, 244, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -2073,8 +2074,8 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
                     .addComponent(btLastDelivery, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(regMesa, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(regMesera, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(regMesa, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(lbCliente1, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)

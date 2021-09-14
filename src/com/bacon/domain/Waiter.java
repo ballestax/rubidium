@@ -1,5 +1,7 @@
 package com.bacon.domain;
 
+import java.util.Objects;
+
 /**
  *
  * @author lrod
@@ -46,5 +48,25 @@ public class Waiter {
     public String toString() {
         return name.toUpperCase();
     }
-    
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        }
+        if (!(obj instanceof Waiter)) {
+            return false;
+        }
+        Waiter waiter = (Waiter) obj;
+        if(id!=waiter.id)
+            return false;
+        return name.equalsIgnoreCase(waiter.getName());
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 59 * hash + Objects.hashCode(this.name);
+        return hash;
+    }
 }
