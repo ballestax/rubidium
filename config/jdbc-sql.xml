@@ -1418,8 +1418,7 @@
         
         <SQLStatement method="ADD_ITEM">
             <SQLFragment>
-                INSERT INTO inventory (name,quantity,measure,cost,price,location,stock,stockmin,average,init,onlyDelivery,snapshot,user) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?);
-                INSERT INTO inventory (name,quantity,measure,cost,price,location,stock,stockmin,average,init,onlyDelivery,tags,user) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?);
+                INSERT INTO inventory (name,quantity,measure,cost,price,location,stock,stockmin,average,init,onlyDelivery,tags,snapshot,user) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?);                
             </SQLFragment>            
         </SQLStatement>
         
@@ -1448,9 +1447,9 @@
                 price=?,
                 stock=?,
                 stockMin=?,
-                onlyDelivery=?,
-                snapshot=? 
-                tags=?  
+                onlyDelivery=?,                 
+                tags=?,
+                snapshot=?
                 WHERE id = ?
             </SQLFragment>            
         </SQLStatement>
@@ -1677,9 +1676,11 @@
         
         <SQLStatement method="GET_PRODUCTS_OUT_INVENTORY">
             <SQLFragment>
-                SELECT p.id as id, p.name as name, sum(ip.cantidad) as quantity, i.deliveryType as deliveryType
+                SELECT p.id as id, p.name as name, sum(ip.cantidad*ivp.quantity) as quantity, i.deliveryType as deliveryType
                 FROM  invoices i, invoice_product ip, products p
-                WHERE i.id=ip.id_invoice AND ip.id_product=p.id and i.status=0 AND ip.id_product=?
+                LEFT JOIN inventory_product ivp ON
+                p.id = ivp.product_id 
+                WHERE i.id=ip.id_invoice AND ip.id_product=p.id and i.status=0 AND ip.id_product=? AND ivp.item_id=? 
                 AND (i.sale_date BETWEEN ? AND ?)
                 GROUP BY p.id
             </SQLFragment>            

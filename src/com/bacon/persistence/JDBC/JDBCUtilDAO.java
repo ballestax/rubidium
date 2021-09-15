@@ -136,9 +136,9 @@ public class JDBCUtilDAO implements UtilDAO {
     public static final String CREATE_INVENTORY_PRODUCT_TABLE_KEY = "CREATE_INVENTORY_PRODUCT_TABLE";
     public static final String UPDATE_INVENTORY_QUANTITY_KEY = "UPDATE_INVENTORY_QUANTITY";
     public static final String ADD_INVENTORY_QUANTITY_KEY = "ADD_INVENTORY_QUANTITY";
-    
+
     public static final String GET_TAGS_INVENTORY_LIST_KEY = "GET_TAGS_INVENTORY_LIST";
-    
+
     public static final String CREATE_INVENTORY_REGISTER_TABLE_KEY = "CREATE_INVENTORY_REGISTER_TABLE";
     public static final String ADD_INVENTORY_EVENT_KEY = "ADD_INVENTORY_EVENT";
     public static final String GET_INVENTORY_EVENT_LIST_KEY = "GET_INVENTORY_EVENT_LIST";
@@ -1141,7 +1141,7 @@ public class JDBCUtilDAO implements UtilDAO {
             ResultSet rs = statement.executeQuery("SELECT * FROM inventory WHERE snapshot=1");
 
             while (rs.next()) {
-                Object[] parameters2 = {rs.getLong("id"), cycleId, rs.getDouble("quantity"), 0, 0, 0,0,0, rs.getInt("onlyDelivery")};
+                Object[] parameters2 = {rs.getLong("id"), cycleId, rs.getDouble("quantity"), 0, 0, 0, 0, 0, rs.getInt("onlyDelivery")};
                 ps2 = sqlStatements.buildSQLStatement(conn, ADD_INVENTARY_SNAPSHOT_ITEM_KEY, parameters2);
                 ps2.executeUpdate();
             }
@@ -1638,12 +1638,12 @@ public class JDBCUtilDAO implements UtilDAO {
         return events;
     }
 
-    public ArrayList<Object[]> getProductsOutInventory(long idProd, Date start) throws DAOException {
+    public ArrayList<Object[]> getProductsOutInventory(long idProd, long idItem, Date start) throws DAOException {
         ArrayList<Object[]> list = new ArrayList<>();
         Connection conn = null;
         PreparedStatement retrieve = null;
         ResultSet rs = null;
-        Object[] parameters = {idProd, Aplication.DF_SQL_TS.format(start), new Date()};
+        Object[] parameters = {idProd, idItem, Aplication.DF_SQL_TS.format(start), new Date()};
         try {
             conn = dataSource.getConnection();
             retrieve = sqlStatements.buildSQLStatement(conn, GET_PRODUCTS_OUT_INVENTORY_KEY, parameters);
@@ -1857,15 +1857,14 @@ public class JDBCUtilDAO implements UtilDAO {
             DBManager.closeConnection(conn);
         }
     }
-<<<<<<< HEAD
-    
+
     public List<String> getTagsInventoryList(String where) throws DAOException {
         String retrievePayment;
         List<String> tagsList = new ArrayList<>();
         try {
-            SQLExtractor sqlExtractorWhere = new SQLExtractor(where, SQLExtractor.Type.WHERE);            
+            SQLExtractor sqlExtractorWhere = new SQLExtractor(where, SQLExtractor.Type.WHERE);
             Map<String, String> namedParams = new HashMap<>();
-            namedParams.put(NAMED_PARAM_WHERE, sqlExtractorWhere.extractWhere());            
+            namedParams.put(NAMED_PARAM_WHERE, sqlExtractorWhere.extractWhere());
             retrievePayment = sqlStatements.getSQLString(GET_TAGS_INVENTORY_LIST_KEY, namedParams);
 
         } catch (SQLException e) {
@@ -1896,7 +1895,6 @@ public class JDBCUtilDAO implements UtilDAO {
         }
         return tagsList;
     }
-=======
 
     public ArrayList<Map> getItemSnapshotList(String where, String orderBy) throws DAOException {
         String retrieve;
@@ -2044,5 +2042,4 @@ public class JDBCUtilDAO implements UtilDAO {
         return dataItemSnap;
     }
 
->>>>>>> add_feature_snapshot
 }

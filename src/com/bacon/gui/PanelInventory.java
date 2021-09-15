@@ -6,7 +6,6 @@ import com.bacon.ProgAction;
 import com.bacon.domain.Item;
 import com.bacon.domain.Presentation;
 import com.bacon.domain.Product;
-import com.bacon.gui.util.MyPopupListener;
 import static com.bacon.gui.PanelSelItem.AC_ADD_ITEM_TO_TABLE;
 import com.bacon.gui.util.Registro;
 import java.awt.BorderLayout;
@@ -39,8 +38,10 @@ import org.apache.log4j.Logger;
 import org.bx.gui.MyDefaultTableModel;
 import org.dz.PanelCapturaMod;
 import java.awt.Desktop;
+import java.awt.PopupMenu;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.File;
-import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -73,6 +74,10 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
     private Registro regTags;
     private boolean filtered;
     private List listFiltered;
+    private JMenuItem itemVer;
+    private JMenuItem itemCargar;
+    private JMenuItem itemDescargar;
+    private JMenuItem itemLinks;
 
     /**
      * Creates new form PanelReportSales
@@ -91,47 +96,57 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
 
         Font f = new Font("Sans", 1, 11);
 
-        JButton btAdd = new JButton("Agregar");
+        JButton btAdd = new JButton();
+        btAdd.setName("Agregar");
         btAdd.setFont(f);
         btAdd.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "shopping-basket-add.png", 24, 24)));
         btAdd.setActionCommand(AC_SHOW_ADD_ITEM);
         btAdd.addActionListener(this);
+        btAdd.setToolTipText("Agregar Item");
 
-        JButton btLoad = new JButton("Cargar");
+        JButton btLoad = new JButton();
+        btLoad.setName("Cargar");
         btLoad.setFont(f);
         btLoad.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "shopping-basket-accept.png", 24, 24)));
         btLoad.setActionCommand(AC_LOAD_ITEM);
         btLoad.addActionListener(this);
+        btLoad.setToolTipText("Cargar Item");
 
-        JButton btDesc = new JButton("Descargar");
+        JButton btDesc = new JButton();
         btDesc.setFont(f);
         btDesc.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "shopping-basket-remove.png", 24, 24)));
         btDesc.setActionCommand(AC_DOWNLOAD_ITEM);
         btDesc.addActionListener(this);
+        btDesc.setToolTipText("Descargar Item");
 
-        JButton btRefresh = new JButton("Actualizar");
+        JButton btRefresh = new JButton();
         btRefresh.setFont(f);
-        btRefresh.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "shopping-basket-refresh.png", 24, 24)));
+        btRefresh.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "refresh.png", 26, 26)));
         btRefresh.setActionCommand(AC_REFRESH_ITEMS);
         btRefresh.addActionListener(this);
+        btRefresh.setToolTipText("Refrescar lista");
 
-        JButton btConciliation = new JButton("Conciliar");
+        JButton btConciliation = new JButton();
         btConciliation.setFont(f);
         btConciliation.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "shopping-basket-prohibit.png", 24, 24)));
         btConciliation.setActionCommand(AC_ADD_CONCILIATION);
         btConciliation.addActionListener(this);
+        btConciliation.setToolTipText("Conciliar Item");
 
-        JButton btExport = new JButton("Exportar");
+        JButton btExport = new JButton();
         btExport.setFont(f);
         btExport.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "export-file.png", 24, 24)));
         btExport.setActionCommand(AC_EXPORT_TO);
         btExport.addActionListener(this);
+        btExport.setToolTipText("Exportar lista");
+        
 
-        JButton btSnapShot = new JButton("SnapShot");
+        JButton btSnapShot = new JButton();
         btSnapShot.setFont(f);
         btSnapShot.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "camera-accept.png", 24, 24)));
         btSnapShot.setActionCommand(AC_SHOW_SNAPSHOT);
         btSnapShot.addActionListener(this);
+        btSnapShot.setToolTipText("Ver Snapshot");
 
         ImageIcon searchIcon = new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "search.png", 16, 16));
         ImageIcon clearIcon = new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "cancel.png", 24, 24));
@@ -162,27 +177,32 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
             }
         });
 
-        List filters = new ArrayList();
-        filters.add("TODOS");
-        filters.add("STOCK MINIMO");
-        filters.add("AGOTADOS");
-
-
         List filters = loadFilters();
         regFilters = new Registro(BoxLayout.X_AXIS, "Items", new String[1], 50);
         regFilters.setHeight(32);
         regFilters.setText(filters.toArray());
         regFilters.setActionCommand(AC_CHANGE_ITEMS);
+        regFilters.addActionListener(this);
+
+        Set tags = loadTags();
+        regTags = new Registro(BoxLayout.X_AXIS, "Tags", new String[1], 50);
+        regTags.setHeight(32);
+        regTags.setText(tags.toArray());
+        regTags.setActionCommand(AC_CHANGE_TAGS);
+        regTags.addActionListener(this);
+
         panelButtons.add(regSearch);
         panelButtons.add(regFilters);
         panelButtons.add(regTags);
+        panelButtons.add(btRefresh);
         panelButtons.add(btAdd);
         panelButtons.add(btLoad);
-        panelButtons.add(btDesc);
-        panelButtons.add(btRefresh);
+        panelButtons.add(btDesc);        
         panelButtons.add(btConciliation);
         panelButtons.add(btExport);
         panelButtons.add(btSnapShot);
+        
+        
 
         String[] colNames = new String[]{"N°", "Item", "Cantidad", "Medida", "Cost", "Price", "Min", "Cost. Total"};
 
@@ -215,11 +235,8 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
 //        tableItems.getColumnModel().getColumn(model.getColumnCount() - 1).setCellEditor(new BotonEditor(tableItems, this, "AC_MOD_USER"));
 //        tableItems.getColumnModel().getColumn(model.getColumnCount() - 1).setCellRenderer(new ButtonCellRenderer("Ver"));
 
-        popupTable = new JPopupMenu();
-        
-        popupListenerTabla = new MyPopupListener(popupTable, true);
-        JMenuItem item1 = new JMenuItem("Ver");
-        item1.addActionListener(new ActionListener() {
+        itemVer = new JMenuItem("Ver");
+        itemVer.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -229,7 +246,7 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
             }
 
         });
-        JMenuItem itemCargar = new JMenuItem("Cargar");
+        itemCargar = new JMenuItem("Cargar");
         itemCargar.addActionListener(new ActionListener() {
 
             @Override
@@ -241,7 +258,7 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
             }
         });
 
-        JMenuItem itemDescargar = new JMenuItem("Descargar");
+        itemDescargar = new JMenuItem("Descargar");
         itemDescargar.addActionListener(new ActionListener() {
 
             @Override
@@ -253,7 +270,7 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
             }
         });
 
-        JMenuItem itemLinks = new JMenuItem("Enlaces");
+        itemLinks = new JMenuItem("Enlaces");
         itemLinks.addActionListener(new ActionListener() {
 
             @Override
@@ -261,85 +278,13 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
                 int r = tableItems.getSelectedRow();
                 String id = tableItems.getValueAt(r, 0).toString();
                 showEnlaces(id);
-
             }
 
         });
-        
-        JMenuItem itemSnapshot = new JMenuItem("<html>Snapshot <font color=green>[OFF]</font><html>");
-        itemSnapshot.addActionListener(new ActionListener() {
 
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int r = tableItems.getSelectedRow();
-                String id = tableItems.getValueAt(r, 0).toString();                
-                
-                Item item = app.getControl().getItemWhere("id=" + id);
-                ArrayList<Object[]> presentations = app.getControl().getPresentationsByItem(item.getId());
-                StringBuilder htmlText = new StringBuilder("<html>");
+        makePopup(-1);
 
-                if (!presentations.isEmpty()) {
-                    htmlText.append("<table  width=\"100%\" cellspacing=\"0\" border=\"1\">");
-                    htmlText.append("<tr bgcolor=\"#A4C1FF\">");
-                    htmlText.append("<td>Producto</td><td>Presentación</td><td>Cantidad</td></tr>");
-                } else {
-                    htmlText.append("<br><br><font color=red size=+1>  El item: <STRONG>")
-                            .append(item.getName().toUpperCase())
-                            .append("</STRONG> no tiene enlaces.  </font><br><br>");
-                }
-
-                for (Object[] presentation : presentations) {
-                    Object[] data = presentation;
-                    long idPres = Long.parseLong(data[0].toString());
-                    long idProd = Long.parseLong(data[1].toString());
-                    String quantity = data[2].toString();
-                    Product prod = app.getControl().getProductById(idProd);
-                    if (idPres == 0) {
-                        htmlText.append("<tr><td>").append(prod.getName().toUpperCase()).append("<td>---")
-                                .append("<td>").append(quantity).append("</tr>");
-                    } else {
-                        Presentation press = app.getControl().getPresentationsById(idPres);
-                        if (press != null && press.isEnabled()) {
-                            Product productById = app.getControl().getProductByPressId((idPres));
-                            htmlText.append("<tr><td>").append(productById.getName().toUpperCase()).append("<td>")
-                                    .append(press.getName().toUpperCase()).append("<td>").append(quantity).append("</tr>");
-                        }
-                    }
-                }
-                htmlText.append("</table></html>");
-
-                JLabel labelInfo = new JLabel(htmlText.toString());
-                labelInfo.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-                JButton btModificar = new JButton("Modificar");
-//                btModificar.setBorder(BorderFactory.createEmptyBorder(0, 10, 5, 10));
-                btModificar.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        showPanelEditItem(String.valueOf(item.getId()));
-                    }
-
-                });
-
-                MyDialogEsc dialog = new MyDialogEsc(app.getGuiManager().getFrame());
-                dialog.setTitle(item.getName().toUpperCase());
-                dialog.setLayout(new BorderLayout());
-                dialog.add(labelInfo, BorderLayout.CENTER);
-                dialog.add(btModificar, BorderLayout.SOUTH);
-                dialog.pack();
-                dialog.setLocationRelativeTo(null);
-                dialog.setVisible(true);
-
-            }
-        });
-
-        popupTable.add(item1);
-        popupTable.addSeparator();
-        popupTable.add(itemCargar);
-        popupTable.add(itemDescargar);
-        popupTable.addSeparator();
-        popupTable.add(itemLinks);
-        popupTable.addSeparator();
-        popupTable.add(itemSnapshot);
+        popupListenerTabla = new MyPopupListener();
 
         tableItems.addMouseListener(popupListenerTabla);
 
@@ -350,6 +295,43 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
 
         populateTable();
 
+    }
+
+    private JPopupMenu makePopup(int row) {
+        boolean on = false;
+        if (row >= 0) {
+            long idItem = Long.parseLong(tableItems.getValueAt(row, 0).toString());
+            Item item = app.getControl().getItemWhere("id=" + idItem);
+            if (item != null) {
+                on = item.isSnapshot();
+            }
+        }
+        String html = "<html>Snapshot <font color=" + (!on ? "green" : "red") + ">[" + (!on ? "ON" : "OFF") + "]</font><html>";
+        JMenuItem itemSnapshot = new JMenuItem(html);
+        itemSnapshot.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int r = tableItems.getSelectedRow();
+                String id = tableItems.getValueAt(r, 0).toString();
+                Item item = app.getControl().getItemWhere("id=" + id);
+                item.setSnapshot(!item.isSnapshot());
+                app.getControl().updateItem(item);
+            }
+        });
+
+        JPopupMenu popupTable = new JPopupMenu();
+
+        popupTable.add(itemVer);
+        popupTable.addSeparator();
+        popupTable.add(itemCargar);
+        popupTable.add(itemDescargar);
+        popupTable.addSeparator();
+        popupTable.add(itemLinks);
+        popupTable.addSeparator();
+        popupTable.add(itemSnapshot);
+
+        return popupTable;
     }
 
     private Set loadTags() {
@@ -777,4 +759,54 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
         }
     }
 
+    public class MyPopupListener implements MouseListener {
+
+        boolean seleccionar;
+
+        public MyPopupListener() {
+            this.seleccionar = true;
+        }
+
+        @Override
+        public void mouseClicked(MouseEvent e) {
+            isPopupTrigger(e);
+        }
+
+        @Override
+        public void mousePressed(MouseEvent e) {
+            isPopupTrigger(e);
+        }
+
+        @Override
+        public void mouseReleased(MouseEvent e) {
+            isPopupTrigger(e);
+        }
+
+        @Override
+        public void mouseEntered(MouseEvent e) {
+            isPopupTrigger(e);
+        }
+
+        @Override
+        public void mouseExited(MouseEvent e) {
+            isPopupTrigger(e);
+        }
+
+        public void isPopupTrigger(MouseEvent e) {
+            if (e.isPopupTrigger()) {
+                if (seleccionar) {
+                    Object source = e.getSource();
+                    if (source != null && (source instanceof JTable)) {
+                        JTable table = (JTable) e.getSource();
+                        int rowAtPoint = table.rowAtPoint(e.getPoint());
+                        table.getSelectionModel().setSelectionInterval(rowAtPoint, rowAtPoint);
+                        int row = table.getSelectedRow();
+                        makePopup(row).show(e.getComponent(), e.getX(), e.getY());
+                    }
+                }
+            }
+
+        }
+
+    }
 }

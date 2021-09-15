@@ -754,7 +754,7 @@ public class Control {
             return false;
         }
     }
-    
+
     public boolean addCycleAndSnapshot(Cycle cycle) {
         try {
             JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
@@ -767,7 +767,6 @@ public class Control {
             return false;
         }
     }
-    
 
     public Cycle getCycle(int id) {
         try {
@@ -875,7 +874,7 @@ public class Control {
             return null;
         }
     }
-    
+
     public ArrayList<Map> getItemSnapshotList(String where, String order) {
         try {
             JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
@@ -885,8 +884,8 @@ public class Control {
             return null;
         }
     }
-    
-    public Map countItemSnap(long idItem, int EVENT, long idCycle ) {
+
+    public Map countItemSnap(long idItem, int EVENT, long idCycle) {
         try {
             JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
             return utilDAO.countItemSnapEvents(idItem, EVENT, idCycle);
@@ -895,8 +894,8 @@ public class Control {
             return null;
         }
     }
-    
-    public Map countItemConciliations(long idItem, long idCycle ) {
+
+    public Map countItemConciliations(long idItem, long idCycle) {
         try {
             JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
             return utilDAO.countItemConciliationEvents(idItem, idCycle);
@@ -1080,7 +1079,7 @@ public class Control {
             return null;
         }
     }
-    
+
     public List<String> getTAGSInventoryList(String where) {
         try {
             JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
@@ -1139,10 +1138,10 @@ public class Control {
         }
     }
 
-    public ArrayList<Object[]> getProductsOutInventoryList(long idProd, Date start) {
+    public ArrayList<Object[]> getProductsOutInventoryList(long idProd, long idItem, Date start) {
         try {
             JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
-            return utilDAO.getProductsOutInventory(idProd, start);
+            return utilDAO.getProductsOutInventory(idProd, idItem, start);
         } catch (DAOException ex) {
             logger.error("Error getting product out list.", ex);
             GUIManager.showErrorMessage(null, "Error consultando lista de salida de productos", "Error");

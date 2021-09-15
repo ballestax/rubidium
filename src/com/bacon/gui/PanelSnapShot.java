@@ -39,6 +39,7 @@ public class PanelSnapShot extends PanelCapturaMod implements ActionListener {
 
     private final String[] colNames = new String[]{"N°", "Item", "Inicio", "Entradas", "Salidas", "Conciliaciones", "Ventas", "Cantidad"};
     private final String[] colNames1 = new String[]{"N°", "Item", "Inicio", "Entradas", "Salidas", "Conciliaciones", "Ventas", "Cantidad", "Real"};
+    private SwingWorker runningSw;
 
     /**
      * Creates new form PanelSnapShot
@@ -123,11 +124,11 @@ public class PanelSnapShot extends PanelCapturaMod implements ActionListener {
     }
 
     private void loadSnapshotItems() {
-
         SwingWorker sw;
         sw = new SwingWorker() {
             @Override
             protected Object doInBackground() throws Exception {
+//                if(runningSw!=null) runningSw.cancel(true);
                 model.setRowCount(0);
                 Cycle lastCycle = app.getControl().getLastCycle();
                 createLabelTitle(lastCycle);
@@ -141,18 +142,19 @@ public class PanelSnapShot extends PanelCapturaMod implements ActionListener {
                     for (Object[] get : presentationsByItem) {
                         int idPres = Integer.parseInt(get[0].toString());
                         int idProd = Integer.parseInt(get[1].toString());
+                        long idItem = Long.valueOf(map.get("item_id").toString());
 //                        System.out.println(idPres + "::" + idProd);
                         if (idPres == 0) { //producto sin presentacion
-                            ArrayList<Object[]> productsOutInventory = app.getControl().getProductsOutInventoryList(idProd, lastCycle.getInit());
+                            ArrayList<Object[]> productsOutInventory = app.getControl().getProductsOutInventoryList(idProd, idItem, lastCycle.getInit());
 //                            productsOutInventory.stream().map(data -> Double.parseDouble(data[2].toString())).reduce(outs, Double::sum);
                             for (int j = 0; j < productsOutInventory.size(); j++) {
                                 Object[] data = productsOutInventory.get(j);
                                 double quantity = Double.parseDouble(data[2].toString());
                                 int delType = Integer.parseInt(data[3].toString());
-                                outs += quantity * (onlyDelivery && delType == PanelPedido.TIPO_LOCAL ? 0 : 1); // excluir locales solo para llevar
+                                outs += quantity * (onlyDelivery && delType == PanelPedido.TIPO_LOCAL ? 0 : 1.0); // excluir locales solo para llevar
                             }
                         } else {
-                            long idItem = Long.valueOf(map.get("item_id").toString());
+
                             ArrayList<Object[]> presentationsOutInventory = app.getControl().getPresentationsOutInventoryList(idPres, idItem, lastCycle.getInit());
 
 //                            presentationsOutInventory.stream().map(data -> Double.parseDouble(data[3].toString())).reduce(outs, Double::sum);
@@ -161,7 +163,7 @@ public class PanelSnapShot extends PanelCapturaMod implements ActionListener {
                                 Object[] data = presentationsOutInventory.get(j);
                                 double quantity = Double.parseDouble(data[3].toString());
                                 int delType = Integer.parseInt(data[4].toString());
-                                outs += quantity * (onlyDelivery && delType == PanelPedido.TIPO_LOCAL ? 0 : 1); // excluir locales solo para llevar
+                                outs += quantity * (onlyDelivery && delType == PanelPedido.TIPO_LOCAL ? 0 : 1.0); // excluir locales solo para llevar
                             }
                         }
                     }
@@ -187,6 +189,7 @@ public class PanelSnapShot extends PanelCapturaMod implements ActionListener {
             }
         };
 
+//        runningSw = sw;
         sw.execute();
 
     }
@@ -357,7 +360,7 @@ public class PanelSnapShot extends PanelCapturaMod implements ActionListener {
                 } catch (Exception e) {
                 }
                 agotada = cant <= 0;
-                warning = val1 != val2;
+                warning = Double.compare(val1, val2) != 0;
             }
             if (isSelected) {
                 setForeground(!agotada ? warning ? ORANGE : Color.black : Color.red);

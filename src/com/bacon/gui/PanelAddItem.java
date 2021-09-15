@@ -196,7 +196,7 @@ public class PanelAddItem extends PanelCaptura implements ActionListener, Proper
         reset();
         if (item != null) {
             itemId = item.getId();
-            System.out.println("Setting itemId:" + itemId);
+            
             regName.setText(item.getName());
             regName.setEnabled(false);
             regMeseure.setText(item.getMeasure());
@@ -213,7 +213,7 @@ public class PanelAddItem extends PanelCaptura implements ActionListener, Proper
             regCost.setEnabled(false);
             regPrice.setText(String.valueOf(item.getPrice()));
             regPrice.setEnabled(false);
-            System.out.println("::"+item.getTagsSt());
+            
             regTags.setText(item.getTagsSt());
             chOnlyDelivery.setSelected(item.isOnlyDelivery());
             chOnlyDelivery.setEnabled(false);
@@ -334,11 +334,10 @@ public class PanelAddItem extends PanelCaptura implements ActionListener, Proper
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(chOnlyDelivery, javax.swing.GroupLayout.PREFERRED_SIZE, 159, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addComponent(regTags, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGap(28, 28, 28)
-                        .addComponent(chSnapShot, javax.swing.GroupLayout.PREFERRED_SIZE, 159, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(chSnapShot, javax.swing.GroupLayout.PREFERRED_SIZE, 159, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(regTags, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 484, Short.MAX_VALUE)
                 .addContainerGap())
