@@ -29,7 +29,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
-import jfxtras.scene.menu.CirclePopupMenu;
 import org.dz.PanelCapturaMod;
 import org.jfree.util.PaintUtilities;
 

@@ -57,7 +57,7 @@
                     |GET_LAST_INVOICE_BY_CLIENT 
                     |ADD_PAYMENT|GET_PAYMENT|UPDATE_PAYMENT|DELETE_PAYMENT|CREATE_PAYMENTS_TABLE
                     |CREATE_INVENTORY_SNAPSHOT_TABLE|ADD_INVENTORY_SNAPSHOT_ITEM|GET_INVENTORY_SNAPSHOT_ITEM
-                    |COUNT_ITEM_SNAP_EVENT
+                    |COUNT_ITEM_SNAP_EVENT|COUNT_ITEM_CONCILIATION_EVENT
                     
                     ) #REQUIRED
                     
@@ -1673,7 +1673,7 @@
         
         <SQLStatement method="GET_PRODUCTS_OUT_INVENTORY">
             <SQLFragment>
-                SELECT p.id as id, p.name as name, sum(ip.cantidad) as quantity
+                SELECT p.id as id, p.name as name, sum(ip.cantidad) as quantity, i.deliveryType as deliveryType
                 FROM  invoices i, invoice_product ip, products p
                 WHERE i.id=ip.id_invoice AND ip.id_product=p.id and i.status=0 AND ip.id_product=?
                 AND (i.sale_date BETWEEN ? AND ?)
@@ -1690,7 +1690,8 @@
                 ip.id_presentation,
                 p.id AS prod_id,
                 ivp.item_id,
-                i.sale_date
+                i.sale_date,
+                i.deliveryType AS deliveryType
                 FROM
                 invoice_product ip
                 LEFT JOIN inventory_product ivp ON
@@ -1797,7 +1798,10 @@
                 quantity DECIMAL(12,2),
                 ins DECIMAL(12,2),
                 outs DECIMAL(12,2),
+                conciliations DECIMAL(12,2),
                 sales DECIMAL(12,2),
+                final DECIMAL(12,2),
+                isOnlyDelivery TINYINT(1),
                 lastUpdatedTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                 PRIMARY KEY (id),
                 FOREIGN KEY (item_id) REFERENCES inventory(id) ON DELETE CASCADE ON UPDATE CASCADE,                
@@ -1809,13 +1813,15 @@
         
         <SQLStatement method="ADD_INVENTORY_SNAPSHOT_ITEM">
             <SQLFragment>
-                INSERT INTO inventory_snapshot (item_id, cycle_id,quantity,ins,outs,sales) VALUES (?,?,?,?,?,?);
+                INSERT INTO inventory_snapshot (item_id, cycle_id,quantity,ins,outs,conciliations,sales,final,isOnlyDelivery) 
+                VALUES (?,?,?,?,?,?,?,?,?);
             </SQLFragment>            
         </SQLStatement>
         
         <SQLStatement method="GET_INVENTORY_SNAPSHOT_ITEM">
             <SQLFragment>
-                SELECT s.id, s.item_id, s.cycle_id, s.quantity, i.name, s.ins, s.outs,s.sales FROM inventory_snapshot s, inventory i
+                SELECT s.id, s.item_id, s.cycle_id, s.quantity, i.name, s.ins, s.outs,s.conciliations,s.sales,s.final,i.quantity,s.isOnlyDelivery 
+                FROM inventory_snapshot s, inventory i
             </SQLFragment>            
             <SQLFragment excludeIfNamedParamEmpty="TRUE">
                 WHERE i.id= s.item_id AND {where} 
@@ -1828,6 +1834,12 @@
         <SQLStatement method="COUNT_ITEM_SNAP_EVENT">
             <SQLFragment>
                 SELECT sum(ir.quantity) as sum FROM inventory_register ir WHERE ir.idItem=? AND ir.event=? AND (lastUpdatedTime BETWEEN ? AND ?)
+            </SQLFragment>            
+        </SQLStatement>
+        
+        <SQLStatement method="COUNT_ITEM_CONCILIATION_EVENT">
+            <SQLFragment>
+                SELECT sum(c.conciliacion-c.existencias) as sum FROM conciliaciones c WHERE c.idItem=? AND (c.lastUpdatedTime BETWEEN ? AND ?)
             </SQLFragment>            
         </SQLStatement>
             

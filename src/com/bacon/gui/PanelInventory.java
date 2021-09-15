@@ -184,6 +184,7 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
 
         tableItems.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tableItems.setSelectionModel(selectionModel);
+        tableItems.getTableHeader().setReorderingAllowed(false);
 
         TablaCellRenderer tRenderer = new TablaCellRenderer(true, app.getDCFORM_P());
 

@@ -1096,15 +1096,15 @@ public class GUIManager {
         setWaitCursor();
         JDialog dialog = new MyDialogEsc();
         dialog.setModal(true);
-        int w = 700;
-        int h = 400;
+        int w = 800;
+        int h = 600;
         dialog.setPreferredSize(new Dimension(w, h));
 
 //        if (!getPanelAddProduct().containsListener(listener)) {
 //            getPanelAddProduct().addPropertyChangeListener(listener);
 //        }
         getPanelSnapShot().reset();
-        dialog.setResizable(false);
+//        dialog.setResizable(false);
         dialog.add(getPanelSnapShot());
         dialog.setTitle("Snapshot.");
         dialog.pack();

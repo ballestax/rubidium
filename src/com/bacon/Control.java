@@ -895,6 +895,16 @@ public class Control {
             return null;
         }
     }
+    
+    public Map countItemConciliations(long idItem, long idCycle ) {
+        try {
+            JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
+            return utilDAO.countItemConciliationEvents(idItem, idCycle);
+        } catch (DAOException ex) {
+            logger.error("Error getting Item Conciliations count.", ex);
+            return null;
+        }
+    }
 
     public Item getItemWhere(String where) {
         return getItemList(where, "").get(0);

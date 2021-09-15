@@ -85,6 +85,7 @@ public class JDBCUtilDAO implements UtilDAO {
     public static final String ADD_INVENTARY_SNAPSHOT_ITEM_KEY = "ADD_INVENTORY_SNAPSHOT_ITEM";
     public static final String GET_INVENTORY_SNAPSHOT_ITEM_KEY = "GET_INVENTORY_SNAPSHOT_ITEM";
     public static final String COUNT_ITEM_SNAP_EVENT_KEY = "COUNT_ITEM_SNAP_EVENT";
+    public static final String COUNT_ITEM_CONCILIATION_EVENT_KEY = "COUNT_ITEM_CONCILIATION_EVENT";
 
     public static final String CREATE_INVOICE_PRODUCT_TABLE_KEY = "CREATE_INVOICE_PRODUCT_TABLE";
     public static final String CREATE_ADDITIONAL_PRODUCT_TABLE_KEY = "CREATE_ADDITIONAL_PRODUCT_TABLE";
@@ -1137,7 +1138,7 @@ public class JDBCUtilDAO implements UtilDAO {
             ResultSet rs = statement.executeQuery("SELECT * FROM inventory WHERE snapshot=1");
 
             while (rs.next()) {
-                Object[] parameters2 = {rs.getLong("id"), cycleId, rs.getDouble("quantity"), 0, 0, 0};
+                Object[] parameters2 = {rs.getLong("id"), cycleId, rs.getDouble("quantity"), 0, 0, 0,0,0, rs.getInt("onlyDelivery")};
                 ps2 = sqlStatements.buildSQLStatement(conn, ADD_INVENTARY_SNAPSHOT_ITEM_KEY, parameters2);
                 ps2.executeUpdate();
             }
@@ -1648,7 +1649,8 @@ public class JDBCUtilDAO implements UtilDAO {
                 int id = rs.getInt("id");
                 String name = rs.getString("name");
                 double quantity = rs.getDouble("quantity");
-                list.add(new Object[]{id, name, quantity});
+                int type = rs.getInt("deliveryType");
+                list.add(new Object[]{id, name, quantity, type});
             }
         } catch (SQLException | IOException e) {
             throw new DAOException("Could not properly retrieve the products out: " + e);
@@ -1675,7 +1677,8 @@ public class JDBCUtilDAO implements UtilDAO {
                 String name = rs.getString("name");
                 String press = rs.getString("pres");
                 double quantity = rs.getDouble("quantity");
-                list.add(new Object[]{id, name, press, quantity});
+                int type = rs.getInt("deliveryType");
+                list.add(new Object[]{id, name, press, quantity, type});
             }
         } catch (SQLException | IOException e) {
             throw new DAOException("Could not properly retrieve the products out: " + e);
@@ -1888,6 +1891,8 @@ public class JDBCUtilDAO implements UtilDAO {
                 dataItemSnap.put("outs", rs.getDouble("s.outs"));
                 dataItemSnap.put("sales", rs.getDouble("s.sales"));
                 dataItemSnap.put("name", rs.getString("i.name"));
+                dataItemSnap.put("onlyDelivery", rs.getBoolean("s.isOnlyDelivery"));
+                dataItemSnap.put("real", rs.getDouble("i.quantity"));
                 snapItems.add(dataItemSnap);
             }
         } catch (SQLException e) {
@@ -1923,7 +1928,7 @@ public class JDBCUtilDAO implements UtilDAO {
             rs = ps.executeQuery();
             rs.last();
             Date dInit = rs.getTimestamp("init");
-            Date dEnd = new Date();
+            Date dEnd = new Date(); //Problematico ver historico
             Object[] parameters = {idItem, EVENT, dInit, dEnd};
 
             ps = sqlStatements.buildSQLStatement(conn, COUNT_ITEM_SNAP_EVENT_KEY, parameters);
@@ -1947,4 +1952,53 @@ public class JDBCUtilDAO implements UtilDAO {
         }
         return dataItemSnap;
     }
+
+    public Map countItemConciliationEvents(long idItem, long idCycle) throws DAOException {
+        String retrieve;
+        ArrayList<Map> snapItems = new ArrayList<>();
+
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        Map dataItemSnap = null;
+
+        try {
+            SQLExtractor sqlExtractorWhere = new SQLExtractor("id=" + idCycle, SQLExtractor.Type.WHERE);
+            SQLExtractor sqlExtractorOrderBy = new SQLExtractor("id", SQLExtractor.Type.ORDER_BY);
+            Map<String, String> namedParams = new HashMap<>();
+            namedParams.put(NAMED_PARAM_WHERE, sqlExtractorWhere.extractWhere());
+            namedParams.put(NAMED_PARAM_ORDER_BY, sqlExtractorOrderBy.extractOrderBy());
+            retrieve = sqlStatements.getSQLString(GET_CYCLE_KEY, namedParams);
+//            System.out.println("retrieve :: " + retrieve);
+
+            conn = dataSource.getConnection();
+            ps = conn.prepareStatement(retrieve);
+            rs = ps.executeQuery();
+            rs.last();
+            Date dInit = rs.getTimestamp("init");
+            Date dEnd = new Date(); //Problematico ver historico
+            Object[] parameters = {idItem, dInit, dEnd};
+
+            ps = sqlStatements.buildSQLStatement(conn, COUNT_ITEM_CONCILIATION_EVENT_KEY, parameters);
+
+            rs = ps.executeQuery();
+//            System.out.println("::"+ps);
+            while (rs.next()) {
+                dataItemSnap = new HashMap();
+                dataItemSnap.put("item_id", idItem);
+                dataItemSnap.put("sum", rs.getDouble("sum"));
+
+            }
+        } catch (SQLException e) {
+            throw new DAOException("Could not proper retrieve the snap conciliation items: " + e);
+        } catch (IOException ex) {
+            throw new DAOException("Could not proper retrieve the snap conciliation items: " + ex);
+        } finally {
+            DBManager.closeResultSet(rs);
+            DBManager.closeStatement(ps);
+            DBManager.closeConnection(conn);
+        }
+        return dataItemSnap;
+    }
+
 }
