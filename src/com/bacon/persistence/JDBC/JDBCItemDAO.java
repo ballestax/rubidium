@@ -135,6 +135,7 @@ public class JDBCItemDAO implements ItemDAO {
                 item.setAverage(rs.getBigDecimal("average"));
                 item.setInit(rs.getDouble("init"));
                 item.setOnlyDelivery(rs.getBoolean("onlyDelivery"));
+                item.setSnapshot(rs.getBoolean("snapshot"));
                 item.setCreatedTime(rs.getDate("createdTime"));
                 item.setUpdateTime(rs.getDate("lastUpdatedTime"));
                 item.setUser(rs.getString("user"));
@@ -174,7 +175,11 @@ public class JDBCItemDAO implements ItemDAO {
                 item.getAverage(),
                 item.getInit(),
                 item.isOnlyDelivery(),
+<<<<<<< HEAD
                 item.getTagsSt(),                
+=======
+                item.isSnapshot(),
+>>>>>>> add_feature_snapshot
                 item.getUser()
             };
             ps = sqlStatements.buildSQLStatement(conn, ADD_ITEM_KEY, parameters);
@@ -259,7 +264,11 @@ public class JDBCItemDAO implements ItemDAO {
                 item.getStock(),
                 item.getStockMin(),
                 item.isOnlyDelivery(),
+<<<<<<< HEAD
                 item.getTagsSt(),
+=======
+                item.isSnapshot(),
+>>>>>>> add_feature_snapshot
                 item.getId()
             };
             update = sqlStatements.buildSQLStatement(conn, UPDATE_ITEM_KEY, parameters);

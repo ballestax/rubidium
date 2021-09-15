@@ -29,6 +29,7 @@ public class Item {
     private double stock;
 
     private boolean onlyDelivery;
+    private boolean snapshot;
 
     private List<Object[]> presentations;
 
@@ -246,6 +247,14 @@ public class Item {
 
     public void setOnlyDelivery(boolean onlyDelivery) {
         this.onlyDelivery = onlyDelivery;
+    }
+
+    public boolean isSnapshot() {
+        return snapshot;
+    }
+
+    public void setSnapshot(boolean snapshot) {
+        this.snapshot = snapshot;
     }
 
 }

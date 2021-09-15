@@ -45,6 +45,8 @@
                       <Component id="chOnlyDelivery" min="-2" pref="159" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="jLabel1" max="32767" attributes="0"/>
+                      <EmptySpace min="-2" pref="28" max="-2" attributes="0"/>
+                      <Component id="chSnapShot" min="-2" pref="159" max="-2" attributes="0"/>
                   </Group>
                   <Component id="regTags" alignment="0" max="32767" attributes="0"/>
               </Group>
@@ -84,6 +86,7 @@
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="chOnlyDelivery" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="jLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="chSnapShot" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace min="-2" max="-2" attributes="0"/>
                       <Component id="labelInfo" min="-2" pref="72" max="-2" attributes="0"/>
@@ -200,6 +203,11 @@
       <AuxValues>
         <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, &quot;Tags&quot;, new JTextArea(&quot;&quot;), widthLabel)"/>
       </AuxValues>
+    </Component>
+    <Component class="javax.swing.JCheckBox" name="chSnapShot">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="jCheckBox1"/>
+      </Properties>
     </Component>
   </SubComponents>
 </Form>

@@ -50,6 +50,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.swing.BoxLayout;
+import javax.swing.JSeparator;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import org.dz.MyDialogEsc;
@@ -85,9 +86,7 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
     }
 
     private void createComponents() {
-
         filtered = false;
-
         panelButtons.setLayout(new FlowLayout(FlowLayout.LEFT));
 
         Font f = new Font("Sans", 1, 11);
@@ -128,10 +127,15 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
         btExport.setActionCommand(AC_EXPORT_TO);
         btExport.addActionListener(this);
 
+        JButton btSnapShot = new JButton("SnapShot");
+        btSnapShot.setFont(f);
+        btSnapShot.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "camera-accept.png", 24, 24)));
+        btSnapShot.setActionCommand(AC_SHOW_SNAPSHOT);
+        btSnapShot.addActionListener(this);
+
         ImageIcon searchIcon = new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "search.png", 16, 16));
         ImageIcon clearIcon = new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "cancel.png", 24, 24));
-        ProgAction actionSearch = new ProgAction("",
-                clearIcon, "", 's') {
+        ProgAction actionSearch = new ProgAction("", clearIcon, "", 's') {
             @Override
             public void actionPerformed(ActionEvent ev) {
                 cleanSearch();
@@ -158,20 +162,17 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
             }
         });
 
+        List filters = new ArrayList();
+        filters.add("TODOS");
+        filters.add("STOCK MINIMO");
+        filters.add("AGOTADOS");
+
+
         List filters = loadFilters();
         regFilters = new Registro(BoxLayout.X_AXIS, "Items", new String[1], 50);
         regFilters.setHeight(32);
         regFilters.setText(filters.toArray());
         regFilters.setActionCommand(AC_CHANGE_ITEMS);
-        regFilters.addActionListener(this);
-
-        Set tags = loadTags();
-        regTags = new Registro(BoxLayout.X_AXIS, "Tags", new String[1], 50);
-        regTags.setHeight(32);
-        regTags.setText(tags.toArray());
-        regTags.setActionCommand(AC_CHANGE_TAGS);
-        regTags.addActionListener(this);
-
         panelButtons.add(regSearch);
         panelButtons.add(regFilters);
         panelButtons.add(regTags);
@@ -181,6 +182,7 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
         panelButtons.add(btRefresh);
         panelButtons.add(btConciliation);
         panelButtons.add(btExport);
+        panelButtons.add(btSnapShot);
 
         String[] colNames = new String[]{"N°", "Item", "Cantidad", "Medida", "Cost", "Price", "Min", "Cost. Total"};
 
@@ -194,6 +196,7 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
 
         tableItems.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tableItems.setSelectionModel(selectionModel);
+        tableItems.getTableHeader().setReorderingAllowed(false);
 
         TablaCellRenderer tRenderer = new TablaCellRenderer(true, app.getDCFORM_P());
 
@@ -213,6 +216,7 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
 //        tableItems.getColumnModel().getColumn(model.getColumnCount() - 1).setCellRenderer(new ButtonCellRenderer("Ver"));
 
         popupTable = new JPopupMenu();
+        
         popupListenerTabla = new MyPopupListener(popupTable, true);
         JMenuItem item1 = new JMenuItem("Ver");
         item1.addActionListener(new ActionListener() {
@@ -256,6 +260,20 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
             public void actionPerformed(ActionEvent e) {
                 int r = tableItems.getSelectedRow();
                 String id = tableItems.getValueAt(r, 0).toString();
+                showEnlaces(id);
+
+            }
+
+        });
+        
+        JMenuItem itemSnapshot = new JMenuItem("<html>Snapshot <font color=green>[OFF]</font><html>");
+        itemSnapshot.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int r = tableItems.getSelectedRow();
+                String id = tableItems.getValueAt(r, 0).toString();                
+                
                 Item item = app.getControl().getItemWhere("id=" + id);
                 ArrayList<Object[]> presentations = app.getControl().getPresentationsByItem(item.getId());
                 StringBuilder htmlText = new StringBuilder("<html>");
@@ -315,9 +333,13 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
         });
 
         popupTable.add(item1);
+        popupTable.addSeparator();
         popupTable.add(itemCargar);
         popupTable.add(itemDescargar);
+        popupTable.addSeparator();
         popupTable.add(itemLinks);
+        popupTable.addSeparator();
+        popupTable.add(itemSnapshot);
 
         tableItems.addMouseListener(popupListenerTabla);
 
@@ -359,6 +381,7 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
     private static final String AC_CHANGE_ITEMS = "AC_CHANGE_ITEMS";
     private static final String AC_CHANGE_TAGS = "AC_CHANGE_TAGS";
     public static final String AC_EXPORT_TO = "AC_EXPORT_TO";
+    public static final String AC_SHOW_SNAPSHOT = "AC_SHOW_SNAPSHOT";
     public static final String AC_ADD_CONCILIATION = "AC_ADD_CONCILIATION";
     public static final String AC_REFRESH_ITEMS = "AC_REFRESH_ITEMS";
     public static final String AC_LOAD_ITEM = "AC_LOAD_ITEM";
@@ -368,6 +391,61 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
     private void showPanelEditItem(String id) {
         Item item = app.getControl().getItemWhere("id=" + id);
         app.getGuiManager().showPanelAddItem(PanelInventory.this, item);
+    }
+
+    private void showEnlaces(String id) throws NumberFormatException {
+        Item item = app.getControl().getItemWhere("id=" + id);
+        ArrayList<Object[]> presentations = app.getControl().getPresentationsByItem(item.getId());
+        StringBuilder htmlText = new StringBuilder("<html>");
+
+        if (!presentations.isEmpty()) {
+            htmlText.append("<table  width=\"100%\" cellspacing=\"0\" border=\"1\">");
+            htmlText.append("<tr bgcolor=\"#A4C1FF\">");
+            htmlText.append("<td>Producto</td><td>Presentación</td><td>Cantidad</td></tr>");
+        } else {
+            htmlText.append("<br><br><font color=red size=+1>  El item: <STRONG>").append(item.getName().toUpperCase()).append("</STRONG> no tiene enlaces.  </font><br><br>");
+        }
+
+        for (Object[] presentation : presentations) {
+            Object[] data = presentation;
+            long idPres = Long.parseLong(data[0].toString());
+            long idProd = Long.parseLong(data[1].toString());
+            String quantity = data[2].toString();
+            Product prod = app.getControl().getProductById(idProd);
+            if (idPres == 0) {
+                htmlText.append("<tr><td>").append(prod.getName().toUpperCase()).append("<td>---")
+                        .append("<td>").append(quantity).append("</tr>");
+            } else {
+                Presentation press = app.getControl().getPresentationsById(idPres);
+                if (press != null && press.isEnabled()) {
+                    Product productById = app.getControl().getProductByPressId((idPres));
+                    htmlText.append("<tr><td>").append(productById.getName().toUpperCase()).append("<td>")
+                            .append(press.getName().toUpperCase()).append("<td>").append(quantity).append("</tr>");
+                }
+            }
+        }
+        htmlText.append("</table></html>");
+
+        JLabel labelInfo = new JLabel(htmlText.toString());
+        labelInfo.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        JButton btModificar = new JButton("Modificar");
+//                btModificar.setBorder(BorderFactory.createEmptyBorder(0, 10, 5, 10));
+        btModificar.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                showPanelEditItem(String.valueOf(item.getId()));
+            }
+
+        });
+
+        MyDialogEsc dialog = new MyDialogEsc(app.getGuiManager().getFrame());
+        dialog.setTitle(item.getName().toUpperCase());
+        dialog.setLayout(new BorderLayout());
+        dialog.add(labelInfo, BorderLayout.CENTER);
+        dialog.add(btModificar, BorderLayout.SOUTH);
+        dialog.pack();
+        dialog.setLocationRelativeTo(null);
+        dialog.setVisible(true);
     }
 
     private void cleanSearch() {
@@ -581,8 +659,8 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
     public void actionPerformed(ActionEvent e) {
         if (AC_SHOW_ADD_ITEM.equals(e.getActionCommand())) {
             app.getGuiManager().showPanelAddItem(this, null);
-//        } else if (AC_SHOW_EDIT_ITEM.equals(e.getActionCommand())) {
-
+        } else if (AC_SHOW_SNAPSHOT.equals(e.getActionCommand())) {
+            app.getGuiManager().showPanelSnapShot();
         } else if (AC_LOAD_ITEM.equals(e.getActionCommand())) {
             app.getGuiManager().showPanelSelItem(this);
         } else if (AC_REFRESH_ITEMS.equals(e.getActionCommand())) {

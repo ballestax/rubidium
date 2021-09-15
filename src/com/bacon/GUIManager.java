@@ -51,6 +51,7 @@ import com.bacon.gui.PanelProducts;
 import com.bacon.gui.PanelReportSales;
 import com.bacon.gui.PanelSelCategory;
 import com.bacon.gui.PanelSelItem;
+import com.bacon.gui.PanelSnapShot;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -141,6 +142,7 @@ public class GUIManager {
     private PanelPayInvoice panelPayInvoice;
     private PanelBasic panelBasicProducts;
     private PanelProducts panelProducts;
+    private PanelSnapShot panelSnapshot;
 
     private GUIManager() {
 
@@ -410,6 +412,13 @@ public class GUIManager {
             panelSelCategory = new PanelSelCategory(app, null);
         }
         return panelSelCategory;
+    }
+    
+    public PanelSnapShot getPanelSnapShot() {
+        if (panelSnapshot == null) {
+            panelSnapshot = new PanelSnapShot(app);
+        }
+        return panelSnapshot;
     }
 
     public PanelSelItem getPanelSelItem() {
@@ -1077,6 +1086,27 @@ public class GUIManager {
         dialog.setResizable(false);
         dialog.add(getPanelAddProduct());
         dialog.setTitle("Agregar producto.");
+        dialog.pack();
+        dialog.setLocationRelativeTo(getFrame());
+        setDefaultCursor();
+        dialog.setVisible(true);
+    }
+    
+    public void showPanelSnapShot() {
+        setWaitCursor();
+        JDialog dialog = new MyDialogEsc();
+        dialog.setModal(true);
+        int w = 800;
+        int h = 600;
+        dialog.setPreferredSize(new Dimension(w, h));
+
+//        if (!getPanelAddProduct().containsListener(listener)) {
+//            getPanelAddProduct().addPropertyChangeListener(listener);
+//        }
+        getPanelSnapShot().reset();
+//        dialog.setResizable(false);
+        dialog.add(getPanelSnapShot());
+        dialog.setTitle("Snapshot.");
         dialog.pack();
         dialog.setLocationRelativeTo(getFrame());
         setDefaultCursor();

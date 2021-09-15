@@ -157,7 +157,7 @@ public class PanelNewCycle extends PanelCapturaMod implements ActionListener {
             //crear el ciclo
             Cycle cycle = new Cycle();
             cycle.setInitialBalance(BigDecimal.valueOf(saldo));
-            if (app.getControl().addCycle(cycle)) {
+            if (app.getControl().addCycleAndSnapshot(cycle)) {
                 cycle = app.getControl().getCycle(ciclo);
                 pcs.firePropertyChange(PanelCash.AC_NEW_CYCLE, null, cycle);
                 cancelPanel();

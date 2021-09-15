@@ -498,7 +498,7 @@ public class PanelDownItem extends PanelCaptura implements ActionListener, Caret
         } else if (AC_ADD_ITEM_TO_TABLE.equals(e.getActionCommand())) {
             Item item = onlyOneItem ? getSelectedItem() : getItem();
             if (item != null) {
-                System.out.println(selectedItem.getQuantity() + "::" + item.getQuantity());
+//                System.out.println(selectedItem.getQuantity() + "::" + item.getQuantity());
                 if (selectedItem.getQuantity() < item.getQuantity()) {
                     tfCantidad.setBorder(bordeError);
                 }
