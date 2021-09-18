@@ -42,8 +42,8 @@ public class PanelConfigOthers extends javax.swing.JPanel implements ActionListe
         lbInfo.setText("Valor del domicilio");
 
 //        exportDIR = property;
-        ConfigDB config = app.getControl().getConfig(com.bacon.Configuration.DELIVERY_VALUE);        
-        regDelivery.setText(config!=null?config.getValor():"0");
+        ConfigDB config = app.getControl().getConfig(com.bacon.Configuration.DELIVERY_VALUE);
+        regDelivery.setText(config != null ? config.getValor() : "0");
 
         lbInfo1.setText("Imprimir pedido previo");
         String printPrevius = app.getConfiguration().getProperty(com.bacon.Configuration.PRINT_PREV_DELIVERY, "false");
@@ -54,7 +54,7 @@ public class PanelConfigOthers extends javax.swing.JPanel implements ActionListe
         }
         regPrintPrev.setText("Permitir imprimir el pedido previo");
         regPrintPrev.setSelected(printP);
-        
+
         lbInfo2.setText("Visualizar exclusiones y notas de producto");
         String showExclusionsSt = app.getConfiguration().getProperty(com.bacon.Configuration.SHOW_EXCLUSIONS, "false");
         boolean showExclusions = false;
@@ -64,7 +64,7 @@ public class PanelConfigOthers extends javax.swing.JPanel implements ActionListe
         }
         regShowExclusions.setText("Mostrar exclusiones en panel pedido");
         regShowExclusions.setSelected(showExclusions);
-        
+
         lbInfo3.setText("Facturar sin existencias");
         String prop = app.getConfiguration().getProperty(com.bacon.Configuration.INVOICE_OUT_STOCK, "false");
         boolean outStock = false;
@@ -74,28 +74,28 @@ public class PanelConfigOthers extends javax.swing.JPanel implements ActionListe
         }
         regInvoiceOutStock.setText("Permitir guardar facturas sin existencias en  inventario");
         regInvoiceOutStock.setSelected(outStock);
-        
+
         lbInfo4.setText("Prefijo numeracion de facturas");
 
 //        exportDIR = property;
         regPrefix.setLabelText("Prefijo");
-        String prefix = app.getConfiguration().getProperty(com.bacon.Configuration.PREFIX_INVOICES, "");
+        config = app.getControl().getConfig(com.bacon.Configuration.PREFIX_INVOICES);
+        String prefix = config != null ? config.getValor() : app.getConfiguration().getProperty(com.bacon.Configuration.PREFIX_INVOICES, "");
         regPrefix.setText(prefix);
-        
+
         lbInfo5.setText("Numero de ceros a formatear consecutivo");
 
 //        exportDIR = property;
         regZeros.setLabelText("Numero ceros");
-        String ceros = app.getConfiguration().getProperty(com.bacon.Configuration.ZEROS_INVOICES, "0");
+        config = app.getControl().getConfig(com.bacon.Configuration.ZEROS_INVOICES);
+        String ceros = config != null ? config.getValor() : app.getConfiguration().getProperty(com.bacon.Configuration.ZEROS_INVOICES, "0");
         regZeros.setDocument(TextFormatter.getIntegerLimiter());
         regZeros.setText(ceros);
-        
+
         lbInfo6.setText("Nombre Documento ticket");
         regDocument.setLabelText("Nombre documento");
         config = app.getControl().getConfig(com.bacon.Configuration.DOCUMENT_NAME);
-        regDocument.setText(config!=null? config.getValor(): "Ticket N°: ");
-        
-        
+        regDocument.setText(config != null ? config.getValor() : app.getConfiguration().getProperty(com.bacon.Configuration.ZEROS_INVOICES, "Ticket N°: "));
 
         btApply.setText("Aplicar");
         btApply.setActionCommand(ACTION_APPLY);
@@ -254,20 +254,20 @@ public class PanelConfigOthers extends javax.swing.JPanel implements ActionListe
 
             boolean selected = regPrintPrev.isSelected();
             app.getConfiguration().setProperty(com.bacon.Configuration.PRINT_PREV_DELIVERY, String.valueOf(selected));
-            
+
             boolean selected2 = regShowExclusions.isSelected();
             app.getConfiguration().setProperty(com.bacon.Configuration.SHOW_EXCLUSIONS, String.valueOf(selected2));
-            
+
             boolean selected3 = regInvoiceOutStock.isSelected();
             app.getConfiguration().setProperty(com.bacon.Configuration.INVOICE_OUT_STOCK, String.valueOf(selected3));
-            
+
             String prefix = regPrefix.getText();
-            app.getConfiguration().setProperty(com.bacon.Configuration.PREFIX_INVOICES, prefix);
-            
+            app.getControl().addConfig(new ConfigDB(com.bacon.Configuration.PREFIX_INVOICES, ConfigDB.STRING, prefix));
+
             String ceros = regZeros.getText();
-            app.getConfiguration().setProperty(com.bacon.Configuration.ZEROS_INVOICES, ceros);
+            app.getControl().addConfig(new ConfigDB(com.bacon.Configuration.ZEROS_INVOICES, ConfigDB.STRING, ceros));            
             
-            String docName = regDocument.getText();            
+            String docName = regDocument.getText();
             app.getControl().addConfig(new ConfigDB(com.bacon.Configuration.DOCUMENT_NAME, ConfigDB.STRING, docName));
 
             app.getConfiguration().save();
