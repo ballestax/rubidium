@@ -230,7 +230,8 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
         lbEntregas.setHorizontalAlignment(SwingConstants.RIGHT);
         lbEntregas.setFont(font);
 
-        int valueDelivery = app.getConfiguration().getProperty(Configuration.DELIVERY_VALUE, 2000);
+        ConfigDB config = app.getControl().getConfig(com.bacon.Configuration.DELIVERY_VALUE);
+        double valueDelivery = config != null ? (double) config.castValor() : app.getConfiguration().getProperty(Configuration.DELIVERY_VALUE, 2000);
         lbEntregas.setText(DCFORM_P.format(valueDelivery));
         lbDescuento1.setHorizontalAlignment(SwingConstants.RIGHT);
         lbDescuento1.setFont(font);
@@ -513,7 +514,7 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
                     block = true;
                     btClear.setEnabled(false);
                     btSearch.setEnabled(false);
-                    spNumDom.setEnabled(false);                    
+                    spNumDom.setEnabled(false);
                     chRecogido.setEnabled(false);
                 }
             } catch (Exception ex) {
@@ -523,7 +524,8 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
         } else if (AC_CHANGE_DOMICILIO.equals(e.getActionCommand())) {
             String dom = regDomicilio.getText();
             if (entregasDom[0].equals(dom)) {  // DOMICILIO
-                int valueDelivery = app.getConfiguration().getProperty(Configuration.DELIVERY_VALUE, 2000);
+                ConfigDB config = app.getControl().getConfig(com.bacon.Configuration.DELIVERY_VALUE);
+                double valueDelivery = config != null ? (double) config.castValor() : app.getConfiguration().getProperty(Configuration.DELIVERY_VALUE, 2000);
                 if (spModelDel != null) {
                     spModelDel.setValue(1);
                 }
@@ -564,7 +566,7 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
             lastClient = null;
             btLastDelivery.setVisible(false);
 
-            lbFactura.setText("<html><font>" + calculateProximoRegistro() + "</font></html>"); 
+            lbFactura.setText("<html><font>" + calculateProximoRegistro() + "</font></html>");
             lbFactura.addMouseListener(lbFacturaMouseListener);
 
             if (Boolean.valueOf(app.getConfiguration().getProperty(Configuration.PRINT_PREV_DELIVERY))) {
@@ -572,7 +574,6 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
             }
 
             lbTitle.setToolTipText(getInfoCiclo(app.getControl().getLastCycle()));
-            
 
             block = false;
         } else if (AC_SELECT_DELIVERY.equals(e.getActionCommand())) {
@@ -758,7 +759,6 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
                 app.getControl().restoreInventory(list, inv.getTipoEntrega());
 
                 lbFactura.setText(calculateProximoRegistro());
-                
 
                 enablePedido(true);
 
@@ -814,7 +814,9 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
     }
 
     private void calcularDelivery() {
-        int valueDelivery = app.getConfiguration().getProperty(Configuration.DELIVERY_VALUE, 2000);
+        ConfigDB config = app.getControl().getConfig(com.bacon.Configuration.DELIVERY_VALUE);
+        double valueDelivery = config != null ? (double) config.castValor() : app.getConfiguration().getProperty(Configuration.DELIVERY_VALUE, 2000);
+
         int num = 0;
         if (tipo == TIPO_DOMICILIO) {
 //            try {
@@ -1210,7 +1212,6 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
         btConfirm.setBackground(new Color(153, 255, 153));
         btConfirm.setActionCommand(AC_CONFIRMAR_PEDIDO);
         btConfirm.setText("CONFIRMAR");
-        
 
         lbCliente1.setVisible(false);
         calcularValores();
@@ -1323,7 +1324,7 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
         tbListado.setEnabled(false);
         btPrint.setVisible(true);
         btPrint1.setVisible(true);
-        
+
         block = true;
 
         this.invoice = invoice;
@@ -2169,7 +2170,7 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
     private class LabelFacturaMouseListener extends MouseAdapter {
 
         @Override
-        public void mouseClicked(MouseEvent e) {            
+        public void mouseClicked(MouseEvent e) {
             if (e.getClickCount() == 2) {
                 String fact = lbFactura.getText();
                 String text = Jsoup.parse(fact).text();

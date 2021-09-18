@@ -76,15 +76,32 @@ public class PrinterService {
             EscPosImage escposImage = new EscPosImage(buffImagen, algorithm);
 
             //DATOS PARA LA FACTURA
-            String BS_NAME = app.getConfiguration().getProperty(Configuration.BS_NAME);
-            String BS_ID = app.getConfiguration().getProperty(Configuration.BS_ID);
-            String BS_ADDRESS = app.getConfiguration().getProperty(Configuration.BS_ADDRESS);
-            String BS_PHONE = app.getConfiguration().getProperty(Configuration.BS_PHONE);
-            String BS_CUSTOM1 = app.getConfiguration().getProperty(Configuration.BS_CUSTOM_TOP);
-            String BS_CUSTOM2 = app.getConfiguration().getProperty(Configuration.BS_CUSTOM_BOTTON);
-            String BS_QUALITY_MESSAGE = app.getConfiguration().getProperty(Configuration.BS_CUSTOM_QUALITY_MSG);
-            String BS_QUALITY_ENABLED = app.getConfiguration().getProperty(Configuration.BS_CUSTOM_QUALITY_ENABLED);
-            String BS_QUALITY_SCALE = app.getConfiguration().getProperty(Configuration.BS_CUSTOM_QUALITY_SCALE);
+            ConfigDB config = app.getControl().getConfig(com.bacon.Configuration.BS_NAME);
+            String BS_NAME = config != null ? config.getValor() : app.getConfiguration().getProperty(Configuration.BS_NAME);
+
+            config = app.getControl().getConfig(com.bacon.Configuration.BS_ID);
+            String BS_ID = config != null ? config.getValor() : app.getConfiguration().getProperty(Configuration.BS_ID);
+
+            config = app.getControl().getConfig(com.bacon.Configuration.BS_ADDRESS);
+            String BS_ADDRESS = config != null ? config.getValor() : app.getConfiguration().getProperty(Configuration.BS_ADDRESS);
+
+            config = app.getControl().getConfig(com.bacon.Configuration.BS_PHONE);
+            String BS_PHONE = config != null ? config.getValor() : app.getConfiguration().getProperty(Configuration.BS_PHONE);
+
+            config = app.getControl().getConfig(com.bacon.Configuration.BS_CUSTOM_TOP);
+            String BS_CUSTOM1 = config != null ? config.getValor() : app.getConfiguration().getProperty(Configuration.BS_CUSTOM_TOP);
+
+            config = app.getControl().getConfig(com.bacon.Configuration.BS_CUSTOM_BOTTON);
+            String BS_CUSTOM2 = config != null ? config.getValor() : app.getConfiguration().getProperty(Configuration.BS_CUSTOM_BOTTON);
+
+            config = app.getControl().getConfig(com.bacon.Configuration.BS_CUSTOM_QUALITY_MSG);
+            String BS_QUALITY_MESSAGE = config != null ? config.getValor() : app.getConfiguration().getProperty(Configuration.BS_CUSTOM_QUALITY_MSG);
+
+            config = app.getControl().getConfig(com.bacon.Configuration.BS_CUSTOM_QUALITY_ENABLED);
+            String BS_QUALITY_ENABLED = config != null ? config.getValor() : app.getConfiguration().getProperty(Configuration.BS_CUSTOM_QUALITY_ENABLED);
+
+            config = app.getControl().getConfig(com.bacon.Configuration.BS_CUSTOM_QUALITY_SCALE);
+            String BS_QUALITY_SCALE = config != null ? config.getValor() : app.getConfiguration().getProperty(Configuration.BS_CUSTOM_QUALITY_SCALE);
 
             // this wrapper uses esc/pos sequence: "ESC '*'"
             BitImageWrapper imageWrapper = new BitImageWrapper();
@@ -119,7 +136,8 @@ public class PrinterService {
                 escpos.writeLF(font3, "Direccion: " + (client != null && !client.getAddresses().isEmpty() ? client.getAddresses().get(0) : "- - -"));
             }
             escpos.feed(1);
-            ConfigDB config = app.getControl().getConfig(Configuration.DOCUMENT_NAME);
+
+            config = app.getControl().getConfig(Configuration.DOCUMENT_NAME);
             String docName = config != null ? config.getValor() : "Ticket N°:";
             escpos.writeLF(font3, String.format(docName + " %1s %25.25s", invoice.getFactura(), app.DF_FULL.format(invoice.getFecha())));
             escpos.feed(1);
@@ -305,7 +323,8 @@ public class PrinterService {
 
     public void imprimirGuide(Invoice invoice, String printerName) {
 
-        String BS_NAME = app.getConfiguration().getProperty(Configuration.BS_NAME);
+        ConfigDB config = app.getControl().getConfig(com.bacon.Configuration.BS_NAME);
+        String BS_NAME = config != null ? config.getValor() : app.getConfiguration().getProperty(Configuration.BS_NAME);
 
         Waiter waiter = null;
         Table table = null;
@@ -340,8 +359,8 @@ public class PrinterService {
                     BS_NAME);
             escpos.feed(1);
 
-            ConfigDB config = app.getControl().getConfig(Configuration.DOCUMENT_NAME);
-            String docName = config != null ? config.getValor() : "Ticket N°:";            
+            config = app.getControl().getConfig(Configuration.DOCUMENT_NAME);
+            String docName = config != null ? config.getValor() : "Ticket N°:";
             escpos.writeLF(font3, String.format(docName + "  %1s", invoice.getFactura()));
             escpos.writeLF(font3, String.format("Fecha:       %1s", app.DF_FULL2.format(invoice.getFecha())));
 
