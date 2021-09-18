@@ -5,9 +5,10 @@
  */
 package com.bacon.gui;
 
-
 import com.bacon.Aplication;
+import com.bacon.Configuration;
 import com.bacon.GUIManager;
+import com.bacon.domain.ConfigDB;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.nio.file.Files;
@@ -46,7 +47,8 @@ public class PanelConfigPrint extends javax.swing.JPanel implements ActionListen
 
         lbInfo.setText("Selecccione la impresora POS");
 
-        printerName = app.getConfiguration().getProperty(com.bacon.Configuration.PRINTER_SELECTED, "");
+        ConfigDB config = app.getControl().getConfig(com.bacon.Configuration.PRINTER_SELECTED);
+        printerName = config != null ? config.getValor() : app.getConfiguration().getProperty(com.bacon.Configuration.PRINTER_SELECTED, "");
         lbPrinter.setText("<html>Impresora seleccionada: <font color=blue>" + printerName + "</font></html>");
 
 //        exportDIR = property;
@@ -61,20 +63,8 @@ public class PanelConfigPrint extends javax.swing.JPanel implements ActionListen
     }
     public static final String AC_SEL_PRINTER = "AC_SEL_PRINTER";
 
-    private boolean getProperties() {
-        String dir = regPrinter.getText();
-        if (Files.exists(Paths.get(dir, ""), LinkOption.NOFOLLOW_LINKS)) {
-//            app.getConfiguration().setProperty(Configuration.EXPORT_DIR, dir);
-            return true;
-        } else {
-            String msg = "<html>'" + dir + "'<br> No es un directorio valido</html>";
-            GUIManager.showErrorMessage(null, msg, "Advertencia");
-            return false;
-        }
-    }
-
     private PrintService[] listPrinters() {
-        PrintService[] printServices = PrintServiceLookup.lookupPrintServices(null, null);        
+        PrintService[] printServices = PrintServiceLookup.lookupPrintServices(null, null);
         return printServices;
     }
 
@@ -149,15 +139,13 @@ public class PanelConfigPrint extends javax.swing.JPanel implements ActionListen
     @Override
     public void actionPerformed(ActionEvent e) {
         if (ACTION_APPLY.equals(e.getActionCommand())) {
-//            if (getProperties()) {
-
-            app.getConfiguration().save();
-//            }
+            String value = printerName;
+            app.getControl().addConfig(new ConfigDB(Configuration.PRINTER_SELECTED, ConfigDB.STRING, value));
         } else if (AC_SEL_PRINTER.equals(e.getActionCommand())) {
             PrintService printer = (PrintService) regPrinter.getSelectedItem();
             lbPrinter.setText("<html>Impresora seleccionada: <font color=blue>" + printer.getName() + "</font></html>");
-
-            app.getConfiguration().setProperty(com.bacon.Configuration.PRINTER_SELECTED, printer.getName());
+            String value = printer.getName();
+            app.getControl().addConfig(new ConfigDB(Configuration.PRINTER_SELECTED, ConfigDB.STRING, value));
         }
     }
 }
