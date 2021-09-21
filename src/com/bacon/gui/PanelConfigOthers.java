@@ -7,9 +7,14 @@ package com.bacon.gui;
 
 import com.bacon.Aplication;
 import com.bacon.domain.ConfigDB;
+import com.bacon.gui.util.Registro;
+import java.awt.Component;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.JCheckBox;
 import org.dz.TextFormatter;
 
 /**
@@ -36,66 +41,47 @@ public class PanelConfigOthers extends javax.swing.JPanel implements ActionListe
     }
 
     private void createComponents() {
+        jPanel1.setLayout(new BoxLayout(jPanel1, BoxLayout.Y_AXIS));
 
-        lbTitle.setText("Configurar");
+        ConfigCont cCont = new ConfigCont(app);
+        cCont.setTitle("Valor del domicilio");
+        cCont.addCampo(new Registro(BoxLayout.X_AXIS, "Domicilio", "", 100));
+        jPanel1.add(cCont);
+        jPanel1.add(Box.createVerticalStrut(5));
 
-        lbInfo.setText("Valor del domicilio");
+        cCont = new ConfigCont(app);
+        cCont.setTitle("Nombre del documento");
+        cCont.addCampo(new Registro(BoxLayout.X_AXIS, "Documento", "", 100));
+        jPanel1.add(cCont);
+        jPanel1.add(Box.createVerticalStrut(5));
 
-//        exportDIR = property;
-        ConfigDB config = app.getControl().getConfig(com.bacon.Configuration.DELIVERY_VALUE);
-        regDelivery.setText(config != null ? config.getValor() : "0");
+        cCont = new ConfigCont(app);
+        cCont.setTitle("Numero de ceros a formatear el consecutivo");
+        cCont.addCampo(new Registro(BoxLayout.X_AXIS, "Ceros", "", 100));
+        jPanel1.add(cCont);
+        jPanel1.add(Box.createVerticalStrut(5));
 
-        lbInfo1.setText("Imprimir pedido previo");
-        String printPrevius = app.getConfiguration().getProperty(com.bacon.Configuration.PRINT_PREV_DELIVERY, "false");
-        boolean printP = false;
-        try {
-            printP = Boolean.parseBoolean(printPrevius);
-        } catch (Exception e) {
-        }
-        regPrintPrev.setText("Permitir imprimir el pedido previo");
-        regPrintPrev.setSelected(printP);
+        cCont = new ConfigCont(app);
+        cCont.setTitle("Prefijo del consecutivo");
+        cCont.addCampo(new Registro(BoxLayout.X_AXIS, "Prefijo", "", 100));
+        jPanel1.add(cCont);
+        jPanel1.add(Box.createVerticalStrut(5));
 
-        lbInfo2.setText("Visualizar exclusiones y notas de producto");
-        String showExclusionsSt = app.getConfiguration().getProperty(com.bacon.Configuration.SHOW_EXCLUSIONS, "false");
-        boolean showExclusions = false;
-        try {
-            showExclusions = Boolean.parseBoolean(showExclusionsSt);
-        } catch (Exception e) {
-        }
-        regShowExclusions.setText("Mostrar exclusiones en panel pedido");
-        regShowExclusions.setSelected(showExclusions);
+        cCont = new ConfigCont(app);
+        cCont.setTitle("Permitir facturar sin existencias");
+        Registro registro = new Registro(BoxLayout.X_AXIS, "Permitir", false, 100);
+        registro.setFontCampo(new Font("Arial", 0, 16));
+        cCont.addCampo(registro);
+        jPanel1.add(cCont);
+        jPanel1.add(Box.createVerticalStrut(5));
 
-        lbInfo3.setText("Facturar sin existencias");
-        String prop = app.getConfiguration().getProperty(com.bacon.Configuration.INVOICE_OUT_STOCK, "false");
-        boolean outStock = false;
-        try {
-            outStock = Boolean.parseBoolean(prop);
-        } catch (Exception e) {
-        }
-        regInvoiceOutStock.setText("Permitir guardar facturas sin existencias en  inventario");
-        regInvoiceOutStock.setSelected(outStock);
-
-        lbInfo4.setText("Prefijo numeracion de facturas");
-
-//        exportDIR = property;
-        regPrefix.setLabelText("Prefijo");
-        config = app.getControl().getConfig(com.bacon.Configuration.PREFIX_INVOICES);
-        String prefix = config != null ? config.getValor() : app.getConfiguration().getProperty(com.bacon.Configuration.PREFIX_INVOICES, "");
-        regPrefix.setText(prefix);
-
-        lbInfo5.setText("Numero de ceros a formatear consecutivo");
-
-//        exportDIR = property;
-        regZeros.setLabelText("Numero ceros");
-        config = app.getControl().getConfig(com.bacon.Configuration.ZEROS_INVOICES);
-        String ceros = config != null ? config.getValor() : app.getConfiguration().getProperty(com.bacon.Configuration.ZEROS_INVOICES, "0");
-        regZeros.setDocument(TextFormatter.getIntegerLimiter());
-        regZeros.setText(ceros);
-
-        lbInfo6.setText("Nombre Documento ticket");
-        regDocument.setLabelText("Nombre documento");
-        config = app.getControl().getConfig(com.bacon.Configuration.DOCUMENT_NAME);
-        regDocument.setText(config != null ? config.getValor() : app.getConfiguration().getProperty(com.bacon.Configuration.ZEROS_INVOICES, "Ticket N°: "));
+        cCont = new ConfigCont(app);
+        cCont.setTitle("Permitir imprimir pedido previo");
+        registro = new Registro(BoxLayout.X_AXIS, "Permitir", false, 100);
+        registro.setFontCampo(new Font("Arial", 0, 16));
+        cCont.addCampo(registro);
+        jPanel1.add(cCont);
+        jPanel1.add(Box.createVerticalStrut(5));
 
         btApply.setText("Aplicar");
         btApply.setActionCommand(ACTION_APPLY);
@@ -112,38 +98,40 @@ public class PanelConfigOthers extends javax.swing.JPanel implements ActionListe
     private void initComponents() {
 
         buttonGroup1 = new javax.swing.ButtonGroup();
-        lbTitle = new javax.swing.JLabel();
         lbInfo = new javax.swing.JLabel();
-        btApply = new javax.swing.JButton();
+        regPrintPrev = new javax.swing.JCheckBox();
         regDelivery = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Domicilio", "");
         lbInfo1 = new javax.swing.JLabel();
-        regPrintPrev = new javax.swing.JCheckBox();
-        lbInfo2 = new javax.swing.JLabel();
+        lbTitle = new javax.swing.JLabel();
         regShowExclusions = new javax.swing.JCheckBox();
+        lbInfo2 = new javax.swing.JLabel();
         lbInfo3 = new javax.swing.JLabel();
         regInvoiceOutStock = new javax.swing.JCheckBox();
         lbInfo4 = new javax.swing.JLabel();
         regPrefix = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Domicilio", "");
-        regZeros = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Domicilio", "");
         lbInfo5 = new javax.swing.JLabel();
+        regZeros = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Domicilio", "");
         regDocument = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Domicilio", "");
         lbInfo6 = new javax.swing.JLabel();
-
-        lbTitle.setBackground(java.awt.Color.lightGray);
-        lbTitle.setOpaque(true);
+        btApply = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jPanel1 = new javax.swing.JPanel();
 
         lbInfo.setText("jLabel2");
         lbInfo.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
+        regPrintPrev.setText("jCheckBox1");
+
         lbInfo1.setText("jLabel2");
         lbInfo1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
-        regPrintPrev.setText("jCheckBox1");
+        lbTitle.setBackground(java.awt.Color.lightGray);
+        lbTitle.setOpaque(true);
+
+        regShowExclusions.setText("jCheckBox1");
 
         lbInfo2.setText("jLabel2");
         lbInfo2.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-
-        regShowExclusions.setText("jCheckBox1");
 
         lbInfo3.setText("jLabel2");
         lbInfo3.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -159,67 +147,38 @@ public class PanelConfigOthers extends javax.swing.JPanel implements ActionListe
         lbInfo6.setText("jLabel2");
         lbInfo6.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 473, Short.MAX_VALUE)
+        );
+
+        jScrollPane1.setViewportView(jPanel1);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(lbTitle, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lbInfo, javax.swing.GroupLayout.DEFAULT_SIZE, 431, Short.MAX_VALUE)
-                    .addComponent(regDelivery, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(0, 337, Short.MAX_VALUE)
                         .addComponent(btApply, javax.swing.GroupLayout.PREFERRED_SIZE, 94, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(lbInfo1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(regPrintPrev, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(lbInfo2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(regShowExclusions, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(lbInfo3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(regInvoiceOutStock, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(lbInfo4, javax.swing.GroupLayout.DEFAULT_SIZE, 431, Short.MAX_VALUE)
-                    .addComponent(regPrefix, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(lbInfo5, javax.swing.GroupLayout.DEFAULT_SIZE, 431, Short.MAX_VALUE)
-                    .addComponent(regZeros, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(lbInfo6, javax.swing.GroupLayout.DEFAULT_SIZE, 431, Short.MAX_VALUE)
-                    .addComponent(regDocument, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jScrollPane1))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(6, 6, 6)
-                .addComponent(lbTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(lbInfo, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap()
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 473, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(regDelivery, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(lbInfo1, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(regPrintPrev)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(lbInfo2, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(regShowExclusions)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(lbInfo3, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(regInvoiceOutStock)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(lbInfo4, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(regPrefix, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(lbInfo5, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(regZeros, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(lbInfo6, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(regDocument, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(btApply, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
@@ -229,6 +188,8 @@ public class PanelConfigOthers extends javax.swing.JPanel implements ActionListe
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btApply;
     private javax.swing.ButtonGroup buttonGroup1;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lbInfo;
     private javax.swing.JLabel lbInfo1;
     private javax.swing.JLabel lbInfo2;
@@ -265,8 +226,8 @@ public class PanelConfigOthers extends javax.swing.JPanel implements ActionListe
             app.getControl().addConfig(new ConfigDB(com.bacon.Configuration.PREFIX_INVOICES, ConfigDB.STRING, prefix));
 
             String ceros = regZeros.getText();
-            app.getControl().addConfig(new ConfigDB(com.bacon.Configuration.ZEROS_INVOICES, ConfigDB.STRING, ceros));            
-            
+            app.getControl().addConfig(new ConfigDB(com.bacon.Configuration.ZEROS_INVOICES, ConfigDB.STRING, ceros));
+
             String docName = regDocument.getText();
             app.getControl().addConfig(new ConfigDB(com.bacon.Configuration.DOCUMENT_NAME, ConfigDB.STRING, docName));
 
