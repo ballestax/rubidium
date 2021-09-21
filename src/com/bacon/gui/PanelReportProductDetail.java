@@ -156,7 +156,7 @@ public class PanelReportProductDetail extends PanelCapturaMod implements ActionL
             int idProd = Integer.parseInt(get[1].toString());
 //            System.out.println(idPres + "  - " + idProd);
             if (idPres == 0) {
-                ArrayList<Object[]> outProd = app.getControl().getProductsOutInventoryList(idProd, item.getCreatedTime());
+                ArrayList<Object[]> outProd = app.getControl().getProductsOutInventoryList(idProd, item.getId(), item.getCreatedTime());
                 for (int j = 0; j < outProd.size(); j++) {
                     Object[] data = outProd.get(j);
                     double quantity = Double.parseDouble(data[2].toString());
