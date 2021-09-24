@@ -5,6 +5,7 @@ import java.awt.Color;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.border.Border;
 
 /**
@@ -30,14 +31,22 @@ public class ConfigCont extends javax.swing.JPanel {
         setBorder(BorderFactory.createCompoundBorder(bdLine, bdMargin));
         
         labelDB.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons()+"trafficlight-green.png", 12, 12)));
+        labelDB.setHorizontalAlignment(JLabel.CENTER);
     }
 
-    public void setTitle(String title) {
+        public void setTitle(String title) {
         lbTitle.setText(title);
     }
 
     public void addCampo(JComponent component) {
         container.add(component);
+    }
+
+    public void setBackgroundTitle(Color color) {
+        lbTitle.setOpaque(true);
+        lbTitle.setBackground(color);
+        labelDB.setOpaque(true);
+        labelDB.setBackground(color);
     }
 
     /**

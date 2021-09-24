@@ -6,15 +6,15 @@
 package com.bacon.gui;
 
 import com.bacon.Aplication;
+import com.bacon.Configuration;
 import com.bacon.domain.ConfigDB;
 import com.bacon.gui.util.Registro;
-import java.awt.Component;
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
-import javax.swing.JCheckBox;
 import org.dz.TextFormatter;
 
 /**
@@ -28,6 +28,13 @@ public class PanelConfigOthers extends javax.swing.JPanel implements ActionListe
     private final Aplication app;
     private String selectedPrinter;
     private String printerName;
+    private Registro regDelivery;
+    private Registro regDocName;
+    private Registro regNumZeros;
+    private Registro regPrefix;
+    private Registro regAllowFact;
+    private Registro regAllowPreview;
+    private Registro regShowExclusions;
 
     /**
      * Creates new form PanelConfigMotor
@@ -38,54 +45,107 @@ public class PanelConfigOthers extends javax.swing.JPanel implements ActionListe
         this.app = app;
         initComponents();
         createComponents();
+        loadData();
     }
 
     private void createComponents() {
         jPanel1.setLayout(new BoxLayout(jPanel1, BoxLayout.Y_AXIS));
 
+        regDelivery = new Registro(BoxLayout.X_AXIS, "Domicilio", "", 100);
+        regDelivery.setDocument(TextFormatter.getDoubleLimiter());
         ConfigCont cCont = new ConfigCont(app);
+        cCont.setBackgroundTitle(new Color(200,210,220));
         cCont.setTitle("Valor del domicilio");
-        cCont.addCampo(new Registro(BoxLayout.X_AXIS, "Domicilio", "", 100));
+        cCont.addCampo(regDelivery);
         jPanel1.add(cCont);
         jPanel1.add(Box.createVerticalStrut(5));
 
+        regDocName = new Registro(BoxLayout.X_AXIS, "Domicilio", "", 100);
         cCont = new ConfigCont(app);
+        cCont.setBackgroundTitle(new Color(200,210,220));
         cCont.setTitle("Nombre del documento");
-        cCont.addCampo(new Registro(BoxLayout.X_AXIS, "Documento", "", 100));
+        cCont.addCampo(regDocName);
         jPanel1.add(cCont);
         jPanel1.add(Box.createVerticalStrut(5));
 
+        regNumZeros = new Registro(BoxLayout.X_AXIS, "Ceros", "", 100);
+        regNumZeros.setDocument(TextFormatter.getIntegerLimiter());
         cCont = new ConfigCont(app);
+        cCont.setBackgroundTitle(new Color(200,210,220));
         cCont.setTitle("Numero de ceros a formatear el consecutivo");
-        cCont.addCampo(new Registro(BoxLayout.X_AXIS, "Ceros", "", 100));
+        cCont.addCampo(regNumZeros);
         jPanel1.add(cCont);
         jPanel1.add(Box.createVerticalStrut(5));
 
+        regPrefix = new Registro(BoxLayout.X_AXIS, "Prefijo", "", 100);
         cCont = new ConfigCont(app);
+        cCont.setBackgroundTitle(new Color(200,210,220));
         cCont.setTitle("Prefijo del consecutivo");
-        cCont.addCampo(new Registro(BoxLayout.X_AXIS, "Prefijo", "", 100));
+        cCont.addCampo(regPrefix);
         jPanel1.add(cCont);
         jPanel1.add(Box.createVerticalStrut(5));
 
+        regAllowFact = new Registro(BoxLayout.X_AXIS, "Permitir", false, 100);
+        regAllowFact.setFontCampo(new Font("Arial", 0, 16));
         cCont = new ConfigCont(app);
+        cCont.setBackgroundTitle(new Color(200,210,220));
         cCont.setTitle("Permitir facturar sin existencias");
-        Registro registro = new Registro(BoxLayout.X_AXIS, "Permitir", false, 100);
-        registro.setFontCampo(new Font("Arial", 0, 16));
-        cCont.addCampo(registro);
+        cCont.addCampo(regAllowFact);
         jPanel1.add(cCont);
         jPanel1.add(Box.createVerticalStrut(5));
 
+        regAllowPreview = new Registro(BoxLayout.X_AXIS, "Permitir", false, 100);
+        regAllowPreview.setFontCampo(new Font("Arial", 0, 16));
         cCont = new ConfigCont(app);
+        cCont.setBackgroundTitle(new Color(200,210,220));
         cCont.setTitle("Permitir imprimir pedido previo");
-        registro = new Registro(BoxLayout.X_AXIS, "Permitir", false, 100);
-        registro.setFontCampo(new Font("Arial", 0, 16));
-        cCont.addCampo(registro);
+        cCont.addCampo(regAllowPreview);
+        jPanel1.add(cCont);
+        jPanel1.add(Box.createVerticalStrut(5));
+
+        regShowExclusions = new Registro(BoxLayout.X_AXIS, "Permitir", false, 100);
+        regShowExclusions.setFontCampo(new Font("Arial", 0, 16));
+        cCont = new ConfigCont(app);
+        cCont.setBackgroundTitle(new Color(200,210,220));
+        cCont.setTitle("Mostrar exclusiones y notas del producto");
+        cCont.addCampo(regShowExclusions);
         jPanel1.add(cCont);
         jPanel1.add(Box.createVerticalStrut(5));
 
         btApply.setText("Aplicar");
         btApply.setActionCommand(ACTION_APPLY);
         btApply.addActionListener(this);
+    }
+
+    private void loadData() {
+        ConfigDB config = app.getControl().getConfig(Configuration.DELIVERY_VALUE);
+        double deliveryValue = config != null ? (double) config.castValor() : 0;
+        regDelivery.setText(app.getDCFORM_W().format(deliveryValue));
+
+        config = app.getControl().getConfig(Configuration.DOCUMENT_NAME);
+        String docName = config != null ? config.getValor() : "";
+        regDocName.setText(docName);
+
+        config = app.getControl().getConfig(Configuration.ZEROS_INVOICES);
+        int zeros = config != null ? (int) config.castValor() : 0;
+        regNumZeros.setText(app.getDCFORM_W().format(zeros));
+
+        config = app.getControl().getConfig(Configuration.PREFIX_INVOICES);
+        String prefix = config != null ? config.getValor() : "";
+        regPrefix.setText(prefix);
+
+        config = app.getControl().getConfig(Configuration.PRINT_PREV_DELIVERY);
+        boolean showPrev = config != null ? (boolean) config.castValor() : false;
+        regAllowPreview.setSelected(showPrev);
+
+        config = app.getControl().getConfig(Configuration.SHOW_EXCLUSIONS);
+        boolean showExclusions = config != null ? (boolean) config.castValor() : false;
+        regShowExclusions.setSelected(showExclusions);
+
+        config = app.getControl().getConfig(Configuration.INVOICE_OUT_STOCK);
+        boolean showOutStock = config != null ? (boolean) config.castValor() : false;
+        regAllowFact.setSelected(showOutStock);
+
     }
 
     /**
@@ -98,54 +158,9 @@ public class PanelConfigOthers extends javax.swing.JPanel implements ActionListe
     private void initComponents() {
 
         buttonGroup1 = new javax.swing.ButtonGroup();
-        lbInfo = new javax.swing.JLabel();
-        regPrintPrev = new javax.swing.JCheckBox();
-        regDelivery = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Domicilio", "");
-        lbInfo1 = new javax.swing.JLabel();
-        lbTitle = new javax.swing.JLabel();
-        regShowExclusions = new javax.swing.JCheckBox();
-        lbInfo2 = new javax.swing.JLabel();
-        lbInfo3 = new javax.swing.JLabel();
-        regInvoiceOutStock = new javax.swing.JCheckBox();
-        lbInfo4 = new javax.swing.JLabel();
-        regPrefix = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Domicilio", "");
-        lbInfo5 = new javax.swing.JLabel();
-        regZeros = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Domicilio", "");
-        regDocument = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Domicilio", "");
-        lbInfo6 = new javax.swing.JLabel();
         btApply = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         jPanel1 = new javax.swing.JPanel();
-
-        lbInfo.setText("jLabel2");
-        lbInfo.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-
-        regPrintPrev.setText("jCheckBox1");
-
-        lbInfo1.setText("jLabel2");
-        lbInfo1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-
-        lbTitle.setBackground(java.awt.Color.lightGray);
-        lbTitle.setOpaque(true);
-
-        regShowExclusions.setText("jCheckBox1");
-
-        lbInfo2.setText("jLabel2");
-        lbInfo2.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-
-        lbInfo3.setText("jLabel2");
-        lbInfo3.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-
-        regInvoiceOutStock.setText("jCheckBox1");
-
-        lbInfo4.setText("jLabel2");
-        lbInfo4.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-
-        lbInfo5.setText("jLabel2");
-        lbInfo5.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-
-        lbInfo6.setText("jLabel2");
-        lbInfo6.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -190,21 +205,6 @@ public class PanelConfigOthers extends javax.swing.JPanel implements ActionListe
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JLabel lbInfo;
-    private javax.swing.JLabel lbInfo1;
-    private javax.swing.JLabel lbInfo2;
-    private javax.swing.JLabel lbInfo3;
-    private javax.swing.JLabel lbInfo4;
-    private javax.swing.JLabel lbInfo5;
-    private javax.swing.JLabel lbInfo6;
-    private javax.swing.JLabel lbTitle;
-    private com.bacon.gui.util.Registro regDelivery;
-    private com.bacon.gui.util.Registro regDocument;
-    private javax.swing.JCheckBox regInvoiceOutStock;
-    private com.bacon.gui.util.Registro regPrefix;
-    private javax.swing.JCheckBox regPrintPrev;
-    private javax.swing.JCheckBox regShowExclusions;
-    private com.bacon.gui.util.Registro regZeros;
     // End of variables declaration//GEN-END:variables
 
     @Override
@@ -213,22 +213,25 @@ public class PanelConfigOthers extends javax.swing.JPanel implements ActionListe
             String value = regDelivery.getText();
             app.getControl().addConfig(new ConfigDB(com.bacon.Configuration.DELIVERY_VALUE, ConfigDB.DOUBLE, value));
 
-            boolean selected = regPrintPrev.isSelected();
-            app.getConfiguration().setProperty(com.bacon.Configuration.PRINT_PREV_DELIVERY, String.valueOf(selected));
+            boolean selected = regAllowPreview.isSelected();
+//            app.getConfiguration().setProperty(com.bacon.Configuration.PRINT_PREV_DELIVERY, String.valueOf(selected));
+            app.getControl().addConfig(new ConfigDB(com.bacon.Configuration.PRINT_PREV_DELIVERY, ConfigDB.BOOLEAN, String.valueOf(selected)));
 
             boolean selected2 = regShowExclusions.isSelected();
-            app.getConfiguration().setProperty(com.bacon.Configuration.SHOW_EXCLUSIONS, String.valueOf(selected2));
+//            app.getConfiguration().setProperty(com.bacon.Configuration.SHOW_EXCLUSIONS, String.valueOf(selected2));
+            app.getControl().addConfig(new ConfigDB(com.bacon.Configuration.SHOW_EXCLUSIONS, ConfigDB.BOOLEAN, String.valueOf(selected2)));
 
-            boolean selected3 = regInvoiceOutStock.isSelected();
-            app.getConfiguration().setProperty(com.bacon.Configuration.INVOICE_OUT_STOCK, String.valueOf(selected3));
+            boolean selected3 = regAllowFact.isSelected();
+//            app.getConfiguration().setProperty(com.bacon.Configuration.INVOICE_OUT_STOCK, String.valueOf(selected3));
+            app.getControl().addConfig(new ConfigDB(com.bacon.Configuration.INVOICE_OUT_STOCK, ConfigDB.BOOLEAN, String.valueOf(selected3)));
 
             String prefix = regPrefix.getText();
             app.getControl().addConfig(new ConfigDB(com.bacon.Configuration.PREFIX_INVOICES, ConfigDB.STRING, prefix));
 
-            String ceros = regZeros.getText();
+            String ceros = regNumZeros.getText();
             app.getControl().addConfig(new ConfigDB(com.bacon.Configuration.ZEROS_INVOICES, ConfigDB.STRING, ceros));
 
-            String docName = regDocument.getText();
+            String docName = regDocName.getText();
             app.getControl().addConfig(new ConfigDB(com.bacon.Configuration.DOCUMENT_NAME, ConfigDB.STRING, docName));
 
             app.getConfiguration().save();

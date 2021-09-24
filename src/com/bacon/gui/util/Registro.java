@@ -560,8 +560,6 @@ public class Registro extends JComponent implements Reseteable, CaretListener {
         }
 
         box.add(((Component) (conIcono ? ((Component) (boxH)) : ((Component) (campo)))));
-        
-        
 
         add(box, BorderLayout.CENTER);
 
@@ -770,6 +768,19 @@ public class Registro extends JComponent implements Reseteable, CaretListener {
     public void setSelected(Object object) {
         if (campo instanceof JComboBox) {
             ((JComboBox) campo).setSelectedItem(object);
+        }
+    }
+
+    public boolean isSelected() {
+        if (campo instanceof JCheckBox) {
+            return ((JCheckBox) campo).isSelected();
+        }
+        return false;
+    }
+
+    public void setSelected(boolean select) {
+        if (campo instanceof JCheckBox) {
+            ((JCheckBox) campo).setSelected(select);
         }
     }
 
