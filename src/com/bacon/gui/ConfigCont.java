@@ -2,6 +2,7 @@ package com.bacon.gui;
 
 import com.bacon.Aplication;
 import java.awt.Color;
+import java.awt.event.ActionListener;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
@@ -18,23 +19,50 @@ public class ConfigCont extends javax.swing.JPanel {
 
     /**
      * Creates new form ConfigCont
+     *
+     * @param app
      */
     public ConfigCont(Aplication app) {
         this.app = app;
         initComponents();
-        createComponents();
+        createComponents(false);
     }
 
-    private void createComponents() {
+    public ConfigCont(Aplication app, boolean selected) {
+        this.app = app;
+        initComponents();
+        createComponents(selected);
+    }
+
+    private void createComponents(boolean selected) {
+
+        jCheckBox1.setVisible(selected);
+
         Border bdMargin = BorderFactory.createEmptyBorder(4, 4, 4, 4);
         Border bdLine = BorderFactory.createLineBorder(Color.darkGray, 1, true);
         setBorder(BorderFactory.createCompoundBorder(bdLine, bdMargin));
-        
-        labelDB.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons()+"trafficlight-green.png", 12, 12)));
+
+        labelDB.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "trafficlight-green.png", 12, 12)));
         labelDB.setHorizontalAlignment(JLabel.CENTER);
     }
 
-        public void setTitle(String title) {
+    public void addActionListener(ActionListener listener) {
+        jCheckBox1.addActionListener(listener);
+    }
+
+    public void showSelected(boolean show) {
+        jCheckBox1.setVisible(show);
+    }
+
+    public void setSelected(boolean selected) {
+        jCheckBox1.setSelected(selected);
+    }
+
+    public boolean isSelected() {
+        return jCheckBox1.isSelected();
+    }
+
+    public void setTitle(String title) {
         lbTitle.setText(title);
     }
 
@@ -62,6 +90,7 @@ public class ConfigCont extends javax.swing.JPanel {
         labelDB = new javax.swing.JLabel();
         lbTitle = new javax.swing.JLabel();
         container = new javax.swing.JPanel();
+        jCheckBox1 = new javax.swing.JCheckBox();
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -86,24 +115,28 @@ public class ConfigCont extends javax.swing.JPanel {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(labelDB, javax.swing.GroupLayout.PREFERRED_SIZE, 15, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(lbTitle, javax.swing.GroupLayout.DEFAULT_SIZE, 377, Short.MAX_VALUE))
+                .addGap(3, 3, 3)
+                .addComponent(jCheckBox1)
+                .addGap(2, 2, 2)
+                .addComponent(lbTitle, javax.swing.GroupLayout.DEFAULT_SIZE, 350, Short.MAX_VALUE))
             .addComponent(container, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lbTitle)
-                    .addComponent(labelDB, javax.swing.GroupLayout.PREFERRED_SIZE, 15, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                    .addComponent(jCheckBox1)
+                    .addComponent(labelDB, javax.swing.GroupLayout.PREFERRED_SIZE, 15, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lbTitle))
                 .addGap(3, 3, 3)
-                .addComponent(container, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(container, javax.swing.GroupLayout.DEFAULT_SIZE, 29, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel container;
+    private javax.swing.JCheckBox jCheckBox1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JLabel labelDB;
     private javax.swing.JLabel lbTitle;

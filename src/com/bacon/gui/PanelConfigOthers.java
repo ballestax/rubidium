@@ -49,9 +49,13 @@ public class PanelConfigOthers extends javax.swing.JPanel implements ActionListe
     }
 
     private void createComponents() {
+        
+        Color color1 = new Color(205, 176, 225);
+        
         jPanel1.setLayout(new BoxLayout(jPanel1, BoxLayout.Y_AXIS));
 
         regDelivery = new Registro(BoxLayout.X_AXIS, "Domicilio", "", 100);
+        regDelivery.setBackground(color1);
         regDelivery.setDocument(TextFormatter.getDoubleLimiter());
         ConfigCont cCont = new ConfigCont(app);
         cCont.setBackgroundTitle(new Color(200,210,220));
@@ -61,6 +65,7 @@ public class PanelConfigOthers extends javax.swing.JPanel implements ActionListe
         jPanel1.add(Box.createVerticalStrut(5));
 
         regDocName = new Registro(BoxLayout.X_AXIS, "Domicilio", "", 100);
+        regDocName.setBackground(color1);
         cCont = new ConfigCont(app);
         cCont.setBackgroundTitle(new Color(200,210,220));
         cCont.setTitle("Nombre del documento");
@@ -69,6 +74,7 @@ public class PanelConfigOthers extends javax.swing.JPanel implements ActionListe
         jPanel1.add(Box.createVerticalStrut(5));
 
         regNumZeros = new Registro(BoxLayout.X_AXIS, "Ceros", "", 100);
+        regNumZeros.setBackground(color1);
         regNumZeros.setDocument(TextFormatter.getIntegerLimiter());
         cCont = new ConfigCont(app);
         cCont.setBackgroundTitle(new Color(200,210,220));
@@ -78,6 +84,7 @@ public class PanelConfigOthers extends javax.swing.JPanel implements ActionListe
         jPanel1.add(Box.createVerticalStrut(5));
 
         regPrefix = new Registro(BoxLayout.X_AXIS, "Prefijo", "", 100);
+        regPrefix.setBackground(color1);
         cCont = new ConfigCont(app);
         cCont.setBackgroundTitle(new Color(200,210,220));
         cCont.setTitle("Prefijo del consecutivo");
@@ -86,6 +93,7 @@ public class PanelConfigOthers extends javax.swing.JPanel implements ActionListe
         jPanel1.add(Box.createVerticalStrut(5));
 
         regAllowFact = new Registro(BoxLayout.X_AXIS, "Permitir", false, 100);
+        regAllowFact.setBackground(color1);
         regAllowFact.setFontCampo(new Font("Arial", 0, 16));
         cCont = new ConfigCont(app);
         cCont.setBackgroundTitle(new Color(200,210,220));
@@ -95,6 +103,7 @@ public class PanelConfigOthers extends javax.swing.JPanel implements ActionListe
         jPanel1.add(Box.createVerticalStrut(5));
 
         regAllowPreview = new Registro(BoxLayout.X_AXIS, "Permitir", false, 100);
+        regAllowPreview.setBackground(color1);
         regAllowPreview.setFontCampo(new Font("Arial", 0, 16));
         cCont = new ConfigCont(app);
         cCont.setBackgroundTitle(new Color(200,210,220));
@@ -104,6 +113,7 @@ public class PanelConfigOthers extends javax.swing.JPanel implements ActionListe
         jPanel1.add(Box.createVerticalStrut(5));
 
         regShowExclusions = new Registro(BoxLayout.X_AXIS, "Permitir", false, 100);
+        regShowExclusions.setBackground(color1);
         regShowExclusions.setFontCampo(new Font("Arial", 0, 16));
         cCont = new ConfigCont(app);
         cCont.setBackgroundTitle(new Color(200,210,220));

@@ -7,16 +7,17 @@ package com.bacon.gui;
 
 import com.bacon.Aplication;
 import com.bacon.Configuration;
-import com.bacon.MyConstants;
 import static com.bacon.MyConstants.CF_FACTURA_ACTUAL;
 import static com.bacon.MyConstants.CF_FACTURA_FINAL;
 import static com.bacon.MyConstants.CF_FACTURA_INICIAL;
 import com.bacon.domain.ConfigDB;
+import com.bacon.gui.util.Registro;
 import com.github.anastaciocintra.escpos.EscPosConst;
 import com.github.anastaciocintra.escpos.Style;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 
 /**
@@ -30,6 +31,22 @@ public class PanelConfigTicket extends javax.swing.JPanel implements ActionListe
     private final Aplication app;
     private String selectedPrinter;
     private String printerName;
+    private Registro regName;
+    private Registro regFont1;
+    private Registro regID;
+    private Registro regFont2;
+    private Registro regPhone;
+    private Registro regFont3;
+    private Registro regAddress;
+    private Registro regFont4;
+    private Registro regCustom1;
+    private Registro regCustom2;
+    private Registro regInvoiceInit;
+    private Registro regInvoiceEnd;
+    private Registro regInvoice;
+    private Registro regQualityMsg;
+    private Registro regQualityScl;
+    private ConfigCont cContQuality;
 
     /**
      * Creates new form PanelConfigMotor
@@ -43,8 +60,8 @@ public class PanelConfigTicket extends javax.swing.JPanel implements ActionListe
     }
 
     private void createComponents() {
-        
-        
+
+        jPanel2.setLayout(new BoxLayout(jPanel2, BoxLayout.Y_AXIS));
 
         lbTitle.setText("Configurar Factura");
 
@@ -56,104 +73,181 @@ public class PanelConfigTicket extends javax.swing.JPanel implements ActionListe
 
         Style[] fuentes = {font1, font2, font3};
 
-        lbInfo1.setText("Nombre");
-        lbInfo1.setBackground(color1);
-//        String propName = app.getConfiguration().getProperty(com.bacon.Configuration.BS_NAME, "NOMBRE");
-        ConfigDB config = app.getControl().getConfig(com.bacon.Configuration.BS_NAME);
-        regText1.setText(config != null ? config.getValor() : "NOMBRE");
-        regText1.setLabelText("Nombre:");
+        int space = 10;
+
+        regName = new Registro(BoxLayout.X_AXIS, "Nombre", "", 100);
+        regName.setBackground(color1);
+        regFont1 = new Registro(BoxLayout.X_AXIS, "Fuente", new Object[0]);
         regFont1.setText(FONTS.values());
+        regFont1.setBackground(color1);
 
-        lbInfo2.setText("Identificacion");
-        lbInfo2.setBackground(color1);
-        String propID = app.getConfiguration().getProperty(com.bacon.Configuration.BS_ID, "000000000");
-        config = app.getControl().getConfig(com.bacon.Configuration.BS_ID);
-        regText2.setText(config != null ? config.getValor() : "000000000");
-//        regText2.setText(propID);
-        regText2.setLabelText("Identificacion:");
+        ConfigCont cCont = new ConfigCont(app);
+        cCont.setBackgroundTitle(new Color(200, 210, 220));
+        cCont.setTitle("Nombre del establecimiento");
+        Box boxHoriz = new Box(BoxLayout.X_AXIS);
+        boxHoriz.add(regName);
+        boxHoriz.add(regFont1);
+        cCont.addCampo(boxHoriz);
+
+        jPanel2.add(cCont);
+        jPanel2.add(Box.createVerticalStrut(space));
+
+        regID = new Registro(BoxLayout.X_AXIS, "Identificacion", "", 100);
+        regID.setBackground(color1);
+        regFont2 = new Registro(BoxLayout.X_AXIS, "Fuente", new Object[0]);
         regFont2.setText(FONTS.values());
+        regFont2.setBackground(color1);
+        cCont = new ConfigCont(app);
+        cCont.setBackgroundTitle(new Color(200, 210, 220));
+        cCont.setTitle("Identificacion");
+        boxHoriz = new Box(BoxLayout.X_AXIS);
+        boxHoriz.add(regID);
+        boxHoriz.add(regFont2);
+        cCont.addCampo(boxHoriz);
 
-        lbInfo3.setText("Direccion");
-        lbInfo3.setBackground(color1);
-//        String propAddress = app.getConfiguration().getProperty(com.bacon.Configuration.BS_ADDRESS, "Direccion");
-        config = app.getControl().getConfig(com.bacon.Configuration.BS_ADDRESS);
-        regText3.setText(config != null ? config.getValor() : "Dirección");
-//        regText3.setText(propAddress);
-        regText3.setLabelText("Dirección");
+        jPanel2.add(cCont);
+        jPanel2.add(Box.createVerticalStrut(space));
+
+        regPhone = new Registro(BoxLayout.X_AXIS, "Telefono", "", 100);
+        regPhone.setBackground(color1);
+        regFont3 = new Registro(BoxLayout.X_AXIS, "Fuente", new Object[0]);
         regFont3.setText(FONTS.values());
+        regFont3.setBackground(color1);
+        cCont = new ConfigCont(app);
+        cCont.setBackgroundTitle(new Color(200, 210, 220));
+        cCont.setTitle("Telefono");
+        boxHoriz = new Box(BoxLayout.X_AXIS);
+        boxHoriz.add(regPhone);
+        boxHoriz.add(regFont3);
+        cCont.addCampo(boxHoriz);
 
-        lbInfo4.setText("Telefono");
-        lbInfo4.setBackground(color1);
-//        String propPhone = app.getConfiguration().getProperty(com.bacon.Configuration.BS_PHONE, "300000000");
-        config = app.getControl().getConfig(com.bacon.Configuration.BS_PHONE);
-        regText4.setText(config != null ? config.getValor() : "3000000000");
-//        regText4.setText(propPhone);
-        regText4.setLabelText("Telefono");
+        jPanel2.add(cCont);
+        jPanel2.add(Box.createVerticalStrut(space));
+
+        regAddress = new Registro(BoxLayout.X_AXIS, "Direccion", "", 100);
+        regAddress.setBackground(color1);
+        regFont4 = new Registro(BoxLayout.X_AXIS, "Fuente", new Object[0]);
         regFont4.setText(FONTS.values());
+        regFont4.setBackground(color1);
+        cCont = new ConfigCont(app);
+        cCont.setBackgroundTitle(new Color(200, 210, 220));
+        cCont.setTitle("Direccion");
+        boxHoriz = new Box(BoxLayout.X_AXIS);
+        boxHoriz.add(regAddress);
+        boxHoriz.add(regFont4);
+        cCont.addCampo(boxHoriz);
 
-        lbInfo5.setText("Personalizado 1");
-        lbInfo5.setBackground(color1);
-//        String propCustom1 = app.getConfiguration().getProperty(com.bacon.Configuration.BS_CUSTOM_TOP, "Personalizado 1");
-        config = app.getControl().getConfig(com.bacon.Configuration.BS_CUSTOM_TOP);
-        regText5.setText(config != null ? config.getValor() : "Personalizado 1");
-//        regText5.setText(propCustom1);
-        regText5.setLabelText("Personalizado1:");
-        regFont5.setText(FONTS.values());
+        jPanel2.add(cCont);
+        jPanel2.add(Box.createVerticalStrut(space));
 
-        lbInfo6.setText("Personalizado 2");
-        lbInfo6.setBackground(color1);
-//        String propCustom2 = app.getConfiguration().getProperty(com.bacon.Configuration.BS_CUSTOM_BOTTON, "Personalizado 2");
-        config = app.getControl().getConfig(com.bacon.Configuration.BS_CUSTOM_BOTTON);
-        regText6.setText(config != null ? config.getValor() : "Personalizado 2");
-//        regText6.setText(propCustom2);
-        regText6.setLabelText("Personalizado2:");
-        regFont6.setText(FONTS.values());
+        regCustom1 = new Registro(BoxLayout.X_AXIS, "Personalizado 1", "", 100);
+        regCustom1.setBackground(color1);
+        regFont4 = new Registro(BoxLayout.X_AXIS, "Fuente", new Object[0]);
+        regFont4.setText(FONTS.values());
+        regFont4.setBackground(color1);
+        cCont = new ConfigCont(app);
+        cCont.setBackgroundTitle(new Color(200, 210, 220));
+        cCont.setTitle("Campo personalizado superior");
+        boxHoriz = new Box(BoxLayout.X_AXIS);
+        boxHoriz.add(regCustom1);
+        boxHoriz.add(regFont4);
+        cCont.addCampo(boxHoriz);
 
-//        String propQualityEnabled = app.getConfiguration().getProperty(com.bacon.Configuration.BS_CUSTOM_QUALITY_ENABLED, "false");
-        config = app.getControl().getConfig(com.bacon.Configuration.BS_CUSTOM_QUALITY_ENABLED);
-        boolean enabled = Boolean.parseBoolean(config != null ? config.getValor() : "false");
-        jCheckBox1.setText("Calidad del servicio");
-        jCheckBox1.setBackground(color1);
-        jCheckBox1.setSelected(enabled);
-        regText10.setEnabled(enabled);
-        regText11.setEnabled(enabled);
-        regFont7.setEnabled(enabled);
-        jCheckBox1.addActionListener(new ActionListener() {
+        jPanel2.add(cCont);
+        jPanel2.add(Box.createVerticalStrut(space));
+
+        regCustom2 = new Registro(BoxLayout.X_AXIS, "Personsalizado 2", "", 100);
+        regCustom2.setBackground(color1);
+        regFont4 = new Registro(BoxLayout.X_AXIS, "Fuente", new Object[0]);
+        regFont4.setText(FONTS.values());
+        regFont4.setBackground(color1);
+        cCont = new ConfigCont(app);
+        cCont.setBackgroundTitle(new Color(200, 210, 220));
+        cCont.setTitle("Campo personalizado inferior");
+        boxHoriz = new Box(BoxLayout.X_AXIS);
+        boxHoriz.add(regCustom2);
+        boxHoriz.add(regFont4);
+        cCont.addCampo(boxHoriz);
+
+        jPanel2.add(cCont);
+        jPanel2.add(Box.createVerticalStrut(space));
+
+        regQualityMsg = new Registro(BoxLayout.X_AXIS, "Mensaje", "", 100);
+        regQualityMsg.setBackground(color1);
+        regQualityScl = new Registro(BoxLayout.X_AXIS, "Escala", "", 100);
+        regQualityScl.setBackground(color1);
+        cContQuality = new ConfigCont(app, true);
+        cContQuality.setBackgroundTitle(new Color(200, 210, 220));
+        cContQuality.setTitle("Calidad del servicio");
+        cContQuality.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                boolean selected = jCheckBox1.isSelected();
-                regText10.setEnabled(selected);
-                regText11.setEnabled(selected);
-                regFont7.setEnabled(selected);
+                boolean selected = cContQuality.isSelected();
+                regQualityMsg.setEnabled(selected);
+                regQualityScl.setEnabled(selected);
+
             }
         });
 
-//        String propQualityService = app.getConfiguration().getProperty(com.bacon.Configuration.BS_CUSTOM_QUALITY_MSG, "");
+        boxHoriz = new Box(BoxLayout.Y_AXIS);
+        boxHoriz.add(regQualityMsg);
+        boxHoriz.add(Box.createVerticalStrut(4));
+        boxHoriz.add(regQualityScl);
+        cContQuality.addCampo(boxHoriz);
+
+        jPanel2.add(cContQuality);
+        jPanel2.add(Box.createVerticalStrut(space));
+
+        regInvoiceInit = new Registro(BoxLayout.X_AXIS, "Inicial", "", 100);
+        regInvoiceInit.setBackground(color1);
+        regInvoiceEnd = new Registro(BoxLayout.X_AXIS, "Final", "", 100);
+        regInvoiceEnd.setBackground(color1);
+        regInvoice = new Registro(BoxLayout.X_AXIS, "Actual", "", 100);
+        regInvoice.setBackground(color1);
+
+        cCont = new ConfigCont(app);
+        cCont.setBackgroundTitle(new Color(200, 210, 220));
+        cCont.setTitle("Consecutivo de facturas");
+        boxHoriz = new Box(BoxLayout.X_AXIS);
+        boxHoriz.add(regInvoiceInit);
+        boxHoriz.add(regInvoiceEnd);
+        boxHoriz.add(regInvoice);
+        cCont.addCampo(boxHoriz);
+
+        jPanel2.add(cCont);
+        jPanel2.add(Box.createVerticalStrut(space));
+
+        ConfigDB config = app.getControl().getConfig(com.bacon.Configuration.BS_NAME);
+        regName.setText(config != null ? config.getValor() : "NOMBRE");
+        config = app.getControl().getConfig(com.bacon.Configuration.BS_ID);
+        regID.setText(config != null ? config.getValor() : "000000000-0");
+        config = app.getControl().getConfig(com.bacon.Configuration.BS_PHONE);
+        regPhone.setText(config != null ? config.getValor() : "300 0000000");
+        config = app.getControl().getConfig(com.bacon.Configuration.BS_ADDRESS);
+        regAddress.setText(config != null ? config.getValor() : "Direcion");
+        config = app.getControl().getConfig(com.bacon.Configuration.BS_CUSTOM_TOP);
+        regCustom1.setText(config != null ? config.getValor() : "Personalizado 1");
+        config = app.getControl().getConfig(com.bacon.Configuration.BS_CUSTOM_BOTTON);
+        regCustom2.setText(config != null ? config.getValor() : "Personalizado 2");
+                        
         config = app.getControl().getConfig(com.bacon.Configuration.BS_CUSTOM_QUALITY_MSG);
-        regText10.setText(config != null ? config.getValor() : "");
-//        regText10.setText(propQualityService);
-        regText10.setLabelText("Mensaje:");
-
+        regQualityMsg.setText(config != null ? config.getValor() : "");
         config = app.getControl().getConfig(com.bacon.Configuration.BS_CUSTOM_QUALITY_SCALE);
-        regText11.setText(config != null ? config.getValor() : "");
-//        String propQualityScale = app.getConfiguration().getProperty(com.bacon.Configuration.BS_CUSTOM_QUALITY_SCALE, "");
-//        regText11.setText(propQualityScale);
-        regText11.setLabelText("Escala:");
-        regFont7.setText(FONTS.values());
+        regQualityScl.setText(config != null ? config.getValor() : "");
+        
 
-        lbInfo7.setText("Consecutivo facturas");
-        lbInfo7.setBackground(color1);
         config = app.getControl().getConfig(CF_FACTURA_INICIAL);
-        regText7.setText(config != null ? config.getValor() : "0");
-        regText7.setLabelText("Inicial:");
-
+        regInvoiceInit.setText(config != null ? config.getValor() : "1");
         config = app.getControl().getConfig(CF_FACTURA_FINAL);
-        regText8.setText(config != null ? config.getValor() : "0");
-        regText8.setLabelText("Final:");
-
+        regInvoiceEnd.setText(config != null ? config.getValor() : "1");
         config = app.getControl().getConfig(CF_FACTURA_ACTUAL);
-        regText9.setText(config != null ? config.getValor() : "0");
-        regText9.setLabelText("Factura actual:");
+        regInvoice.setText(config != null ? config.getValor() : "1");
+
+        config = app.getControl().getConfig(com.bacon.Configuration.BS_CUSTOM_QUALITY_ENABLED);
+        boolean selected = Boolean.valueOf(config != null ? config.getValor() : "false");
+        cContQuality.setSelected(selected);        
+        regQualityMsg.setEnabled(selected);
+        regQualityScl.setEnabled(selected);
 
         btApply.setText("Aplicar");
         btApply.setActionCommand(ACTION_APPLY);
@@ -172,182 +266,24 @@ public class PanelConfigTicket extends javax.swing.JPanel implements ActionListe
         buttonGroup1 = new javax.swing.ButtonGroup();
         lbTitle = new javax.swing.JLabel();
         btApply = new javax.swing.JButton();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jPanel1 = new javax.swing.JPanel();
-        lbInfo3 = new javax.swing.JLabel();
-        regText4 = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Reg4", "",100);
-        jCheckBox1 = new javax.swing.JCheckBox();
-        regText7 = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Reg6", "",100);
-        lbInfo6 = new javax.swing.JLabel();
-        regText10 = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Reg6", "",100);
-        regText11 = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Reg6", "",100);
-        lbInfo4 = new javax.swing.JLabel();
-        regText6 = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Reg6", "",100);
-        lbInfo2 = new javax.swing.JLabel();
-        lbInfo7 = new javax.swing.JLabel();
-        regText9 = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Reg6", "",100);
-        regFont6 = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Fuente", new Object[0]);
-        regFont3 = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Fuente", new Object[0]);
-        regFont7 = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Fuente", new Object[0]);
-        regText8 = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Reg6", "",100);
-        regText1 = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "reg1", "", 100);
-        regText2 = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Reg2", "",100);
-        regText3 = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Reg3", "", 100);
-        lbInfo5 = new javax.swing.JLabel();
-        regFont2 = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Fuente", new Object[0]);
-        regText5 = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Reg5", "",100);
-        lbInfo1 = new javax.swing.JLabel();
-        regFont4 = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Fuente", new Object[0]);
-        regFont5 = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Fuente", new Object[0]);
-        regFont1 = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Fuente", new Object[0]);
+        jScrollPane2 = new javax.swing.JScrollPane();
+        jPanel2 = new javax.swing.JPanel();
 
         lbTitle.setBackground(java.awt.Color.lightGray);
         lbTitle.setOpaque(true);
 
-        lbInfo3.setText("jLabel2");
-        lbInfo3.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-        lbInfo3.setOpaque(true);
-
-        jCheckBox1.setText("jCheckBox1");
-
-        lbInfo6.setText("jLabel2");
-        lbInfo6.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-        lbInfo6.setOpaque(true);
-
-        lbInfo4.setText("jLabel2");
-        lbInfo4.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-        lbInfo4.setOpaque(true);
-
-        lbInfo2.setText("jLabel2");
-        lbInfo2.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-        lbInfo2.setOpaque(true);
-
-        lbInfo7.setText("jLabel2");
-        lbInfo7.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-        lbInfo7.setOpaque(true);
-
-        lbInfo5.setText("jLabel2");
-        lbInfo5.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-        lbInfo5.setOpaque(true);
-
-        lbInfo1.setBackground(new java.awt.Color(226, 175, 206));
-        lbInfo1.setText("jLabel2");
-        lbInfo1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-        lbInfo1.setOpaque(true);
-
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jCheckBox1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(lbInfo1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(regText1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(regFont1, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(lbInfo2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(regText2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(regFont2, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(lbInfo3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(regText3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(regFont3, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(lbInfo4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(regText4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(regFont4, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(lbInfo5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(regText5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(regFont5, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(lbInfo6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(regText6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(regFont6, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(lbInfo7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(regText7, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(regText8, javax.swing.GroupLayout.PREFERRED_SIZE, 212, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(regText9, javax.swing.GroupLayout.PREFERRED_SIZE, 212, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addComponent(regText10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(regFont7, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(regText11, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap())
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 542, Short.MAX_VALUE)
         );
 
-        jPanel1Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {regText7, regText8, regText9});
-
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(lbInfo1, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(2, 2, 2)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(regText1, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(regFont1, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(lbInfo2, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(2, 2, 2)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(regText2, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(regFont2, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(lbInfo3, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(2, 2, 2)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(regText3, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(regFont3, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(lbInfo4, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(2, 2, 2)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(regText4, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(regFont4, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(lbInfo5, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(2, 2, 2)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(regText5, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(regFont5, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(lbInfo6, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(2, 2, 2)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(regText6, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(regFont6, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(4, 4, 4)
-                .addComponent(jCheckBox1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(regText10, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(regFont7, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(2, 2, 2)
-                .addComponent(regText11, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(lbInfo7, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(2, 2, 2)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
-                    .addComponent(regText7, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(regText8, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(regText9, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap())
-        );
-
-        jScrollPane1.setViewportView(jPanel1);
+        jScrollPane2.setViewportView(jPanel2);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -360,7 +296,7 @@ public class PanelConfigTicket extends javax.swing.JPanel implements ActionListe
                     .addGroup(layout.createSequentialGroup()
                         .addGap(0, 578, Short.MAX_VALUE)
                         .addComponent(btApply, javax.swing.GroupLayout.PREFERRED_SIZE, 94, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 672, Short.MAX_VALUE))
+                    .addComponent(jScrollPane2))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -368,8 +304,8 @@ public class PanelConfigTicket extends javax.swing.JPanel implements ActionListe
             .addGroup(layout.createSequentialGroup()
                 .addGap(6, 6, 6)
                 .addComponent(lbTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 536, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 542, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btApply, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -380,83 +316,57 @@ public class PanelConfigTicket extends javax.swing.JPanel implements ActionListe
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btApply;
     private javax.swing.ButtonGroup buttonGroup1;
-    private javax.swing.JCheckBox jCheckBox1;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JLabel lbInfo1;
-    private javax.swing.JLabel lbInfo2;
-    private javax.swing.JLabel lbInfo3;
-    private javax.swing.JLabel lbInfo4;
-    private javax.swing.JLabel lbInfo5;
-    private javax.swing.JLabel lbInfo6;
-    private javax.swing.JLabel lbInfo7;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JLabel lbTitle;
-    private com.bacon.gui.util.Registro regFont1;
-    private com.bacon.gui.util.Registro regFont2;
-    private com.bacon.gui.util.Registro regFont3;
-    private com.bacon.gui.util.Registro regFont4;
-    private com.bacon.gui.util.Registro regFont5;
-    private com.bacon.gui.util.Registro regFont6;
-    private com.bacon.gui.util.Registro regFont7;
-    private com.bacon.gui.util.Registro regText1;
-    private com.bacon.gui.util.Registro regText10;
-    private com.bacon.gui.util.Registro regText11;
-    private com.bacon.gui.util.Registro regText2;
-    private com.bacon.gui.util.Registro regText3;
-    private com.bacon.gui.util.Registro regText4;
-    private com.bacon.gui.util.Registro regText5;
-    private com.bacon.gui.util.Registro regText6;
-    private com.bacon.gui.util.Registro regText7;
-    private com.bacon.gui.util.Registro regText8;
-    private com.bacon.gui.util.Registro regText9;
     // End of variables declaration//GEN-END:variables
 
     @Override
     public void actionPerformed(ActionEvent e) {
         if (ACTION_APPLY.equals(e.getActionCommand())) {
-            String value = regText1.getText();
+            String value = regName.getText();
             app.getControl().addConfig(new ConfigDB(Configuration.BS_NAME, ConfigDB.STRING, value));
 
-            value = regText2.getText();
+            value = regID.getText();
 //            app.getConfiguration().setProperty(com.bacon.Configuration.BS_ID, value);
             app.getControl().addConfig(new ConfigDB(Configuration.BS_ID, ConfigDB.STRING, value));
 
-            value = regText3.getText();
+            value = regAddress.getText();
 //            app.getConfiguration().setProperty(com.bacon.Configuration.BS_ADDRESS, value);
             app.getControl().addConfig(new ConfigDB(Configuration.BS_ADDRESS, ConfigDB.STRING, value));
 
-            value = regText4.getText();
+            value = regPhone.getText();
             app.getControl().addConfig(new ConfigDB(Configuration.BS_PHONE, ConfigDB.STRING, value));
 //            app.getConfiguration().setProperty(com.bacon.Configuration.BS_PHONE, value);
 
-            value = regText5.getText();
+            value = regCustom1.getText();
             app.getControl().addConfig(new ConfigDB(Configuration.BS_CUSTOM_TOP, ConfigDB.STRING, value));
 //            app.getConfiguration().setProperty(com.bacon.Configuration.BS_CUSTOM_TOP, value);
 
-            value = regText6.getText();
+            value = regCustom2.getText();
             app.getControl().addConfig(new ConfigDB(Configuration.BS_CUSTOM_BOTTON, ConfigDB.STRING, value));
 //            app.getConfiguration().setProperty(com.bacon.Configuration.BS_CUSTOM_BOTTON, value);
 
-            value = regText7.getText();
+            value = regInvoiceInit.getText();
             app.getControl().addConfig(new ConfigDB(CF_FACTURA_INICIAL, ConfigDB.INTEGER, value));
 
-            value = regText8.getText();
+            value = regInvoiceEnd.getText();
             app.getControl().addConfig(new ConfigDB(CF_FACTURA_FINAL, ConfigDB.INTEGER, value));
 
-            value = regText9.getText();
+            value = regInvoice.getText();
             app.getControl().addConfig(new ConfigDB(CF_FACTURA_ACTUAL, ConfigDB.INTEGER, value));
 
-            value = regText10.getText();
+            value = regQualityMsg.getText();
             app.getControl().addConfig(new ConfigDB(Configuration.BS_CUSTOM_QUALITY_MSG, ConfigDB.STRING, value));
 //            app.getConfiguration().setProperty(com.bacon.Configuration.BS_CUSTOM_QUALITY_MSG, value);
 
-            value = regText11.getText();
+            value = regQualityScl.getText();
             app.getControl().addConfig(new ConfigDB(Configuration.BS_CUSTOM_QUALITY_SCALE, ConfigDB.STRING, value));
 //            app.getConfiguration().setProperty(com.bacon.Configuration.BS_CUSTOM_QUALITY_SCALE, value);
 
-            boolean selected = jCheckBox1.isSelected();
+            boolean selected = cContQuality.isSelected();
             app.getControl().addConfig(new ConfigDB(Configuration.BS_CUSTOM_QUALITY_ENABLED, ConfigDB.BOOLEAN, String.valueOf(selected)));
-//            app.getConfiguration().setProperty(com.bacon.Configuration.BS_CUSTOM_QUALITY_ENABLED, Boolean.toString(selected));
+            app.getConfiguration().setProperty(com.bacon.Configuration.BS_CUSTOM_QUALITY_ENABLED, Boolean.toString(selected));
 
             app.getConfiguration().save();
         }
