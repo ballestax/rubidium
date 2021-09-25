@@ -13,6 +13,7 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusListener;
+import java.awt.image.BufferedImage;
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.EtchedBorder;
@@ -395,6 +396,22 @@ public class Registro extends JComponent implements Reseteable, CaretListener {
         inicializar(combo);
     }
 
+    public Registro(int axis, String stLabel, boolean selected, int widthLabel) {
+        super();
+        box = new Box(axis);
+        this.bordered = true;
+        docLim = null;
+        this.axis = axis;
+        this.height = 20;
+        this.widthLabel = widthLabel;
+        this.stLabel = stLabel;
+        stCampo = "";
+        fontLabel = fontLabelDefault;
+        fontCampo = fontCampoDefault;
+        JCheckBox checkBox = new JCheckBox("", selected);
+        inicializar(checkBox);
+    }
+
     public Registro(int axis, String stLabel, String[] opcs, int widthlabel) {
         super();
         box = new Box(axis);
@@ -507,6 +524,9 @@ public class Registro extends JComponent implements Reseteable, CaretListener {
         if (widthLabel > 0) {
             label.setPreferredSize(new Dimension(widthLabel, height));
             label.setMinimumSize(new Dimension(widthLabel, height));
+            if (campo instanceof JCheckBox) {
+                label.setMaximumSize(new Dimension(widthLabel, height));
+            }
         }
 
         FocusListener focusListeners[] = campo.getFocusListeners();
@@ -521,6 +541,9 @@ public class Registro extends JComponent implements Reseteable, CaretListener {
 //        label.setHorizontalTextPosition(SwingConstants.LEFT);
 
         box.add(label);
+//        if (axis == 0) {
+//            box.add(new JSeparator(SwingConstants.VERTICAL));
+//        }
         boolean conIcono = false;
 
         int heigh = getHeight();
@@ -535,10 +558,9 @@ public class Registro extends JComponent implements Reseteable, CaretListener {
             boxH.add(icono);
             conIcono = true;
         }
+
         box.add(((Component) (conIcono ? ((Component) (boxH)) : ((Component) (campo)))));
-//        System.out.println("campo:"+campo);
-//        if(campo instanceof JComboBox)
-//        System.out.println(((JComboBox)campo).getModel());
+
         add(box, BorderLayout.CENTER);
 
         if (popup) {
@@ -644,7 +666,9 @@ public class Registro extends JComponent implements Reseteable, CaretListener {
         if (campo instanceof JTextField) {
             return ((JTextField) campo).getText();
         }
-
+        if (campo instanceof JCheckBox) {
+            return ((JCheckBox) campo).isSelected();
+        }
         if (campo instanceof JTextArea) {
             return ((JTextArea) campo).getText();
         }
@@ -677,6 +701,8 @@ public class Registro extends JComponent implements Reseteable, CaretListener {
             return ((MyDatePickerImp) campo).getText();
         } else if (campo instanceof JTextArea) {
             return ((JTextArea) campo).getText();
+        } else if (campo instanceof JCheckBox) {
+            return String.valueOf(((JCheckBox) campo).isSelected());
         } else {
             return "";
         }
@@ -742,6 +768,19 @@ public class Registro extends JComponent implements Reseteable, CaretListener {
     public void setSelected(Object object) {
         if (campo instanceof JComboBox) {
             ((JComboBox) campo).setSelectedItem(object);
+        }
+    }
+
+    public boolean isSelected() {
+        if (campo instanceof JCheckBox) {
+            return ((JCheckBox) campo).isSelected();
+        }
+        return false;
+    }
+
+    public void setSelected(boolean select) {
+        if (campo instanceof JCheckBox) {
+            ((JCheckBox) campo).setSelected(select);
         }
     }
 
@@ -915,6 +954,8 @@ public class Registro extends JComponent implements Reseteable, CaretListener {
             } else {
                 ((JTextArea) campo).setForeground(new Color(100, 100, 100));
             }
+        } else if (campo instanceof JCheckBox) {
+            ((JCheckBox) campo).setEnabled(editable);
         }
     }
 
@@ -924,6 +965,8 @@ public class Registro extends JComponent implements Reseteable, CaretListener {
                 ((JComboBox) campo).setActionCommand(actionCommand);
             } else if (campo instanceof JTextField) {
                 ((JTextField) campo).setActionCommand(actionCommand);
+            } else if (campo instanceof JCheckBox) {
+                ((JCheckBox) campo).setActionCommand(actionCommand);
             }
         }
     }
@@ -934,6 +977,8 @@ public class Registro extends JComponent implements Reseteable, CaretListener {
                 ((JComboBox) campo).addActionListener(listener);
             } else if (campo instanceof JTextField) {
                 ((JTextField) campo).addActionListener(listener);
+            } else if (campo instanceof JCheckBox) {
+                ((JCheckBox) campo).addActionListener(listener);
             }
         }
     }
@@ -958,6 +1003,9 @@ public class Registro extends JComponent implements Reseteable, CaretListener {
         if (campo != null) {
             if (campo instanceof MyDatePickerImp) {
                 ((MyDatePickerImp) campo).setFontField(f);
+            } else if (campo instanceof JCheckBox) {
+                ((JCheckBox) campo).setFont(f);
+                scaleCheckBoxIcon((JCheckBox) campo);
             } else {
                 campo.setFont(f);
             }
@@ -985,6 +1033,46 @@ public class Registro extends JComponent implements Reseteable, CaretListener {
         } else if (campo instanceof JTextArea) {
             ((JTextArea) campo).setMargin(new Insets(top, left, botton, right));
         }
+    }
+
+    public static void scaleCheckBoxIcon(JCheckBox checkbox) {
+        boolean previousState = checkbox.isSelected();
+        checkbox.setSelected(false);
+        FontMetrics boxFontMetrics = checkbox.getFontMetrics(checkbox.getFont());
+        Icon boxIcon = UIManager.getIcon("CheckBox.icon");
+        BufferedImage boxImage = new BufferedImage(
+                boxIcon.getIconWidth(), boxIcon.getIconHeight(), BufferedImage.TYPE_INT_ARGB
+        );
+        Graphics graphics = boxImage.createGraphics();
+        try {
+            boxIcon.paintIcon(checkbox, graphics, 0, 0);
+        } finally {
+            graphics.dispose();
+        }
+        ImageIcon newBoxImage = new ImageIcon(boxImage);
+        Image finalBoxImage = newBoxImage.getImage().getScaledInstance(
+                boxFontMetrics.getHeight(), boxFontMetrics.getHeight(), Image.SCALE_SMOOTH
+        );
+        checkbox.setIcon(new ImageIcon(finalBoxImage));
+
+        checkbox.setSelected(true);
+        Icon checkedBoxIcon = UIManager.getIcon("CheckBox.icon");
+        BufferedImage checkedBoxImage = new BufferedImage(
+                checkedBoxIcon.getIconWidth(), checkedBoxIcon.getIconHeight(), BufferedImage.TYPE_INT_ARGB
+        );
+        Graphics checkedGraphics = checkedBoxImage.createGraphics();
+        try {
+            checkedBoxIcon.paintIcon(checkbox, checkedGraphics, 0, 0);
+        } finally {
+            checkedGraphics.dispose();
+        }
+        ImageIcon newCheckedBoxImage = new ImageIcon(checkedBoxImage);
+        Image finalCheckedBoxImage = newCheckedBoxImage.getImage().getScaledInstance(
+                boxFontMetrics.getHeight(), boxFontMetrics.getHeight(), Image.SCALE_SMOOTH
+        );
+        checkbox.setSelectedIcon(new ImageIcon(finalCheckedBoxImage));
+        checkbox.setSelected(false);
+        checkbox.setSelected(previousState);
     }
 
     protected Border bordeError;
