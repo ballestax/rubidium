@@ -15,6 +15,7 @@ import com.bacon.gui.util.Registro;
 import com.github.anastaciocintra.escpos.EscPosConst;
 import com.github.anastaciocintra.escpos.Style;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.Box;
@@ -66,6 +67,8 @@ public class PanelConfigTicket extends javax.swing.JPanel implements ActionListe
         lbTitle.setText("Configurar Factura");
 
         Color color1 = new Color(225, 176, 206);
+        
+        Font font = new Font("Sans",1,16);
 
         Style font1 = new Style().setFontSize(Style.FontSize._1, Style.FontSize._1).setJustification(EscPosConst.Justification.Center);
         Style font2 = new Style().setFontSize(Style.FontSize._2, Style.FontSize._2).setJustification(EscPosConst.Justification.Center);
@@ -74,8 +77,10 @@ public class PanelConfigTicket extends javax.swing.JPanel implements ActionListe
         Style[] fuentes = {font1, font2, font3};
 
         int space = 10;
+        int lWidth = 110;
 
-        regName = new Registro(BoxLayout.X_AXIS, "Nombre", "", 100);
+        regName = new Registro(BoxLayout.X_AXIS, "Nombre", "", lWidth);
+        regName.setFontCampo(font);
         regName.setBackground(color1);
         regFont1 = new Registro(BoxLayout.X_AXIS, "Fuente", new Object[0]);
         regFont1.setText(FONTS.values());
@@ -92,8 +97,9 @@ public class PanelConfigTicket extends javax.swing.JPanel implements ActionListe
         jPanel2.add(cCont);
         jPanel2.add(Box.createVerticalStrut(space));
 
-        regID = new Registro(BoxLayout.X_AXIS, "Identificacion", "", 100);
+        regID = new Registro(BoxLayout.X_AXIS, "Identificacion", "", lWidth);
         regID.setBackground(color1);
+        regID.setFontCampo(font);
         regFont2 = new Registro(BoxLayout.X_AXIS, "Fuente", new Object[0]);
         regFont2.setText(FONTS.values());
         regFont2.setBackground(color1);
@@ -108,8 +114,9 @@ public class PanelConfigTicket extends javax.swing.JPanel implements ActionListe
         jPanel2.add(cCont);
         jPanel2.add(Box.createVerticalStrut(space));
 
-        regPhone = new Registro(BoxLayout.X_AXIS, "Telefono", "", 100);
+        regPhone = new Registro(BoxLayout.X_AXIS, "Telefono", "", lWidth);
         regPhone.setBackground(color1);
+        regPhone.setFontCampo(font);
         regFont3 = new Registro(BoxLayout.X_AXIS, "Fuente", new Object[0]);
         regFont3.setText(FONTS.values());
         regFont3.setBackground(color1);
@@ -124,8 +131,9 @@ public class PanelConfigTicket extends javax.swing.JPanel implements ActionListe
         jPanel2.add(cCont);
         jPanel2.add(Box.createVerticalStrut(space));
 
-        regAddress = new Registro(BoxLayout.X_AXIS, "Direccion", "", 100);
+        regAddress = new Registro(BoxLayout.X_AXIS, "Direccion", "", lWidth);
         regAddress.setBackground(color1);
+        regAddress.setFontCampo(font);
         regFont4 = new Registro(BoxLayout.X_AXIS, "Fuente", new Object[0]);
         regFont4.setText(FONTS.values());
         regFont4.setBackground(color1);
@@ -140,8 +148,9 @@ public class PanelConfigTicket extends javax.swing.JPanel implements ActionListe
         jPanel2.add(cCont);
         jPanel2.add(Box.createVerticalStrut(space));
 
-        regCustom1 = new Registro(BoxLayout.X_AXIS, "Personalizado 1", "", 100);
+        regCustom1 = new Registro(BoxLayout.X_AXIS, "Personalizado 1", "", lWidth);
         regCustom1.setBackground(color1);
+        regCustom1.setFontCampo(font);
         regFont4 = new Registro(BoxLayout.X_AXIS, "Fuente", new Object[0]);
         regFont4.setText(FONTS.values());
         regFont4.setBackground(color1);
@@ -156,8 +165,9 @@ public class PanelConfigTicket extends javax.swing.JPanel implements ActionListe
         jPanel2.add(cCont);
         jPanel2.add(Box.createVerticalStrut(space));
 
-        regCustom2 = new Registro(BoxLayout.X_AXIS, "Personsalizado 2", "", 100);
+        regCustom2 = new Registro(BoxLayout.X_AXIS, "Personsalizado 2", "", lWidth);
         regCustom2.setBackground(color1);
+        regCustom2.setFontCampo(font);
         regFont4 = new Registro(BoxLayout.X_AXIS, "Fuente", new Object[0]);
         regFont4.setText(FONTS.values());
         regFont4.setBackground(color1);
@@ -172,10 +182,12 @@ public class PanelConfigTicket extends javax.swing.JPanel implements ActionListe
         jPanel2.add(cCont);
         jPanel2.add(Box.createVerticalStrut(space));
 
-        regQualityMsg = new Registro(BoxLayout.X_AXIS, "Mensaje", "", 100);
+        regQualityMsg = new Registro(BoxLayout.X_AXIS, "Mensaje", "", lWidth);
         regQualityMsg.setBackground(color1);
-        regQualityScl = new Registro(BoxLayout.X_AXIS, "Escala", "", 100);
+        regQualityMsg.setFontCampo(font);
+        regQualityScl = new Registro(BoxLayout.X_AXIS, "Escala", "", lWidth);
         regQualityScl.setBackground(color1);
+        regQualityScl.setFontCampo(font);
         cContQuality = new ConfigCont(app, true);
         cContQuality.setBackgroundTitle(new Color(200, 210, 220));
         cContQuality.setTitle("Calidad del servicio");
@@ -185,7 +197,6 @@ public class PanelConfigTicket extends javax.swing.JPanel implements ActionListe
                 boolean selected = cContQuality.isSelected();
                 regQualityMsg.setEnabled(selected);
                 regQualityScl.setEnabled(selected);
-
             }
         });
 
@@ -198,12 +209,15 @@ public class PanelConfigTicket extends javax.swing.JPanel implements ActionListe
         jPanel2.add(cContQuality);
         jPanel2.add(Box.createVerticalStrut(space));
 
-        regInvoiceInit = new Registro(BoxLayout.X_AXIS, "Inicial", "", 100);
+        regInvoiceInit = new Registro(BoxLayout.X_AXIS, "Inicial", "", lWidth);
         regInvoiceInit.setBackground(color1);
-        regInvoiceEnd = new Registro(BoxLayout.X_AXIS, "Final", "", 100);
+        regInvoiceInit.setFontCampo(font);
+        regInvoiceEnd = new Registro(BoxLayout.X_AXIS, "Final", "", lWidth);
         regInvoiceEnd.setBackground(color1);
-        regInvoice = new Registro(BoxLayout.X_AXIS, "Actual", "", 100);
+        regInvoiceEnd.setFontCampo(font);
+        regInvoice = new Registro(BoxLayout.X_AXIS, "Actual", "", lWidth);
         regInvoice.setBackground(color1);
+        regInvoice.setFontCampo(font);
 
         cCont = new ConfigCont(app);
         cCont.setBackgroundTitle(new Color(200, 210, 220));
@@ -215,6 +229,7 @@ public class PanelConfigTicket extends javax.swing.JPanel implements ActionListe
         cCont.addCampo(boxHoriz);
 
         jPanel2.add(cCont);
+        jPanel2.add(Box.createVerticalGlue());
         jPanel2.add(Box.createVerticalStrut(space));
 
         ConfigDB config = app.getControl().getConfig(com.bacon.Configuration.BS_NAME);
