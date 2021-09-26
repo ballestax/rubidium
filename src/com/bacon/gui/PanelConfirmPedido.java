@@ -4,6 +4,7 @@ import com.bacon.Aplication;
 import com.bacon.Configuration;
 import com.bacon.GUIManager;
 import com.bacon.domain.Client;
+import com.bacon.domain.ConfigDB;
 import com.bacon.domain.Invoice;
 import com.bacon.domain.ProductoPed;
 import com.bacon.domain.Table;
@@ -161,7 +162,7 @@ public class PanelConfirmPedido extends javax.swing.JPanel implements ActionList
                 total = total + serv;
             }
 
-                lbTotal.setText("<html>Total<br><font size=+1 color=red>" + app.getCurrencyFormat().format(total) + "</html>");
+            lbTotal.setText("<html>Total<br><font size=+1 color=red>" + app.getCurrencyFormat().format(total) + "</html>");
 
             updateUI();
         }
@@ -179,7 +180,8 @@ public class PanelConfirmPedido extends javax.swing.JPanel implements ActionList
     @Override
     public void actionPerformed(ActionEvent e) {
         if (AC_PRINT_BILL.equals(e.getActionCommand())) {
-            String propPrinter = app.getConfiguration().getProperty(Configuration.PRINTER_SELECTED);
+            ConfigDB config = app.getControl().getConfig(Configuration.PRINTER_SELECTED);
+            String propPrinter = config != null ? config.getValor() : "";
             if (propPrinter.isEmpty()) {
                 GUIManager.showErrorMessage(null, "No ha seleccionado una impresora valida para imprimir", "Impresora no encontrada");
                 return;
@@ -194,7 +196,8 @@ public class PanelConfirmPedido extends javax.swing.JPanel implements ActionList
             anularFactura();
 
         } else if (AC_PRINT_GUIDE.equals(e.getActionCommand())) {
-            String propPrinter = app.getConfiguration().getProperty(Configuration.PRINTER_SELECTED);
+            ConfigDB config = app.getControl().getConfig(Configuration.PRINTER_SELECTED);
+            String propPrinter = config != null ? config.getValor() : "";            
             if (propPrinter.isEmpty()) {
                 GUIManager.showErrorMessage(null, "No ha seleccionado una impresora valida para imprimir", "Impresora no encontrada");
                 return;
@@ -254,12 +257,6 @@ public class PanelConfirmPedido extends javax.swing.JPanel implements ActionList
         lbTotal.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
         lbInfo.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-
-        btPrint.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btPrintActionPerformed(evt);
-            }
-        });
 
         lbTable.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         jScrollPane1.setViewportView(lbTable);
@@ -337,10 +334,6 @@ public class PanelConfirmPedido extends javax.swing.JPanel implements ActionList
 
     }// </editor-fold>//GEN-END:initComponents
 
-    private void btPrintActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btPrintActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btPrintActionPerformed
-
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btAdd;
@@ -362,4 +355,6 @@ public class PanelConfirmPedido extends javax.swing.JPanel implements ActionList
     public void propertyChange(PropertyChangeEvent evt) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
+
+    
 }

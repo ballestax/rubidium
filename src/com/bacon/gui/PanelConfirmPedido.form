@@ -122,9 +122,6 @@
     <Component class="javax.swing.JButton" name="btConfirm">
     </Component>
     <Component class="javax.swing.JButton" name="btPrint">
-      <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btPrintActionPerformed"/>
-      </Events>
     </Component>
     <Component class="javax.swing.JButton" name="btAdd">
     </Component>
