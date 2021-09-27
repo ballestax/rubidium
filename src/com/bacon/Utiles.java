@@ -16,7 +16,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.FileAlreadyExistsException;
@@ -107,10 +106,9 @@ public class Utiles {
             return null;
         }
         StringBuilder buf = new StringBuilder("<---Matriz:" + matriz + "--->\n");
-        for (int i = 0; i < matriz.length; i++) {
+        for (Object[] matriz1 : matriz) {
             for (int j = 0; j < matriz[0].length; j++) {
-
-                buf.append(matriz[i][j]);
+                buf.append(matriz1[j]);
                 buf.append(" ");
             }
             buf.append("\n");
@@ -365,14 +363,11 @@ public class Utiles {
                 path = path.toAbsolutePath();                
                 System.out.println("\n" + path + " directorio creado.");
                 return true;
-            } catch (NoSuchFileException e) {
-                creado = false;
+            } catch (NoSuchFileException e) {                
                 System.err.println("\nDirectory creation failed:\n" + e);
-            } catch (FileAlreadyExistsException e) {
-                creado = false;
+            } catch (FileAlreadyExistsException e) {                
                 System.err.println("\nDirectory creation failed:\n" + e);
-            } catch (IOException e) {
-                creado = false;
+            } catch (IOException e) {                
                 System.err.println("\nDirectory creation failed:\n" + e);
             }
         }

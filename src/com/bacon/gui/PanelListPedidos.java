@@ -73,9 +73,9 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener,
     private String queryDate;
     private Color COLOR_BACKG;
 
-    private Logger log = Logger.getLogger(PanelListPedidos.class.getCanonicalName());
+    private final Logger log = Logger.getLogger(PanelListPedidos.class.getCanonicalName());
 
-    public static final String __TODOS__ = " - TODOS - ";
+    public static final String TODOS = " - TODOS - ";
     public static final String PERIODO_MES = "MES";
     public static final String PERIODO_SEMANA = "SEMANA";
     public static final String PERIODO_DIA = "DIA";
@@ -97,7 +97,6 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener,
     private SimpleDateFormat formFecha;
     private MyDatePickerImp datePick1;
 
-    public static final Logger logger = Logger.getLogger(PanelListPedidos.class.getCanonicalName());
     private ProgAction acSearchCycle;
     private JTextField tfCycle;
     private String selPeriodo;
@@ -239,7 +238,7 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener,
 
         btBuscar.addActionListener(this);
 
-        String[] TIPOS_VENTAS = {__TODOS__,
+        String[] TIPOS_VENTAS = {TODOS,
             MyConstants.PEDIDO_LOCAL.toUpperCase(),
             MyConstants.PEDIDO_DOMICILIO.toUpperCase(),
             MyConstants.PEDIDO_PARA_LLEVAR.toUpperCase()
@@ -252,7 +251,7 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener,
 
         productsList = app.getControl().getProductsList("", "name");
         Product PTODOS = new Product(0);
-        PTODOS.setName(__TODOS__);
+        PTODOS.setName(TODOS);
         productsList.add(0, PTODOS);
         regProduct.setActionCommand(ACTION_SEARCH);
         regProduct.addActionListener(this);
@@ -262,7 +261,7 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener,
 //        String[] ESTADOS = {__TODOS__, ST_ENTREGADO, ST_DEVUELTO, ST_DESPACHADO, ST_FACTURADO};
         waitersList = app.getControl().getWaitresslList("", "name");
         Waiter WTODOS = new Waiter();
-        WTODOS.setName(__TODOS__);
+        WTODOS.setName(TODOS);
         waitersList.add(0, WTODOS);
         regMesero.setLabelText("Mesero");
         regMesero.setText(waitersList.toArray());
@@ -753,13 +752,13 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener,
 
         productsList = app.getControl().getProductsList("", "name");
         Product PTODOS = new Product(0);
-        PTODOS.setName(__TODOS__);
+        PTODOS.setName(TODOS);
         productsList.add(0, PTODOS);
         regProduct.setText((productsList.toArray()));
 
         waitersList = app.getControl().getWaitresslList("", "name");
         Waiter WTODOS = new Waiter();
-        WTODOS.setName(__TODOS__);
+        WTODOS.setName(TODOS);
         waitersList.add(0, WTODOS);
         regMesero.setText(waitersList.toArray());
     }

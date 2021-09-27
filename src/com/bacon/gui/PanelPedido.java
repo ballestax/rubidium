@@ -8,7 +8,7 @@ package com.bacon.gui;
 import com.bacon.Aplication;
 import com.bacon.Configuration;
 import com.bacon.GUIManager;
-import static com.bacon.MyConstants.CF_FACTURA_ACTUAL;
+import com.bacon.MyConstants;
 import com.bacon.domain.Client;
 import com.bacon.domain.ConfigDB;
 import com.bacon.domain.Cycle;
@@ -979,29 +979,6 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
         productoPed.setPrecio(precio);
 
         addProductPed(productoPed, 1, precio);
-        /*if (productos.contains(productoPed)) {
-            int row = productos.indexOf(productoPed);
-            int cant = Integer.valueOf(modeloTb.getValueAt(row, 0).toString());
-            modeloTb.setValueAt(cant + 1, row, 0);
-            productoPed.setCantidad(cant + 1);
-            productos.set(row, productoPed);
-        } else {
-            try {
-                productoPed.setCantidad(1);
-                productos.add(productoPed);
-                modeloTb.addRow(new Object[]{
-                    1,
-                    productoPed,
-                    producto.getPrice(),
-                    producto.getPrice()
-                });
-
-                modeloTb.setRowEditable(modeloTb.getRowCount() - 1, false);
-                modeloTb.setCellEditable(modeloTb.getRowCount() - 1, 0, true);
-            } catch (Exception ex) {
-                System.out.println(ex.getMessage());
-            }
-        }*/
     }
 
     public void addProductPed(ProductoPed productPed, int cantidad, double price) {
@@ -1694,7 +1671,7 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
 
         String consFactura = "000";
 
-        ConfigDB cfFactura = app.getControl().getConfig(CF_FACTURA_ACTUAL);
+        ConfigDB cfFactura = app.getControl().getConfig(MyConstants.CF_FACTURA_ACTUAL);
         if (cfFactura != null) {
 
             Integer consecutivo = (Integer) cfFactura.castValor();

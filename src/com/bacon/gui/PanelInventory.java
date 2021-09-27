@@ -658,8 +658,8 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
             filtrarItems();
         }
 
-        if (e.getActionCommand().equals(AC_EXPORT_TO)) {
-            System.out.println("exportando..");
+        if (e.getActionCommand().equals(AC_EXPORT_TO)) {            
+            logger.debug("Exportando...");
             SwingWorker tarea = new SwingWorker() {
                 @Override
                 protected Object doInBackground() throws Exception {

@@ -101,8 +101,9 @@ public class XLSManager {
     }
 
     public void exportarTabla(DefaultTableModel modelo, String title, String ruta, PropertyChangeListener listener, String[] values) {
+        
         try {
-            FileOutputStream out = new FileOutputStream(ruta);
+            FileOutputStream out = new FileOutputStream(ruta);            
             XSSFWorkbook book = new XSSFWorkbook();
             XSSFSheet sheet = book.createSheet("Reporte 1");
             DataFormat formato = book.createDataFormat();
@@ -179,8 +180,7 @@ public class XLSManager {
                             cell.setCellValue(Integer.parseInt(obj.toString()));
                             cell.setCellType(Cell.CELL_TYPE_NUMERIC);
                             cell.setCellStyle(stiloRight);
-                        } else if (obj instanceof Double || obj instanceof BigDecimal) {
-                            System.out.println(":" + obj.toString() + "---" + obj.getClass());
+                        } else if (obj instanceof Double || obj instanceof BigDecimal) {                            
                             cell.setCellValue(Double.parseDouble(obj.toString()));
                             cell.setCellType(Cell.CELL_TYPE_NUMERIC);
                             cell.setCellStyle(stiloRight);
@@ -205,7 +205,7 @@ public class XLSManager {
             book.write(out);
             out.close();
             listener.propertyChange(new PropertyChangeEvent(modelo, TAREA_COMPLETADA, ruta, 1));
-        } catch (Exception e) {
+        } catch (IOException e) {
             System.out.println("exception:" + e.getMessage());
         }
     }
@@ -302,8 +302,7 @@ public class XLSManager {
                                     cell.setCellValue(Integer.parseInt(obj.toString()));
                                     cell.setCellType(Cell.CELL_TYPE_NUMERIC);
                                     cell.setCellStyle(stiloRight);
-                                } else if (obj instanceof Double) {
-                                    System.out.println(":" + obj.toString() + "---" + obj.getClass());
+                                } else if (obj instanceof Double) {                                    
                                     cell.setCellValue(Double.parseDouble(obj.toString()));
                                     cell.setCellType(Cell.CELL_TYPE_NUMERIC);
                                     cell.setCellStyle(stiloRight);

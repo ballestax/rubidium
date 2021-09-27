@@ -81,7 +81,7 @@ public final class Aplication implements ActionListener, PropertyChangeListener,
     public static final String DEFAULT_EXPORT_DIR = "";
 
     //Correr la aplicacion con configuracion de servidor local
-    private static boolean local = !true;
+    private static boolean local = true;
 
     public DateFormat DF = new SimpleDateFormat("dd-MM-yyyy");
     public DateFormat DF_FULL = new SimpleDateFormat("dd MMMM yyyy hh:mm");
@@ -109,7 +109,6 @@ public final class Aplication implements ActionListener, PropertyChangeListener,
     private final SimpleDateFormat formatoFecha;
     private User user;
     private static final Logger logger = Logger.getLogger(Aplication.class.getCanonicalName());
-    private SwingWorker sw;
     private ScheduledExecutorService ses;
     private SimpleDateFormat sdfExport;
     private PropertyChangeSupport pcs;
@@ -123,8 +122,6 @@ public final class Aplication implements ActionListener, PropertyChangeListener,
     private ProgAction acShowProducts;
 
     public Aplication() {
-
-        //log4j 
         Properties properties = new Properties();
         try {
             String logFile = Aplication.getDirTrabajo() + File.separator + "logging.log";
@@ -162,10 +159,10 @@ public final class Aplication implements ActionListener, PropertyChangeListener,
 
         String prop = configuration.getProperty(Configuration.DINST, "NULL");
         if ("NULL".equals(prop)) {
-            configuration.setProperty(configuration.DINST, new Date().toString());
+            configuration.setProperty(Configuration.DINST, new Date().toString());
         }
         int cus = configuration.getProperty(Configuration.CUS, 0);
-        configuration.setProperty(configuration.CUS, String.valueOf(++cus));
+        configuration.setProperty(Configuration.CUS, String.valueOf(++cus));
 
         initActions();
         formatoFecha = new SimpleDateFormat("dd-MM-yyyy");
@@ -255,7 +252,7 @@ public final class Aplication implements ActionListener, PropertyChangeListener,
                 logger.debug("Time server verified");
             }
         });
-        //hilo.start();
+        hilo.start();
     }
 
     public DecimalFormat getDCFORM_P() {
@@ -320,21 +317,16 @@ public final class Aplication implements ActionListener, PropertyChangeListener,
         return user;
     }
 
-    private Color getColor() {
-        return org.balx.Utiles.colorAleatorio(20, 150);
-    }
-
     public DecimalFormat getCurrencyFormat() {
-        DecimalFormat DCFORM_P = (DecimalFormat) NumberFormat.getInstance();
-        DCFORM_P.applyPattern("$ ###,###,###");
-        return DCFORM_P;
+        DecimalFormat DF_CURRENCY = (DecimalFormat) NumberFormat.getInstance();
+        DF_CURRENCY.applyPattern("$ ###,###,###");
+        return DF_CURRENCY;
     }
 
     public void setUser(User user) {
         user.setPassword("");
         this.user = user;
         getGuiManager().reloadToolbar();
-//        getGuiManager().changeUser();
     }
 
     public SimpleDateFormat getSdfExport() {
@@ -624,10 +616,6 @@ public final class Aplication implements ActionListener, PropertyChangeListener,
 
     @Override
     public void propertyChange(final PropertyChangeEvent evt) {
-        if (PanelProduct2.AC_ADD_QUICK.equals(evt.getPropertyName())) {
-            Product producto = (Product) evt.getNewValue();
-//            guiManager.getPanelPedido().addProduct(producto);
-        }
     }
 
     @Override
