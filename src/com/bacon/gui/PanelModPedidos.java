@@ -19,10 +19,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import org.apache.commons.lang3.StringUtils;
+import javax.swing.SwingWorker;
 import org.dz.PanelCapturaMod;
 
 /**
@@ -99,6 +98,7 @@ public class PanelModPedidos extends PanelCapturaMod
 
         splitPane.setRightComponent(pnPedido);
 
+        productsList = new ArrayList<>();
         loadAllProducts();
 
         panelCategory = new PanelCategory(categorys.get(0), productsList, app);
@@ -116,6 +116,7 @@ public class PanelModPedidos extends PanelCapturaMod
         } else if (PanelCategory.ORDEN_PRICE.equalsIgnoreCase(order)) {
             orderBy = "price, name";
         }
+
         productsList = app.getControl().getProductsList("enabled=1", orderBy);
     }
 

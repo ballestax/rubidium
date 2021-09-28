@@ -23,7 +23,9 @@ import java.util.HashMap;
 import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
+import javax.swing.SwingWorker;
 import org.apache.log4j.Logger;
+import org.balx.Utiles;
 import org.dz.PanelCapturaMod;
 
 /**
@@ -31,7 +33,7 @@ import org.dz.PanelCapturaMod;
  * @author lrod
  */
 public class PanelCategory extends PanelCapturaMod implements PropertyChangeListener {
-
+    
     private final Aplication app;
     private Category category;
     private List<Product> products;
@@ -39,7 +41,7 @@ public class PanelCategory extends PanelCapturaMod implements PropertyChangeList
     private int oldSize;
     private int view;
     private String selectedSort;
-
+    
     public static final String ORDEN_ID = "ORDEN_ID";
     public static final String ORDEN_ALPHA = "ALFABETICO";
     public static final String ORDEN_PRICE = "PRECIO";
@@ -62,30 +64,34 @@ public class PanelCategory extends PanelCapturaMod implements PropertyChangeList
         this.selectedSort = null;
         mapProdsV1 = new HashMap<>();
         mapProdsV2 = new HashMap<>();
+        
         initComponents();
+        pbLoading.setVisible(false);
         createProductsCard(products);
         createComponents();
     }
-
+    
     private void createComponents() {
+        pbLoading.setStringPainted(true);
+        pbLoading.setForeground(Utiles.colorAleatorio(40, 100));
         lbTitle.setText(category.getName());
         lbTitle.setOpaque(true);
         lbTitle.setBorder(BorderFactory.createEtchedBorder());
         lbTitle.setBackground(new Color(84, 36, 0, 130));
-
+        
         lbTitle.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
             }
         });
-
+        
         lbTitle.setVisible(false);
-
+        
         showView2();
-
-        oldSize = products.size();
+        
+        oldSize = products != null ? products.size() : 0;
     }
-
+    
     public void setProducts(List<Product> products) {
         this.products = products;
         if (products == null) {
@@ -98,29 +104,75 @@ public class PanelCategory extends PanelCapturaMod implements PropertyChangeList
             showView2();
         }
     }
-
+    
     private void createProductsCard(List<Product> products) {
+        if (products == null) {
+            return;
+        }
         mapProdsV1.clear();
         mapProdsV2.clear();
-        products.forEach((product) -> {
-            PanelProduct pnProd = new PanelProduct(app, product);
-            pnProd.addPropertyChangeListener(app.getGuiManager().getPanelPedido());
-            mapProdsV2.put(product.getId(), pnProd);
-
-            PanelProduct2 pnProd2 = new PanelProduct2(app, product);
-            pnProd2.addPropertyChangeListener(app.getGuiManager().getPanelPedido());
-            mapProdsV1.put(product.getId(), pnProd2);
-
-        });
-
+        int size = products.size();
+        
+        SwingWorker<Boolean, Object[]> sw = new SwingWorker<Boolean, Object[]>() {
+            int count = 0;
+            
+            @Override
+            
+            protected Boolean doInBackground() throws Exception {
+                pbLoading.setMaximum(size);
+                pbLoading.setVisible(true);
+                products.forEach((product) -> {
+                    PanelProduct pnProd = new PanelProduct(app, product);
+                    pnProd.addPropertyChangeListener(app.getGuiManager().getPanelPedido());
+                    publish(new Object[]{pnProd, product.getId()});
+                    
+                    PanelProduct2 pnProd2 = new PanelProduct2(app, product);
+                    pnProd2.addPropertyChangeListener(app.getGuiManager().getPanelPedido());
+                    publish(new Object[]{pnProd2, product.getId()});
+                    
+                });
+                return true;
+            }
+            
+            @Override
+            protected void process(List<Object[]> chunks) {
+                for (Object[] chunk : chunks) {
+                    
+                    if (chunk[0] instanceof PanelProduct2) {
+                        long prodId = Long.parseLong(chunk[1].toString());
+                        mapProdsV1.put(prodId, (PanelProduct2) chunk[0]);
+                    } else if (chunk[0] instanceof PanelProduct) {
+                        long prodId = Long.parseLong(chunk[1].toString());
+                        mapProdsV2.put(prodId, (PanelProduct) chunk[0]);
+                    }
+                    count++;
+                    pbLoading.setValue(count / 2);
+                    pbLoading.setString("Cargando productos:  " + count + " de " + size*2);
+                }
+            }
+            
+            @Override
+            protected void done() {
+                if (view == 1) {
+                    showView1();
+                } else {
+                    showView2();
+                }
+//                pbLoading.setIndeterminate(false);
+                pbLoading.setVisible(false);
+            }
+            
+        };
+        sw.execute();
+        
     }
-
+    
     public void showView2() {
         view = 2;
         app.getGuiManager().setWaitCursor();
         pnItems.removeAll();
         pnItems.setLayout(new GridBagLayout());
-
+        
         if (products != null) {
             int COLS = 3;
             int LX = products.size() / COLS;
@@ -133,14 +185,15 @@ public class PanelCategory extends PanelCapturaMod implements PropertyChangeList
                         break;
                     }
                     PanelProduct pnProd = mapProdsV2.get(products.get(c).getId());
-                    if(pnProd!=null)
-                    pnItems.add(pnProd,
-                            new GridBagConstraints(j, i, 1, 1,
-                                    0.1, 0,
-                                    GridBagConstraints.NORTH,
-                                    GridBagConstraints.HORIZONTAL,
-                                    new Insets(2, 2, 2, 2),
-                                    0, 0));
+                    if (pnProd != null) {
+                        pnItems.add(pnProd,
+                                new GridBagConstraints(j, i, 1, 1,
+                                        0.1, 0,
+                                        GridBagConstraints.NORTH,
+                                        GridBagConstraints.HORIZONTAL,
+                                        new Insets(2, 2, 2, 2),
+                                        0, 0));
+                    }
                     c++;
                 }
             }
@@ -151,49 +204,51 @@ public class PanelCategory extends PanelCapturaMod implements PropertyChangeList
                             GridBagConstraints.BOTH,
                             new Insets(1, 1, 1, 1),
                             1, 1));
-
+            
         }
         pnItems.updateUI();
         app.getGuiManager().setDefaultCursor();
     }
-
+    
     public void showView1() {
         view = 1;
         app.getGuiManager().setWaitCursor();
         pnItems.removeAll();
         pnItems.setLayout(new GridLayout(0, 2, 10, 10));
-
+        
         if (products != null) {
             for (int i = 0; i < products.size(); i++) {
                 PanelProduct2 pnProd2 = mapProdsV1.get(products.get(i).getId());
-                pnItems.add(pnProd2);
+                if (pnProd2 != null) {
+                    pnItems.add(pnProd2);
+                }
             }
         }
-
+        
         pnItems.add(Box.createVerticalGlue());
         pnItems.add(Box.createVerticalGlue());
         pnItems.updateUI();
         app.getGuiManager().setDefaultCursor();
     }
-
+    
     public void resizePanel() {
-
+        
         if (pnItems != null) {
             int width = pnItems.getWidth();
-
+            
             if (oldSize != products.size()) {
                 if (width > 0) {
                     int h = 120 * ((products.size() + 1) / 2);
-
+                    
                     pnItems.setSize(width, h);
                 }
             }
         }
     }
-
+    
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-
+        
         if (null != evt.getPropertyName()) {
             switch (evt.getPropertyName()) {
                 case PanelProduct2.AC_ADD_QUICK:
@@ -209,23 +264,22 @@ public class PanelCategory extends PanelCapturaMod implements PropertyChangeList
                     changeSort(evt.getNewValue().toString());
                     break;
                 case PanelTopSearch.AC_REFRESH_PRODUCTS:
-                    System.out.println("Refreshin products");
                     this.products = loadProductsFromDB(getSelectedSort());
                     createProductsCard(products);
                     setProducts(products);
-                    break;                    
+                    break;
                 default:
                     break;
             }
         }
     }
-
-    public void changeSort(String sort) {        
-        if (selectedSort==null  || !selectedSort.equals(sort)) {
+    
+    public void changeSort(String sort) {
+        if (selectedSort == null || !selectedSort.equals(sort)) {
             setProducts(loadProductsFromDB(sort));
         }
     }
-
+    
     private List<Product> loadProductsFromDB(String sort) {
         selectedSort = sort;
         List<Product> listProducts;
@@ -238,7 +292,7 @@ public class PanelCategory extends PanelCapturaMod implements PropertyChangeList
         }
         return listProducts;
     }
-
+    
     public String getSelectedSort() {
         return selectedSort;
     }
@@ -255,6 +309,7 @@ public class PanelCategory extends PanelCapturaMod implements PropertyChangeList
         lbTitle = new javax.swing.JLabel();
         pnItems = new javax.swing.JPanel();
         filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 32767));
+        pbLoading = new javax.swing.JProgressBar();
 
         pnItems.setLayout(new java.awt.GridLayout(1, 0));
 
@@ -262,12 +317,13 @@ public class PanelCategory extends PanelCapturaMod implements PropertyChangeList
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+            .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(filler1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(lbTitle, javax.swing.GroupLayout.DEFAULT_SIZE, 811, Short.MAX_VALUE)
-                    .addComponent(pnItems, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(filler1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(lbTitle, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 811, Short.MAX_VALUE)
+                    .addComponent(pnItems, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(pbLoading, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -276,9 +332,11 @@ public class PanelCategory extends PanelCapturaMod implements PropertyChangeList
                 .addContainerGap()
                 .addComponent(lbTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(pnItems, javax.swing.GroupLayout.DEFAULT_SIZE, 179, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(pnItems, javax.swing.GroupLayout.DEFAULT_SIZE, 151, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(filler1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(pbLoading, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -287,6 +345,7 @@ public class PanelCategory extends PanelCapturaMod implements PropertyChangeList
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.Box.Filler filler1;
     private javax.swing.JLabel lbTitle;
+    private javax.swing.JProgressBar pbLoading;
     private javax.swing.JPanel pnItems;
     // End of variables declaration//GEN-END:variables
 

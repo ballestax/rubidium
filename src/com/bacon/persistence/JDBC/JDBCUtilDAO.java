@@ -280,8 +280,6 @@ public class JDBCUtilDAO implements UtilDAO {
         try {
             conn = dataSource.getConnection();
             pSt = conn.prepareStatement(retrieve);
-//            Object[] parameters = {code};
-//            pSt = sqlStatements.buildSQLStatement(conn, EXIST_CLAVE_KEY, parameters);
             rs = pSt.executeQuery();
 
             while (rs.next()) {

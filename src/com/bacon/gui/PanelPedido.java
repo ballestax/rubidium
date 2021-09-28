@@ -474,7 +474,24 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
         calcularValores();
 
         lbTicket.setVisible(false);
-        lbFactura.setText("<html><font>" + calculateProximoRegistro() + "</font></html>");
+        SwingWorker sw = new SwingWorker() {
+            @Override
+            protected Object doInBackground() throws Exception {
+                publish(calculateProximoRegistro());
+                return true;
+            }
+
+            @Override
+            protected void process(List chunks) {
+                String registro = "0";
+                for (Object chunk : chunks) {
+                    registro = (String) chunk;
+                }
+                lbFactura.setText("<html><font>" + registro + "</font></html>");
+            }
+
+        };
+        sw.execute();
 
         lbFactura.addMouseListener(lbFacturaMouseListener);
     }
@@ -1634,7 +1651,7 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
 
     private String calculateProximoRegistro() {
 
-        String prefijo = app.getConfiguration().getProperty("cf.prefix", "F");
+        String prefijo = app.getConfiguration().getProperty("cf.prefix", "");
 //        System.out.println("prefijo = " + prefijo);
 
         //get el numero de ceros a la izquierda para formatear el numero 

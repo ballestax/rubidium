@@ -8,12 +8,11 @@ package com.bacon.gui;
 import com.bacon.MyConstants;
 import com.bacon.Aplication;
 import com.bacon.Configuration;
+import com.bacon.domain.ConfigDB;
 import com.bacon.domain.Product;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.swing.BoxLayout;
@@ -225,11 +224,9 @@ public class PanelTopSearch extends PanelCaptura implements ActionListener {
             reset();
         } else if (AC_SELECT_VIEW1.equals(e.getActionCommand())) {
             pcs.firePropertyChange(AC_SELECT_VIEW1, null, null);
-
         } else if (AC_SELECT_VIEW2.equals(e.getActionCommand())) {
             pcs.firePropertyChange(AC_SELECT_VIEW2, null, null);
         } else if (AC_ADD_CUSTOM_PRODUCT.equals(e.getActionCommand())) {
-
             PanelPedido panelPedido = app.getGuiManager().getPanelPedido();
             app.getGuiManager().showPanelAddOtherProduct(panelPedido);
         } else if (AC_CHANGE_SORT.equals(e.getActionCommand())) {
@@ -237,9 +234,13 @@ public class PanelTopSearch extends PanelCaptura implements ActionListener {
             pcs.firePropertyChange(AC_CHANGE_SORT, null, cbSort.getSelectedItem());
         } else if (AC_REFRESH_PRODUCTS.equals(e.getActionCommand())) {
             pcs.firePropertyChange(AC_REFRESH_PRODUCTS, null, null);
+            if (!regSearch.getText().isEmpty()) {
+                filtrar(regSearch.getText(), 1);
+            }
         } else if (AC_SEND_PIN.equals(e.getActionCommand())) {
-            String propPrinter = app.getConfiguration().getProperty(Configuration.PRINTER_SELECTED);
-            app.getPrinterService().sendPulsePin(propPrinter);
+            ConfigDB config = app.getControl().getConfig(Configuration.PRINTER_SELECTED);
+            String printer = config != null ? config.getValor() : "";
+            app.getPrinterService().sendPulsePin(printer);
         }
 
     }
