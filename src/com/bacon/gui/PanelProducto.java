@@ -6,7 +6,6 @@
 package com.bacon.gui;
 
 import com.bacon.Aplication;
-import com.bacon.ImageManager;
 import com.bacon.domain.Product;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -28,7 +27,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
 import javax.swing.border.EtchedBorder;
 

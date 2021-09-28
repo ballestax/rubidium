@@ -50,10 +50,9 @@ public class ProductRenderer extends Box implements TableCellRenderer {
 
         add(labelName);
         add(labelAdicion);
-        
+
 //        add(labelNotas);
 //        add(labelEsp);
-
         setOpaque(true);
 
     }
@@ -79,9 +78,18 @@ public class ProductRenderer extends Box implements TableCellRenderer {
                 StringBuilder stb = new StringBuilder();
                 stb.append("<html>");
                 stb.append("<font color=blue>").append(prodPed.getProduct().getName().toUpperCase()).append("</font>");
-                stb.append("<p>").append(prodPed.getStAdicionales()).append("</p>");
-                stb.append("<p>").append(prodPed.getStExclusiones()).append("</p>");
-                stb.append("<p>").append(prodPed.getEspecificaciones()).append("</p></html>");
+                stb.append("<font color=#bb2345>[").append(prodPed.getPrecio()).append("]</font>");
+                if (prodPed.hasPresentation()) {
+                    stb.append("<p>").append(prodPed.getPresentation().getName()).append("</p>");
+                }
+                if (prodPed.hasAdditionals()) {
+                    stb.append("<p>Adiciones:").append(prodPed.getStAdicionales()).append("</p>");
+                }
+                if (prodPed.hasExcluisones()) {
+                    stb.append("<p><font color=red> Sin:").append(prodPed.getStExclusiones()).append("</font></p>");
+                }
+//                stb.append("<p>").append(prodPed.getEspecificaciones()).append("</p>)");
+                stb.append("</html>");
 
 //                System.err.println(stb.toString());
                 setToolTipText(stb.toString());

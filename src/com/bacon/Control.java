@@ -1170,6 +1170,17 @@ public class Control {
             return null;
         }
     }
+    
+    public List<Double> getRankProductsByVarPriceList(long idItem, int limit) {
+        try {
+            JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
+            return utilDAO.getRankProductsByVarPriceList(idItem, limit);
+        } catch (DAOException ex) {
+            logger.error("Error getting rank of products by price.", ex);
+            GUIManager.showErrorMessage(null, "Error consultando rank products by var price", "Error");
+            return null;
+        }
+    }
 
     public ArrayList<Object[]> getProductsSales(Date start, Date end) {
         try {

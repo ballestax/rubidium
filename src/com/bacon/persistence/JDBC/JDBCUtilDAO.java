@@ -70,6 +70,7 @@ public class JDBCUtilDAO implements UtilDAO {
     public static final String CREATE_PRODUCT_INGREDIENT_TABLE_KEY = "CREATE_PRODUCT_INGREDIENT_TABLE";
     public static final String GET_INGREDIENTS_BY_PRODUCT_KEY = "GET_INGREDIENTS_BY_PRODUCT";
     public static final String GET_PRESENTATIONS_BY_PRODUCT_KEY = "GET_PRESENTATIONS_BY_PRODUCT";
+    public static final String GET_PRODUCTS_BY_VARPRICE_RANK_LIST_KEY = "GET_PRODUCTS_BY_VARPRICE_RANK_LIST";
 
     public static final String CREATE_WAITERS_TABLE_KEY = "CREATE_WAITERS_TABLE";
     public static final String CREATE_TABLES_TABLE_KEY = "CREATE_TABLES_TABLE";
@@ -2040,6 +2041,31 @@ public class JDBCUtilDAO implements UtilDAO {
             DBManager.closeConnection(conn);
         }
         return dataItemSnap;
+    }
+
+    public List<Double> getRankProductsByVarPriceList(long prodID, int limit) throws DAOException {
+        ArrayList<Double> list = new ArrayList<>();
+        Connection conn = null;
+        PreparedStatement retrieve = null;
+        ResultSet rs = null;
+        Object[] parameters = {prodID, limit};
+        try {
+            conn = dataSource.getConnection();
+            retrieve = sqlStatements.buildSQLStatement(conn, GET_PRODUCTS_BY_VARPRICE_RANK_LIST_KEY, parameters);
+            rs = retrieve.executeQuery();
+            while (rs.next()) {
+                double price = rs.getDouble("price");
+                list.add(price);
+            }
+        } catch (SQLException | IOException e) {
+            throw new DAOException("Could not properly retrieve the rank of products: " + e);
+        } finally {
+            DBManager.closeResultSet(rs);
+            DBManager.closeStatement(retrieve);
+            DBManager.closeConnection(conn);
+        }
+        return list;
+
     }
 
 }

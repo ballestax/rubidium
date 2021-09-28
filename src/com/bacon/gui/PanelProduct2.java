@@ -7,7 +7,10 @@ package com.bacon.gui;
 
 import com.bacon.Aplication;
 import com.bacon.Configuration;
+import com.bacon.domain.Presentation;
 import com.bacon.domain.Product;
+import com.bacon.domain.ProductoPed;
+import static com.bacon.gui.PanelCustomPedido.AC_CUSTOM_ADD;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Insets;
@@ -18,6 +21,9 @@ import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JMenuItem;
@@ -127,28 +133,65 @@ public class PanelProduct2 extends PanelCapturaMod implements ActionListener {
 
         popPres = new JPopupMenu();
 
-        popPres.add(new JMenuItem("Opcion1"));
-        popPres.add(new JMenuItem("Opcion2"));
-        popPres.add(new JMenuItem("Opcion3"));
+        ArrayList<Presentation> presList = app.getControl().getPresentationsByProduct(product.getId());
+
+        for (Presentation press : presList) {
+            String html = "<html><font color='#610034'size=4>" + press.getName().toUpperCase() + "</font> [<font color='#3d0021'>" + app.DCFORM_P.format(press.getPrice()) + "</font>]</html>";
+            JMenuItem item = new JMenuItem(html);
+            item.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(4, 2, 2, 2), BorderFactory.createMatteBorder(0, 0, 1, 0, Color.DARK_GRAY)));
+            popPres.add(item);
+            item.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    ProductoPed prod = new ProductoPed(product);
+                    prod.setPresentation(press);
+                    pcs.firePropertyChange(AC_CUSTOM_ADD, new Object[]{1, press.getPrice()}, prod);
+                }
+            });
+        }
+
+        if (product.isVariablePrice()) {
+            List<Double> rankProductsByVarPriceList = app.getControl().getRankProductsByVarPriceList(product.getId(), 6)
+                    .stream().sorted().collect(Collectors.toList());
+            for (Double price : rankProductsByVarPriceList) {
+                if (product.getPrice() == price) {
+                    continue;
+                }
+                String name = price >= 1000 ? (app.DCFORM_W.format(price / 1000) + "K") : String.valueOf(price);
+                String html = "<html><font color='#610034'size=4>" + name.toUpperCase() + "</font> [<font color='#3d0021'>" + app.DCFORM_P.format(price) + "</font>]</html>";
+                JMenuItem item = new JMenuItem(html);
+                item.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(4, 2, 2, 2), BorderFactory.createMatteBorder(0, 0, 1, 0, Color.DARK_GRAY)));
+                popPres.add(item);
+                item.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        ProductoPed prod = new ProductoPed(product);
+                        prod.setPrecio(price);
+                        pcs.firePropertyChange(AC_CUSTOM_ADD, new Object[]{1, price}, prod);
+                    }
+                });
+            }
+            JMenuItem item = new JMenuItem("<html><font color='#61AA34'size=4>" + "OTROS..." + "</font></html>");
+            item.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(4, 2, 2, 2), BorderFactory.createMatteBorder(0, 0, 1, 0, Color.DARK_GRAY)));
+            item.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    app.getGuiManager().showCustomPedido(product, app);
+                }
+            });
+            popPres.add(item);
+        }
 
         btAddCustom.addMouseListener(new MouseAdapter() {
 
             @Override
-            public void mousePressed(MouseEvent e) {
-                System.out.println("e = " + e);
-                
-            }
-
-            @Override
             public void mouseReleased(MouseEvent e) {
-                System.out.println(e);
                 if (SwingUtilities.isRightMouseButton(e)) {
                     popPres.show(btAddCustom, 0, 0);
                 }
             }
 
         });
-
     }
     public static final String AC_ADD_CUSTOM = "AC_ADD_CUSTOM";
     public static final String AC_ADD_QUICK = "AC_ADD_QUICK";

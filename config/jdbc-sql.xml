@@ -59,7 +59,7 @@
                     |GET_TAGS_INVENTORY_LIST
                     |CREATE_INVENTORY_SNAPSHOT_TABLE|ADD_INVENTORY_SNAPSHOT_ITEM|GET_INVENTORY_SNAPSHOT_ITEM
                     |COUNT_ITEM_SNAP_EVENT|COUNT_ITEM_CONCILIATION_EVENT
-                    
+                    |GET_PRODUCTS_BY_VARPRICE_RANK_LIST
                     ) #REQUIRED
                     
 	>
@@ -1859,6 +1859,16 @@
             </SQLFragment>
             <SQLFragment>
                 GROUP BY tags
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="GET_PRODUCTS_BY_VARPRICE_RANK_LIST">
+            <SQLFragment>
+                SELECT id,id_product,price, count(id) as rank FROM invoice_product            
+                WHERE id_product=?
+                GROUP BY price
+                ORDER BY rank DESC
+                LIMIT ?
             </SQLFragment>
         </SQLStatement>
         
