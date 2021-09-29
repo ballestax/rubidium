@@ -459,7 +459,8 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
         regMesa.setText(tables.toArray());
 
 //        regService.setEnabled(true);
-        btPrint.setVisible((Boolean.valueOf(app.getConfiguration().getProperty(Configuration.PRINT_PREV_DELIVERY))));
+        config = app.getControl().getConfig(Configuration.PRINT_PREV_DELIVERY);
+        btPrint.setVisible(config != null ? (Boolean.valueOf(config.getValor())) : false);
 //        btPrint.setVisible(false);
         btPrint1.setVisible(false);
 
@@ -586,7 +587,8 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
             lbFactura.setText("<html><font>" + calculateProximoRegistro() + "</font></html>");
             lbFactura.addMouseListener(lbFacturaMouseListener);
 
-            if (Boolean.valueOf(app.getConfiguration().getProperty(Configuration.PRINT_PREV_DELIVERY))) {
+            ConfigDB config = app.getControl().getConfig(Configuration.PRINT_PREV_DELIVERY);
+            if (config != null ? Boolean.valueOf(config.getValor()) : false) {
                 btPrint.setVisible(true);
             }
 
@@ -1352,7 +1354,8 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
         }
 
         if (!checkAllInventory()) {
-            String property = app.getConfiguration().getProperty(Configuration.INVOICE_OUT_STOCK, "true");
+            ConfigDB config = app.getControl().getConfig(Configuration.INVOICE_OUT_STOCK);
+            String property = config != null ? config.getValor() : "false";
             boolean permit = Boolean.valueOf(property);
             GUIManager.showErrorMessage(null, "Los productos exceden las existencias en inventario.\n"
                     + "Esta " + (permit ? "habilitado" : "deshabilitado") + " facturar sin existencias", "Producto agotado");
@@ -1650,9 +1653,8 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
     }
 
     private String calculateProximoRegistro() {
-
-        String prefijo = app.getConfiguration().getProperty("cf.prefix", "");
-//        System.out.println("prefijo = " + prefijo);
+        ConfigDB config = app.getControl().getConfig(Configuration.PREFIX_INVOICES);
+        String prefijo = config != null ? config.getValor() : "";
 
         //get el numero de ceros a la izquierda para formatear el numero 
         int ceros = 0;
@@ -1660,12 +1662,10 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
             ceros = Integer.parseInt(app.getConfiguration().getProperty("cf.zeros", "0"));
         } catch (NumberFormatException e) {
         }
-
 //        int rows = app.getControl().contarRows("select id from invoices");
         Object maxValue = app.getControl().getMaxValue("invoices", "code");
 
         Integer value = 0;
-
         try {
             value = Integer.parseInt(StringUtils.getDigits(maxValue.toString()));
         } catch (Exception e) {

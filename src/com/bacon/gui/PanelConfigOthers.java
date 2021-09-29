@@ -245,7 +245,7 @@ public class PanelConfigOthers extends javax.swing.JPanel implements ActionListe
             app.getControl().addConfig(new ConfigDB(com.bacon.Configuration.PREFIX_INVOICES, ConfigDB.STRING, prefix));
 
             String ceros = regNumZeros.getText();
-            app.getControl().addConfig(new ConfigDB(com.bacon.Configuration.ZEROS_INVOICES, ConfigDB.STRING, ceros));
+            app.getControl().addConfig(new ConfigDB(com.bacon.Configuration.ZEROS_INVOICES, ConfigDB.INTEGER, ceros));
 
             String docName = regDocName.getText();
             app.getControl().addConfig(new ConfigDB(com.bacon.Configuration.DOCUMENT_NAME, ConfigDB.STRING, docName));
