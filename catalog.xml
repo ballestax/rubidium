@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog" prefer="system">
-    <system systemId="http://siri.procuraduria.gov.co:8086/CertWEB/Certificado.aspx" uri="xml-resources/web-service-references/Certificado/wsdl/siri.procuraduria.gov.co_8086/CertWEB/Certificado.aspx"/>
-    <system systemId="http://siri.procuraduria.gov.co:8086/CertWEB/Certificado.aspx?tpo=1" uri="xml-resources/web-service-references/Certificado/wsdl/siri.procuraduria.gov.co_8086/CertWEB/Certificado.aspx.tpo_1"/>
-</catalog>
