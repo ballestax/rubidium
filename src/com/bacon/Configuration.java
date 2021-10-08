@@ -156,12 +156,12 @@ public class Configuration {
         return configuration.getProperty(property, propDefault);
     }
 
-    public int getProperty(String property, int propDefault) {
+    public int getProperty(String property, int propDefault) {        
         int valor = propDefault;
         try {
             valor = Integer.parseInt(configuration.getProperty(property, "" + propDefault));
         } catch (Exception e) {
-        }
+        }        
         return valor;
     }
 

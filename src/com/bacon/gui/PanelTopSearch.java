@@ -46,7 +46,7 @@ public class PanelTopSearch extends PanelCaptura implements ActionListener {
         btBuscar.setActionCommand(AC_CLEAR_FIELD);
         btBuscar.addActionListener(this);
 
-        btCustomProduct.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "add1.png", 18, 18)));
+        btCustomProduct.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "cashdrawer.png", 20, 20)));
         btCustomProduct.setActionCommand(AC_SEND_PIN);
         btCustomProduct.addActionListener(this);
 //        btCustomProduct.setEnabled(false);

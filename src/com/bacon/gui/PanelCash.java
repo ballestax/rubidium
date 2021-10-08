@@ -6,7 +6,9 @@
 package com.bacon.gui;
 
 import com.bacon.Aplication;
+import com.bacon.Configuration;
 import com.bacon.MyConstants;
+import com.bacon.domain.ConfigDB;
 import com.bacon.domain.Cycle;
 import com.bacon.domain.Invoice;
 import com.bacon.domain.Table;
@@ -32,7 +34,6 @@ import static javax.swing.BorderFactory.createLineBorder;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.JTextField;
@@ -101,6 +102,10 @@ public class PanelCash extends PanelCapturaMod implements ActionListener, Proper
         btRefresh.setActionCommand(AC_REFRESH);
         btRefresh.addActionListener(this);
         btRefresh.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "update.png", 32, 32)));
+        
+        btRefresh1.setActionCommand(AC_OPEN_CASH);
+        btRefresh1.addActionListener(this);
+        btRefresh1.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "cashdrawer.png", 32, 32)));
 
         btAddExtra.setActionCommand(AC_ADD_GASTO);
         btAddExtra.addActionListener(this);
@@ -257,6 +262,7 @@ public class PanelCash extends PanelCapturaMod implements ActionListener, Proper
     public static final String AC_CLOSE_CYCLE = "AC_CLOSE_CYCLE";
     public static final String AC_NEW_CYCLE = "AC_NEW_CYCLE";
     public static final String AC_REFRESH = "AC_REFRESH";
+    public static final String AC_OPEN_CASH = "AC_OPEN_CASH";
 
     private void showCycle(Cycle cycle) {
         jLabel2.setText("<html><font color=blue size=5>" + cycle.getId() + "</font></html>");
@@ -382,6 +388,10 @@ public class PanelCash extends PanelCapturaMod implements ActionListener, Proper
                 regFilter2.setSelected(0);
             }
             loadCycle();
+        } else if (AC_OPEN_CASH.equals(e.getActionCommand())) {
+            ConfigDB config = app.getControl().getConfig(Configuration.PRINTER_SELECTED);
+            String printer = config != null ? config.getValor() : "";
+            app.getPrinterService().sendPulsePin(printer);
         }
     }
 

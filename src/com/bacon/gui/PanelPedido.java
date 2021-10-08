@@ -437,13 +437,6 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
         tbListado.getColumnModel().getColumn(3).setCellRenderer(formatRenderer);
 
         ArrayList<Object[]> data = new ArrayList<>();
-
-//        data.add(new Object[]{1, new String[]{"Doble carne", "+Queso americano", "Sin verduras"},
-//            17000, 18000});
-//        data.add(new Object[]{2, new String[]{"Rib 57", "", ""},
-//            18000, 36000});
-//        data.add(new Object[]{1, new String[]{"Chori", "", ""},
-//            15000, 15000});
         populateTabla(data);
 
         ArrayList<Table> tables = app.getControl().getTableslList("", "");
@@ -519,6 +512,17 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
         regDescuento.setVisible(showDescuento);
         lbDescuento1.setVisible(showDescuento);
     }
+    
+    public void shoAlertCycle() {
+        Cycle lastCycle = app.getControl().getLastCycle();
+        PrettyTime pt = new PrettyTime(new Locale("es"));
+        if(lastCycle!=null){
+            Date init = lastCycle.getInit();
+            List<Duration> presDur = pt.calculatePreciseDuration(init);
+            String formatDuration = pt.formatDuration(presDur);
+        }
+    }
+    
 
     @Override
     public void actionPerformed(ActionEvent e) {
