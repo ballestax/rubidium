@@ -162,7 +162,9 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
 
         showDescuento = false;
 
-        lbTitle.setText("Factura");
+        ConfigDB config = app.getControl().getConfig(Configuration.DOCUMENT_NAME);
+        String docName = config != null && !config.getValor().isEmpty() ? config.getValor() : "Ticket";
+        lbTitle.setText(docName);
         lbTitle.setToolTipText(getInfoCiclo(app.getControl().getLastCycle()));
 
         btTogle1.setText("Local");
@@ -230,7 +232,7 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
         lbEntregas.setHorizontalAlignment(SwingConstants.RIGHT);
         lbEntregas.setFont(font);
 
-        ConfigDB config = app.getControl().getConfig(Configuration.DELIVERY_VALUE);
+        config = app.getControl().getConfig(Configuration.DELIVERY_VALUE);
         double valueDelivery = config != null ? (double) config.castValor() : 0;
         lbEntregas.setText(DCFORM_P.format(valueDelivery));
         lbDescuento1.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -488,6 +490,8 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
         sw.execute();
 
         lbFactura.addMouseListener(lbFacturaMouseListener);
+        
+//        showAlertCycle();
     }
     public static final String AC_CHECK_RECOGIDO = "AC_CHECK_RECOGIDO";
 
@@ -512,17 +516,17 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
         regDescuento.setVisible(showDescuento);
         lbDescuento1.setVisible(showDescuento);
     }
-    
-    public void shoAlertCycle() {
+
+    public void showAlertCycle() {
         Cycle lastCycle = app.getControl().getLastCycle();
         PrettyTime pt = new PrettyTime(new Locale("es"));
-        if(lastCycle!=null){
+        if (lastCycle != null) {
             Date init = lastCycle.getInit();
             List<Duration> presDur = pt.calculatePreciseDuration(init);
             String formatDuration = pt.formatDuration(presDur);
+    
         }
     }
-    
 
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -595,6 +599,9 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
             if (config != null ? Boolean.valueOf(config.getValor()) : false) {
                 btPrint.setVisible(true);
             }
+            config = app.getControl().getConfig(Configuration.DOCUMENT_NAME);
+            String docName = config != null && !config.getValor().isEmpty() ? config.getValor() : "Ticket";
+            lbTitle.setText(docName);
 
             lbTitle.setToolTipText(getInfoCiclo(app.getControl().getLastCycle()));
 
@@ -1477,7 +1484,7 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
 
         //check factura number
 //        int existClave = 0;
-//        do {            
+//        do {
 //            existClave = app.getControl().existClave("invoices", "code", "'" + invoice.getFactura() + "'");
 //            System.out.println("existClave = " + existClave);
 //            if (existClave > 0) {
@@ -1660,7 +1667,7 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
         ConfigDB config = app.getControl().getConfig(Configuration.PREFIX_INVOICES);
         String prefijo = config != null ? config.getValor() : "";
 
-        //get el numero de ceros a la izquierda para formatear el numero 
+        //get el numero de ceros a la izquierda para formatear el numero
         int ceros = 0;
         try {
             ceros = Integer.parseInt(app.getConfiguration().getProperty("cf.zeros", "0"));
@@ -1815,7 +1822,7 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
         btTogle1.setSelected(true);
 
         lbTitle.setForeground(colorLocal.darker());
-//        this.setBackground(colorLocal.brighter());      
+//        this.setBackground(colorLocal.brighter());
         regMesera.setTint(colorLocal);
         regMesa.setTint(colorLocal);
 

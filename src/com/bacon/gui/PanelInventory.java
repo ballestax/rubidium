@@ -38,7 +38,6 @@ import org.apache.log4j.Logger;
 import org.bx.gui.MyDefaultTableModel;
 import org.dz.PanelCapturaMod;
 import java.awt.Desktop;
-import java.awt.PopupMenu;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
@@ -51,7 +50,6 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.swing.BoxLayout;
-import javax.swing.JSeparator;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import org.dz.MyDialogEsc;
@@ -78,6 +76,8 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
     private JMenuItem itemCargar;
     private JMenuItem itemDescargar;
     private JMenuItem itemLinks;
+    private Object filterSelected;
+    private Object tagSelected;
 
     /**
      * Creates new form PanelReportSales
@@ -139,7 +139,6 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
         btExport.setActionCommand(AC_EXPORT_TO);
         btExport.addActionListener(this);
         btExport.setToolTipText("Exportar lista");
-        
 
         JButton btSnapShot = new JButton();
         btSnapShot.setFont(f);
@@ -197,12 +196,10 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
         panelButtons.add(btRefresh);
         panelButtons.add(btAdd);
         panelButtons.add(btLoad);
-        panelButtons.add(btDesc);        
+        panelButtons.add(btDesc);
         panelButtons.add(btConciliation);
         panelButtons.add(btExport);
         panelButtons.add(btSnapShot);
-        
-        
 
         String[] colNames = new String[]{"N°", "Item", "Cantidad", "Medida", "Cost", "Price", "Min", "Cost. Total"};
 
@@ -340,7 +337,11 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
         LinkedHashSet<String> listTags = new LinkedHashSet<>();
         if (!tagsInventoryList.isEmpty()) {
             //split(,) la lista de tags de cada item, lo pasa a lowercase y filtra que no este vacio el string
-            listTags = tagsInventoryList.stream().flatMap(Pattern.compile(",")::splitAsStream).filter(tag -> !tag.isEmpty()).map(tag -> FILTER_ITEM_TAGS + tag.toUpperCase().trim()).collect(Collectors.toCollection(LinkedHashSet::new));
+            listTags = tagsInventoryList.stream()
+                    .flatMap(Pattern.compile(",")::splitAsStream)
+                    .filter(tag -> !tag.isEmpty())
+                    .map(tag -> FILTER_ITEM_TAGS + tag.toUpperCase().trim())
+                    .collect(Collectors.toCollection(LinkedHashSet::new));
         }
         return listTags;
     }
@@ -439,10 +440,16 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
         boolean enable = text.isEmpty();
         regFilters.setEnabled(enable);
         regTags.setEnabled(enable);
+        if (enable) {
+            filtrarItems();
+            return;
+        }
 
         ArrayList<Item> listItems = app.getControl().getItemList("", "name");
 
-        List<Item> listFiltered = listItems.stream().filter(item -> item.getName().toUpperCase().contains(text.toUpperCase())).collect(Collectors.toList());
+        List<Item> listFiltered = listItems.stream()
+                .filter(item -> item.getName().toUpperCase().contains(text.toUpperCase()))
+                .collect(Collectors.toList());
 
         populateTable(listFiltered);
     }
@@ -645,20 +652,25 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
             app.getGuiManager().showPanelSnapShot();
         } else if (AC_LOAD_ITEM.equals(e.getActionCommand())) {
             app.getGuiManager().showPanelSelItem(this);
-        } else if (AC_REFRESH_ITEMS.equals(e.getActionCommand())) {
+        } else if (AC_REFRESH_ITEMS.equals(e.getActionCommand())) {            
             regFilters.setText(loadFilters().toArray());
-            filtrar();
+            regFilters.setSelected(filterSelected);
+            regTags.setText(loadTags().toArray());
+            regTags.setSelected(tagSelected);
+            filtrarItems();
         } else if (AC_ADD_CONCILIATION.equals(e.getActionCommand())) {
             app.getGuiManager().showPanelConciliacion(true);
         } else if (AC_DOWNLOAD_ITEM.equals(e.getActionCommand())) {
             app.getGuiManager().showPanelDownItem(this);
         } else if (AC_CHANGE_ITEMS.equals(e.getActionCommand())) {
+            filterSelected = regFilters.getSelectedItem();
             filtrarItems();
         } else if (AC_CHANGE_TAGS.equals(e.getActionCommand())) {
+            tagSelected = regTags.getSelectedItem();
             filtrarItems();
         }
 
-        if (e.getActionCommand().equals(AC_EXPORT_TO)) {            
+        if (e.getActionCommand().equals(AC_EXPORT_TO)) {
             logger.debug("Exportando...");
             SwingWorker tarea = new SwingWorker() {
                 @Override
