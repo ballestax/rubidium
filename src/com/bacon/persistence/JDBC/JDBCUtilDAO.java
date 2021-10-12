@@ -850,6 +850,7 @@ public class JDBCUtilDAO implements UtilDAO {
                 waiter.setId(rs.getInt(1));
                 waiter.setName(rs.getString(2));
                 waiter.setStatus(rs.getInt(3));
+                waiter.setColor(rs.getString("color"));
                 waiters.add(waiter);
             }
         } catch (SQLException e) {

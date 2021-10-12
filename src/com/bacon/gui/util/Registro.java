@@ -902,7 +902,7 @@ public class Registro extends JComponent implements Reseteable, CaretListener {
             ((JComboBox) campo).setForeground(fg);
         } else if (campo instanceof MyDatePickerImp) {
             ((MyDatePickerImp) campo).setFieldForeground(fg);
-        }
+        }        
     }
 
     public void setTextAligment(int align) {

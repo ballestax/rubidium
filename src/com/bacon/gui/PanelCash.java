@@ -25,12 +25,15 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.EventObject;
+import java.util.logging.Level;
 import javax.swing.AbstractCellEditor;
 import javax.swing.BorderFactory;
 import static javax.swing.BorderFactory.createLineBorder;
+import javax.swing.DefaultListSelectionModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JMenuItem;
@@ -42,6 +45,8 @@ import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.border.EtchedBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import org.apache.log4j.Logger;
@@ -52,7 +57,7 @@ import org.dz.PanelCapturaMod;
  *
  * @author lrod
  */
-public class PanelCash extends PanelCapturaMod implements ActionListener, PropertyChangeListener {
+public class PanelCash extends PanelCapturaMod implements ActionListener, ListSelectionListener, PropertyChangeListener {
 
     private final Aplication app;
     private Cycle cycle;
@@ -65,6 +70,7 @@ public class PanelCash extends PanelCapturaMod implements ActionListener, Proper
     private ImageIcon icClose;
     private JPopupMenu popupTable;
     private com.bacon.gui.util.MyPopupListener popupListenerTabla;
+    private String colSelection;
 
     /**
      * Creates new form PanelCash
@@ -102,7 +108,7 @@ public class PanelCash extends PanelCapturaMod implements ActionListener, Proper
         btRefresh.setActionCommand(AC_REFRESH);
         btRefresh.addActionListener(this);
         btRefresh.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "update.png", 32, 32)));
-        
+
         btRefresh1.setActionCommand(AC_OPEN_CASH);
         btRefresh1.addActionListener(this);
         btRefresh1.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "cashdrawer.png", 32, 32)));
@@ -114,7 +120,7 @@ public class PanelCash extends PanelCapturaMod implements ActionListener, Proper
         decimalFormat = app.getDCFORM_W();
 
         tableInvoices.setModel(model);
-        tableInvoices.setRowHeight(22);
+        tableInvoices.setRowHeight(24);
         Font f = new Font("Sans", 0, 14);
         int[] colW = new int[]{40, 100, 45, 45, 20, 40, 30, 25, 25};
         for (int i = 0; i < colW.length; i++) {
@@ -139,7 +145,12 @@ public class PanelCash extends PanelCapturaMod implements ActionListener, Proper
         });
         popupTable.add(item1);
 
-        tableInvoices.addMouseListener(popupListenerTabla);
+        tableInvoices.addMouseListener(popupListenerTabla);        
+        tableInvoices.getTableHeader().setReorderingAllowed(false);
+
+        DefaultListSelectionModel selModel = new DefaultListSelectionModel();
+        selModel.addListSelectionListener(this);
+        tableInvoices.setSelectionModel(selModel);
 
         tableExtras.setModel(modelExt);
         tableExtras.setRowHeight(22);
@@ -235,6 +246,10 @@ public class PanelCash extends PanelCapturaMod implements ActionListener, Proper
         regFilter2.setActionCommand(AC_FILTER);
         regFilter2.addActionListener(this);
 //        regFilter2.setEnabled(false);
+
+        selStatusBar.setOpaque(true);
+        selStatusBar.setBorder(BorderFactory.createEtchedBorder());
+        selStatusBar.setVisible(false);
 
         loadCycle();
 
@@ -403,6 +418,39 @@ public class PanelCash extends PanelCapturaMod implements ActionListener, Proper
             this.cycle = lastCycle;
             showCycle(cycle);
         }
+    }
+
+    @Override
+    public void valueChanged(ListSelectionEvent e) {
+        int[] selectedRows = tableInvoices.getSelectedRows();
+        double total = 0, service = 0;
+
+        for (int selectedRow : selectedRows) {
+            double valInvoice = 0;
+            try {
+                valInvoice = app.getDCFORM_P().parse(tableInvoices.getValueAt(selectedRow, 2).toString()).doubleValue();
+            } catch (ParseException ex) {
+            }
+//            double servInvoice = Double.parseDouble(tableInvoices.getValueAt(selectedRow, 9).toString());
+            total += valInvoice;
+//            service += servInvoice;
+
+        }
+        makeStatusLabelSelecteds(selectedRows.length, total, service);
+    }
+
+    private void makeStatusLabelSelecteds(int rows, double tot, double serv) {
+
+        if (rows > 0) {
+            selStatusBar.setVisible(true);
+            selStatusBar.setText("<html>  <font color=" + colSelection + ">Selección</font> [<font color=blue>" + (rows)
+                    + "</font> pedidos]  "
+//                    + "Servicio: <font color=green>" + app.DCFORM_P.format(serv)
+                    + "</font> - Total: <font color=blue>" + app.DCFORM_P.format(tot) + "</font></html>");
+        } else {
+            selStatusBar.setText("");
+            selStatusBar.setVisible(false);
+        }
 
     }
 
@@ -446,6 +494,7 @@ public class PanelCash extends PanelCapturaMod implements ActionListener, Proper
         tableExtras = new javax.swing.JTable();
         regFilter2 = new com.bacon.gui.util.Registro(1, "Filter1", new String[0]);
         regFilter1 = new com.bacon.gui.util.Registro(1, "Filter1", new String[0]);
+        selStatusBar = new javax.swing.JLabel();
 
         jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
@@ -648,7 +697,8 @@ public class PanelCash extends PanelCapturaMod implements ActionListener, Proper
                                 .addComponent(regFilter1, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(2, 2, 2)
                                 .addComponent(regFilter2, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(jScrollPane1))
+                            .addComponent(jScrollPane1)
+                            .addComponent(selStatusBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
@@ -673,8 +723,11 @@ public class PanelCash extends PanelCapturaMod implements ActionListener, Proper
                     .addComponent(regFilter1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 449, Short.MAX_VALUE)
-                    .addComponent(jScrollPane3))
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 449, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jScrollPane1)
+                        .addGap(2, 2, 2)
+                        .addComponent(selStatusBar, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -715,6 +768,7 @@ public class PanelCash extends PanelCapturaMod implements ActionListener, Proper
     private javax.swing.JLabel lbTit5;
     private com.bacon.gui.util.Registro regFilter1;
     private com.bacon.gui.util.Registro regFilter2;
+    private javax.swing.JLabel selStatusBar;
     private javax.swing.JTable tableExtras;
     private javax.swing.JTable tableInvoices;
     // End of variables declaration//GEN-END:variables
@@ -775,7 +829,7 @@ public class PanelCash extends PanelCapturaMod implements ActionListener, Proper
             }
             try {
                 fireEditingStopped();
-            } catch (Exception ex) {
+            } catch (Exception ex) {                
                 System.err.println(ex.getMessage());
             }
         }

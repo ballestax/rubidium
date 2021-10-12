@@ -307,7 +307,7 @@ public class JDBCInvoiceDAO implements InvoiceDAO {
                 invoice = new Invoice();
                 invoice.setId(rs.getLong(1));
                 invoice.setFactura(rs.getString(2));
-                invoice.setFecha(rs.getDate(3));
+                invoice.setFecha(rs.getTimestamp(3));
                 invoice.setTipoEntrega(rs.getInt(4));
                 invoice.setValor(rs.getBigDecimal(5));
                 invoice.setNumDeliverys(rs.getInt(6));
@@ -365,7 +365,7 @@ public class JDBCInvoiceDAO implements InvoiceDAO {
                 invoice = new Invoice();
                 invoice.setId(rs.getLong(1));
                 invoice.setFactura(rs.getString(2));
-                invoice.setFecha(rs.getDate(3));
+                invoice.setFecha(rs.getTimestamp(3));
                 invoice.setTipoEntrega(rs.getInt(4));
                 invoice.setValor(rs.getBigDecimal(5));
                 invoice.setNumDeliverys(rs.getInt(6));

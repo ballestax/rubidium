@@ -21,9 +21,10 @@
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
-              <EmptySpace min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="jScrollPane2" alignment="0" max="32767" attributes="0"/>
+                  <Component id="lbIndicator" max="32767" attributes="0"/>
+                  <Component id="jScrollPane2" alignment="1" max="32767" attributes="0"/>
                   <Group type="102" alignment="0" attributes="0">
                       <Component id="regDireccion" max="32767" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
@@ -107,7 +108,7 @@
                       </Group>
                   </Group>
               </Group>
-              <EmptySpace min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -123,7 +124,7 @@
                   <Component id="btInventoryInfo" max="32767" attributes="0"/>
                   <Component id="lbTicket" alignment="0" max="32767" attributes="0"/>
               </Group>
-              <EmptySpace max="-2" attributes="0"/>
+              <EmptySpace min="-2" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="2" attributes="0">
                   <Component id="regCelular" linkSize="2" alignment="2" pref="31" max="32767" attributes="0"/>
                   <Component id="btSearch" linkSize="2" alignment="2" pref="31" max="32767" attributes="0"/>
@@ -132,27 +133,29 @@
                   <Component id="lbCliente" alignment="2" min="-2" pref="31" max="-2" attributes="0"/>
                   <Component id="btLastDelivery" alignment="2" min="-2" pref="31" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace max="-2" attributes="0"/>
+              <EmptySpace min="-2" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="1" attributes="0">
                   <Component id="regMesera" min="-2" pref="30" max="-2" attributes="0"/>
                   <Component id="regMesa" min="-2" pref="30" max="-2" attributes="0"/>
                   <Component id="lbCliente1" min="-2" pref="31" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace max="-2" attributes="0"/>
+              <EmptySpace min="-2" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" max="-2" attributes="0">
                   <Component id="regDireccion" linkSize="2" pref="27" max="32767" attributes="0"/>
                   <Component id="chRecogido" max="32767" attributes="0"/>
               </Group>
-              <EmptySpace max="-2" attributes="0"/>
-              <Component id="jScrollPane2" pref="107" max="32767" attributes="0"/>
-              <EmptySpace max="-2" attributes="0"/>
+              <EmptySpace min="-2" pref="2" max="-2" attributes="0"/>
+              <Component id="lbIndicator" min="-2" pref="5" max="-2" attributes="0"/>
+              <EmptySpace min="-2" pref="4" max="-2" attributes="0"/>
+              <Component id="jScrollPane2" pref="79" max="32767" attributes="0"/>
+              <EmptySpace min="-2" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="2" attributes="0">
                   <Component id="regDomicilio" linkSize="3" alignment="2" min="-2" pref="30" max="-2" attributes="0"/>
                   <Component id="lbEntregas" linkSize="3" alignment="2" min="-2" pref="31" max="-2" attributes="0"/>
                   <Component id="spNumDom" linkSize="3" alignment="2" min="-2" max="-2" attributes="0"/>
                   <Component id="regSubtotal" linkSize="3" alignment="2" min="-2" pref="30" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace max="-2" attributes="0"/>
+              <EmptySpace min="-2" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="2" attributes="0">
                   <Component id="tfService" linkSize="3" alignment="2" min="-2" max="-2" attributes="0"/>
                   <Component id="regService" linkSize="3" alignment="2" min="-2" pref="30" max="-2" attributes="0"/>
@@ -168,7 +171,7 @@
                   <Component id="btConfirm" alignment="2" min="-2" pref="33" max="-2" attributes="0"/>
                   <Component id="filler1" alignment="2" min="-2" pref="10" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace max="-2" attributes="0"/>
+              <EmptySpace min="-2" max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -455,6 +458,8 @@
           </Border>
         </Property>
       </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="lbIndicator">
     </Component>
   </SubComponents>
 </Form>

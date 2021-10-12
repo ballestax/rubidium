@@ -9,6 +9,7 @@ import com.bacon.Aplication;
 import com.bacon.Configuration;
 import com.bacon.GUIManager;
 import com.bacon.MyConstants;
+import com.bacon.domain.Backup;
 import com.bacon.domain.Client;
 import com.bacon.domain.ConfigDB;
 import com.bacon.domain.Cycle;
@@ -22,6 +23,7 @@ import com.bacon.domain.Table;
 import com.bacon.domain.Waiter;
 import com.bacon.gui.util.MyPopupListener;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Font;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
@@ -47,7 +49,9 @@ import java.util.Set;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
@@ -55,6 +59,7 @@ import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingWorker;
+import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
@@ -62,6 +67,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
+import jdk.internal.org.jline.utils.Colors;
 import org.apache.commons.collections.keyvalue.MultiKey;
 import org.apache.commons.collections.map.MultiValueMap;
 import org.apache.commons.lang3.StringUtils;
@@ -72,6 +78,8 @@ import org.bx.gui.MyDefaultTableModel;
 import org.dz.MyDialogEsc;
 import org.dz.PanelCapturaMod;
 import org.dz.TextFormatter;
+import org.dz.Utiles;
+import org.dzur.Util;
 import org.jsoup.Jsoup;
 import org.ocpsoft.prettytime.Duration;
 import org.ocpsoft.prettytime.PrettyTime;
@@ -444,13 +452,23 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
         ArrayList<Table> tables = app.getControl().getTableslList("", "");
 
         ArrayList<Waiter> waiters = app.getControl().getWaitresslList("status=1", "name");
+        waiters.add(0, new Waiter("-----", 0));
+        regMesera.setText(waiters.toArray());
+        regMesera.setFontCampo(new Font("Sans", 1, 16));
+        ((JComboBox) regMesera.getComponent()).setRenderer(new WaiterListCellRender());
+        regMesera.setActionCommand(AC_CHANGE_SELECTED);
+        regMesera.addActionListener(this);
+
+        lbIndicator.setBorder(BorderFactory.createEtchedBorder());
+        lbIndicator.setOpaque(true);
+        lbIndicator.setVisible(false);
 
         org.balx.TextFormato tForm = new TextFormato();
         regCelular.setDocument(tForm.getLimitadorNumeros());
         regCelular.setActionCommand(AC_SEARCH_CLIENT);
         regCelular.addActionListener(this);
 
-        regMesera.setText(waiters.toArray());
+        regMesa.setFontCampo(new Font("Sans", 1, 16));
         regMesa.setText(tables.toArray());
 
 //        regService.setEnabled(true);
@@ -490,9 +508,10 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
         sw.execute();
 
         lbFactura.addMouseListener(lbFacturaMouseListener);
-        
+
 //        showAlertCycle();
     }
+    private static final String AC_CHANGE_SELECTED = "AC_CHANGE_SELECTED";
     public static final String AC_CHECK_RECOGIDO = "AC_CHECK_RECOGIDO";
 
     public static final String AC_PRINT_ORDER = "AC_PRINT_ORDER";
@@ -524,7 +543,7 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
             Date init = lastCycle.getInit();
             List<Duration> presDur = pt.calculatePreciseDuration(init);
             String formatDuration = pt.formatDuration(presDur);
-    
+
         }
     }
 
@@ -811,6 +830,17 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
             Invoice invoice1 = getInvoice();
             app.getControl().updateInvoiceFull(invoice1, oldProducts);
             block = true;
+        } else if (AC_CHANGE_SELECTED.equals(e.getActionCommand())) {
+            Waiter waitres = (Waiter) regMesera.getSelectedItem();
+            Color color = Color.BLACK;
+            try {
+                color = Color.decode(waitres.getColor());
+            } catch (Exception ex) {
+            }
+            regMesera.setForeground(color);
+            lbIndicator.setBackground(color);
+            lbIndicator.setVisible(regMesera.getSelected() > 0);
+
         }
     }
 
@@ -1210,6 +1240,7 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
         mapInventory.clear();
         modeloTb.setRowCount(0);
         regDomicilio.setSelected(0);
+        regMesera.setSelected(0);
         regCelular.setText("");
         regDireccion.setText("");
         regDescuento.setText("0");
@@ -1379,7 +1410,7 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
         Table table = (Table) regMesa.getSelectedItem();
         boolean validate = true;
         if (TIPO_LOCAL == tipo) {
-            if (waitres == null) {
+            if (waitres == null || regMesera.getSelected() < 1) {
                 regMesera.setBorderToError();
                 validate = false;
             }
@@ -1541,7 +1572,7 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
         Table table = (Table) regMesa.getSelectedItem();
         boolean validate = true;
         if (TIPO_LOCAL == tipo) {
-            if (waitres == null) {
+            if (waitres == null || regMesera.getSelected() < 1) {
                 regMesera.setBorderToError();
                 validate = false;
             }
@@ -1789,6 +1820,7 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
         btClear.setVisible(true);
 //        btLastDelivery.setVisible(true);
         regMesera.setVisible(false);
+        lbIndicator.setVisible(false);
         regMesa.setVisible(false);
         regService.setVisible(false);
         tfService.setVisible(false);
@@ -1824,6 +1856,7 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
         lbTitle.setForeground(colorLocal.darker());
 //        this.setBackground(colorLocal.brighter());
         regMesera.setTint(colorLocal);
+        lbIndicator.setVisible(regMesera.getSelected()>0);
         regMesa.setTint(colorLocal);
 
         jScrollPane2.setBorder(BorderFactory.createLineBorder(colorLocal, 1, true));
@@ -1909,6 +1942,7 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
         btLastDelivery = new javax.swing.JButton();
         lbCliente1 = new javax.swing.JLabel();
         lbTicket = new javax.swing.JLabel();
+        lbIndicator = new javax.swing.JLabel();
 
         lbTitle.setFont(new java.awt.Font("Ubuntu", 1, 14)); // NOI18N
         lbTitle.setText("jLabel1");
@@ -1984,7 +2018,8 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane2)
+                    .addComponent(lbIndicator, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(regDireccion, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -2087,8 +2122,10 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(regDireccion, javax.swing.GroupLayout.DEFAULT_SIZE, 27, Short.MAX_VALUE)
                     .addComponent(chRecogido, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 107, Short.MAX_VALUE)
+                .addGap(2, 2, 2)
+                .addComponent(lbIndicator, javax.swing.GroupLayout.PREFERRED_SIZE, 5, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(4, 4, 4)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 79, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
                     .addComponent(regDomicilio, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -2141,6 +2178,7 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
     private javax.swing.JLabel lbDescuento1;
     private javax.swing.JLabel lbEntregas;
     private javax.swing.JLabel lbFactura;
+    private javax.swing.JLabel lbIndicator;
     private javax.swing.JLabel lbStatus;
     private javax.swing.JLabel lbTicket;
     private javax.swing.JLabel lbTitle;
@@ -2180,6 +2218,38 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
                 String text = Jsoup.parse(fact).text();
                 regCelular.setText(text);
             }
+        }
+    }
+
+    public class WaiterListCellRender extends JLabel implements javax.swing.ListCellRenderer<Object> {
+
+        public WaiterListCellRender() {
+            setOpaque(true);
+            setForeground(Util.colorAleatorio());
+            setBorder(BorderFactory.createEmptyBorder(3, 2, 3, 2));
+            setFont(new Font("Sans", 1, 16));
+        }
+
+        @Override
+        public Component getListCellRendererComponent(JList<? extends Object> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+            if (value != null && value instanceof Waiter) {
+                Waiter waiter = (Waiter) value;
+
+                setText(waiter.getName().toUpperCase());
+                Color color = Color.BLACK;
+                try {
+                    color = Color.decode(waiter.getColor());
+                } catch (Exception e) {
+                }
+
+                setForeground(color);
+                if (isSelected) {
+                    setBackground(list.getSelectionBackground());
+                } else {
+                    setBackground(list.getBackground());
+                }
+            }
+            return this;
         }
     }
 

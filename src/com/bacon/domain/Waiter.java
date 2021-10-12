@@ -7,9 +7,10 @@ import java.util.Objects;
  * @author lrod
  */
 public class Waiter {
-    
+
     private int id;
     private String name;
+    private String color;
     private int status;
 
     public Waiter() {
@@ -43,7 +44,15 @@ public class Waiter {
     public void setStatus(int status) {
         this.status = status;
     }
-    
+
+    public String getColor() {
+        return color;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
+    }
+
     @Override
     public String toString() {
         return name.toUpperCase();
@@ -58,8 +67,9 @@ public class Waiter {
             return false;
         }
         Waiter waiter = (Waiter) obj;
-        if(id!=waiter.id)
+        if (id != waiter.id) {
             return false;
+        }
         return name.equalsIgnoreCase(waiter.getName());
     }
 

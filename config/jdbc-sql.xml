@@ -942,6 +942,7 @@
                 id INTEGER AUTO_INCREMENT,
                 name VARCHAR(255),
                 status INTEGER,
+                color VARCHAR(15),
                 PRIMARY KEY (id)
                 )ENGINE=InnoDB DEFAULT CHARSET=latin1;
             </SQLFragment>
