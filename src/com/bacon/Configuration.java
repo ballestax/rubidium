@@ -53,6 +53,9 @@ public class Configuration {
     public static final String DOCUMENT_NAME = "cf.documentname";
     public static final String CLIENT_NAME = "cf.clientname";
     public static final String PROD_ORDER = "cf.order";
+    public static final String NUM_COLUMNS_VIEW1 = "cf.numcolumnsv1";
+    public static final String NUM_COLUMNS_VIEW2 = "cf.numcolumnsv2";
+    
 
     public static final String BS_ID = "cf.tck.id";
     public static final String BS_NAME = "cf.tck.name";

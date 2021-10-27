@@ -39,7 +39,7 @@ public class AppBasic {
                                 "Error en la aplicacion");
                     }
 
-                } catch (BackingStoreException ex) {
+                } catch (Exception ex) {
                     GUIManager.showErrorMessage(null, ex, "Error al iniciar la aplicacion");
                 }
 

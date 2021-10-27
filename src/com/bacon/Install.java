@@ -16,7 +16,7 @@ import java.util.prefs.Preferences;
 public final class Install {
 
     private Preferences registro;
-    private final transient String REG = "/BaconApp/soft";
+    private final transient String REG = "baconapp";
     private static final String CLAVE = "ahbabcbgcd";
     private final transient String REG1 = "/baconapp/inst";
     private static final String CLAVE1 = "vinst";
@@ -42,7 +42,7 @@ public final class Install {
     protected final boolean test() throws BackingStoreException {
         if (registro.nodeExists(REG)) {
             //comprobacion hecha
-            String get = registro.get(REG + "/" + CLAVE, "null");
+            String get = registro.node(REG).get(CLAVE, "null");
             if (!get.equals("null")) {
                 try {
                     
@@ -85,7 +85,7 @@ public final class Install {
     }
 
 //    protected final void writeHash() {
-//        registro.put(REG + "/" + CLAVE, "1821232734");
+//        registro.node(REG).put(CLAVE, "1821232734");
 //        try {
 //            registro.flush();
 //        } catch (Exception e) {

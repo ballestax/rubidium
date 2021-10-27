@@ -636,11 +636,11 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         if (PanelAddItem.AC_ADD_ITEM.equals(evt.getPropertyName())) {
-            populateTable();
+            refreshItemsFiltered();
         } else if (AC_ADD_ITEM_TO_TABLE.equals(evt.getPropertyName())) {
-            populateTable();
+            refreshItemsFiltered();
         } else if (PanelNewConciliacion.ACTION_SAVE_CONCILIACION.equals(evt.getPropertyName())) {
-            populateTable();
+            refreshItemsFiltered();
         }
     }
 
@@ -652,12 +652,8 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
             app.getGuiManager().showPanelSnapShot();
         } else if (AC_LOAD_ITEM.equals(e.getActionCommand())) {
             app.getGuiManager().showPanelSelItem(this);
-        } else if (AC_REFRESH_ITEMS.equals(e.getActionCommand())) {            
-            regFilters.setText(loadFilters().toArray());
-            regFilters.setSelected(filterSelected);
-            regTags.setText(loadTags().toArray());
-            regTags.setSelected(tagSelected);
-            filtrarItems();
+        } else if (AC_REFRESH_ITEMS.equals(e.getActionCommand())) {
+            refreshItemsFiltered();
         } else if (AC_ADD_CONCILIATION.equals(e.getActionCommand())) {
             app.getGuiManager().showPanelConciliacion(true);
         } else if (AC_DOWNLOAD_ITEM.equals(e.getActionCommand())) {
@@ -690,6 +686,19 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
         }
     }
 
+    private void refreshItemsFiltered() {
+        if (regSearch.getText().isEmpty()) {
+            regFilters.setText(loadFilters().toArray());
+            regFilters.setSelected(filterSelected);
+            regTags.setText(loadTags().toArray());
+            regTags.setSelected(tagSelected);
+            filtrarItems();
+        } else {
+            filtrar();
+        }
+
+    }
+
     @Override
     public void valueChanged(ListSelectionEvent e) {
         int row = tableItems.getSelectedRow();
@@ -701,9 +710,6 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
             Item item = app.getControl().getItemWhere("id=" + id);
             pnDetail.showInfoProduct(item);
         } catch (Exception ex) {
-            System.err.println(ex.getMessage());
-//            logger.error(ex.getMessage());
-
         }
     }
 

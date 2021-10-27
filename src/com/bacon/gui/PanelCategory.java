@@ -7,6 +7,8 @@ package com.bacon.gui;
 
 import com.bacon.domain.Category;
 import com.bacon.Aplication;
+import com.bacon.Configuration;
+import com.bacon.domain.ConfigDB;
 import com.bacon.domain.Product;
 import java.awt.Color;
 import java.awt.GridBagConstraints;
@@ -25,8 +27,8 @@ import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.SwingWorker;
 import org.apache.log4j.Logger;
-import org.balx.Utiles;
 import org.dz.PanelCapturaMod;
+import org.dz.Utiles;
 
 /**
  *
@@ -173,8 +175,11 @@ public class PanelCategory extends PanelCapturaMod implements PropertyChangeList
         pnItems.removeAll();
         pnItems.setLayout(new GridBagLayout());
         
+        ConfigDB config = app.getControl().getConfig(Configuration.NUM_COLUMNS_VIEW2);
+        int COLS = config != null ? (int) config.castValor() : 2;
+
         if (products != null) {
-            int COLS = 3;
+            
             int LX = products.size() / COLS;
             int LY = (int) Math.ceil(products.size() / COLS);
             int c = 0;
@@ -216,6 +221,11 @@ public class PanelCategory extends PanelCapturaMod implements PropertyChangeList
         pnItems.removeAll();
         pnItems.setLayout(new GridLayout(0, 2, 10, 10));
         
+        ConfigDB config = app.getControl().getConfig(Configuration.NUM_COLUMNS_VIEW1);
+        int COLS = config != null ? (int) config.castValor() : 2;
+        
+        pnItems.setLayout(new GridLayout(0, COLS, 10, 10));
+
         if (products != null) {
             for (int i = 0; i < products.size(); i++) {
                 PanelProduct2 pnProd2 = mapProdsV1.get(products.get(i).getId());

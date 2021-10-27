@@ -234,6 +234,7 @@ public class PanelTopSearch extends PanelCaptura implements ActionListener {
             pcs.firePropertyChange(AC_CHANGE_SORT, null, cbSort.getSelectedItem());
         } else if (AC_REFRESH_PRODUCTS.equals(e.getActionCommand())) {
             pcs.firePropertyChange(AC_REFRESH_PRODUCTS, null, null);
+            
             if (!regSearch.getText().isEmpty()) {
                 filtrar(regSearch.getText(), 1);
             }

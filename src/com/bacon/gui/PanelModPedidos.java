@@ -8,6 +8,7 @@ package com.bacon.gui;
 import com.bacon.domain.Category;
 import com.bacon.Aplication;
 import com.bacon.Configuration;
+import com.bacon.domain.ConfigDB;
 import com.bacon.domain.Product;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
@@ -21,7 +22,6 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.SwingWorker;
 import org.dz.PanelCapturaMod;
 
 /**
@@ -69,18 +69,21 @@ public class PanelModPedidos extends PanelCapturaMod
 
         panelTopSearch = new PanelTopSearch(app);
         panelTopSearch.addPropertyChangeListener(this);
+        
 
         panelTop.add(panelTopSearch);
 
         panelSelCategory = app.getGuiManager().getPanelSelCategory();
         panelSelCategory.addPropertyChangeListener(this);
+        panelTopSearch.addPropertyChangeListener(panelSelCategory);
 
         categorys = app.getControl().getCategoriesList();
-        int MAX = app.getConfiguration().getProperty(Configuration.MAX_CATEGORIES_LIST, 5);
+        ConfigDB config = app.getControl().getConfig(Configuration.MAX_CATEGORIES_LIST);
+        int MAX = config != null ? (int) config.castValor() : 4;
         if (categorys.size() < MAX) {
             categorys = app.getControl().getAllCategoriesList();
         }
-        categorys.add(0, new Category("TODO"));
+        categorys.add(0, new Category("TODOS"));
 
         panelSelCategory.setCategories(categorys);
 
@@ -97,6 +100,7 @@ public class PanelModPedidos extends PanelCapturaMod
         pnPedido = app.getGuiManager().getPanelPedido();
 
         splitPane.setRightComponent(pnPedido);
+        splitPane.setOneTouchExpandable(true);
 
         productsList = new ArrayList<>();
         loadAllProducts();
@@ -158,7 +162,7 @@ public class PanelModPedidos extends PanelCapturaMod
             this.updateUI();
         } else if (evt.getPropertyName().startsWith(PanelSelCategory.SEL_CAT_)) {
             String cat = evt.getPropertyName().substring(8).toLowerCase();
-
+            
             Comparator<Product> comparator = Comparator.<Product>naturalOrder();
             if (PanelCategory.ORDEN_ALPHA.equalsIgnoreCase(panelCategory.getSelectedSort())) {
                 comparator = compAlpha;
@@ -168,7 +172,7 @@ public class PanelModPedidos extends PanelCapturaMod
 
             List<Product> list = this.productsList;
 
-            if (!"TODO".equalsIgnoreCase(cat)) {
+            if (!"TODO".equalsIgnoreCase(cat) && !"...".equalsIgnoreCase(cat)) {
                 list = productsList.stream().filter(p -> p.getCategory().equalsIgnoreCase(cat)).sorted(comparator).collect(Collectors.toList());
             } else {
                 list = productsList.stream().sorted(comparator).collect(Collectors.toList());

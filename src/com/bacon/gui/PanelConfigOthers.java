@@ -35,6 +35,9 @@ public class PanelConfigOthers extends javax.swing.JPanel implements ActionListe
     private Registro regAllowFact;
     private Registro regAllowPreview;
     private Registro regShowExclusions;
+    private Registro regNumColumnsV1;
+    private Registro regNumColumnsV2;
+    private Registro regNumCategories;
 
     /**
      * Creates new form PanelConfigMotor
@@ -125,6 +128,39 @@ public class PanelConfigOthers extends javax.swing.JPanel implements ActionListe
         cCont.setTitle("Mostrar exclusiones y notas del producto");
         cCont.addCampo(regShowExclusions);
         jPanel1.add(cCont);
+        jPanel1.add(Box.createVerticalStrut(5));
+        
+        regNumColumnsV1 = new Registro(BoxLayout.X_AXIS, "Columnas V1", "", 100);
+        regNumColumnsV1.setBackground(color1);
+        regNumColumnsV1.setFontCampo(font);
+        regNumColumnsV1.setDocument(TextFormatter.getIntegerLimiter());
+        
+        regNumColumnsV2 = new Registro(BoxLayout.X_AXIS, "Columnas V2", "", 100);
+        regNumColumnsV2.setBackground(color1);
+        regNumColumnsV2.setFontCampo(font);
+        regNumColumnsV2.setDocument(TextFormatter.getIntegerLimiter());
+                
+        Box boxHoriz = new Box(BoxLayout.X_AXIS);
+        boxHoriz.add(regNumColumnsV1);
+        boxHoriz.add(Box.createVerticalStrut(4));
+        boxHoriz.add(regNumColumnsV2);
+                
+        cCont = new ConfigCont(app);
+        cCont.setBackgroundTitle(new Color(200,210,220));
+        cCont.setTitle("Numero de columnas en el panel pedidos");
+        cCont.addCampo(boxHoriz);
+        jPanel1.add(cCont);        
+        jPanel1.add(Box.createVerticalStrut(5));
+                
+        regNumCategories = new Registro(BoxLayout.X_AXIS, "Max. Categorias", "", 100);
+        regNumCategories.setBackground(color1);
+        regNumCategories.setFontCampo(font);
+        regNumCategories.setDocument(TextFormatter.getIntegerLimiter());
+        cCont = new ConfigCont(app);
+        cCont.setBackgroundTitle(new Color(200,210,220));
+        cCont.setTitle("Numero de categorias a visualizar");
+        cCont.addCampo(regNumCategories);
+        jPanel1.add(cCont);
         jPanel1.add(Box.createVerticalGlue());
         jPanel1.add(Box.createVerticalStrut(5));
 
@@ -161,6 +197,18 @@ public class PanelConfigOthers extends javax.swing.JPanel implements ActionListe
         config = app.getControl().getConfig(Configuration.INVOICE_OUT_STOCK);
         boolean showOutStock = config != null ? (boolean) config.castValor() : false;
         regAllowFact.setSelected(showOutStock);
+        
+        config = app.getControl().getConfig(Configuration.NUM_COLUMNS_VIEW1);
+        int numColumns1 = config != null ? (int) config.castValor() : 2;
+        regNumColumnsV1.setText(app.getDCFORM_W().format(numColumns1));
+        
+        config = app.getControl().getConfig(Configuration.NUM_COLUMNS_VIEW2);
+        int numColumns2 = config != null ? (int) config.castValor() : 2;
+        regNumColumnsV2.setText(app.getDCFORM_W().format(numColumns2));
+        
+        config = app.getControl().getConfig(Configuration.MAX_CATEGORIES_LIST);
+        int numCategories = config != null ? (int) config.castValor() : 5;
+        regNumCategories.setText(app.getDCFORM_W().format(numCategories));
 
     }
 
@@ -249,6 +297,15 @@ public class PanelConfigOthers extends javax.swing.JPanel implements ActionListe
 
             String docName = regDocName.getText();
             app.getControl().addConfig(new ConfigDB(com.bacon.Configuration.DOCUMENT_NAME, ConfigDB.STRING, docName));
+            
+            String columnsV1 = regNumColumnsV1.getText();
+            app.getControl().addConfig(new ConfigDB(Configuration.NUM_COLUMNS_VIEW1, ConfigDB.INTEGER, columnsV1));
+            
+            String columnsV2 = regNumColumnsV2.getText();
+            app.getControl().addConfig(new ConfigDB(Configuration.NUM_COLUMNS_VIEW2, ConfigDB.INTEGER, columnsV2));
+            
+            String categories = regNumCategories.getText();
+            app.getControl().addConfig(new ConfigDB(Configuration.MAX_CATEGORIES_LIST, ConfigDB.INTEGER, categories));
 
             app.getConfiguration().save();
         }
