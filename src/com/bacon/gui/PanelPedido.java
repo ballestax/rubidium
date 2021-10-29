@@ -9,7 +9,6 @@ import com.bacon.Aplication;
 import com.bacon.Configuration;
 import com.bacon.GUIManager;
 import com.bacon.MyConstants;
-import com.bacon.domain.Backup;
 import com.bacon.domain.Client;
 import com.bacon.domain.ConfigDB;
 import com.bacon.domain.Cycle;
@@ -22,6 +21,7 @@ import com.bacon.domain.ProductoPed;
 import com.bacon.domain.Table;
 import com.bacon.domain.Waiter;
 import com.bacon.gui.util.MyPopupListener;
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
@@ -59,7 +59,6 @@ import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingWorker;
-import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
@@ -67,7 +66,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
-import jdk.internal.org.jline.utils.Colors;
 import org.apache.commons.collections.keyvalue.MultiKey;
 import org.apache.commons.collections.map.MultiValueMap;
 import org.apache.commons.lang3.StringUtils;
@@ -78,7 +76,6 @@ import org.bx.gui.MyDefaultTableModel;
 import org.dz.MyDialogEsc;
 import org.dz.PanelCapturaMod;
 import org.dz.TextFormatter;
-import org.dz.Utiles;
 import org.dzur.Util;
 import org.jsoup.Jsoup;
 import org.ocpsoft.prettytime.Duration;
@@ -175,16 +172,23 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
         lbTitle.setText(docName);
         lbTitle.setToolTipText(getInfoCiclo(app.getControl().getLastCycle()));
 
+        Font font1 = new Font("sans", 1, 11);
+
         btTogle1.setText("Local");
         btTogle1.setActionCommand(AC_SELECT_LOCAL);
         btTogle1.addActionListener(this);
         btTogle1.setSelected(true);
         btTogle1.setForeground(colorLocal);
+        btTogle1.setMargin(new Insets(1, 1, 1, 1));
+        btTogle1.setFont(font1);
 
         btTogle2.setText("Domicilio");
         btTogle2.setActionCommand(AC_SELECT_DELIVERY);
         btTogle2.addActionListener(this);
         btTogle2.setForeground(colorDelivery);
+        btTogle2.setMargin(new Insets(1, 1, 1, 1));
+        btTogle2.setMargin(null);
+        btTogle2.setFont(font1);
 
         btDelete.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "trash.png", 18, 18)));
         btDelete.setActionCommand(AC_DELETE_PEDIDO);
@@ -479,15 +483,14 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
 
         showLabelDescuento();
 
+        containerPanels.setLayout(new BorderLayout());
+
         showDelivery();
 
         block = false;
 
-        lbCliente1.setVisible(false);
-
         calcularValores();
 
-        lbTicket.setVisible(false);
         SwingWorker sw = new SwingWorker() {
             @Override
             protected Object doInBackground() throws Exception {
@@ -507,6 +510,7 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
         };
         sw.execute();
 
+//        containerPanels.setBorder(bordeError);
         lbFactura.addMouseListener(lbFacturaMouseListener);
 
 //        showAlertCycle();
@@ -738,8 +742,7 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
 
                 Invoice lastInvoice = app.getControl().getLastDelivery(lastClient.getCellphone());
 
-                List<Duration> presDur = pt.calculatePreciseDuration(lastInvoice.getFecha());
-
+//                List<Duration> presDur = pt.calculatePreciseDuration(lastInvoice.getFecha());
                 htmlText.append("Cliente: ").append("<font color=blue size=+1>").append(lastClient.getCellphone()).append("</font>");
                 if (lastInvoice != null) {
                     htmlText.append("<br>");
@@ -818,7 +821,6 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
                 btConfirm.setActionCommand(AC_CONFIRMAR_PEDIDO);
                 btConfirm.setText("GUARDAR");
 
-                lbCliente1.setVisible(false);
                 lbCliente.setText("");
 
                 btPrint.setVisible(false);
@@ -1250,7 +1252,6 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
         btConfirm.setActionCommand(AC_CONFIRMAR_PEDIDO);
         btConfirm.setText("CONFIRMAR");
 
-        lbCliente1.setVisible(false);
         calcularValores();
     }
 
@@ -1319,9 +1320,6 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
             chServ.setSelected(invoice.isService());
             regService.setText(String.valueOf(invoice.getPorcService()));
 
-            lbCliente1.setVisible(true);
-            lbCliente1.setText(text);
-
         } else {
 
             showDelivery();
@@ -1340,7 +1338,6 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
                 regDomicilio.setSelected(1);
             }
 
-            lbCliente1.setVisible(false);
             lbCliente.setText(text);
 
         }
@@ -1844,7 +1841,9 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
         lbDescuento1.setBorder(border);
         chServ.setBorder(border);
 
-        lbCliente1.setVisible(false);
+        containerPanels.removeAll();
+        containerPanels.add(pnContDelivery);
+        containerPanels.updateUI();
 
     }
 
@@ -1856,7 +1855,7 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
         lbTitle.setForeground(colorLocal.darker());
 //        this.setBackground(colorLocal.brighter());
         regMesera.setTint(colorLocal);
-        lbIndicator.setVisible(regMesera.getSelected()>0);
+        lbIndicator.setVisible(regMesera.getSelected() > 0);
         regMesa.setTint(colorLocal);
 
         jScrollPane2.setBorder(BorderFactory.createLineBorder(colorLocal, 1, true));
@@ -1895,6 +1894,10 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
         lbDescuento1.setBorder(border);
         chServ.setBorder(border);
 
+        containerPanels.removeAll();
+        containerPanels.add(pnContService);
+        containerPanels.updateUI();
+
     }
 
     /**
@@ -1907,6 +1910,14 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
     private void initComponents() {
 
         buttonGroup1 = new javax.swing.ButtonGroup();
+        pnContDelivery = new javax.swing.JPanel();
+        lbEntregas = new javax.swing.JLabel();
+        spNumDom = new javax.swing.JSpinner();
+        regDomicilio = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Entrega",new String[1],60);
+        pnContService = new javax.swing.JPanel();
+        regService = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Servicio","",70);
+        tfService = new javax.swing.JTextField();
+        chServ = new javax.swing.JCheckBox();
         lbTitle = new javax.swing.JLabel();
         regCelular = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS,"","", 70);
         regDireccion = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS,"","",70);
@@ -1915,10 +1926,7 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
         regDescuento = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS,"","");
         regTotal = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS,"","",60);
         regSubtotal = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "","",60);
-        regService = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Servicio","",70);
-        regDomicilio = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Entrega",new String[1],60);
         lbDescuento1 = new javax.swing.JLabel();
-        lbEntregas = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
         tbListado = new javax.swing.JTable();
         jPanel1 = new javax.swing.JPanel();
@@ -1931,18 +1939,67 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
         lbStatus = new javax.swing.JLabel();
         lbFactura = new javax.swing.JLabel();
         btPrint = new javax.swing.JButton();
-        tfService = new javax.swing.JTextField();
-        chServ = new javax.swing.JCheckBox();
         btPrint1 = new javax.swing.JButton();
         btClear = new javax.swing.JButton();
         chRecogido = new javax.swing.JCheckBox();
-        spNumDom = new javax.swing.JSpinner();
-        filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0), new java.awt.Dimension(32767, 0));
         btInventoryInfo = new javax.swing.JButton();
         btLastDelivery = new javax.swing.JButton();
-        lbCliente1 = new javax.swing.JLabel();
-        lbTicket = new javax.swing.JLabel();
         lbIndicator = new javax.swing.JLabel();
+        containerPanels = new javax.swing.JPanel();
+
+        lbEntregas.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(233, 235, 4)));
+        lbEntregas.setMinimumSize(new java.awt.Dimension(80, 31));
+        lbEntregas.setPreferredSize(new java.awt.Dimension(100, 31));
+
+        javax.swing.GroupLayout pnContDeliveryLayout = new javax.swing.GroupLayout(pnContDelivery);
+        pnContDelivery.setLayout(pnContDeliveryLayout);
+        pnContDeliveryLayout.setHorizontalGroup(
+            pnContDeliveryLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnContDeliveryLayout.createSequentialGroup()
+                .addComponent(regDomicilio, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(spNumDom, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(6, 6, 6)
+                .addComponent(lbEntregas, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(2, 2, 2))
+        );
+        pnContDeliveryLayout.setVerticalGroup(
+            pnContDeliveryLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnContDeliveryLayout.createSequentialGroup()
+                .addGap(1, 1, 1)
+                .addGroup(pnContDeliveryLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                    .addComponent(regDomicilio, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lbEntregas, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(spNumDom, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(1, 1, 1))
+        );
+
+        chServ.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        chServ.setOpaque(true);
+
+        javax.swing.GroupLayout pnContServiceLayout = new javax.swing.GroupLayout(pnContService);
+        pnContService.setLayout(pnContServiceLayout);
+        pnContServiceLayout.setHorizontalGroup(
+            pnContServiceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnContServiceLayout.createSequentialGroup()
+                .addGap(2, 2, 2)
+                .addComponent(chServ, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(regService, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(tfService, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(2, 2, 2))
+        );
+        pnContServiceLayout.setVerticalGroup(
+            pnContServiceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnContServiceLayout.createSequentialGroup()
+                .addGap(1, 1, 1)
+                .addGroup(pnContServiceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                    .addComponent(tfService, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(regService, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chServ, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(1, 1, 1))
+        );
 
         lbTitle.setFont(new java.awt.Font("Ubuntu", 1, 14)); // NOI18N
         lbTitle.setText("jLabel1");
@@ -1953,10 +2010,6 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
 
         regSubtotal.setMinimumSize(new java.awt.Dimension(160, 31));
         regSubtotal.setPreferredSize(new java.awt.Dimension(160, 31));
-
-        lbEntregas.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(233, 235, 4)));
-        lbEntregas.setMinimumSize(new java.awt.Dimension(80, 31));
-        lbEntregas.setPreferredSize(new java.awt.Dimension(100, 31));
 
         tbListado.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -1976,12 +2029,12 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(1, 1, 1)
-                .addComponent(btTogle1, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(1, 1, 1)
-                .addComponent(btTogle2, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(1, 1, 1))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(btTogle1, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btTogle2, javax.swing.GroupLayout.DEFAULT_SIZE, 90, Short.MAX_VALUE)
+                .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1999,17 +2052,18 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
         lbFactura.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         lbFactura.setBorder(javax.swing.BorderFactory.createCompoundBorder(javax.swing.BorderFactory.createEtchedBorder(), javax.swing.BorderFactory.createEmptyBorder(1, 5, 1, 5)));
 
-        chServ.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-        chServ.setOpaque(true);
-
         chRecogido.setFont(new java.awt.Font("Ubuntu", 0, 14)); // NOI18N
 
-        lbCliente1.setBorder(javax.swing.BorderFactory.createLineBorder(java.awt.Color.lightGray));
-
-        lbTicket.setFont(new java.awt.Font("Ubuntu", 1, 14)); // NOI18N
-        lbTicket.setForeground(new java.awt.Color(1, 41, 103));
-        lbTicket.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        lbTicket.setBorder(javax.swing.BorderFactory.createCompoundBorder(javax.swing.BorderFactory.createEtchedBorder(), javax.swing.BorderFactory.createEmptyBorder(1, 5, 1, 5)));
+        javax.swing.GroupLayout containerPanelsLayout = new javax.swing.GroupLayout(containerPanels);
+        containerPanels.setLayout(containerPanelsLayout);
+        containerPanelsLayout.setHorizontalGroup(
+            containerPanelsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+        containerPanelsLayout.setVerticalGroup(
+            containerPanelsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -2024,75 +2078,53 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
                         .addComponent(regDireccion, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(chRecogido, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(regDomicilio, javax.swing.GroupLayout.PREFERRED_SIZE, 157, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(spNumDom, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(0, 0, 0)
-                                .addComponent(lbEntregas, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(chServ, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(regService, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(tfService, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(btConfirm, javax.swing.GroupLayout.PREFERRED_SIZE, 94, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btPrint, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btPrint1, javax.swing.GroupLayout.PREFERRED_SIZE, 93, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(filler1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(4, 4, 4)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(regDescuento, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(1, 1, 1)
-                                .addComponent(lbDescuento1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                            .addComponent(regSubtotal, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(regTotal, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(lbTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(lbTitle)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(lbFactura, javax.swing.GroupLayout.PREFERRED_SIZE, 93, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(lbTicket, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(lbFactura, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btInventoryInfo, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btDelete, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(regMesera, javax.swing.GroupLayout.DEFAULT_SIZE, 177, Short.MAX_VALUE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(regMesa, javax.swing.GroupLayout.DEFAULT_SIZE, 177, Short.MAX_VALUE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(regCelular, javax.swing.GroupLayout.PREFERRED_SIZE, 244, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btClear, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(2, 2, 2)
-                                .addComponent(lbStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(regCelular, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                        .addComponent(btSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btClear, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(6, 6, 6)
+                        .addComponent(lbStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(lbCliente, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(1, 1, 1)
+                        .addComponent(btLastDelivery, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(regMesera, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(6, 6, 6)
+                        .addComponent(regMesa, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(26, 26, 26))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(lbCliente, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                                .addGap(1, 1, 1)
-                                .addComponent(btLastDelivery, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(lbCliente1, javax.swing.GroupLayout.DEFAULT_SIZE, 167, Short.MAX_VALUE))))
-                .addContainerGap())
+                                .addComponent(btConfirm, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btPrint, javax.swing.GroupLayout.PREFERRED_SIZE, 82, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btPrint1, javax.swing.GroupLayout.PREFERRED_SIZE, 82, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(containerPanels, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                .addComponent(regDescuento, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(6, 6, 6)
+                                .addComponent(lbDescuento1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(regTotal, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(regSubtotal, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))))
         );
 
         layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {btDelete, btInventoryInfo});
-
-        layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {btPrint, btPrint1});
 
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -2103,21 +2135,21 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
                     .addComponent(lbTitle, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(lbFactura, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btInventoryInfo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(lbTicket, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(btInventoryInfo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
-                    .addComponent(regCelular, javax.swing.GroupLayout.DEFAULT_SIZE, 31, Short.MAX_VALUE)
-                    .addComponent(btSearch, javax.swing.GroupLayout.DEFAULT_SIZE, 31, Short.MAX_VALUE)
-                    .addComponent(btClear, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lbStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lbCliente, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btLastDelivery, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                            .addComponent(lbStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lbCliente, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btLastDelivery, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btClear, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(regCelular, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 31, Short.MAX_VALUE))
+                    .addComponent(btSearch, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 31, Short.MAX_VALUE))
+                .addGap(7, 7, 7)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(regMesera, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(regMesa, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lbCliente1, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(regMesa, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(regDireccion, javax.swing.GroupLayout.DEFAULT_SIZE, 27, Short.MAX_VALUE)
@@ -2125,33 +2157,26 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
                 .addGap(2, 2, 2)
                 .addComponent(lbIndicator, javax.swing.GroupLayout.PREFERRED_SIZE, 5, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(4, 4, 4)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 79, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 72, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
-                    .addComponent(regDomicilio, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lbEntregas, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(spNumDom, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(regSubtotal, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
-                    .addComponent(tfService, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(regService, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chServ, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(regDescuento, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE)
-                    .addComponent(lbDescuento1, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(regSubtotal, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(containerPanels, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
                     .addComponent(btPrint1, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(regTotal, javax.swing.GroupLayout.PREFERRED_SIZE, 30, Short.MAX_VALUE)
                     .addComponent(btPrint, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btConfirm, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(filler1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap())
+                    .addComponent(btConfirm, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(3, 3, 3)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                    .addComponent(regDescuento, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE)
+                    .addComponent(lbDescuento1, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)))
         );
 
         layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {btSearch, regCelular, regDireccion});
 
-        layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {lbDescuento1, lbEntregas, regDescuento, regDomicilio, regService, regSubtotal, regTotal, spNumDom, tfService});
+        layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {lbDescuento1, regDescuento, regSubtotal, regTotal});
 
     }// </editor-fold>//GEN-END:initComponents
 
@@ -2170,18 +2195,18 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JCheckBox chRecogido;
     private javax.swing.JCheckBox chServ;
-    private javax.swing.Box.Filler filler1;
+    private javax.swing.JPanel containerPanels;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JLabel lbCliente;
-    private javax.swing.JLabel lbCliente1;
     private javax.swing.JLabel lbDescuento1;
     private javax.swing.JLabel lbEntregas;
     private javax.swing.JLabel lbFactura;
     private javax.swing.JLabel lbIndicator;
     private javax.swing.JLabel lbStatus;
-    private javax.swing.JLabel lbTicket;
     private javax.swing.JLabel lbTitle;
+    private javax.swing.JPanel pnContDelivery;
+    private javax.swing.JPanel pnContService;
     private com.bacon.gui.util.Registro regCelular;
     private com.bacon.gui.util.Registro regDescuento;
     private com.bacon.gui.util.Registro regDireccion;

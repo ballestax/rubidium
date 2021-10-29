@@ -63,7 +63,7 @@ public class PanelSelCategory extends PanelCapturaMod implements ActionListener 
         if (categories != null) {
             for (int i = 0; i < categories.size() && i <= MAX; i++) {
                 JButton btCategory = new JButton();
-                btCategory.setBackground(Utiles.colorAleatorio(125, 255));
+                btCategory.setBackground(categories.get(i).getColor());
                 btCategory.setMargin(new Insets(1, 1, 1, 1));
                 String name = categories.get(i).getName().toUpperCase();
                 btCategory.setText(name);

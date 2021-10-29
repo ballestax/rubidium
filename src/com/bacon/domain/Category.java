@@ -5,6 +5,7 @@
  */
 package com.bacon.domain;
 
+import java.awt.Color;
 import java.util.Objects;
 
 /**
@@ -14,6 +15,7 @@ import java.util.Objects;
 public class Category {
 
     private String name;
+    private Color color;
 
     public Category(String name) {
         this.name = name;
@@ -25,6 +27,14 @@ public class Category {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Color getColor() {
+        return color;
+    }
+
+    public void setColor(Color color) {
+        this.color = color;
     }
 
     @Override
@@ -50,8 +60,5 @@ public class Category {
         hash = 89 * hash + Objects.hashCode(this.name);
         return hash;
     }
-    
-    
-    
 
 }
