@@ -1974,6 +1974,8 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
                 .addGap(1, 1, 1))
         );
 
+        pnContDeliveryLayout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {lbEntregas, regDomicilio, spNumDom});
+
         chServ.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         chServ.setOpaque(true);
 
@@ -1997,9 +1999,11 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
                 .addGroup(pnContServiceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
                     .addComponent(tfService, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(regService, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chServ, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(chServ, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(1, 1, 1))
         );
+
+        pnContServiceLayout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {chServ, regService, tfService});
 
         lbTitle.setFont(new java.awt.Font("Ubuntu", 1, 14)); // NOI18N
         lbTitle.setText("jLabel1");
@@ -2062,7 +2066,7 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
         );
         containerPanelsLayout.setVerticalGroup(
             containerPanelsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
+            .addGap(0, 33, Short.MAX_VALUE)
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -2157,7 +2161,7 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
                 .addGap(2, 2, 2)
                 .addComponent(lbIndicator, javax.swing.GroupLayout.PREFERRED_SIZE, 5, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(4, 4, 4)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 72, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 68, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(regSubtotal, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -2176,7 +2180,7 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
 
         layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {btSearch, regCelular, regDireccion});
 
-        layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {lbDescuento1, regDescuento, regSubtotal, regTotal});
+        layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {btConfirm, btPrint, btPrint1, containerPanels, lbDescuento1, regDescuento, regSubtotal, regTotal});
 
     }// </editor-fold>//GEN-END:initComponents
 

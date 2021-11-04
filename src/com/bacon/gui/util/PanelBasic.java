@@ -36,8 +36,8 @@ public class PanelBasic extends javax.swing.JPanel {
 
     private void createComponents(String title, Icon icon, JComponent panel) {
         btBack.setAction(app.getAction(Aplication.ACTION_RETURN_TO_MENU));
-        btBack.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons()+"go-home.png", 20, 20)));
-        btBack.setText("Inicio");
+        btBack.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons()+"go-home.png", 24, 24)));
+        btBack.setText("");
         lbTitle.setText(title);
         lbTitle.setIcon(icon);
         lbTitle.setBorder(BorderFactory.createEtchedBorder());

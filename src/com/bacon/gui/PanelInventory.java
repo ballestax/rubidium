@@ -63,7 +63,7 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
     private final Aplication app;
     private MyDefaultTableModel model;
     private PanelReportProductDetail pnDetail;
-    public static final Logger logger = Logger.getLogger(PanelInventory.class.getCanonicalName());
+    public static final Logger LOGGER = Logger.getLogger(PanelInventory.class.getCanonicalName());
 
     private JPopupMenu popupTable;
     private MyPopupListener popupListenerTabla;
@@ -99,7 +99,7 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
         JButton btAdd = new JButton();
         btAdd.setName("Agregar");
         btAdd.setFont(f);
-        btAdd.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "shopping-basket-add.png", 24, 24)));
+        btAdd.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "shopping-basket-add.png", 22, 22)));
         btAdd.setActionCommand(AC_SHOW_ADD_ITEM);
         btAdd.addActionListener(this);
         btAdd.setToolTipText("Agregar Item");
@@ -107,55 +107,55 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
         JButton btLoad = new JButton();
         btLoad.setName("Cargar");
         btLoad.setFont(f);
-        btLoad.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "shopping-basket-accept.png", 24, 24)));
+        btLoad.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "shopping-basket-accept.png", 22, 22)));
         btLoad.setActionCommand(AC_LOAD_ITEM);
         btLoad.addActionListener(this);
         btLoad.setToolTipText("Cargar Item");
 
         JButton btDesc = new JButton();
         btDesc.setFont(f);
-        btDesc.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "shopping-basket-remove.png", 24, 24)));
+        btDesc.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "shopping-basket-remove.png", 22, 22)));
         btDesc.setActionCommand(AC_DOWNLOAD_ITEM);
         btDesc.addActionListener(this);
         btDesc.setToolTipText("Descargar Item");
 
         JButton btRefresh = new JButton();
         btRefresh.setFont(f);
-        btRefresh.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "refresh.png", 26, 26)));
+        btRefresh.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "refresh.png", 22, 22)));
         btRefresh.setActionCommand(AC_REFRESH_ITEMS);
         btRefresh.addActionListener(this);
         btRefresh.setToolTipText("Refrescar lista");
 
         JButton btConciliation = new JButton();
         btConciliation.setFont(f);
-        btConciliation.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "shopping-basket-prohibit.png", 24, 24)));
+        btConciliation.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "shopping-basket-prohibit.png", 22, 22)));
         btConciliation.setActionCommand(AC_ADD_CONCILIATION);
         btConciliation.addActionListener(this);
         btConciliation.setToolTipText("Conciliar Item");
 
         JButton btExport = new JButton();
         btExport.setFont(f);
-        btExport.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "export-file.png", 24, 24)));
+        btExport.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "export-file.png", 22, 22)));
         btExport.setActionCommand(AC_EXPORT_TO);
         btExport.addActionListener(this);
         btExport.setToolTipText("Exportar lista");
 
         JButton btSnapShot = new JButton();
         btSnapShot.setFont(f);
-        btSnapShot.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "camera-accept.png", 24, 24)));
+        btSnapShot.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "camera-accept.png", 22, 22)));
         btSnapShot.setActionCommand(AC_SHOW_SNAPSHOT);
         btSnapShot.addActionListener(this);
         btSnapShot.setToolTipText("Ver Snapshot");
 
         ImageIcon searchIcon = new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "search.png", 16, 16));
-        ImageIcon clearIcon = new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "cancel.png", 24, 24));
+        ImageIcon clearIcon = new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "cancel.png", 22, 22));
         ProgAction actionSearch = new ProgAction("", clearIcon, "", 's') {
             @Override
             public void actionPerformed(ActionEvent ev) {
                 cleanSearch();
             }
         };
-        regSearch = new Registro(BoxLayout.X_AXIS, "", "", 150, actionSearch);
+        regSearch = new Registro(BoxLayout.X_AXIS, "", "", 110, actionSearch);
         regSearch.setLabelIcon(searchIcon);
         regSearch.setLabelHorizontalAlignment(SwingConstants.RIGHT);
         regSearch.getDocument().addDocumentListener(new DocumentListener() {
@@ -667,7 +667,7 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
         }
 
         if (e.getActionCommand().equals(AC_EXPORT_TO)) {
-            logger.debug("Exportando...");
+            LOGGER.debug("Exportando...");
             SwingWorker tarea = new SwingWorker() {
                 @Override
                 protected Object doInBackground() throws Exception {

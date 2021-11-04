@@ -5,7 +5,6 @@ import com.bacon.MyConstants;
 import com.bacon.ProgAction;
 import com.bacon.domain.Category;
 import com.bacon.domain.Product;
-import static com.bacon.gui.PanelInventory.logger;
 import static com.bacon.gui.PanelTopSearch.AC_CLEAR_FIELD;
 import com.bacon.gui.util.MyPopupListener;
 import java.awt.Color;
@@ -41,6 +40,7 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableRowSorter;
 import org.bx.gui.MyDefaultTableModel;
 import org.dz.PanelCapturaMod;
+import static com.bacon.gui.PanelInventory.LOGGER;
 
 /**
  *
@@ -226,7 +226,7 @@ public class PanelProducts extends PanelCapturaMod implements ActionListener, Li
 //            pnDetail.showInfoProduct(item);
             showProduct(prod);
         } catch (Exception ex) {
-            logger.error(ex.getMessage());
+            LOGGER.error(ex.getMessage());
         }
     }
 

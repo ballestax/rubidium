@@ -456,12 +456,12 @@ public final class Aplication implements ActionListener, PropertyChangeListener,
             public void actionPerformed(ActionEvent e) {
                 Permission perm = getControl().getPermissionByName("show-products-module");
                 getGuiManager().showBasicPanel(getGuiManager().getPanelBasicProducts(), perm);
-            }
+            }   
         };
         acShowProducts.setSmallIcon(new ImageIcon(imgManager.getImagen(getFolderIcons() + "shopping-bag-purple.png", 25, 25)));
         acShowProducts.setLargeIcon(new ImageIcon(imgManager.getImagen(getFolderIcons() + "shopping-bag-purple.png", 32, 32)));
 
-        acCerrarSesion = new ProgAction("Cerrar secion",
+        acCerrarSesion = new ProgAction("Cerrar sesion",
                 null, "Cerrar la sesion del usuario actual", 'x') {
             public void actionPerformed(ActionEvent e) {
                 getGuiManager().closeSesion();
