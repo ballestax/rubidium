@@ -17,7 +17,7 @@
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
-              <Component id="lbStatus" min="-2" pref="658" max="-2" attributes="0"/>
+              <Component id="lbStatus" min="-2" pref="512" max="-2" attributes="0"/>
               <EmptySpace min="0" pref="0" max="-2" attributes="0"/>
               <Component id="lbStatus1" max="32767" attributes="0"/>
           </Group>
@@ -29,8 +29,8 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
               <Component id="pnFilters" min="-2" max="-2" attributes="0"/>
-              <EmptySpace min="-2" pref="3" max="-2" attributes="0"/>
-              <Component id="jScrollPane1" pref="307" max="32767" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="jScrollPane1" pref="290" max="32767" attributes="0"/>
               <EmptySpace min="-2" pref="3" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="1" attributes="0">
                   <Component id="lbStatus" min="-2" pref="29" max="-2" attributes="0"/>
@@ -54,72 +54,58 @@
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="0" attributes="0">
-                  <EmptySpace min="-2" max="-2" attributes="0"/>
-                  <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace min="-2" max="-2" attributes="0"/>
-                  <Component id="tfBuscar" min="-2" pref="120" max="-2" attributes="0"/>
-                  <EmptySpace min="-2" pref="1" max="-2" attributes="0"/>
-                  <Component id="btBuscar" min="-2" pref="30" max="-2" attributes="0"/>
-                  <EmptySpace min="-2" max="-2" attributes="0"/>
+                  <EmptySpace min="-2" pref="4" max="-2" attributes="0"/>
+                  <Component id="regSearch" min="-2" pref="161" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
                   <Component id="btFilters" min="-2" pref="29" max="-2" attributes="0"/>
+                  <EmptySpace min="-2" pref="3" max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                      <Group type="102" attributes="0">
+                          <Component id="regTipo" min="-2" pref="121" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="regMesero" min="-2" pref="121" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="regProduct" min="-2" pref="184" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="regPeriodo" min="-2" pref="117" max="-2" attributes="0"/>
+                          <EmptySpace min="-2" max="-2" attributes="0"/>
+                          <Component id="regDate" min="-2" pref="124" max="-2" attributes="0"/>
+                      </Group>
+                      <Component id="lbPeriodo1" max="32767" attributes="0"/>
+                  </Group>
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="regTipo" min="-2" pref="121" max="-2" attributes="0"/>
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Component id="regMesero" min="-2" pref="121" max="-2" attributes="0"/>
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Component id="regProduct" min="-2" pref="184" max="-2" attributes="0"/>
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Component id="regPeriodo" min="-2" pref="138" max="-2" attributes="0"/>
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Component id="regDate" min="-2" pref="124" max="-2" attributes="0"/>
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Component id="lbPeriodo" pref="236" max="32767" attributes="0"/>
+                  <Component id="lbPeriodo" pref="319" max="32767" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="btUpdate" min="-2" pref="30" max="-2" attributes="0"/>
                   <EmptySpace min="-2" max="-2" attributes="0"/>
                   <Component id="btConfig" min="-2" pref="30" max="-2" attributes="0"/>
-                  <EmptySpace min="-2" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
         <DimensionLayout dim="1">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Group type="102" attributes="0">
-                  <EmptySpace min="-2" max="-2" attributes="0"/>
+              <Group type="102" alignment="0" attributes="0">
+                  <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="2" attributes="0">
-                      <Component id="btBuscar" linkSize="1" alignment="2" min="-2" pref="29" max="-2" attributes="0"/>
-                      <Component id="tfBuscar" linkSize="1" alignment="2" min="-2" max="-2" attributes="0"/>
-                      <Component id="regTipo" linkSize="1" alignment="2" min="-2" pref="32" max="-2" attributes="0"/>
+                      <Component id="regSearch" alignment="2" min="-2" pref="34" max="-2" attributes="0"/>
+                      <Component id="btFilters" alignment="2" min="-2" pref="31" max="-2" attributes="0"/>
                       <Component id="regMesero" linkSize="1" alignment="2" min="-2" pref="34" max="-2" attributes="0"/>
                       <Component id="regProduct" linkSize="1" alignment="2" min="-2" pref="29" max="-2" attributes="0"/>
                       <Component id="regPeriodo" linkSize="1" alignment="2" min="-2" pref="29" max="-2" attributes="0"/>
-                      <Component id="lbPeriodo" alignment="2" max="32767" attributes="0"/>
-                      <Component id="jLabel1" alignment="2" min="-2" max="-2" attributes="0"/>
-                      <Component id="btConfig" alignment="2" min="-2" pref="29" max="-2" attributes="0"/>
-                      <Component id="btUpdate" alignment="2" min="-2" pref="29" max="-2" attributes="0"/>
-                      <Component id="btFilters" alignment="2" min="-2" pref="31" max="-2" attributes="0"/>
                       <Component id="regDate" linkSize="1" alignment="2" min="-2" pref="29" max="-2" attributes="0"/>
+                      <Component id="lbPeriodo" alignment="2" max="32767" attributes="0"/>
+                      <Component id="btUpdate" alignment="2" min="-2" pref="29" max="-2" attributes="0"/>
+                      <Component id="btConfig" alignment="2" min="-2" pref="29" max="-2" attributes="0"/>
+                      <Component id="regTipo" alignment="0" min="-2" pref="34" max="-2" attributes="0"/>
                   </Group>
-                  <EmptySpace max="32767" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="lbPeriodo1" min="-2" pref="30" max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
       </Layout>
       <SubComponents>
-        <Component class="javax.swing.JLabel" name="jLabel1">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="jLabel1"/>
-          </Properties>
-        </Component>
-        <Component class="javax.swing.JTextField" name="tfBuscar">
-          <Properties>
-            <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-              <Font name="Ubuntu" size="18" style="0"/>
-            </Property>
-          </Properties>
-        </Component>
-        <Component class="javax.swing.JButton" name="btBuscar">
-        </Component>
         <Component class="com.bacon.gui.util.Registro" name="regTipo">
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.bacon.gui.util.Registro(BoxLayout.Y_AXIS, &quot;Tipo&quot;, new String[0])"/>
@@ -156,6 +142,17 @@
             <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.bacon.gui.util.Registro(BoxLayout.Y_AXIS, &quot;Fecha&quot;, datePick1)"/>
             <AuxValue name="JavaCodeGenerator_CreateCodePre" type="java.lang.String" value="datePick1 = new MyDatePickerImp(new Date(), true);"/>
           </AuxValues>
+        </Component>
+        <Component class="com.bacon.gui.util.Registro" name="regSearch">
+          <AuxValues>
+            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, &quot;&quot;, &quot;&quot;, 80, actionSearch)"/>
+            <AuxValue name="JavaCodeGenerator_CreateCodePre" type="java.lang.String" value="clearIcon = new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + &quot;delete.png&quot;, 18, 18));&#xa;actionSearch = new ProgAction(&quot;&quot;, clearIcon, &quot;&quot;, &apos;s&apos;) {&#xa;            @Override&#xa;            public void actionPerformed(ActionEvent ev) {&#xa;                cleanSearch();&#xa;            }&#xa;        };"/>
+          </AuxValues>
+        </Component>
+        <Component class="javax.swing.JLabel" name="lbPeriodo1">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="jLabel2"/>
+          </Properties>
         </Component>
       </SubComponents>
     </Container>
