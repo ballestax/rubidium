@@ -206,6 +206,15 @@ public class Control {
         }
     }
 
+    public int existClaveMult(String tabla, String columna, String where) {
+        try {
+            JDBCUtilDAO utilDAO = (JDBCUtilDAO) JDBCDAOFactory.getInstance().getUtilDAO();
+            return utilDAO.existClaveMult(tabla, columna, where);
+        } catch (Exception e) {
+            return -1;
+        }
+    }
+
     public int getMaxIDTabla(String tabla) {
         try {
             JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
@@ -381,9 +390,9 @@ public class Control {
     }
 
     public boolean hasPermission(User user, Permission perm) {
-//        if (perm == null) {
-//            return false;
-//        }
+        if (perm == null) {
+            return false;
+        }
         try {
             JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
             int val = utilDAO.hasPermission(user.getId(), perm.getId());
@@ -419,6 +428,30 @@ public class Control {
             logger.error("Error getting permissions.", ex);
         }
         return null;
+    }
+
+    public boolean addProduct(Product product) {
+        try {
+            JDBCProductDAO prodDAO = (JDBCProductDAO) DAOFactory.getInstance().getProductDAO();
+            prodDAO.addProduct(product);
+            return true;
+        } catch (DAOException ex) {
+            String msg = "Error adding product: " + product.getName();
+            logger.error(msg, ex);
+            GUIManager.showErrorMessage(null, msg, "Error");
+            return false;
+        }
+    }
+
+    public boolean updateProduct(Product prod) {
+        try {
+            JDBCProductDAO prodDAO = (JDBCProductDAO) DAOFactory.getInstance().getProductDAO();
+            prodDAO.updateProduct(prod);
+            return true;
+        } catch (DAOException ex) {
+            logger.error("Error updating Product.", ex);
+            return false;
+        }
     }
 
     public ArrayList<Product> getProductsList(String where, String order) {
@@ -722,6 +755,16 @@ public class Control {
         }
     }
 
+    public ArrayList<Presentation> getAllPresentationsByProduct(long idProduct) {
+        try {
+            JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
+            return utilDAO.getAllPresentationsByProduct(idProduct);
+        } catch (DAOException ex) {
+            logger.error("Error getting Presentations list.", ex);
+            return null;
+        }
+    }
+
     public Presentation getPresentationsById(long idPres) {
         try {
             JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
@@ -965,6 +1008,17 @@ public class Control {
         }
     }
 
+    public ArrayList<String> getCategoriesList(String where, String order) {
+        try {
+            JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
+            return utilDAO.getCategoriesList(where, order);
+        } catch (DAOException ex) {
+            logger.error("Error getting units list.", ex);
+            GUIManager.showErrorMessage(null, "Error consultando lista de unidades", "Error");
+            return null;
+        }
+    }
+
     public void addUnit(String nombre) {
         try {
             JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
@@ -992,6 +1046,58 @@ public class Control {
         } catch (DAOException ex) {
             logger.error("Error updating unit.", ex);
             GUIManager.showErrorMessage(null, "Error updating unidad", "Error");
+        }
+    }
+
+    public void addCategory(String nombre) {
+        try {
+            JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
+            utilDAO.addCategory(nombre);
+        } catch (DAOException ex) {
+            logger.error("Error adding unit.", ex);
+            GUIManager.showErrorMessage(null, "Error agregando unidad", "Error");
+        }
+    }
+
+    public void updateCategory(String nombre, String id) {
+        try {
+            JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
+            utilDAO.updateCategory(nombre, id);
+        } catch (DAOException ex) {
+            logger.error("Error updating unit.", ex);
+            GUIManager.showErrorMessage(null, "Error updating unidad", "Error");
+        }
+    }
+
+    public void addPresentation(Presentation pres) {
+        try {
+            JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
+            utilDAO.addPresentation(pres);
+        } catch (DAOException ex) {
+            logger.error("Error adding unit.", ex);
+            GUIManager.showErrorMessage(null, "Error agregando presentacion", "Error");
+        }
+    }
+
+    public boolean updatePresentation(Presentation pres) {
+        try {
+            JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
+            return utilDAO.updatePresentation(pres);
+        } catch (DAOException ex) {
+            logger.error("Error updating press.", ex);
+            GUIManager.showErrorMessage(null, "Error actualizando presentacion", "Error");
+            return false;
+        }
+    }
+
+    public boolean updatePresentationToDefault(Presentation pres) {
+        try {
+            JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
+            return utilDAO.updatePresentationToDefault(pres);
+        } catch (DAOException ex) {
+            logger.error("Error updating press.", ex);
+            GUIManager.showErrorMessage(null, "Error actualizando presentacion", "Error");
+            return false;
         }
     }
 
@@ -1236,6 +1342,46 @@ public class Control {
             GUIManager.showErrorMessage(null, "Error consultando facturas", "Error");
             return null;
 
+        }
+    }
+
+    public ArrayList<String> getExpensesCategoriesList(String where, String orderBy) {
+        try {
+            JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
+            return utilDAO.getExpensesCategoriesList(where, orderBy);
+        } catch (DAOException ex) {
+            logger.error("Error getting Expenses Categories list.", ex);
+            return null;
+}
+    }
+    
+    public void addExpenseCategory(String nombre) {
+        try {
+            JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
+            utilDAO.addExpenseCategory(nombre);
+        } catch (DAOException ex) {
+            logger.error("Error adding unit.", ex);
+            GUIManager.showErrorMessage(null, "Error agregando unidad", "Error");
+        }
+    }
+
+    public void updateExpenseCategory(String nombre, String id) {
+        try {
+            JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
+            utilDAO.updateExpensesCategory(nombre, id);
+        } catch (DAOException ex) {
+            logger.error("Error updating unit.", ex);
+            GUIManager.showErrorMessage(null, "Error updating unidad", "Error");
+        }
+    }
+    
+    public void addExpenseIncome(HashMap data) {
+        try {
+            JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
+            utilDAO.addExpenseIncome(data);
+        } catch (DAOException ex) {
+            logger.error("Error adding expense-income.", ex);
+            GUIManager.showErrorMessage(null, "Error agregando expense-income", "Error");
         }
     }
 

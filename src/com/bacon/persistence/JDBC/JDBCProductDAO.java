@@ -97,15 +97,15 @@ public class JDBCProductDAO implements ProductDAO {
             rs = retrieve.executeQuery();
             while (rs.next()) {
                 producto = new Product();
-                producto.setId(rs.getInt(1));
-                producto.setName(rs.getString(2));
-                producto.setCode(rs.getString(3));                
-                producto.setDescription(rs.getString(4));
-                producto.setPrice(rs.getBigDecimal(5).doubleValue());
-                producto.setImage(rs.getString(6));
-                producto.setCategory(rs.getString(7));
-                producto.setVariablePrice(rs.getBoolean(8));
-                producto.setEnabled(rs.getBoolean(9));
+                producto.setId(rs.getInt("id"));
+                producto.setName(rs.getString("name"));
+                producto.setCode(rs.getString("code"));                
+                producto.setDescription(rs.getString("description"));
+                producto.setPrice(rs.getBigDecimal("price").doubleValue());
+                producto.setImage(rs.getString("image"));
+                producto.setCategory(rs.getString("category"));
+                producto.setVariablePrice(rs.getBoolean("variable"));
+                producto.setEnabled(rs.getBoolean("enabled"));
             }
         } catch (SQLException e) {
             throw new DAOException("Could not properly retrieve the Product: " + e);
@@ -155,15 +155,15 @@ public class JDBCProductDAO implements ProductDAO {
             
             while (rs.next()) {
                 producto = new Product();
-                producto.setId(rs.getInt(1));
-                producto.setName(rs.getString(2));
-                producto.setCode(rs.getString(3));                
-                producto.setDescription(rs.getString(4));
-                producto.setPrice(rs.getBigDecimal(5).doubleValue());
-                producto.setVariablePrice(rs.getBoolean(6));
-                producto.setImage(rs.getString(7));
-                producto.setCategory(rs.getString(8)); 
-                producto.setEnabled(rs.getBoolean(9));                
+                producto.setId(rs.getInt("id"));
+                producto.setName(rs.getString("name"));
+                producto.setCode(rs.getString("code"));                
+                producto.setDescription(rs.getString("description"));
+                producto.setPrice(rs.getBigDecimal("price").doubleValue());
+                producto.setImage(rs.getString("image"));
+                producto.setCategory(rs.getString("category"));
+                producto.setVariablePrice(rs.getBoolean("variable"));
+                producto.setEnabled(rs.getBoolean("enabled"));             
                 productos.add(producto);
             }
         } catch (SQLException e) {
@@ -279,15 +279,15 @@ public class JDBCProductDAO implements ProductDAO {
             rs = ps.executeQuery();
             while (rs.next()) {
                 producto = new Product();
-                producto.setId(rs.getInt(1));
-                producto.setName(rs.getString(2));
-                producto.setCode(rs.getString(3));                
-                producto.setDescription(rs.getString(4));
-                producto.setPrice(rs.getBigDecimal(5).doubleValue());
-                producto.setVariablePrice(rs.getBoolean(6));
-                producto.setImage(rs.getString(7));
-                producto.setCategory(rs.getString(8));                
-                producto.setEnabled(rs.getBoolean(9));
+                producto.setId(rs.getInt("id"));
+                producto.setName(rs.getString("name"));
+                producto.setCode(rs.getString("code"));                
+                producto.setDescription(rs.getString("description"));
+                producto.setPrice(rs.getBigDecimal("price").doubleValue());
+                producto.setImage(rs.getString("image"));
+                producto.setCategory(rs.getString("category"));
+                producto.setVariablePrice(rs.getBoolean("variable"));
+                producto.setEnabled(rs.getBoolean("enabled"));
                 productos.add(producto);
             }
         } catch (SQLException e) {
@@ -322,15 +322,15 @@ public class JDBCProductDAO implements ProductDAO {
             rs = retrieve.executeQuery();
             while (rs.next()) {
                 producto = new Product();
-                producto.setId(rs.getInt(1));
-                producto.setName(rs.getString(2));
-                producto.setCode(rs.getString(3));                
-                producto.setDescription(rs.getString(4));
-                producto.setPrice(rs.getBigDecimal(5).doubleValue());
-                producto.setImage(rs.getString(6));
-                producto.setCategory(rs.getString(7));
-                producto.setVariablePrice(rs.getBoolean(8));
-                producto.setEnabled(rs.getBoolean(9));
+                producto.setId(rs.getInt("id"));
+                producto.setName(rs.getString("name"));
+                producto.setCode(rs.getString("code"));                
+                producto.setDescription(rs.getString("description"));
+                producto.setPrice(rs.getBigDecimal("price").doubleValue());
+                producto.setImage(rs.getString("image"));
+                producto.setCategory(rs.getString("category"));
+                producto.setVariablePrice(rs.getBoolean("variable"));
+                producto.setEnabled(rs.getBoolean("enabled"));
             }
         } catch (SQLException e) {
             throw new DAOException("Could not properly retrieve the Product: " + e);

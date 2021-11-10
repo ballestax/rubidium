@@ -70,6 +70,7 @@ public class JDBCUtilDAO implements UtilDAO {
     public static final String CREATE_PRODUCT_INGREDIENT_TABLE_KEY = "CREATE_PRODUCT_INGREDIENT_TABLE";
     public static final String GET_INGREDIENTS_BY_PRODUCT_KEY = "GET_INGREDIENTS_BY_PRODUCT";
     public static final String GET_PRESENTATIONS_BY_PRODUCT_KEY = "GET_PRESENTATIONS_BY_PRODUCT";
+    public static final String GET_ALL_PRESENTATIONS_BY_PRODUCT_KEY = "GET_ALL_PRESENTATIONS_BY_PRODUCT";
     public static final String GET_PRODUCTS_BY_VARPRICE_RANK_LIST_KEY = "GET_PRODUCTS_BY_VARPRICE_RANK_LIST";
 
     public static final String CREATE_WAITERS_TABLE_KEY = "CREATE_WAITERS_TABLE";
@@ -106,6 +107,8 @@ public class JDBCUtilDAO implements UtilDAO {
     public static final String ADD_INVOICE_OTHER_PRODUCT_KEY = "ADD_INVOICE_OTHER_PRODUCT";
 
     public static final String CREATE_EXPENSES_INCOMES_TABLE_KEY = "CREATE_EXPENSES_INCOMES_TABLE";
+    public static final String ADD_EXPENSE_INCOME_KEY = "ADD_EXPENSE_INCOME";
+    public static final String CREATE_EXPENSES_CATEGORIES_TABLE_KEY = "CREATE_EXPENSES_CATEGORIES_TABLE";
 
     public static final String CHECK_INVENTORY_KEY = "CHECK_INVENTORY";
     public static final String CHECK_INVENTORY_PRODUCT_KEY = "CHECK_INVENTORY_PRODUCT";
@@ -151,11 +154,26 @@ public class JDBCUtilDAO implements UtilDAO {
 
     public static final String GET_PRODUCTS_SALES_KEY = "GET_PRODUCTS_SALES";
 
+    public static final String CREATE_CATEGORIES_TABLE_KEY = "CREATE_CATEGORIES_TABLE";
+    public static final String GET_CATEGORIES_LIST_KEY = "GET_CATEGORY_PROD";
+    public static final String ADD_CATEGORY_KEY = "ADD_CATEGORY";
+    public static final String UPDATE_CATEGORY_KEY = "UPDATE_CATEGORY";
+    
+    public static final String GET_EXPENSES_CATEGORIES_LIST_KEY = "GET_EXPENSES_CATEGORY";
+    public static final String ADD_EXPENSES_CATEGORY_KEY = "ADD_EXPENSES_CATEGORY";
+    public static final String UPDATE_EXPENSES_CATEGORY_KEY = "UPDATE_EXPENSES_CATEGORY";
+
+    public static final String ADD_PRESENTATION_KEY = "ADD_PRESENTATION";
+    public static final String UPDATE_PRESENTATION_KEY = "UPDATE_PRESENTATION";
+    public static final String UPDATE_PRESENTATION_TO_DEFAULT_KEY = "UPDATE_PRESENTATION_TO_DEFAULT";
+    public static final String UPDATE_PRESENTATION_TO_DEFAULT_BY_ID_KEY = "UPDATE_PRESENTATION_TO_DEFAULT_BY_ID";
+
     private static final Logger logger = Logger.getLogger(JDBCUtilDAO.class.getCanonicalName());
 
     public static final String NAMED_PARAM_KEY = "{key}";
     public static final String GET_MAX_ID_KEY = "GET_MAX_ID";
     public static final String EXIST_CLAVE_KEY = "EXIST_CLAVE";
+    public static final String EXIST_CLAVE_MULT_KEY = "EXIST_CLAVE_MULT";
 
     public JDBCUtilDAO(DataSource dataSource, SQLLoader sqlStatements) {
         this.dataSource = dataSource;
@@ -209,6 +227,9 @@ public class JDBCUtilDAO implements UtilDAO {
         TABLE_NAME = "expenses_incomes";
         createTable(TABLE_NAME, CREATE_EXPENSES_INCOMES_TABLE_KEY);
 
+        TABLE_NAME = "expenses_categories";
+        createTable(TABLE_NAME, CREATE_EXPENSES_CATEGORIES_TABLE_KEY);
+
         TABLE_NAME = "units";
         createTable(TABLE_NAME, CREATE_UNITS_TABLE_KEY);
 
@@ -223,6 +244,9 @@ public class JDBCUtilDAO implements UtilDAO {
 
         TABLE_NAME = "inventory_snapshot";
         createTable(TABLE_NAME, CREATE_INVENTORY_SNAPSHOT_TABLE_KEY);
+
+        TABLE_NAME = "categories";
+        createTable(TABLE_NAME, CREATE_CATEGORIES_TABLE_KEY);
 
     }
 
@@ -270,6 +294,40 @@ public class JDBCUtilDAO implements UtilDAO {
             namedParams.put(JDBCDAOFactory.NAMED_PARAM_QUERY, column);
             namedParams.put(NAMED_PARAM_KEY, code);
             retrieve = sqlStatements.getSQLString(EXIST_CLAVE_KEY, namedParams);
+        } catch (IOException e) {
+            throw new DAOException("Could not properly retrieve the outdated count", e);
+        }
+        Connection conn = null;
+        PreparedStatement pSt = null;
+        ResultSet rs = null;
+        int count = 0;
+        try {
+            conn = dataSource.getConnection();
+            pSt = conn.prepareStatement(retrieve);
+            rs = pSt.executeQuery();
+
+            while (rs.next()) {
+                count = rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            throw new DAOException("Could not properly retrieve the outdated count: " + e);
+        } finally {
+            DBManager.closeResultSet(rs);
+            DBManager.closeStatement(pSt);
+            DBManager.closeConnection(conn);
+        }
+        return count;
+    }
+
+    public int existClaveMult(String table, String column, String where) throws DAOException {
+        String retrieve;
+        try {
+            Map<String, String> namedParams = new HashMap<String, String>();
+            namedParams.put(JDBCDAOFactory.NAMED_PARAM_TABLE, table);
+            namedParams.put(JDBCDAOFactory.NAMED_PARAM_QUERY, column);
+            namedParams.put(NAMED_PARAM_KEY, where);
+            retrieve = sqlStatements.getSQLString(EXIST_CLAVE_MULT_KEY, namedParams);
+            System.out.println("retrieve = " + retrieve);
         } catch (IOException e) {
             throw new DAOException("Could not properly retrieve the outdated count", e);
         }
@@ -992,6 +1050,40 @@ public class JDBCUtilDAO implements UtilDAO {
         return presentations;
     }
 
+    public ArrayList<Presentation> getAllPresentationsByProduct(long id) throws DAOException {
+        ArrayList<Presentation> presentations = new ArrayList<>();
+        Connection conn = null;
+        PreparedStatement retrieve = null;
+        ResultSet rs = null;
+        Object[] parameters = {id};
+        try {
+            conn = dataSource.getConnection();
+            retrieve = sqlStatements.buildSQLStatement(conn, GET_ALL_PRESENTATIONS_BY_PRODUCT_KEY, parameters);
+
+            rs = retrieve.executeQuery();
+            while (rs.next()) {
+                Presentation pres = new Presentation();
+                pres.setId(rs.getInt(1));
+                pres.setIDProd(rs.getInt(2));
+                pres.setSerie(rs.getInt(3));
+                pres.setName(rs.getString(4));
+                pres.setPrice(rs.getDouble(5));
+                pres.setDefault(rs.getBoolean(6));
+                pres.setEnabled(rs.getBoolean(7));
+                presentations.add(pres);
+            }
+        } catch (SQLException e) {
+            throw new DAOException("Could not properly retrieve the presentations list: " + e);
+        } catch (IOException e) {
+            throw new DAOException("Could not properly retrieve the presentations list: " + e);
+        } finally {
+            DBManager.closeResultSet(rs);
+            DBManager.closeStatement(retrieve);
+            DBManager.closeConnection(conn);
+        }
+        return presentations;
+    }
+
     public Presentation getPresentationDefault(long id) throws DAOException {
         Presentation pres = null;
         Connection conn = null;
@@ -1463,6 +1555,141 @@ public class JDBCUtilDAO implements UtilDAO {
         } catch (SQLException | IOException e) {
             DBManager.rollbackConn(conn);
             throw new DAOException("Could not properly update the Unit", e);
+        } finally {
+            DBManager.closeStatement(update);
+            DBManager.closeConnection(conn);
+        }
+    }
+
+    public void addCategory(String category) throws DAOException {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        try {
+            conn = dataSource.getConnection();
+            conn.setAutoCommit(false);
+            Object[] parameters = {
+                category, 1
+            };
+            ps = sqlStatements.buildSQLStatement(conn, ADD_CATEGORY_KEY, parameters);
+            ps.executeUpdate();
+            conn.commit();
+        } catch (SQLException e) {
+            DBManager.rollbackConn(conn);
+            throw new DAOException("Cannot add Category", e);
+        } catch (IOException e) {
+            DBManager.rollbackConn(conn);
+            throw new DAOException("Cannot add Category", e);
+        } finally {
+            DBManager.closeStatement(ps);
+            DBManager.closeConnection(conn);
+        }
+    }
+
+    public void updateCategory(String category, String id) throws DAOException {
+        Connection conn = null;
+        PreparedStatement update = null;
+        String idCategory = "'" + category + "'";
+        try {
+            conn = dataSource.getConnection();
+            conn.setAutoCommit(false);
+            Object[] parameters = {
+                category,
+                id
+            };
+            update = sqlStatements.buildSQLStatement(conn, UPDATE_CATEGORY_KEY, parameters);
+            update.executeUpdate();
+            conn.commit();
+        } catch (SQLException | IOException e) {
+            DBManager.rollbackConn(conn);
+            throw new DAOException("Could not properly update the Category", e);
+        } finally {
+            DBManager.closeStatement(update);
+            DBManager.closeConnection(conn);
+        }
+    }
+
+    public void addPresentation(Presentation presentation) throws DAOException {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        try {
+            conn = dataSource.getConnection();
+            conn.setAutoCommit(false);
+            Object[] parameters = {
+                presentation.getName(),
+                presentation.getPrice(),
+                presentation.getSerie(),
+                presentation.isDefault(),
+                presentation.isEnabled(),
+                presentation.getIDProd()
+            };
+            ps = sqlStatements.buildSQLStatement(conn, ADD_PRESENTATION_KEY, parameters);
+            ps.executeUpdate();
+            conn.commit();
+        } catch (SQLException e) {
+            DBManager.rollbackConn(conn);
+            throw new DAOException("Cannot add Presentation", e);
+        } catch (IOException e) {
+            DBManager.rollbackConn(conn);
+            throw new DAOException("Cannot add Presentation", e);
+        } finally {
+            DBManager.closeStatement(ps);
+            DBManager.closeConnection(conn);
+        }
+    }
+
+    public boolean updatePresentation(Presentation pres) throws DAOException {
+        Connection conn = null;
+        PreparedStatement update = null;
+        try {
+            conn = dataSource.getConnection();
+            conn.setAutoCommit(false);
+            Object[] parameters = {
+                pres.getName(),
+                pres.getPrice(),
+                pres.getSerie(),
+                pres.isDefault(),
+                pres.isEnabled(),
+                pres.getId()
+            };
+            update = sqlStatements.buildSQLStatement(conn, UPDATE_PRESENTATION_KEY, parameters);
+            update.executeUpdate();
+            conn.commit();
+            return true;
+        } catch (SQLException | IOException e) {
+            DBManager.rollbackConn(conn);
+            throw new DAOException("Could not properly update the Category", e);
+        } finally {
+            DBManager.closeStatement(update);
+            DBManager.closeConnection(conn);
+        }
+    }
+
+    public boolean updatePresentationToDefault(Presentation pres) throws DAOException {
+        Connection conn = null;
+        PreparedStatement update = null;
+        try {
+            conn = dataSource.getConnection();
+            conn.setAutoCommit(false);
+            Object[] parameters = {
+                0,
+                pres.getIDProd()
+            };
+            update = sqlStatements.buildSQLStatement(conn, UPDATE_PRESENTATION_TO_DEFAULT_KEY, parameters);
+            update.executeUpdate();
+
+            Object[] parameters1 = {
+                1,
+                pres.getIDProd(),
+                pres.getId()
+            };
+            update = sqlStatements.buildSQLStatement(conn, UPDATE_PRESENTATION_TO_DEFAULT_BY_ID_KEY, parameters1);
+            update.executeUpdate();
+
+            conn.commit();
+            return true;
+        } catch (SQLException | IOException e) {
+            DBManager.rollbackConn(conn);
+            throw new DAOException("Could not properly update the Category", e);
         } finally {
             DBManager.closeStatement(update);
             DBManager.closeConnection(conn);
@@ -2065,6 +2292,162 @@ public class JDBCUtilDAO implements UtilDAO {
         }
         return list;
 
+    }
+
+    public ArrayList<String> getCategoriesList(String where, String orderBy) throws DAOException {
+        String retrieveUnit;
+        ArrayList<String> categories = new ArrayList<>();
+        try {
+            SQLExtractor sqlExtractorWhere = new SQLExtractor(where, SQLExtractor.Type.WHERE);
+            SQLExtractor sqlExtractorOrderBy = new SQLExtractor(orderBy, SQLExtractor.Type.ORDER_BY);
+            Map<String, String> namedParams = new HashMap<>();
+            namedParams.put(NAMED_PARAM_WHERE, sqlExtractorWhere.extractWhere());
+            namedParams.put(NAMED_PARAM_ORDER_BY, sqlExtractorOrderBy.extractOrderBy());
+            retrieveUnit = sqlStatements.getSQLString(GET_CATEGORIES_LIST_KEY, namedParams);
+
+        } catch (SQLException e) {
+            throw new DAOException("Could not properly retrieve the Categories List", e);
+        } catch (IOException e) {
+            throw new DAOException("Could not properly retrieve the Categories List", e);
+}
+
+        Connection conn = null;
+        PreparedStatement retrieve = null;
+        ResultSet rs = null;
+        String category = null;
+        try {
+            conn = dataSource.getConnection();
+            retrieve = conn.prepareStatement(retrieveUnit);
+            rs = retrieve.executeQuery();
+
+            while (rs.next()) {
+                category = rs.getString("name");
+                categories.add(category);
+            }
+        } catch (SQLException e) {
+            throw new DAOException("Could not proper retrieve the Unit: " + e);
+        } finally {
+            DBManager.closeResultSet(rs);
+            DBManager.closeStatement(retrieve);
+            DBManager.closeConnection(conn);
+        }
+        return categories;
+    }
+    
+    public ArrayList<String> getExpensesCategoriesList(String where, String orderBy) throws DAOException {
+        String retrieveUnit;
+        ArrayList<String> categories = new ArrayList<>();
+        try {
+            SQLExtractor sqlExtractorWhere = new SQLExtractor(where, SQLExtractor.Type.WHERE);
+            SQLExtractor sqlExtractorOrderBy = new SQLExtractor(orderBy, SQLExtractor.Type.ORDER_BY);
+            Map<String, String> namedParams = new HashMap<>();
+            namedParams.put(NAMED_PARAM_WHERE, sqlExtractorWhere.extractWhere());
+            namedParams.put(NAMED_PARAM_ORDER_BY, sqlExtractorOrderBy.extractOrderBy());
+            retrieveUnit = sqlStatements.getSQLString(GET_EXPENSES_CATEGORIES_LIST_KEY, namedParams);
+
+        } catch (SQLException e) {
+            throw new DAOException("Could not properly retrieve the Categories List", e);
+        } catch (IOException e) {
+            throw new DAOException("Could not properly retrieve the Categories List", e);
+        }
+
+        Connection conn = null;
+        PreparedStatement retrieve = null;
+        ResultSet rs = null;
+        String category = null;
+        try {
+            conn = dataSource.getConnection();
+            retrieve = conn.prepareStatement(retrieveUnit);
+            rs = retrieve.executeQuery();
+
+            while (rs.next()) {
+                category = rs.getString("category");
+                categories.add(category);
+            }
+        } catch (SQLException e) {
+            throw new DAOException("Could not proper retrieve the Unit: " + e);
+        } finally {
+            DBManager.closeResultSet(rs);
+            DBManager.closeStatement(retrieve);
+            DBManager.closeConnection(conn);
+        }
+        return categories;
+    }
+    
+    public void addExpenseCategory(String category) throws DAOException {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        try {
+            conn = dataSource.getConnection();
+            conn.setAutoCommit(false);
+            Object[] parameters = {
+                category
+            };
+            ps = sqlStatements.buildSQLStatement(conn, ADD_EXPENSES_CATEGORY_KEY, parameters);
+            ps.executeUpdate();
+            conn.commit();
+        } catch (SQLException e) {
+            DBManager.rollbackConn(conn);
+            throw new DAOException("Cannot add Category", e);
+        } catch (IOException e) {
+            DBManager.rollbackConn(conn);
+            throw new DAOException("Cannot add Category", e);
+        } finally {
+            DBManager.closeStatement(ps);
+            DBManager.closeConnection(conn);
+        }
+    }
+
+    public void updateExpensesCategory(String category, String id) throws DAOException {
+        Connection conn = null;
+        PreparedStatement update = null;
+        String idCategory = "'" + category + "'";
+        try {
+            conn = dataSource.getConnection();
+            conn.setAutoCommit(false);
+            Object[] parameters = {
+                category,
+                id
+            };
+            update = sqlStatements.buildSQLStatement(conn, UPDATE_EXPENSES_CATEGORY_KEY, parameters);
+            update.executeUpdate();
+            conn.commit();
+        } catch (SQLException | IOException e) {
+            DBManager.rollbackConn(conn);
+            throw new DAOException("Could not properly update the Category", e);
+        } finally {
+            DBManager.closeStatement(update);
+            DBManager.closeConnection(conn);
+        }
+    }
+    
+    public void addExpenseIncome(HashMap data) throws DAOException {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        try {
+            conn = dataSource.getConnection();
+            conn.setAutoCommit(false);
+            Object[] parameters = {
+                data.get("TYPE"),
+                data.get("DESC"),
+                data.get("VALUE"),
+                data.get("NOTE"),
+                data.get("CYCLE"),
+                data.get("CATEGORY")
+            };
+            ps = sqlStatements.buildSQLStatement(conn, ADD_EXPENSE_INCOME_KEY, parameters);
+            ps.executeUpdate();
+            conn.commit();
+        } catch (SQLException e) {
+            DBManager.rollbackConn(conn);
+            throw new DAOException("Cannot add Payment", e);
+        } catch (IOException e) {
+            DBManager.rollbackConn(conn);
+            throw new DAOException("Cannot add Payment", e);
+        } finally {
+            DBManager.closeStatement(ps);
+            DBManager.closeConnection(conn);
+        }
     }
 
 }

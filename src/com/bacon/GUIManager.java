@@ -10,6 +10,7 @@ import com.bacon.domain.Cycle;
 import com.bacon.domain.Invoice;
 import com.bacon.domain.Item;
 import com.bacon.domain.Permission;
+import com.bacon.domain.Presentation;
 import com.bacon.domain.Product;
 import com.bacon.domain.Rol;
 import com.bacon.domain.User;
@@ -47,6 +48,7 @@ import com.bacon.gui.PanelNewCycle;
 import com.bacon.gui.PanelNewLocation;
 import com.bacon.gui.PanelOtherProduct;
 import com.bacon.gui.PanelPayInvoice;
+import com.bacon.gui.PanelPressProduct;
 import com.bacon.gui.PanelProducts;
 import com.bacon.gui.PanelReportSales;
 import com.bacon.gui.PanelSelCategory;
@@ -69,6 +71,7 @@ import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import javax.swing.AbstractButton;
 import javax.swing.Box;
 import javax.swing.ImageIcon;
@@ -446,7 +449,7 @@ public class GUIManager {
         return panelDownItem;
     }
 
-    public PanelList getPanelNewList(String title, PropertyChangeListener listener, ArrayList lista) {
+    public PanelList getPanelNewList(String title, PropertyChangeListener listener, List lista) {
         pnNewList = new PanelList<>(app, title, listener, lista);
         return pnNewList;
     }
@@ -621,10 +624,10 @@ public class GUIManager {
                 toolbar.add((app.getAction(Aplication.ACTION_SHOW_INVENTORY)));
             }
             
-//            perm = app.getControl().getPermissionByName("show-products-module");
-//            if (user != null && app.getControl().hasPermission(user, perm)) {
-//                toolbar.add((app.getAction(Aplication.ACTION_SHOW_PRODUCTS)));
-//            }
+            perm = app.getControl().getPermissionByName("show-products-module");
+            if (user != null && app.getControl().hasPermission(user, perm)) {
+                toolbar.add((app.getAction(Aplication.ACTION_SHOW_PRODUCTS)));
+            }
 
             perm = app.getControl().getPermissionByName("show-admin-module");
             if (user != null && app.getControl().hasPermission(user, perm)) {
@@ -1290,6 +1293,65 @@ public class GUIManager {
             pnConfigTicket = new PanelConfigTicket(app);
         }
         return pnConfigTicket;
+    }
+    
+    public void showPanelNewCategory(String title, PropertyChangeListener listener, List lista) {
+        setWaitCursor();
+        JDialog dialog = new MyDialogEsc();
+        dialog.setModal(true);
+        dialog.setIconImage(app.getImgManager().getImagen("gui/img/Inventory-maintenance.png", 18, 18));
+        dialog.add(getPanelNewList(title, listener, lista));
+        dialog.setTitle("Categorias.");
+        dialog.pack();
+        dialog.setLocationRelativeTo(getFrame());
+        setDefaultCursor();
+        dialog.setVisible(true);
+    }
+    
+    public void showPanelAddPress(PropertyChangeListener listener, Product product) {
+        setWaitCursor();
+        JDialog dialog = new MyDialogEsc();
+        dialog.setModal(true);
+        int w = 400;
+        int h = 400;
+        dialog.setPreferredSize(new Dimension(w, h));
+
+        PanelPressProduct panelPres = new PanelPressProduct(app, product);
+        panelPres.addPropertyChangeListener(listener);
+        panelPres.showNewPresentacionMode();
+
+        String title = "Agregar presentacion.";
+
+//        dialog.setResizable(false);
+        dialog.add(panelPres);
+        dialog.setTitle(title);
+        dialog.pack();
+        dialog.setLocationRelativeTo(getFrame());
+        setDefaultCursor();
+        dialog.setVisible(true);
+    }
+    
+    public void showPanelEditPress(PropertyChangeListener listener, Presentation presentation) {
+        setWaitCursor();
+        JDialog dialog = new MyDialogEsc();
+        dialog.setModal(true);
+        int w = 400;
+        int h = 300;
+        dialog.setPreferredSize(new Dimension(w, h));
+
+        PanelPressProduct panelPres = new PanelPressProduct(app, presentation);
+        panelPres.addPropertyChangeListener(getPanelProducts());
+        panelPres.showEditPresentacionMode();
+
+        String title = "Editar presentacion.";
+
+//        dialog.setResizable(false);
+        dialog.add(panelPres);
+        dialog.setTitle(title);
+        dialog.pack();
+        dialog.setLocationRelativeTo(getFrame());
+        setDefaultCursor();
+        dialog.setVisible(true);
     }
 
 }
