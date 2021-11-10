@@ -73,7 +73,7 @@ public class Invoice {
         return fecha;
     }
 
-    public void setFecha(Date fecha) {
+    public void setFecha(Date fecha) {        
         this.fecha = fecha;
     }
 

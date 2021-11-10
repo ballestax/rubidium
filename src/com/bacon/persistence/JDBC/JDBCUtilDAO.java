@@ -1276,8 +1276,8 @@ public class JDBCUtilDAO implements UtilDAO {
             while (rs.next()) {
                 cycle = new Cycle();
                 cycle.setId(rs.getInt(1));
-                cycle.setInit(rs.getDate(2));
-                cycle.setEnd(rs.getDate(3));
+                cycle.setInit(rs.getTimestamp(2));
+                cycle.setEnd(rs.getTimestamp(3));
                 cycle.setInitialBalance(rs.getBigDecimal(4));
                 cycle.setStatus(rs.getInt(5));
                 cycles.add(cycle);
@@ -1852,7 +1852,7 @@ public class JDBCUtilDAO implements UtilDAO {
                 event.setIdItem(rs.getLong("idItem"));
                 event.setEvent(rs.getInt("event"));
                 event.setQuantity(rs.getDouble("quantity"));
-                event.setLastUpdate(rs.getDate("lastUpdatedTime"));
+                event.setLastUpdate(rs.getTimestamp("lastUpdatedTime"));
                 events.add(event);
             }
         } catch (SQLException e) {

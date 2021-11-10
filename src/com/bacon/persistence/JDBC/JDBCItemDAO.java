@@ -136,8 +136,8 @@ public class JDBCItemDAO implements ItemDAO {
                 item.setInit(rs.getDouble("init"));
                 item.setOnlyDelivery(rs.getBoolean("onlyDelivery"));
                 item.setSnapshot(rs.getBoolean("snapshot"));
-                item.setCreatedTime(rs.getDate("createdTime"));
-                item.setUpdateTime(rs.getDate("lastUpdatedTime"));
+                item.setCreatedTime(rs.getTimestamp("createdTime"));
+                item.setUpdateTime(rs.getTimestamp("lastUpdatedTime"));
                 item.setUser(rs.getString("user"));
                 item.setTags(rs.getString("tags"));
                 items.add(item);
