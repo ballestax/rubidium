@@ -26,8 +26,8 @@ import javax.swing.ImageIcon;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
-import org.balx.Utiles;
 import org.dz.PanelCapturaMod;
+import org.dz.Utiles;
 
 /**
  *

@@ -48,15 +48,15 @@ public class LevenshteinDistance {
         {1353, 1463, 1331, 803},
         {1353, 803, 1331, 1078}};
 
-        int[] c1 = org.bx.Utiles.getColumna(cd, 0);
+        int[] c1 = Utiles.getColumna(cd, 0);
         for (int i = 0; i < c1.length; i++) {
             cd[i][0] = cd[i][3];
             cd[i][3] = c1[i];
         }
 
-        int[][] cdr = org.balx.Utiles.matrizRotada180(cd);
+        int[][] cdr = org.dz.Utiles.matrizRotada180(cd);
         int[][] esp = new int[cdr.length][cdr[0].length];
-        org.balx.Utiles.llenarMatrizRf(esp, 21);
+        org.dz.Utiles.llenarMatrizRf(esp, 21);
         for (int i = 0; i < cdr.length; i++) {
             for (int j = 0; j < cdr[0].length; j++) {
                 cdr[i][j] = (cdr[i][j] / 11) - esp[i][j];

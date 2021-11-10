@@ -20,7 +20,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
-import org.bx.gui.MyDefaultTableModel;
+import org.dz.MyDefaultTableModel;
 import org.dz.PanelCapturaMod;
 
 /**

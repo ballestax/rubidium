@@ -14,10 +14,9 @@ import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
-import org.balx.Utiles;
 import org.dz.PanelCaptura;
-import org.dzur.StringUtil;
-import org.dzur.Util;
+import org.dz.StringUtil;
+
 
 /**
  *
@@ -108,7 +107,7 @@ public class PanelClientCard extends PanelCaptura implements ActionListener {
     public Client saveClient() {
 
         String celular = regCelular.getText();
-        String direccion = Util.removerDobleEspacioBlanco(regAddress.getText());
+        String direccion = StringUtil.removerDobleEspacioBlanco(regAddress.getText());
         String nombre = regNombres.getText();
         String apellido = regApellidos.getText();
 

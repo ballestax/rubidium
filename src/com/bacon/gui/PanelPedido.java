@@ -70,13 +70,13 @@ import org.apache.commons.collections.keyvalue.MultiKey;
 import org.apache.commons.collections.map.MultiValueMap;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
-import org.balx.ColorDg;
-import org.balx.TextFormato;
-import org.bx.gui.MyDefaultTableModel;
+import org.dz.MyDefaultTableModel;
+
 import org.dz.MyDialogEsc;
+import org.dz.MyListModel;
 import org.dz.PanelCapturaMod;
 import org.dz.TextFormatter;
-import org.dzur.Util;
+import org.dz.Utiles;
 import org.jsoup.Jsoup;
 import org.ocpsoft.prettytime.Duration;
 import org.ocpsoft.prettytime.PrettyTime;
@@ -88,7 +88,7 @@ import org.ocpsoft.prettytime.PrettyTime;
 public class PanelPedido extends PanelCapturaMod implements ActionListener, ChangeListener, TableModelListener, PropertyChangeListener {
 
     private final Aplication app;
-    private org.dzur.gui.MyListModel model;
+    private MyListModel model;
     private MyDefaultTableModel modeloTb;
     private SpinnerNumberModel spModel;
     private SpinnerNumberModel spModelDel;
@@ -155,9 +155,9 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
         Font font = new Font("Arial", 1, 18);
         Font font2 = new Font("Serif", 1, 15);
 
-        colorDelivery = ColorDg.colorAleatorio().getColor1().darker();
+        colorDelivery = Utiles.colorAleatorio(100,200).darker();
 //        colorLocal = new Color(180,30,154);
-        colorLocal = ColorDg.colorAleatorio().getColor2().darker();
+        colorLocal = Utiles.colorAleatorio(100,200).darker();
 
         DCFORM_P = (DecimalFormat) NumberFormat.getInstance();
         DCFORM_P.applyPattern("$ ###,###,###");
@@ -467,8 +467,8 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
         lbIndicator.setOpaque(true);
         lbIndicator.setVisible(false);
 
-        org.balx.TextFormato tForm = new TextFormato();
-        regCelular.setDocument(tForm.getLimitadorNumeros());
+        
+        regCelular.setDocument(TextFormatter.getIntegerLimiter());
         regCelular.setActionCommand(AC_SEARCH_CLIENT);
         regCelular.addActionListener(this);
 
@@ -2254,7 +2254,7 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
 
         public WaiterListCellRender() {
             setOpaque(true);
-            setForeground(Util.colorAleatorio());
+            setForeground(Utiles.colorAleatorio(0,255));
             setBorder(BorderFactory.createEmptyBorder(3, 2, 3, 2));
             setFont(new Font("Sans", 1, 16));
         }

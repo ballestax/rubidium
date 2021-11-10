@@ -13,9 +13,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.util.ArrayList;
-import org.bx.UpperCaseTextField;
-import org.bx.gui.MyDefaultTableModel;
+import org.dz.MyDefaultTableModel;
 import org.dz.PanelCapturaMod;
+import org.dz.UpperCaseTextField;
 
 /**
  *

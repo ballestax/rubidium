@@ -10,6 +10,7 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.RenderingHints;
 import java.awt.Shape;
+import java.awt.font.LineMetrics;
 import java.awt.geom.Area;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Rectangle2D;
@@ -17,10 +18,10 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.HashMap;
 import javax.swing.JTextArea;
-import org.balx.ColorDg;
+import org.dz.Imagenes;
 import static org.dz.Imagenes.calcularLargoTMinimo;
-import static org.dz.Imagenes.partirCadena;
-import sun.font.FontLineMetrics;
+import org.dz.Resources;
+
 
 /**
  *
@@ -47,7 +48,7 @@ public class ImageManager {
         if (images.containsKey(key)) {
             return images.get(key);
         } else {
-            Image img = org.balx.Resources.getImagen(key, this.getClass());
+            Image img = Resources.getImagen(key, this.getClass());
             images.put(key, img);
             return img;
         }
@@ -61,9 +62,9 @@ public class ImageManager {
 //            Image img = Toolkit.getDefaultToolkit().getImage(clas.getResource(key));
             Image img;
             try {
-                img = org.balx.Resources.getImagen(key, this.getClass());
+                img = Resources.getImagen(key, this.getClass());
             } catch (Exception e) {
-                img = org.balx.Imagenes.centrarTexto(w, h, "No Image", new Font("Arial", 1, 12), Color.lightGray, Color.darkGray);
+                img = Imagenes.centrarTexto(w, h, "No Image", new Font("Arial", 1, 12), Color.lightGray, Color.darkGray);
             }
 
             images.put(key, img);
@@ -73,22 +74,22 @@ public class ImageManager {
 
     public BufferedImage getBufImagen(String key) {
         if (images.containsKey(key)) {
-            return org.bx.Imagenes.toBuffereredImage(images.get(key));
+            return Imagenes.toBuffereredImage(images.get(key));
         } else {
-            BufferedImage img = org.dzur.Resources.cargarImagen(key);
+            BufferedImage img = Resources.cargarImagen(key);
             images.put(key, img);
-            return org.bx.Imagenes.toBuffereredImage(img);
+            return Imagenes.toBuffereredImage(img);
         }
     }
 
     public BufferedImage getBufImagen(String key, int w, int h) {
         if (images.containsKey(key)) {
             Image img = images.get(key);
-            return org.bx.Imagenes.toBuffereredImage(img.getScaledInstance(w, h, Image.SCALE_AREA_AVERAGING));
+            return Imagenes.toBuffereredImage(img.getScaledInstance(w, h, Image.SCALE_AREA_AVERAGING));
         } else {
-            BufferedImage img = org.dzur.Resources.cargarImagen(key);
+            BufferedImage img = Resources.cargarImagen(key);
             images.put(key, img);
-            return org.bx.Imagenes.toBuffereredImage(img.getScaledInstance(w, h, Image.SCALE_AREA_AVERAGING));
+            return Imagenes.toBuffereredImage(img.getScaledInstance(w, h, Image.SCALE_AREA_AVERAGING));
         }
     }
 
@@ -111,7 +112,7 @@ public class ImageManager {
         int y = offset / 2;
         g.translate(x, y);
 
-        g.setColor(ColorDg.colorAleatorio().getColor1());
+        g.setColor(org.dz.Utiles.colorAleatorio(120, 200));
         g.fill(circle);
 //        g.setColor(Color.BLACK);
 //        g.draw(circle);
@@ -135,8 +136,8 @@ public class ImageManager {
         int mx = w - largo;
         int my = h - alto;
         for (int i = 0; i < linea.length; i++) {
-            linea[i] = org.balx.Utiles.eliminarAcentos(linea[i]);
-            FontLineMetrics lm = (FontLineMetrics) g.getFont().getLineMetrics(linea[i], frc);
+            linea[i] = org.dz.Utiles.eliminarAcentos(linea[i]);
+            LineMetrics lm = g.getFont().getLineMetrics(linea[i], frc);
             Rectangle2D bounds = g.getFont().getStringBounds(linea[i], frc);
             float largoCadena = (float) bounds.getWidth();
             float alturaCadena = (float) bounds.getHeight() - lm.getLeading();
@@ -182,11 +183,11 @@ public class ImageManager {
         String linea1 = "";
         String temp = "";
         String token = " ";
-        
+
         JTextArea ta = new JTextArea();
         ta.setWrapStyleWord(band);
         do {
-            
+
             if (calcularLargoTMinimo(s, f, w) < tamFuenteMin) {
                 int ind = s.lastIndexOf(token);
                 lineas.add(s.substring(0, ind));

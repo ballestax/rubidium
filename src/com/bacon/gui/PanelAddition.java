@@ -11,7 +11,6 @@ import java.awt.event.MouseEvent;
 import javax.swing.BorderFactory;
 import javax.swing.SpinnerNumberModel;
 import org.apache.commons.lang3.StringUtils;
-import org.balx.SpinnerNumberModelo;
 import org.dz.PanelCaptura;
 
 /**

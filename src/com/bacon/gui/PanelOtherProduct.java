@@ -10,8 +10,8 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
-import org.bx.TextFormatter;
 import org.dz.PanelCapturaMod;
+import org.dz.TextFormatter;
 
 /**
  *

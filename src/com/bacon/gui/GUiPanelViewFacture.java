@@ -29,7 +29,7 @@ import javax.swing.JEditorPane;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
-import org.bx.gui.PanelCaptura;
+import org.dz.PanelCaptura;
 
 /**
  *

@@ -27,7 +27,9 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
-import org.balx.Imagenes;
+import org.dz.ImagenFx;
+
+import org.dz.Imagenes;
 
 /**
  *
@@ -50,8 +52,8 @@ public class PanelDash extends JPanel {
 //        imagen = centrarTexto;//ImagenesFx.rotarImagen(org.bx.Imagenes.toBuffereredImage(centrarTexto), -45);
         imagen = Imagenes.imagenToGray(app.getImageBC(), "");
         Image tmp = app.getImgManager().getImagen(app.getFolderIcons()+"logo.png");
-        imgMas = org.bx.Imagenes.toBuffereredImage(tmp);
-        tmp = org.dzur.ImagenesFx.escarlarImagen(imgMas, 80, 30, true);
+        imgMas = Imagenes.toBuffereredImage(tmp);
+        tmp = ImagenFx.escarlarImagen(imgMas, 80, 30, true);
         
         wl = imgMas.getWidth(this);
         hl = imgMas.getHeight(this);

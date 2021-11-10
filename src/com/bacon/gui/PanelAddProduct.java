@@ -44,8 +44,9 @@ import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableRowSorter;
 import org.apache.log4j.Logger;
-import org.bx.gui.MyDefaultTableModel;
+import org.dz.MyDefaultTableModel;
 import org.dz.PanelCapturaMod;
+
 
 /**
  *

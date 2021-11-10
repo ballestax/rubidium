@@ -13,7 +13,7 @@ import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.UIManager;
 import javax.swing.table.TableCellRenderer;
-import static org.bx.gui.CheckTable.COLOR_CHECK;
+
 
 /**
  *
@@ -23,9 +23,11 @@ public class TableSelectCellRenderer extends JLabel implements TableCellRenderer
 
     boolean isBordered = true;
     JTable table;
+    private final Color COLOR_CHECK;
 
     public TableSelectCellRenderer(boolean isBordered) {
         this.isBordered = isBordered;
+        COLOR_CHECK = new Color(100,220,159);
         setOpaque(true);
     }
 

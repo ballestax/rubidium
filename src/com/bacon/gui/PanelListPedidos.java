@@ -2,7 +2,6 @@ package com.bacon.gui;
 
 import com.bacon.Aplication;
 import com.bacon.Configuration;
-import com.bacon.GUIManager;
 import com.bacon.MyConstants;
 import com.bacon.ProgAction;
 import com.bacon.domain.Cycle;
@@ -21,11 +20,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
-import java.awt.event.ContainerEvent;
-import java.awt.event.ContainerListener;
 import java.awt.event.MouseEvent;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import java.beans.PropertyChangeEvent;
 import java.math.BigDecimal;
 import java.text.Format;
@@ -62,9 +57,9 @@ import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableRowSorter;
 import org.apache.log4j.Logger;
-import org.balx.Utiles;
-import org.bx.gui.MyDefaultTableModel;
+import org.dz.MyDefaultTableModel;
 import org.dz.PanelCapturaMod;
+import org.dz.Utiles;
 import org.jfree.util.PaintUtilities;
 
 /**

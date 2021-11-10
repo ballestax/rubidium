@@ -20,7 +20,7 @@ import javax.swing.border.EtchedBorder;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.text.Document;
-import org.bx.UpperCaseTextField;
+
 
 public class Registro extends JComponent implements Reseteable, CaretListener {
 

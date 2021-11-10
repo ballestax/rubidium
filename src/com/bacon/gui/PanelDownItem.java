@@ -23,9 +23,9 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import org.balx.TextFormato;
-import org.bx.gui.MyDefaultTableModel;
-import org.bx.gui.PanelCaptura;
+import org.dz.MyDefaultTableModel;
+import org.dz.PanelCaptura;
+import org.dz.TextFormatter;
 
 /**
  *
@@ -78,9 +78,8 @@ public class PanelDownItem extends PanelCaptura implements ActionListener, Caret
         tabla.setSelectionModel(selectionModel);
         tabla.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tabla.setFont(new Font("Tahoma", 0, 15));
-
-        org.balx.TextFormato docF = new TextFormato();
-        tfCantidad.setDocument(docF.getLimitadorNumeros());
+        
+        tfCantidad.setDocument(TextFormatter.getIntegerLimiter());
         tfCantidad.addCaretListener(new Caret());
         tfCantidad.addCaretListener(this);
 

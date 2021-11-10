@@ -24,7 +24,8 @@ import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import org.dz.PanelCapturaMod;
-import org.dzur.Util;
+import org.dz.Utiles;
+
 
 /**
  *
@@ -79,7 +80,7 @@ public class PanelModPedidos extends PanelCapturaMod
         panelTopSearch.addPropertyChangeListener(panelSelCategory);
         
         categorys = app.getControl().getCategoriesList();
-        categorys.stream().forEach(category -> category.setColor(Util.colorAleatorio(200, 250)));
+        categorys.stream().forEach(category -> category.setColor(Utiles.colorAleatorio(200, 250)));
         ConfigDB config = app.getControl().getConfig(Configuration.MAX_CATEGORIES_LIST);
         int MAX = config != null ? (int) config.castValor() : 4;
         if (categorys.size() < MAX) {

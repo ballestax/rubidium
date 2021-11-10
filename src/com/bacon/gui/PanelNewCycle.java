@@ -11,8 +11,8 @@ import javax.swing.BoxLayout;
 import javax.swing.SwingConstants;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
-import org.bx.TextFormatter;
 import org.dz.PanelCapturaMod;
+import org.dz.TextFormatter;
 
 /**
  *

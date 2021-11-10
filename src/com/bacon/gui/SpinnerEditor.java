@@ -19,7 +19,8 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.SpinnerModel;
 import javax.swing.SwingUtilities;
-import org.balx.TextFormato;
+import org.dz.TextFormatter;
+
 
 /**
  *
@@ -38,8 +39,8 @@ public class SpinnerEditor extends DefaultCellEditor {
         editor = ((JSpinner.DefaultEditor) spinner.getEditor());
 
         textField = editor.getTextField();
-        org.balx.TextFormato tf = new TextFormato();
-        textField.setDocument(tf.getLimitadorNumeros());
+        
+        textField.setDocument(TextFormatter.getIntegerLimiter());
         textField.addFocusListener(new FocusListener() {
             @Override
             public void focusGained(FocusEvent e) {

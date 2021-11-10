@@ -23,7 +23,8 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JTextField;
-import org.bx.Registro;
+import org.dz.Resources;
+
 
 /**
  *
@@ -128,12 +129,12 @@ public class BoxRowFilter extends Box implements ActionListener {
 
         btDelete = new JButton("");
         btDelete.setPreferredSize(new Dimension(16, 16));
-        btDelete.setIcon(new ImageIcon(org.balx.Resources.getImagen(app.getFolderIcons()+"delete-icon.png", Aplication.class, 12, 12)));
+        btDelete.setIcon(new ImageIcon(Resources.getImagen(app.getFolderIcons()+"delete-icon.png", Aplication.class, 12, 12)));
         btDelete.setActionCommand("REMOVE_ROWFILTER");
         btDelete.addActionListener(this);
         btAdd = new JButton("");
         btAdd.setPreferredSize(new Dimension(16, 16));
-        btAdd.setIcon(new ImageIcon(org.balx.Resources.getImagen(app.getFolderIcons()+"add-icon.png", Aplication.class, 12, 12)));
+        btAdd.setIcon(new ImageIcon(Resources.getImagen(app.getFolderIcons()+"add-icon.png", Aplication.class, 12, 12)));
         btAdd.setActionCommand("ADD_ROWFILTER");
         btAdd.addActionListener(this);
         bBot = new Box(BoxLayout.Y_AXIS);

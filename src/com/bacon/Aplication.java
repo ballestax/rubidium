@@ -42,7 +42,7 @@ import javax.swing.JButton;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import org.apache.log4j.Logger;
-import org.balx.Imagenes;
+import org.dz.Imagenes;
 
 /**
  *
@@ -346,7 +346,7 @@ public final class Aplication implements ActionListener, PropertyChangeListener,
 
     private Image createImage() {
         Font f1 = new Font("Agency FB", 1, 16);
-        Image centrarTexto = org.balx.Imagenes.centrarTexto(WC, WC, "Bacon 57 Burger", f1, Color.white, Color.blue);
+        Image centrarTexto = Imagenes.centrarTexto(WC, WC, "Bacon 57 Burger", f1, Color.white, Color.blue);
         return Imagenes.imagenToGray(centrarTexto, "");
     }
 

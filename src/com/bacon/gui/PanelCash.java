@@ -29,7 +29,6 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.EventObject;
-import java.util.logging.Level;
 import javax.swing.AbstractCellEditor;
 import javax.swing.BorderFactory;
 import static javax.swing.BorderFactory.createLineBorder;
@@ -50,7 +49,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import org.apache.log4j.Logger;
-import org.bx.gui.MyDefaultTableModel;
+import org.dz.MyDefaultTableModel;
 import org.dz.PanelCapturaMod;
 
 /**

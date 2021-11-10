@@ -9,6 +9,7 @@ package com.bacon.gui;
 import com.bacon.Aplication;
 import com.bacon.Configuration;
 import com.bacon.GUIManager;
+import com.bacon.Utiles;
 import com.bacon.domain.Backup;
 import java.awt.Color;
 import java.awt.Component;
@@ -44,9 +45,9 @@ import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import org.balx.NTiempo;
-import org.bx.gui.PanelCaptura;
-import org.dzur.gui.MyListModel;
+import org.dz.MyListModel;
+import org.dz.PanelCaptura;
+
 
 /**
  *
@@ -170,14 +171,7 @@ public class PanelAdminBackup extends PanelCaptura implements ActionListener, Ca
             if (f.isFile()) {
                 BasicFileAttributes attrib = Files.readAttributes(Paths.get(file, ""), BasicFileAttributes.class, LinkOption.NOFOLLOW_LINKS);
                 FileTime creation = attrib.creationTime();
-                long size = attrib.size();
-                long trans = new Date().getTime() - creation.toMillis();
-                String tSt;
-                if (trans > 86400000) {
-                    tSt = String.valueOf(Math.ceil(trans / 86400000)) + " dias";
-                } else {
-                    tSt = new NTiempo(trans).toString4();
-                }
+                long size = attrib.size();               
                 Backup back = new Backup();
                 back.setName(f.getName());
                 back.setCreationDate(new Date(creation.toMillis()));
@@ -427,7 +421,7 @@ public class PanelAdminBackup extends PanelCaptura implements ActionListener, Ca
                 if (selBackup != null) {
                     System.out.println(selBackup.getPath());
                     try {
-                        ArrayList<String> sql = org.bx.Utiles.splitArchivoEnLineas(selBackup.getPath(), true);
+                        ArrayList<String> sql = Utiles.splitArchivoEnLineas(selBackup.getPath(), true);
 //                        Arrays.toString(sql.toArray());
                         app.getCtrlBackup().restoreBackup(sql, this);
                     } catch (IOException ex) {

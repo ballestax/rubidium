@@ -30,7 +30,6 @@ import com.itextpdf.text.pdf.draw.LineSeparator;
 import com.itextpdf.tool.xml.ElementList;
 import com.itextpdf.tool.xml.XMLWorker;
 import com.itextpdf.tool.xml.XMLWorkerHelper;
-import com.itextpdf.tool.xml.css.CSS;
 import com.itextpdf.tool.xml.css.CssFile;
 import com.itextpdf.tool.xml.css.StyleAttrCSSResolver;
 import com.itextpdf.tool.xml.html.Tags;
@@ -46,7 +45,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import org.bx.gui.MyDefaultTableModel;
+import org.dz.MyDefaultTableModel;
+
 
 /**
  *

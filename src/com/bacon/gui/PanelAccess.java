@@ -9,6 +9,7 @@ package com.bacon.gui;
 import com.bacon.Aplication;
 import com.bacon.domain.User;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -19,6 +20,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -27,6 +29,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
+import org.dz.Registro;
 
 /**
  *
@@ -37,17 +40,17 @@ public class PanelAccess extends JPanel{
     private JTextField usuario;
     private JPasswordField contraseña;
     private JLabel mensajes;
-    private String nomBtns[] = {"Aceptar", "Cancelar"};
-    private JButton[] btns = new JButton[nomBtns.length];
-    private Font fnt = new Font("arial", 1, 15);
-    private Font fnt2 = new Font("arial", 0, 20);
+    private final String nomBtns[] = {"Aceptar", "Cancelar"};
+    private final JButton[] btns = new JButton[nomBtns.length];
+    private final Font fnt = new Font("Sans", 1, 16);
+    private final Font fnt2 = new Font("arial", 0, 20);
     private Aplication app;
     private JLabel labelImg;
     private com.bacon.gui.util.Registro regHost;
     private ActionListener listener;
     private JTextField host;
-    private org.bx.Registro regUser;
-    private org.bx.Registro regPassword;
+    private Registro regUser;
+    private Registro regPassword;
     private PropertyChangeSupport pcs;
 
     public PanelAccess(Aplication app) {
@@ -68,33 +71,24 @@ public class PanelAccess extends JPanel{
         add(regUser, new GridBagConstraints(3, 1, 2, 1, 0.1, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(15, 2, 2, 7), 100, 16));
         add(regPassword, new GridBagConstraints(3, 2, 2, 1, 0.1, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(2, 2, 2, 7), 100, 16));
 
-//        add(regHost, new GridBagConstraints(3, 3, 2, 1, 0.1, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(2, 2, 2, 7), 100, 16));
-//        Box box = new Box(BoxLayout.X_AXIS);
-//        box.add(Box.createHorizontalStrut(15));
-//        box.add(btns[0]);
-//        box.add(Box.createHorizontalStrut(5));
-//        box.add(btns[1]);
-//        box.add(Box.createHorizontalStrut(15));
-//        add(box, new GridBagConstraints(1, 4, 6, 1, 1.0, 1.0, GridBagConstraints.EAST, GridBagConstraints.HORIZONTAL, new Insets(7, 2, 2, 7), 0, 0));
-        add(btns[1], new GridBagConstraints(0, 5, 2, 1, 0.1, 0.0, GridBagConstraints.SOUTH, GridBagConstraints.HORIZONTAL, new Insets(7, 15, 7, 7), 0, 0));
-        add(btns[0], new GridBagConstraints(3, 5, 2, 1, 0.1, 0.0, GridBagConstraints.SOUTH, GridBagConstraints.HORIZONTAL, new Insets(7, 5, 7, 15), 0, 0));
+        Box boxBtns = new Box(BoxLayout.X_AXIS);        
+        boxBtns.add(btns[1]);
+        boxBtns.add(Box.createHorizontalGlue());
+        boxBtns.add(btns[0]);
+        add(boxBtns, new GridBagConstraints(0, 5, 7, 1, 1.0, 0.1, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(7, 15, 7, 7), 0, 0));
 
-        setBackground(new Color(0, 0, 0, 0));
+//        setBackground(new Color(0, 0, 0, 0));
     
     }
 
     private void crearComponentes() {
         usuario = new JTextField();
-        usuario.setSize(170, 21);
-        usuario.setFont(fnt);
-        regUser = new org.bx.Registro(BoxLayout.Y_AXIS, "Usuario:", usuario);
+        regUser = new Registro(BoxLayout.Y_AXIS, "Usuario:", usuario);
+        regUser.setFont(fnt);
 
         contraseña = new JPasswordField();
-        contraseña.setFont(fnt2);
-        contraseña.setSize(170, 21);
-        contraseña.setLocation(85, 90);
-//        contraseña.setEchoChar('*');
-        regPassword = new org.bx.Registro(BoxLayout.Y_AXIS, "Contraseña:", contraseña);
+        regPassword = new Registro(BoxLayout.Y_AXIS, "Contraseña:", contraseña);
+        regPassword.setFont(fnt2);
         contraseña.addKeyListener(new KeyListener() {
 
             @Override
@@ -121,16 +115,15 @@ public class PanelAccess extends JPanel{
         labelImg = new JLabel(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "security.png", 90, 90)));
 
         mensajes = new JLabel("MENSAJES");
-        mensajes.setSize(200, 50);
-        mensajes.setLocation(50, 130);
+//        mensajes.setSize(200, 50);        
         mensajes.setFont(fnt);
         mensajes.setBackground(Color.orange);
 
         for (int i = 0; i < btns.length; i++) {
             btns[i] = new JButton(nomBtns[i]);
             btns[i].setFont(fnt);
-            btns[i].setSize(100, 30);
-            btns[i].setLocation(40 + (i * 120), 190);
+            btns[i].setMinimumSize(new Dimension(120, 30));
+            btns[i].setPreferredSize(new Dimension(120, 30));
             btns[i].addActionListener(new ActionListener() {
 
                 @Override
@@ -139,6 +132,11 @@ public class PanelAccess extends JPanel{
                 }
             });
         }
+    }
+
+    @Override
+    public void setVisible(boolean aFlag) {
+        super.setVisible(aFlag); //To change body of generated methods, choose Tools | Templates.        
     }
 
     private void procesarEvento(ActionEvent e) {

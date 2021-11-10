@@ -29,9 +29,9 @@ import javax.swing.JComponent;
 import javax.swing.JTextField;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
-import org.balx.Resources;
 import org.dz.DatePicker;
 import org.dz.MyDialogEsc;
+import org.dz.Resources;
 
 /**
  *

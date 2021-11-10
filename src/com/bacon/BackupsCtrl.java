@@ -93,9 +93,8 @@ public class BackupsCtrl {
         try {
 //            String fileName = "bck_" + app.getFormatoFecha().format(new Date());
             Path get = Paths.get(fileName);
-            org.balx.Utiles.escribirTexto(get.toString(), backup);
+            org.dz.Utiles.escribirTexto(get.toString(), backup);
         } catch (Exception e) {
-            System.err.println(e.getMessage());
             logger.debug(e.getMessage(), e);
         }
     }

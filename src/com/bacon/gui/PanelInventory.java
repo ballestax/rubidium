@@ -35,7 +35,6 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableCellRenderer;
 import org.apache.log4j.Logger;
-import org.bx.gui.MyDefaultTableModel;
 import org.dz.PanelCapturaMod;
 import java.awt.Desktop;
 import java.awt.event.MouseEvent;
@@ -52,6 +51,7 @@ import java.util.stream.Stream;
 import javax.swing.BoxLayout;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import org.dz.MyDefaultTableModel;
 import org.dz.MyDialogEsc;
 
 /**

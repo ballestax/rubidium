@@ -30,7 +30,6 @@ import javax.swing.RowFilter;
 import javax.swing.SwingConstants;
 import javax.swing.SwingWorker;
 import javax.swing.table.TableRowSorter;
-import org.bx.gui.MyDefaultTableModel;
 import org.dz.PanelCapturaMod;
 import org.dz.TextFormatter;
 import java.util.Collections;
@@ -41,6 +40,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
+import org.dz.MyDefaultTableModel;
 
 /**
  *

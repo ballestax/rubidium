@@ -7,6 +7,7 @@ package com.bacon.gui;
 
 import com.bacon.gui.util.TableSelectCellRenderer;
 import com.bacon.Aplication;
+import com.bacon.Utiles;
 import com.bacon.domain.Permission;
 import com.bacon.domain.Rol;
 import java.awt.Font;
@@ -23,10 +24,10 @@ import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
-import org.bx.Utiles;
-import org.bx.gui.ListSelection;
-import org.bx.gui.MyDefaultTableModel;
-import org.bx.gui.PanelCaptura;
+import org.dz.ListSelection;
+import org.dz.MyDefaultTableModel;
+import org.dz.PanelCaptura;
+
 
 /**
  *

@@ -32,9 +32,10 @@ import javax.swing.JScrollPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.text.Document;
-import org.balx.ColorDg;
-import org.balx.SpinnerNumberModelo;
+
 import org.dz.PanelCapturaMod;
+import org.dz.SpinnerNumberModelo;
+import org.dz.Utiles;
 
 /**
  *
@@ -144,7 +145,7 @@ public class PanelCustomPedido extends PanelCapturaMod implements ActionListener
         lbInfo.setText(spCantidad.getValue() + " " + product.getName());
 
         lbTitle1.setText("Ingredientes");
-        lbTitle1.setBackground(ColorDg.colorAleatorio().getColor1());
+        lbTitle1.setBackground(Utiles.colorAleatorio(100,220));
         panel1.setLayout(new GridLayout(3, 3, 5, 5));
         ingredients = app.getControl().getIngredientsByProduct(product.getCode());
 
@@ -158,7 +159,7 @@ public class PanelCustomPedido extends PanelCapturaMod implements ActionListener
         }
 
         lbTitle2.setText("Adicionales");
-        lbTitle2.setBackground(ColorDg.colorAleatorio().getColor1());
+        lbTitle2.setBackground(Utiles.colorAleatorio(100,220));
         panel2 = new JPanel();
         panel2.setBorder(BorderFactory.createEmptyBorder(5, 2, 5, 15));
         sPanel1.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
@@ -175,7 +176,7 @@ public class PanelCustomPedido extends PanelCapturaMod implements ActionListener
         }
 
         lbTitle3.setText("Elige la presentación");
-        lbTitle3.setBackground(ColorDg.colorAleatorio().getColor1());
+        lbTitle3.setBackground(Utiles.colorAleatorio(100,220));
         ArrayList<Presentation> presList = app.getControl().getPresentationsByProduct(product.getId());
         int rows = presList.isEmpty() ? 1 : (3 % presList.size());
         panel3.setLayout(new GridLayout(rows, 4, 5, 5));

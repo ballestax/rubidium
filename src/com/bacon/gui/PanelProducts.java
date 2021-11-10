@@ -38,9 +38,9 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableRowSorter;
-import org.bx.gui.MyDefaultTableModel;
 import org.dz.PanelCapturaMod;
 import static com.bacon.gui.PanelInventory.LOGGER;
+import org.dz.MyDefaultTableModel;
 
 /**
  *

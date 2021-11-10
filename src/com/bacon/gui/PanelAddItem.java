@@ -26,10 +26,10 @@ import javax.swing.SwingWorker;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import org.apache.commons.lang3.StringUtils;
-import org.bx.TextFormatter;
-import org.bx.gui.ListSelection;
-import org.bx.gui.MyDefaultTableModel;
+import org.dz.ListSelection;
+import org.dz.MyDefaultTableModel;
 import org.dz.PanelCaptura;
+import org.dz.TextFormatter;
 import org.xhtmlrenderer.util.Util;
 
 /**

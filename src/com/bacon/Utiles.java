@@ -38,6 +38,7 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
 import javax.imageio.ImageIO;
 import org.apache.xmlbeans.impl.common.Levenshtein;
+import org.dz.Mat;
 import org.jasypt.encryption.pbe.StandardPBEStringEncryptor;
 
 /**
@@ -127,7 +128,7 @@ public class Utiles {
             for (int j = 0; j < col.length; j++) {
                 col[j] = (columna[j] != null) ? columna[j].toString().length() : 4;
             }
-            max[i] = org.balx.Utiles.maximo(col);
+            max[i] = org.dz.Utiles.maximo(col);
         }
 
         StringBuilder buf = new StringBuilder("<---Matriz:" + matriz + "--->\n");
@@ -342,7 +343,7 @@ public class Utiles {
     }
 
     public static String getNumeroFormateado(int num, int pos) {
-        int l = org.dzur.Mat.getCifras(num).length;
+        int l = Mat.getCifras(num).length;
         if (l >= pos) {
             return String.valueOf(num);
         } else {
@@ -480,7 +481,7 @@ public class Utiles {
 //            Process p = Runtime.getRuntime().exec("C://Program Files/Tesseract-OCR/tesseract imag1.jpg D:\\list");
         Process p = Runtime.getRuntime().exec(command + " " + img + " " + output + " " + parameters);
         p.waitFor();    
-        ArrayList<String> leerTexto = org.balx.Utiles.leerTexto(output + ".txt");
+        ArrayList<String> leerTexto = org.dz.Utiles.leerTexto(output + ".txt");
         if (leerTexto != null && !leerTexto.isEmpty()) {
             return leerTexto.get(0);
         } else {

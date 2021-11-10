@@ -28,8 +28,9 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPasswordField;
-import org.bx.Registro;
-import org.bx.gui.PanelCaptura;
+import org.dz.PanelCaptura;
+import org.dz.Registro;
+
 
 /**
  *

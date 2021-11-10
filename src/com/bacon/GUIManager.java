@@ -89,9 +89,9 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
-import org.bx.gui.MyDialog;
+import static org.dz.GuiUtil.centrarFrame;
 import org.dz.MyDialogEsc;
-import static org.dzur.gui.GuiUtil.centrarFrame;
+
 
 /**
  *
@@ -99,7 +99,7 @@ import static org.dzur.gui.GuiUtil.centrarFrame;
  */
 public class GUIManager {
 
-    private MyDialog myDialog;
+    private MyDialogEsc myDialog;
     private static Aplication app;
 
     private PanelBasic panelBasicAdminModule;
@@ -469,7 +469,7 @@ public class GUIManager {
     }
 
     private Color getColor() {
-        return org.balx.Utiles.colorAleatorio(20, 150);
+        return org.dz.Utiles.colorAleatorio(20, 150);
     }
 
     public JMenuItem getLabelUser() {
@@ -802,9 +802,7 @@ public class GUIManager {
     public void showNewUser(PropertyChangeListener pcl) {
         setWaitCursor();
         JDialog dialog = getDialog(true);
-        int w = 360;
-        int h = 250;
-//        dialog.setPreferredSize(new Dimension(w, h));
+        dialog.setPreferredSize(null);
         dialog.add(getPanelNewUser(pcl));
         dialog.setResizable(false);
         dialog.setTitle("Nuevo Usuario.");
@@ -816,10 +814,8 @@ public class GUIManager {
 
     public void showNewRol(PropertyChangeListener pcl, Rol role) {
         setWaitCursor();
-        JDialog dialog = getDialog(true);
-        int w = 360;
-        int h = 250;
-//        dialog.setPreferredSize(new Dimension(w, h));
+        JDialog dialog = getDialog(true);        
+        dialog.setPreferredSize(null);
         dialog.add(getPanelNewRol(pcl, role));
         dialog.setResizable(false);
         dialog.setTitle("Nuevo Rol de Usuario.");
@@ -861,7 +857,7 @@ public class GUIManager {
 
     private void showPanelNewUser() {
         setWaitCursor();
-        final JDialog dialog = new MyDialog();
+        final JDialog dialog = new MyDialogEsc();
         dialog.setModalityType(Dialog.ModalityType.TOOLKIT_MODAL);
         int w = 350;
         int h = 280;
@@ -884,7 +880,7 @@ public class GUIManager {
     private void showPanelControlAccess() {
         user = app.getUser();
         setWaitCursor();
-        final JDialog dialog = new MyDialog();
+        final JDialog dialog = new MyDialogEsc();
         dialog.setModalityType(Dialog.ModalityType.TOOLKIT_MODAL);
         int w = 350;
         int h = 220;
@@ -906,18 +902,18 @@ public class GUIManager {
         dialog.setVisible(true);
     }
 
-    public MyDialog getDialog(boolean limpiar) {
+    public MyDialogEsc getDialog(boolean limpiar) {
         if (myDialog == null) {
-            myDialog = new MyDialog(frame);
+            myDialog = new MyDialogEsc(frame);
         }
         if (limpiar) {
             myDialog.getContentPane().removeAll();
-        }
+        }        
         return myDialog;
     }
 
-    public MyDialog getDialog(JDialog parent) {
-        MyDialog dialog = new MyDialog(parent);
+    public MyDialogEsc getDialog(JDialog parent) {
+        MyDialogEsc dialog = new MyDialogEsc(parent);
         return dialog;
     }
 
@@ -951,10 +947,7 @@ public class GUIManager {
     public void showCustomPedido(Product product, PropertyChangeListener pcl) {
         setWaitCursor();
         JDialog dialog = getDialog(true);
-//        dialog.setUndecorated(true);
-//        int w = 360;
-//        int h = 200;
-//        dialog.setPreferredSize(new Dimension(w, h));
+        dialog.setPreferredSize(null);
         PanelCustomPedido pnCustomPed = new PanelCustomPedido(app, product);
         pnCustomPed.addPropertyChangeListener(getPanelPedido());
         dialog.add(pnCustomPed);
@@ -971,7 +964,7 @@ public class GUIManager {
 
         setWaitCursor();
         JDialog dialog = getDialog(true);
-
+        dialog.setPreferredSize(null);
         dialog.add(confirmPedido);
 //        dialog.setResizable(false);
         dialog.setTitle("Revisar pedido");
@@ -988,7 +981,7 @@ public class GUIManager {
 //        dialog.setUndecorated(true);
 //        int w = 360;
 //        int h = 200;
-//        dialog.setPreferredSize(new Dimension(w, h));
+        dialog.setPreferredSize(null);
         PanelClientCard clientCard = new PanelClientCard(app, client);
         clientCard.addPropertyChangeListener(getPanelPedido());
         dialog.add(clientCard);
@@ -1003,6 +996,7 @@ public class GUIManager {
     public void showInventoryCard() {
         setWaitCursor();
         JDialog dialog = getDialog(true);
+        dialog.setPreferredSize(null);
 //        dialog.setUndecorated(true);
 //        int w = 360;
 //        int h = 200;
@@ -1021,10 +1015,8 @@ public class GUIManager {
     public void showPanelPayInvoice(Invoice invoice) {
         setWaitCursor();
         JDialog dialog = getDialog(true);
-//        dialog.setUndecorated(true);
-//        int w = 360;
-//        int h = 200;
-//        dialog.setPreferredSize(new Dimension(w, h));
+
+        dialog.setPreferredSize(null);
         PanelPayInvoice pPayInvoice = new PanelPayInvoice(app, invoice);
 //        ppayInvoice.addPropertyChangeListener(getPanelPedido());
         dialog.add(pPayInvoice);
@@ -1039,7 +1031,7 @@ public class GUIManager {
     public void showPanelNewCycle(PropertyChangeListener listener) {
         setWaitCursor();
         JDialog dialog = getDialog(true);
-
+        dialog.setPreferredSize(null);
         PanelNewCycle panelNewCycle = new PanelNewCycle(app);
         panelNewCycle.addPropertyChangeListener(listener);
         dialog.add(panelNewCycle);
@@ -1223,7 +1215,7 @@ public class GUIManager {
 
     public void showPanelNewUnit(String title, PropertyChangeListener listener, ArrayList lista) {
         setWaitCursor();
-        JDialog dialog = new MyDialog();
+        JDialog dialog = new MyDialogEsc();
         dialog.setModal(true);
         dialog.setIconImage(app.getImgManager().getImagen("gui/img/Inventory-maintenance.png", 18, 18));
         dialog.add(getPanelNewList(title, listener, lista));
@@ -1251,7 +1243,7 @@ public class GUIManager {
 //    }
     public void showPanelConciliacion(boolean reset) {
         setWaitCursor();
-        JDialog dialog = new MyDialog();
+        JDialog dialog = new MyDialogEsc();
         dialog.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
         if (!getPanelNewConciliacion(false).containsListener(getPanelInventory())) {
             getPanelNewConciliacion(false).addPropertyChangeListener(getPanelInventory());
@@ -1266,7 +1258,7 @@ public class GUIManager {
 
     public void showPanelNewLocation(PropertyChangeListener listener) {
         setWaitCursor();
-        JDialog dialog = new MyDialog();
+        JDialog dialog = new MyDialogEsc();
         dialog.setModal(true);
         if (!getPanelSelItem().containsListener(listener)) {
             getPanelSelItem().addPropertyChangeListener(listener);

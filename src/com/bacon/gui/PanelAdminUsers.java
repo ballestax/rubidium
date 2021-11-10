@@ -27,9 +27,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.EventObject;
-import java.util.HashSet;
 import java.util.List;
 import javax.swing.AbstractCellEditor;
 import javax.swing.BorderFactory;
@@ -43,9 +41,9 @@ import javax.swing.JTextField;
 import javax.swing.UIManager;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
-import javax.swing.tree.TreePath;
-import org.bx.gui.MyDefaultTableModel;
-import org.bx.gui.MyTableCellRenderer;
+import org.dz.MyDefaultTableModel;
+import org.dz.MyTableCellRenderer;
+
 
 /**
  *

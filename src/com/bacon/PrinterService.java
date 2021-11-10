@@ -26,7 +26,8 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.logging.Level;
 import javax.print.PrintService;
-import org.bx.Imagenes;
+import org.dz.Imagenes;
+
 
 /**
  *

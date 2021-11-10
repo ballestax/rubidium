@@ -54,15 +54,16 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableRowSorter;
-import org.bx.Registro;
-import org.bx.TextFormatter;
-import org.bx.gui.MyDefaultTableModel;
-import org.bx.gui.PanelCaptura;
+
 import javax.swing.ImageIcon;
 import javax.swing.SwingWorker;
 import org.apache.log4j.Logger;
 import static javax.swing.BorderFactory.createLineBorder;
-import javax.xml.stream.Location;
+import org.dz.MyDefaultTableModel;
+import org.dz.PanelCaptura;
+import org.dz.Registro;
+import org.dz.TextFormatter;
+
 
 /**
  *

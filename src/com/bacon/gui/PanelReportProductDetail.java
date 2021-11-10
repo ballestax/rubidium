@@ -16,7 +16,6 @@ import com.bacon.domain.Location;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Desktop;
-import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
@@ -26,7 +25,6 @@ import java.text.DateFormat;
 import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -40,9 +38,10 @@ import javax.swing.UIManager;
 import javax.swing.table.TableCellRenderer;
 
 import org.apache.log4j.Logger;
-import org.bx.gui.MyDefaultTableModel;
+import org.dz.MyDefaultTableModel;
+import org.dz.MyListModel;
 import org.dz.PanelCapturaMod;
-import org.dzur.gui.MyListModel;
+
 
 /**
  *
@@ -130,7 +129,7 @@ public class PanelReportProductDetail extends PanelCapturaMod implements ActionL
 //            }
         }
 
-        Color colAl = org.dzur.Util.colorAleatorio(200, 255);
+        Color colAl = org.dz.Utiles.colorAleatorio(200, 255);
         String color = Utiles.toHex(colAl);
 
         codigoProd = String.valueOf(item.getId());

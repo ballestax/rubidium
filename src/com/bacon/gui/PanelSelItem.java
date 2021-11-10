@@ -12,10 +12,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.ImageIcon;
 import javax.swing.ListSelectionModel;
@@ -26,10 +23,9 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import org.balx.TextFormato;
-import org.bx.TextFormatter;
-import org.bx.gui.MyDefaultTableModel;
-import org.bx.gui.PanelCaptura;
+import org.dz.MyDefaultTableModel;
+import org.dz.PanelCaptura;
+import org.dz.TextFormatter;
 
 /**
  *
@@ -86,8 +82,8 @@ public class PanelSelItem extends PanelCaptura implements ActionListener, CaretL
         tabla.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tabla.setFont(new Font("Tahoma", 0, 15));
 
-        org.balx.TextFormato docF = new TextFormato();
-        tfCantidad.setDocument(docF.getLimitadorNumeros());
+        
+        tfCantidad.setDocument(TextFormatter.getDoubleLimiter());
         tfCantidad.addCaretListener(new Caret());
         tfCantidad.addCaretListener(this);
         tfValorUnit.setDocument(TextFormatter.getDoubleLimiter());

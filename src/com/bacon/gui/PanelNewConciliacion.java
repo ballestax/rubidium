@@ -31,7 +31,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import org.apache.log4j.Logger;
-import org.bx.gui.MyDefaultTableModel;
+import org.dz.MyDefaultTableModel;
 import org.dz.PanelCapturaMod;
 import org.dz.TextFormatter;
 
