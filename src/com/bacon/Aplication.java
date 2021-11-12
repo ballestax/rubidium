@@ -51,7 +51,7 @@ import org.dz.Imagenes;
 public final class Aplication implements ActionListener, PropertyChangeListener, ListSelectionListener {
 
     public static final String TITLE = "Bacon 57 Burger";
-    public static final String VERSION = "2.1.2"; // 17/July/2021
+    public static final String VERSION = "2.2.1"; // 10/Nov/2021
     public static final String ACTION_CANCEL_PANEL = "acCancelPanel";
     public static final String ACTION_EXIT_APP = "acExitApp";
     public static final String ACTION_SHOW_PREFERENCES = "acShowPreferences";

@@ -158,13 +158,13 @@ public class JDBCConciliacionDAO implements ConciliacionDAO {
                 conciliacion = new Conciliacion();
                 conciliacion.setId(rs.getInt(1));
                 conciliacion.setCodigo(rs.getString(2));
-                conciliacion.setFecha(rs.getDate(3));
+                conciliacion.setFecha(rs.getTimestamp(3));
                 conciliacion.setIdItem(rs.getInt(4));
                 conciliacion.setExistencias(rs.getDouble(5));
                 conciliacion.setConciliacion(rs.getDouble(6));
                 conciliacion.setLocacion(rs.getInt(7));
                 conciliacion.setNota(rs.getString(8));
-                conciliacion.setUpdateTime(rs.getDate(9));
+                conciliacion.setUpdateTime(rs.getTimestamp(9));
                 conciliacion.setUser(rs.getString(10));
                 conciliaciones.add(conciliacion);
             }

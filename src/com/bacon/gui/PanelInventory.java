@@ -641,6 +641,10 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
             refreshItemsFiltered();
         } else if (PanelNewConciliacion.ACTION_SAVE_CONCILIACION.equals(evt.getPropertyName())) {
             refreshItemsFiltered();
+        } else if (PanelAddItem.AC_DELETE_ITEM.equals(evt.getPropertyName())) {
+            refreshItemsFiltered();
+        } else if (PanelAddItem.AC_UPDATE_ITEM.equals(evt.getPropertyName())) {
+            refreshItemsFiltered();
         }
     }
 

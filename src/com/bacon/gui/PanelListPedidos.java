@@ -652,7 +652,6 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener,
                             tfCycle.setText(String.valueOf(lastCycle.getId()));
                             makeTitleCycle(lastCycle);
                         }
-
                         break;
                     }
 

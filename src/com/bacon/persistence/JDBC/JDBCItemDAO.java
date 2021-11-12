@@ -86,7 +86,7 @@ public class JDBCItemDAO implements ItemDAO {
     }
 
     @Override
-    public Item getItem(int id) throws DAOException {
+    public Item getItem(long id) throws DAOException {
         return getItemBy("id=" + id);
     }
 
@@ -136,8 +136,8 @@ public class JDBCItemDAO implements ItemDAO {
                 item.setInit(rs.getDouble("init"));
                 item.setOnlyDelivery(rs.getBoolean("onlyDelivery"));
                 item.setSnapshot(rs.getBoolean("snapshot"));
-                item.setCreatedTime(rs.getDate("createdTime"));
-                item.setUpdateTime(rs.getDate("lastUpdatedTime"));
+                item.setCreatedTime(rs.getTimestamp("createdTime"));
+                item.setUpdateTime(rs.getTimestamp("lastUpdatedTime"));
                 item.setUser(rs.getString("user"));
                 item.setTags(rs.getString("tags"));
                 items.add(item);
@@ -203,12 +203,11 @@ public class JDBCItemDAO implements ItemDAO {
                 if (idPres != 0) {
                     Object[] parameters1 = {idItem, idProd, idPres, cant};
                     ps = sqlStatements.buildSQLStatement(conn, ADD_INVENTORY_PRESENTATION_KEY, parameters1);
-                    
-                }else{
+
+                } else {
                     Object[] parameters1 = {idItem, idProd, cant};
                     ps = sqlStatements.buildSQLStatement(conn, ADD_INVENTORY_PRODUCT_KEY, parameters1);
-    
-                
+
                 }
                 ps.executeUpdate();
             }
@@ -227,7 +226,7 @@ public class JDBCItemDAO implements ItemDAO {
     }
 
     @Override
-    public void deleteItem(int id) throws DAOException {
+    public void deleteItem(long id) throws DAOException {
         Connection conn = null;
         PreparedStatement ps = null;
         try {
@@ -256,8 +255,9 @@ public class JDBCItemDAO implements ItemDAO {
             conn = dataSource.getConnection();
             conn.setAutoCommit(false);
             Object[] parameters = {
+                item.getName(),
                 item.getCost(),
-                item.getPrice(),                
+                item.getPrice(),
                 item.getStock(),
                 item.getStockMin(),
                 item.isOnlyDelivery(),
@@ -279,7 +279,7 @@ public class JDBCItemDAO implements ItemDAO {
             DBManager.closeConnection(conn);
         }
     }
-    
+
     public void updateItemPres(Item item) throws DAOException {
         if (item == null) {
             throw new IllegalArgumentException("Null item");
@@ -290,14 +290,14 @@ public class JDBCItemDAO implements ItemDAO {
         try {
             conn = dataSource.getConnection();
             conn.setAutoCommit(false);
-            
+
             Object[] parameters = {item.getId()};
 //            System.out.println("deleting id:"+item.getId());
             ps = sqlStatements.buildSQLStatement(conn, DELETE_ITEM_PRES_KEY, parameters);
             ps.executeUpdate();
-            
+
             long idItem = item.getId();
-            
+
             List<Object[]> presList = item.getPresentations();
 
             for (int i = 0; i < presList.size(); i++) {
@@ -308,7 +308,7 @@ public class JDBCItemDAO implements ItemDAO {
                 if (idPres != 0) {
                     Object[] parameters1 = {idItem, idProd, idPres, cant};
                     ps = sqlStatements.buildSQLStatement(conn, ADD_INVENTORY_PRESENTATION_KEY, parameters1);
-                }else{
+                } else {
                     Object[] parameters1 = {idItem, idProd, cant};
                     ps = sqlStatements.buildSQLStatement(conn, ADD_INVENTORY_PRODUCT_KEY, parameters1);
                 }

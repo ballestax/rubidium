@@ -24,7 +24,7 @@
                     |GET_PERSON|GET_PERSON_LIMIT|INSERT_PERSON|UPDATE_PERSON|GET_ID_PERSON|DELETE_PERSON|DELETE_PERSON_WHERE
                     |CREATE_CONFIG_TABLE|GET_CONFIG|DELETE_CONFIG|UPDATE_CONFIG|EXIST_CONFIG
                     |ADD_CONFIG
-                    |EXIST_CLAVE|GET_MAX_ID|COUNT_TABLE2
+                    |EXIST_CLAVE|GET_MAX_ID|COUNT_TABLE2|EXIST_CLAVE_MULT
                     |CREATE_PRODUCTS_TABLE|ADD_PRODUCT|GET_PRODUCT|DELETE_PRODUCT|UPDATE_PRODUCT|GET_PRODUCT_BY_PRESS_ID
                     |CREATE_INGREDIENTS_TABLE|ADD_INGREDIENT|GET_INGREDIENT|DELETE_INGREDIENT|UPDATE_INGREDIENT
                     |CREATE_PRODUCT_INGREDIENT_TABLE|GET_INGREDIENTS_BY_PRODUCT
@@ -37,16 +37,18 @@
                     |GET_FIRST_REGISTRO|GET_LAST_REGISTRO
                     |CREATE_CLIENTS_TABLE|GET_CLIENT|ADD_CLIENT|DELETE_CLIENT|UPDATE_CLIENT
                     |CREATE_PRESENTATION_PRODUCT_TABLE|GET_PRESENTATIONS_BY_PRODUCT|GET_PRESENTATION_BY_DEFAULT|GET_PRESENTATION
+                    |GET_ALL_PRESENTATIONS_BY_PRODUCT
                     |CREATE_CYCLES_TABLE|GET_CYCLE|ADD_CYCLE|DELETE_CYCLE|UPDATE_CYCLE
                     |CREATE_OTHER_PRODUCTS_TABLE|GET_OTHER_PRODUCT|ADD_OTHER_PRODUCT|DELETE_OTHER_PRODUCT
                     |CREATE_INVOICE_OTHER_PRODUCT_TABLE|ADD_INVOICE_OTHER_PRODUCT
                     |GET_CATEGORIES_SORTED|GET_ALL_CATEGORIES|GET_CATEGORY
                     |CREATE_EXPENSES_INCOMES_TABLE|ADD_EXPENSE_INCOME|GET_EXPENSE_INCOME
-                    |GET_INVOICE_BY_PRODUCT
+                    |CREATE_EXPENSES_CATEGORIES_TABLE|ADD_EXPENSES_CATEGORY|GET_EXPENSES_CATEGORY|UPDATE_EXPENSES_CATEGORY
+                    |DELETE_EXPENSES_CATEGORY|GET_INVOICE_BY_PRODUCT
                     |CREATE_INVENTORY_TABLE|GET_ITEM|ADD_ITEM|UPDATE_ITEM
                     |ADD_UNIT|GET_UNIT|UPDATE_UNIT|DELETE_UNIT|CREATE_UNITS_TABLE
                     |CREATE_INVENTORY_PRODUCT_TABLE|ADD_INVENTORY_PRODUCT|CHECK_INVENTORY|CHECK_INVENTORY_PRODUCT
-                    |ADD_INVENTORY_PRESENTATION|DELETE_ITEM_PRES
+                    |ADD_INVENTORY_PRESENTATION|DELETE_ITEM_PRES|DELETE_ITEM
                     |UPDATE_INVENTORY_QUANTITY|ADD_INVENTORY_QUANTITY
                     |CREATE_CONCILIACIONES_TABLE|ADD_CONCILIACION|GET_CONCILIACION|UPDATE_CONCILIACION|DELETE_CONCILIACION
                     |ADD_LOCATION|GET_LOCATION|UPDATE_LOCATION|DELETE_LOCATION|CREATE_LOCATIONS_TABLE
@@ -58,8 +60,11 @@
                     |ADD_PAYMENT|GET_PAYMENT|UPDATE_PAYMENT|DELETE_PAYMENT|CREATE_PAYMENTS_TABLE
                     |GET_TAGS_INVENTORY_LIST
                     |CREATE_INVENTORY_SNAPSHOT_TABLE|ADD_INVENTORY_SNAPSHOT_ITEM|GET_INVENTORY_SNAPSHOT_ITEM
+                    |UPDATE_INVENTORY_SNAPSHOT_ITEM
                     |COUNT_ITEM_SNAP_EVENT|COUNT_ITEM_CONCILIATION_EVENT
                     |GET_PRODUCTS_BY_VARPRICE_RANK_LIST
+                    |CREATE_CATEGORIES_TABLE|ADD_CATEGORY|GET_CATEGORY_PROD|UPDATE_CATEGORY
+                    |ADD_PRESENTATION|UPDATE_PRESENTATION|UPDATE_PRESENTATION_TO_DEFAULT|UPDATE_PRESENTATION_TO_DEFAULT_BY_ID
                     ) #REQUIRED
                     
 	>
@@ -641,6 +646,12 @@
             </SQLFragment>
         </SQLStatement>
         
+        <SQLStatement method="EXIST_CLAVE_MULT">
+            <SQLFragment>
+                SELECT count({query}) FROM {table} WHERE {key};
+            </SQLFragment>
+        </SQLStatement>
+        
         <SQLStatement method="GET_MAX_ID">
             <SQLFragment>
                 SELECT max(id) FROM {table};
@@ -697,13 +708,14 @@
             <SQLFragment>
                 UPDATE products SET 
                 name=?,                
-                category=?,
+                code=?,                
                 description=?,
                 price=?,
                 image=?,
+                category=?,
                 variable=?,
                 enabled=? 
-                WHERE code = ?
+                WHERE id = ?
             </SQLFragment>
         </SQLStatement> 
         
@@ -1160,6 +1172,17 @@
             </SQLFragment>
         </SQLStatement>
                 
+        <SQLStatement method="GET_ALL_PRESENTATIONS_BY_PRODUCT">
+            <SQLFragment>
+                SELECT ps.id, ps.product_id, ps.serie,ps.name,ps.price,ps.isdefault,ps.isenabled
+                FROM presentation_product ps
+                WHERE 
+                ps.product_id = ?
+                ORDER BY
+                ps.price, ps.name
+            </SQLFragment>
+        </SQLStatement>
+                
         <SQLStatement method="GET_PRESENTATION_BY_DEFAULT">
             <SQLFragment>
                 SELECT ps.id, ps.product_id, ps.serie,ps.name,ps.price,ps.isdefault,ps.isenabled
@@ -1331,18 +1354,22 @@
                 CREATE TABLE expenses_incomes(
                 id INTEGER AUTO_INCREMENT,
                 type INTEGER NOT NULL,
-                category INTEGER NOT NULL,
+                desc VARCHAR(100),
                 value DECIMAL(20,2),
                 note VARCHAR(255),
-                PRIMARY KEY (id)                
+                cycle_id INTEGER NOT NULL,
+                category_id INTEGER NOT NULL,
+                PRIMARY KEY (id),      
+                FOREIGN KEY (cycle_id) REFERENCES cycles(id) ON DELETE CASCADE ON UPDATE CASCADE,                       
+                FOREIGN KEY (category_id) REFERENCES expenses_categories(id) ON DELETE CASCADE ON UPDATE CASCADE                       
                 )ENGINE=InnoDB DEFAULT CHARSET=latin1;
             </SQLFragment>
         </SQLStatement>   
         
         <SQLStatement method="ADD_EXPENSE_INCOME">
             <SQLFragment>
-                INSERT INTO expense_income (type, category, value, note) 
-                VALUES (?,?,?,?)
+                INSERT INTO expenses_incomes (type,desc,value,note,cycle_id,category_id) 
+                VALUES (?,?,?,?,?,?)
             </SQLFragment>
         </SQLStatement>
         
@@ -1361,6 +1388,50 @@
             </SQLFragment>        
         </SQLStatement>	     
         
+        <SQLStatement method="CREATE_EXPENSES_CATEGORIES_TABLE">            
+            <SQLFragment>
+                CREATE TABLE expenses_categories(
+                id INTEGER AUTO_INCREMENT,
+                category VARCHAR(30) NOT NULL UNIQUE,                
+                PRIMARY KEY (id)                
+                )ENGINE=InnoDB DEFAULT CHARSET=latin1;
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="ADD_EXPENSES_CATEGORY">
+            <SQLFragment>
+                INSERT INTO expenses_categories (category) VALUES (?);
+            </SQLFragment>
+        </SQLStatement>        
+        
+        <SQLStatement method="GET_EXPENSES_CATEGORY">
+            <SQLFragment>
+                SELECT
+            </SQLFragment>
+            <SQLFragment>
+                * FROM expenses_categories
+            </SQLFragment>
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                WHERE {where}
+            </SQLFragment>    
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                ORDER BY {orderby}
+            </SQLFragment>        
+        </SQLStatement>
+        
+        <SQLStatement method="UPDATE_EXPENSES_CATEGORY">
+            <SQLFragment>
+                UPDATE expenses_categories SET 
+                category=?
+                WHERE category = ?;
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="DELETE_EXPENSES_CATEGORY">
+            <SQLFragment>
+                DELETE FROM expenses_categories WHERE category = ?;
+            </SQLFragment>
+        </SQLStatement>
         
         <SQLStatement method="CREATE_INVENTORY_TABLE">            
             <SQLFragment>
@@ -1438,12 +1509,13 @@
         <SQLStatement method="DELETE_ITEM_PRES">
             <SQLFragment>
                 DELETE FROM inventory_product WHERE item_id = ?;                
-            </SQLFragment>
+            </SQLFragment>  
         </SQLStatement>
         
         <SQLStatement method="UPDATE_ITEM">
             <SQLFragment>
-                UPDATE inventory SET                 
+                UPDATE inventory SET
+                name=?,                 
                 cost=?,
                 price=?,
                 stock=?,
@@ -1455,6 +1527,11 @@
             </SQLFragment>            
         </SQLStatement>
         
+        <SQLStatement method="DELETE_ITEM">
+            <SQLFragment>
+                DELETE FROM inventory WHERE id = ?;
+            </SQLFragment>  
+        </SQLStatement>
         
         <SQLStatement method="CREATE_UNITS_TABLE">
             <SQLFragment>
@@ -1815,12 +1892,23 @@
                 )ENGINE=InnoDB DEFAULT CHARSET=latin1;
             </SQLFragment>
         </SQLStatement>
-        
-        
+                
         <SQLStatement method="ADD_INVENTORY_SNAPSHOT_ITEM">
             <SQLFragment>
                 INSERT INTO inventory_snapshot (item_id, cycle_id,quantity,ins,outs,conciliations,sales,final,isOnlyDelivery) 
                 VALUES (?,?,?,?,?,?,?,?,?);
+            </SQLFragment>            
+        </SQLStatement>
+        
+        <SQLStatement method="UPDATE_INVENTORY_SNAPSHOT_ITEM">
+            <SQLFragment>
+                UPDATE inventory_snapshot SET
+                ins =?,
+                outs=?,
+                conciliations=?,
+                sales=?,
+                final=?
+                WHERE id = ?;
             </SQLFragment>            
         </SQLStatement>
         
@@ -1848,8 +1936,7 @@
                 SELECT sum(c.conciliacion-c.existencias) as sum FROM conciliaciones c WHERE c.idItem=? AND (c.lastUpdatedTime BETWEEN ? AND ?)
             </SQLFragment>            
         </SQLStatement>
-            
-        
+             
         
         <SQLStatement method="GET_TAGS_INVENTORY_LIST">
             <SQLFragment>
@@ -1872,6 +1959,81 @@
                 LIMIT ?
             </SQLFragment>
         </SQLStatement>
+        
+        <SQLStatement method="CREATE_CATEGORIES_TABLE">
+            <SQLFragment>
+                CREATE TABLE categories(
+                id INTEGER AUTO_INCREMENT,
+                name VARCHAR(255) NOT NULL UNIQUE,
+                zorder INTEGER,
+                PRIMARY KEY (id)
+                )ENGINE=InnoDB DEFAULT CHARSET=latin1;
+            </SQLFragment>
+        </SQLStatement>	
+        
+        <SQLStatement method="ADD_CATEGORY">
+            <SQLFragment>
+                INSERT INTO categories (name,zorder) VALUES (?,?);
+            </SQLFragment>
+        </SQLStatement>        
+        
+        <SQLStatement method="GET_CATEGORY_PROD">
+            <SQLFragment>
+                SELECT
+            </SQLFragment>
+            <SQLFragment>
+                * FROM categories
+            </SQLFragment>
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                WHERE {where}
+            </SQLFragment>    
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                ORDER BY {orderby}
+            </SQLFragment>        
+        </SQLStatement>
+        
+        <SQLStatement method="UPDATE_CATEGORY">
+            <SQLFragment>
+                UPDATE categories SET 
+                name=?
+                WHERE name = ?;
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="ADD_PRESENTATION">
+            <SQLFragment>
+                INSERT INTO presentation_product (name,price,serie,isdefault,isenabled,product_id) VALUES (?,?,?,?,?,?);
+            </SQLFragment>
+        </SQLStatement> 
+        
+        <SQLStatement method="UPDATE_PRESENTATION">
+            <SQLFragment>
+                UPDATE  presentation_product SET
+                name =?,
+                price=?,
+                serie=?,
+                isdefault=?,
+                isenabled=?
+                WHERE id = ?
+            </SQLFragment>
+        </SQLStatement> 
+        
+        <SQLStatement method="UPDATE_PRESENTATION_TO_DEFAULT">
+            <SQLFragment>
+                UPDATE presentation_product SET                
+                isdefault=? 
+                WHERE product_id = ?;
+            </SQLFragment>            
+        </SQLStatement> 
+        
+        <SQLStatement method="UPDATE_PRESENTATION_TO_DEFAULT_BY_ID">
+            <SQLFragment>
+                UPDATE presentation_product SET                
+                isdefault=? 
+                WHERE product_id = ? AND id =?;
+            </SQLFragment>
+            
+        </SQLStatement> 
         
     </DAOStatements>
 </DAOConfiguration>

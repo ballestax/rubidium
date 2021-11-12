@@ -13,6 +13,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.JOptionPane;
 import javax.swing.ListSelectionModel;
@@ -38,7 +39,7 @@ public class PanelList<T> extends PanelCapturaMod implements ListSelectionListen
     public static final String AC_ADD = "AC_ADD";
     public static final String AC_EDIT = "AC_EDIT";
     public static final String AC_DELETE = "AC_DELETE";
-    private ArrayList lista;
+    private List lista;
 
     /**
      * Creates new form PanelList
@@ -48,7 +49,7 @@ public class PanelList<T> extends PanelCapturaMod implements ListSelectionListen
      * @param listener
      * @param lista
      */
-    public PanelList(Aplication app, String title, PropertyChangeListener listener, ArrayList lista) {
+    public PanelList(Aplication app, String title, PropertyChangeListener listener, List lista) {
         this.app = app;
         this.title = title;
         this.lista = lista;

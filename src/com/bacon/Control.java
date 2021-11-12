@@ -6,6 +6,7 @@
 package com.bacon;
 
 import com.bacon.domain.Additional;
+import com.bacon.domain.CashMov;
 import com.bacon.domain.Category;
 import com.bacon.domain.Client;
 import com.bacon.domain.Conciliacion;
@@ -206,6 +207,15 @@ public class Control {
         }
     }
 
+    public int existClaveMult(String tabla, String columna, String where) {
+        try {
+            JDBCUtilDAO utilDAO = (JDBCUtilDAO) JDBCDAOFactory.getInstance().getUtilDAO();
+            return utilDAO.existClaveMult(tabla, columna, where);
+        } catch (Exception e) {
+            return -1;
+        }
+    }
+
     public int getMaxIDTabla(String tabla) {
         try {
             JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
@@ -381,9 +391,9 @@ public class Control {
     }
 
     public boolean hasPermission(User user, Permission perm) {
-//        if (perm == null) {
-//            return false;
-//        }
+        if (perm == null) {
+            return false;
+        }
         try {
             JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
             int val = utilDAO.hasPermission(user.getId(), perm.getId());
@@ -419,6 +429,30 @@ public class Control {
             logger.error("Error getting permissions.", ex);
         }
         return null;
+    }
+
+    public boolean addProduct(Product product) {
+        try {
+            JDBCProductDAO prodDAO = (JDBCProductDAO) DAOFactory.getInstance().getProductDAO();
+            prodDAO.addProduct(product);
+            return true;
+        } catch (DAOException ex) {
+            String msg = "Error adding product: " + product.getName();
+            logger.error(msg, ex);
+            GUIManager.showErrorMessage(null, msg, "Error");
+            return false;
+        }
+    }
+
+    public boolean updateProduct(Product prod) {
+        try {
+            JDBCProductDAO prodDAO = (JDBCProductDAO) DAOFactory.getInstance().getProductDAO();
+            prodDAO.updateProduct(prod);
+            return true;
+        } catch (DAOException ex) {
+            logger.error("Error updating Product.", ex);
+            return false;
+        }
     }
 
     public ArrayList<Product> getProductsList(String where, String order) {
@@ -722,6 +756,16 @@ public class Control {
         }
     }
 
+    public ArrayList<Presentation> getAllPresentationsByProduct(long idProduct) {
+        try {
+            JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
+            return utilDAO.getAllPresentationsByProduct(idProduct);
+        } catch (DAOException ex) {
+            logger.error("Error getting Presentations list.", ex);
+            return null;
+        }
+    }
+
     public Presentation getPresentationsById(long idPres) {
         try {
             JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
@@ -953,11 +997,32 @@ public class Control {
             return false;
         }
     }
+    
+    public void deleteItem(long id) {
+        try {
+            JDBCItemDAO itemDAO = (JDBCItemDAO) DAOFactory.getInstance().getItemDAO();
+            itemDAO.deleteItem(id);
+        } catch (DAOException ex) {
+            logger.error("Error deleting item.", ex);
+            GUIManager.showErrorMessage(null, "Error eliminando item", "Error");
+        }
+    }
 
     public ArrayList<String> getUnitsList(String where, String order) {
         try {
             JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
             return utilDAO.getUnitList(where, order);
+        } catch (DAOException ex) {
+            logger.error("Error getting units list.", ex);
+            GUIManager.showErrorMessage(null, "Error consultando lista de unidades", "Error");
+            return null;
+        }
+    }
+
+    public ArrayList<String> getCategoriesList(String where, String order) {
+        try {
+            JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
+            return utilDAO.getCategoriesList(where, order);
         } catch (DAOException ex) {
             logger.error("Error getting units list.", ex);
             GUIManager.showErrorMessage(null, "Error consultando lista de unidades", "Error");
@@ -992,6 +1057,58 @@ public class Control {
         } catch (DAOException ex) {
             logger.error("Error updating unit.", ex);
             GUIManager.showErrorMessage(null, "Error updating unidad", "Error");
+        }
+    }
+
+    public void addCategory(String nombre) {
+        try {
+            JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
+            utilDAO.addCategory(nombre);
+        } catch (DAOException ex) {
+            logger.error("Error adding unit.", ex);
+            GUIManager.showErrorMessage(null, "Error agregando unidad", "Error");
+        }
+    }
+
+    public void updateCategory(String nombre, String id) {
+        try {
+            JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
+            utilDAO.updateCategory(nombre, id);
+        } catch (DAOException ex) {
+            logger.error("Error updating unit.", ex);
+            GUIManager.showErrorMessage(null, "Error updating unidad", "Error");
+        }
+    }
+
+    public void addPresentation(Presentation pres) {
+        try {
+            JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
+            utilDAO.addPresentation(pres);
+        } catch (DAOException ex) {
+            logger.error("Error adding unit.", ex);
+            GUIManager.showErrorMessage(null, "Error agregando presentacion", "Error");
+        }
+    }
+
+    public boolean updatePresentation(Presentation pres) {
+        try {
+            JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
+            return utilDAO.updatePresentation(pres);
+        } catch (DAOException ex) {
+            logger.error("Error updating press.", ex);
+            GUIManager.showErrorMessage(null, "Error actualizando presentacion", "Error");
+            return false;
+        }
+    }
+
+    public boolean updatePresentationToDefault(Presentation pres) {
+        try {
+            JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
+            return utilDAO.updatePresentationToDefault(pres);
+        } catch (DAOException ex) {
+            logger.error("Error updating press.", ex);
+            GUIManager.showErrorMessage(null, "Error actualizando presentacion", "Error");
+            return false;
         }
     }
 
@@ -1139,9 +1256,13 @@ public class Control {
     }
 
     public ArrayList<Object[]> getProductsOutInventoryList(long idProd, long idItem, Date start) {
+        return getProductsOutInventoryList(idProd, idItem, start, new Date());
+    }
+
+    public ArrayList<Object[]> getProductsOutInventoryList(long idProd, long idItem, Date start, Date end) {
         try {
             JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
-            return utilDAO.getProductsOutInventory(idProd, idItem, start);
+            return utilDAO.getProductsOutInventory(idProd, idItem, start, end);
         } catch (DAOException ex) {
             logger.error("Error getting product out list.", ex);
             GUIManager.showErrorMessage(null, "Error consultando lista de salida de productos", "Error");
@@ -1150,9 +1271,13 @@ public class Control {
     }
 
     public ArrayList<Object[]> getPresentationsOutInventoryList(long idPres, long idItem, Date start) {
+        return getPresentationsOutInventoryList(idPres, idItem, start, new Date());
+    }
+
+    public ArrayList<Object[]> getPresentationsOutInventoryList(long idPres, long idItem, Date start, Date end) {
         try {
             JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
-            return utilDAO.getPresentationOutInventory(idPres, idItem, start);
+            return utilDAO.getPresentationOutInventory(idPres, idItem, start, end);
         } catch (DAOException ex) {
             logger.error("Error getting presentation out list.", ex);
             GUIManager.showErrorMessage(null, "Error consultando lista de salida de productos por presentacion", "Error");
@@ -1170,7 +1295,7 @@ public class Control {
             return null;
         }
     }
-    
+
     public List<Double> getRankProductsByVarPriceList(long idItem, int limit) {
         try {
             JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
@@ -1237,6 +1362,127 @@ public class Control {
             return null;
 
         }
+    }
+
+    public ArrayList<CashMov.Category> getExpensesCategoriesList(String where, String orderBy) {
+        try {
+            JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
+            return utilDAO.getExpensesCategoriesList(where, orderBy);
+        } catch (DAOException ex) {
+            logger.error("Error getting Expenses Categories list.", ex);
+            return null;
+        }
+    }
+
+    public void addExpenseCategory(String nombre) {
+        try {
+            JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
+            utilDAO.addExpenseCategory(nombre);
+        } catch (DAOException ex) {
+            logger.error("Error adding unit.", ex);
+            GUIManager.showErrorMessage(null, "Error agregando unidad", "Error");
+        }
+    }
+
+    public void updateExpenseCategory(String nombre, String id) {
+        try {
+            JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
+            utilDAO.updateExpensesCategory(nombre, id);
+        } catch (DAOException ex) {
+            logger.error("Error updating unit.", ex);
+            GUIManager.showErrorMessage(null, "Error updating unidad", "Error");
+        }
+    }
+
+    public void addExpenseIncome(HashMap data) {
+        try {
+            JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
+            utilDAO.addExpenseIncome(data);
+        } catch (DAOException ex) {
+            logger.error("Error adding expense-income.", ex);
+            GUIManager.showErrorMessage(null, "Error agregando expense-income", "Error");
+        }
+    }
+
+    public void deleteExpenseCategory(String nombre) {
+        try {
+            JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
+            utilDAO.deleteExpenseCategory(nombre);
+        } catch (DAOException ex) {
+            logger.error("Error deleting category.", ex);
+            GUIManager.showErrorMessage(null, "Error eliminando categoria", "Error");
+        }
+    }
+
+    public void saveSnapshotData(Cycle cycle) {
+        ArrayList<Map> itemSnapList = app.getControl().getItemSnapshotList("cycle_id=" + cycle.getId(), "i.name");
+        try {
+            JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
+            for (Map map : itemSnapList) {
+                HashMap<String, Double> data = getSnapshotData(map, cycle);
+                Long id = Long.parseLong(map.get("id").toString());
+                utilDAO.updateSnapshotItem(id, data);
+            }
+        } catch (DAOException ex) {
+            logger.error("Error updating snapshot.", ex);
+            GUIManager.showErrorMessage(null, "Error actualizando datos del snapshot", "Error");
+        }
+    }
+
+    public HashMap<String, Double> getSnapshotData(Map map, Cycle lastCycle) {
+        double outs = 0;
+        ArrayList<Object[]> presentationsByItem = app.getControl().getPresentationsByItem(Long.valueOf(map.get("item_id").toString()));
+
+        Date end = new Date();
+        if (!lastCycle.isOpened()) {
+            end = lastCycle.getEnd();
+        }
+    
+        boolean onlyDelivery = Boolean.parseBoolean(map.get("onlyDelivery").toString()); // item is only delivery
+        for (Object[] get : presentationsByItem) {
+            long idPres = Long.parseLong(get[0].toString());
+            long idProd = Long.parseLong(get[1].toString());
+            long idItem = Long.valueOf(map.get("item_id").toString());
+            if (idPres == 0) { //producto sin presentacion
+                ArrayList<Object[]> productsOutInventory = app.getControl().getProductsOutInventoryList(idProd, idItem, lastCycle.getInit(), end);
+                for (int j = 0; j < productsOutInventory.size(); j++) {
+                    Object[] data = productsOutInventory.get(j);
+                    double quantity = Double.parseDouble(data[2].toString());
+                    int delType = Integer.parseInt(data[3].toString());
+                    outs += quantity * (onlyDelivery && delType == PanelPedido.TIPO_LOCAL ? 0 : 1.0); // excluir locales solo para llevar
+                }
+            } else {
+                ArrayList<Object[]> presentationsOutInventory = app.getControl().getPresentationsOutInventoryList(idPres, idItem, lastCycle.getInit(), end);
+                for (int j = 0; j < presentationsOutInventory.size(); j++) {
+                    Object[] data = presentationsOutInventory.get(j);
+                    double quantity = Double.parseDouble(data[3].toString());
+                    int delType = Integer.parseInt(data[4].toString());
+                    outs += quantity * (onlyDelivery && delType == PanelPedido.TIPO_LOCAL ? 0 : 1.0); // excluir locales solo para llevar
+                }
+            }
+        }
+
+        Map countIn = app.getControl().countItemSnap(Long.valueOf(map.get("item_id").toString()), 1, lastCycle.getId());
+        Map countOut = app.getControl().countItemSnap(Long.valueOf(map.get("item_id").toString()), 2, lastCycle.getId());
+        Map countConc = app.getControl().countItemConciliations(Long.valueOf(map.get("item_id").toString()), lastCycle.getId());
+
+        double quantity = Double.parseDouble(map.get("quantity").toString());
+        double sIns = Double.parseDouble(countIn.get("sum").toString());
+        double sOuts = Double.parseDouble(countOut.get("sum").toString());
+        double sConc = Double.parseDouble(countConc.get("sum").toString());
+        double res = quantity + sIns - sOuts - outs + sConc;
+        double real = Double.parseDouble(map.get("real").toString());
+
+        HashMap<String, Double> data = new HashMap<>();
+        data.put("quantity", quantity);
+        data.put("income", sIns);
+        data.put("outcome", sOuts);
+        data.put("conciliation", sConc);
+        data.put("sales", outs);
+        data.put("result", res);
+        data.put("real", real);
+
+        return data;
     }
 
 }
