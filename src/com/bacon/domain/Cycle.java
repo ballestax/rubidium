@@ -60,7 +60,9 @@ public class Cycle {
     public void setStatus(int status) {
         this.status = status;
     }
-    
-    
+
+    public boolean isOpened() {
+        return status == OPENED;
+    }
 
 }

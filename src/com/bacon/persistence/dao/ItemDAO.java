@@ -15,13 +15,13 @@ import java.util.ArrayList;
  */
 public interface ItemDAO {
 
-    public Item getItem(int id) throws com.bacon.persistence.dao.DAOException;
+    public Item getItem(long id) throws com.bacon.persistence.dao.DAOException;
 
     public ArrayList<Item> getItemList() throws com.bacon.persistence.dao.DAOException;
 
     public void addItem(Item item) throws com.bacon.persistence.dao.DAOException;
 
-    public void deleteItem(int id) throws com.bacon.persistence.dao.DAOException;
+    public void deleteItem(long id) throws com.bacon.persistence.dao.DAOException;
 
     public void updateItem(Item item) throws com.bacon.persistence.dao.DAOException;
 

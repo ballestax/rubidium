@@ -22,12 +22,16 @@
                   <Component id="jLabel1" max="32767" attributes="0"/>
                   <Component id="regNote" max="32767" attributes="0"/>
                   <Component id="regTipo" alignment="0" max="32767" attributes="0"/>
-                  <Component id="regCategory" alignment="0" max="32767" attributes="0"/>
                   <Component id="regDesc" alignment="0" max="32767" attributes="0"/>
                   <Component id="regValor" max="32767" attributes="0"/>
                   <Group type="102" alignment="1" attributes="0">
-                      <EmptySpace min="0" pref="272" max="32767" attributes="0"/>
+                      <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                       <Component id="btSave" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <Group type="102" alignment="1" attributes="0">
+                      <Component id="regCategory" pref="303" max="32767" attributes="0"/>
+                      <EmptySpace min="-2" pref="2" max="-2" attributes="0"/>
+                      <Component id="btAddCategory" min="-2" pref="37" max="-2" attributes="0"/>
                   </Group>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
@@ -37,12 +41,15 @@
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
-              <EmptySpace max="-2" attributes="0"/>
-              <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
+              <EmptySpace min="-2" pref="3" max="-2" attributes="0"/>
+              <Component id="jLabel1" min="-2" pref="26" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="regTipo" linkSize="1" min="-2" pref="36" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="regCategory" linkSize="1" min="-2" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="2" attributes="0">
+                  <Component id="regCategory" linkSize="1" alignment="2" min="-2" max="-2" attributes="0"/>
+                  <Component id="btAddCategory" linkSize="1" alignment="2" min="-2" max="-2" attributes="0"/>
+              </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="regDesc" linkSize="1" min="-2" max="-2" attributes="0"/>
               <EmptySpace min="-2" max="-2" attributes="0"/>
@@ -62,7 +69,6 @@
         <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
           <Color blue="70" green="70" red="93" type="rgb"/>
         </Property>
-        <Property name="text" type="java.lang.String" value="jLabel1"/>
         <Property name="opaque" type="boolean" value="true"/>
       </Properties>
     </Component>
@@ -95,6 +101,8 @@
       <Properties>
         <Property name="text" type="java.lang.String" value="jButton1"/>
       </Properties>
+    </Component>
+    <Component class="javax.swing.JButton" name="btAddCategory">
     </Component>
   </SubComponents>
 </Form>

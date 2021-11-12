@@ -7,6 +7,7 @@ package com.bacon.persistence.JDBC;
 
 import com.bacon.Aplication;
 import com.bacon.DBManager;
+import com.bacon.domain.CashMov;
 import com.bacon.domain.Category;
 import com.bacon.domain.Cycle;
 import com.bacon.domain.Ingredient;
@@ -143,6 +144,8 @@ public class JDBCUtilDAO implements UtilDAO {
 
     public static final String GET_TAGS_INVENTORY_LIST_KEY = "GET_TAGS_INVENTORY_LIST";
 
+    public static final String UPDATE_INVENTORY_SNAPSHOT_ITEM_KEY = "UPDATE_INVENTORY_SNAPSHOT_ITEM";
+
     public static final String CREATE_INVENTORY_REGISTER_TABLE_KEY = "CREATE_INVENTORY_REGISTER_TABLE";
     public static final String ADD_INVENTORY_EVENT_KEY = "ADD_INVENTORY_EVENT";
     public static final String GET_INVENTORY_EVENT_LIST_KEY = "GET_INVENTORY_EVENT_LIST";
@@ -158,10 +161,11 @@ public class JDBCUtilDAO implements UtilDAO {
     public static final String GET_CATEGORIES_LIST_KEY = "GET_CATEGORY_PROD";
     public static final String ADD_CATEGORY_KEY = "ADD_CATEGORY";
     public static final String UPDATE_CATEGORY_KEY = "UPDATE_CATEGORY";
-    
+
     public static final String GET_EXPENSES_CATEGORIES_LIST_KEY = "GET_EXPENSES_CATEGORY";
     public static final String ADD_EXPENSES_CATEGORY_KEY = "ADD_EXPENSES_CATEGORY";
     public static final String UPDATE_EXPENSES_CATEGORY_KEY = "UPDATE_EXPENSES_CATEGORY";
+    public static final String DELETE_EXPENSES_CATEGORY_KEY = "DELETE_EXPENSES_CATEGORY";
 
     public static final String ADD_PRESENTATION_KEY = "ADD_PRESENTATION";
     public static final String UPDATE_PRESENTATION_KEY = "UPDATE_PRESENTATION";
@@ -1229,7 +1233,7 @@ public class JDBCUtilDAO implements UtilDAO {
                 }
             }
 
-            Statement statement = conn.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            Statement statement = conn.createStatement();
             ResultSet rs = statement.executeQuery("SELECT * FROM inventory WHERE snapshot=1");
 
             while (rs.next()) {
@@ -1244,6 +1248,32 @@ public class JDBCUtilDAO implements UtilDAO {
         } finally {
             DBManager.closeStatement(ps);
             DBManager.closeStatement(ps2);
+            DBManager.closeConnection(conn);
+        }
+    }
+
+    public void updateSnapshotItem(long id, Map data) throws DAOException {
+        Connection conn = null;
+        PreparedStatement update = null;
+        try {
+            conn = dataSource.getConnection();
+            conn.setAutoCommit(false);
+            Object[] parameters = {
+                data.get("income"),
+                data.get("outcome"),
+                data.get("conciliation"),
+                data.get("sales"),
+                data.get("real"),
+                id
+            };
+            update = sqlStatements.buildSQLStatement(conn, UPDATE_INVENTORY_SNAPSHOT_ITEM_KEY, parameters);
+            update.executeUpdate();
+            conn.commit();
+        } catch (SQLException | IOException e) {
+            DBManager.rollbackConn(conn);
+            throw new DAOException("Could not properly update the Unit", e);
+        } finally {
+            DBManager.closeStatement(update);
             DBManager.closeConnection(conn);
         }
     }
@@ -1293,6 +1323,32 @@ public class JDBCUtilDAO implements UtilDAO {
     }
 
     public void updateCycle(Cycle cycle) throws DAOException {
+        Connection conn = null;
+        PreparedStatement update = null;
+        try {
+            conn = dataSource.getConnection();
+            conn.setAutoCommit(false);
+            Object[] parameters = {
+                cycle.getEnd(),
+                cycle.getStatus(),
+                cycle.getId()
+            };
+            update = sqlStatements.buildSQLStatement(conn, UPDATE_CYCLE_KEY, parameters);
+            update.executeUpdate();
+            conn.commit();
+        } catch (SQLException e) {
+            DBManager.rollbackConn(conn);
+            throw new DAOException("Could not properly update the cycle", e);
+        } catch (IOException e) {
+            DBManager.rollbackConn(conn);
+            throw new DAOException("Could not properly update the cycle", e);
+        } finally {
+            DBManager.closeStatement(update);
+            DBManager.closeConnection(conn);
+        }
+    }
+
+    public void saveSnapshotData(Cycle cycle) throws DAOException {
         Connection conn = null;
         PreparedStatement update = null;
         try {
@@ -1866,11 +1922,15 @@ public class JDBCUtilDAO implements UtilDAO {
     }
 
     public ArrayList<Object[]> getProductsOutInventory(long idProd, long idItem, Date start) throws DAOException {
+        return getProductsOutInventory(idProd, idItem, start, new Date());
+    }
+
+    public ArrayList<Object[]> getProductsOutInventory(long idProd, long idItem, Date start, Date end) throws DAOException {
         ArrayList<Object[]> list = new ArrayList<>();
         Connection conn = null;
         PreparedStatement retrieve = null;
         ResultSet rs = null;
-        Object[] parameters = {idProd, idItem, Aplication.DF_SQL_TS.format(start), new Date()};
+        Object[] parameters = {idProd, idItem, Aplication.DF_SQL_TS.format(start), Aplication.DF_SQL_TS.format(end)};
         try {
             conn = dataSource.getConnection();
             retrieve = sqlStatements.buildSQLStatement(conn, GET_PRODUCTS_OUT_INVENTORY_KEY, parameters);
@@ -1893,11 +1953,15 @@ public class JDBCUtilDAO implements UtilDAO {
     }
 
     public ArrayList<Object[]> getPresentationOutInventory(long idPres, long idItem, Date start) throws DAOException {
+        return getPresentationOutInventory(idPres, idItem, start, new Date());
+    }
+
+    public ArrayList<Object[]> getPresentationOutInventory(long idPres, long idItem, Date start, Date end) throws DAOException {
         ArrayList<Object[]> list = new ArrayList<>();
         Connection conn = null;
         PreparedStatement retrieve = null;
         ResultSet rs = null;
-        Object[] parameters = {idPres, idItem, Aplication.DF_SQL_TS.format(start), new Date(),};
+        Object[] parameters = {idPres, idItem, Aplication.DF_SQL_TS.format(start), Aplication.DF_SQL_TS.format(end)};
         try {
             conn = dataSource.getConnection();
             retrieve = sqlStatements.buildSQLStatement(conn, GET_PRESENTATIONS_OUT_INVENTORY_KEY, parameters);
@@ -2157,6 +2221,7 @@ public class JDBCUtilDAO implements UtilDAO {
                 dataItemSnap.put("quantity", rs.getDouble("s.quantity"));
                 dataItemSnap.put("ins", rs.getDouble("s.ins"));
                 dataItemSnap.put("outs", rs.getDouble("s.outs"));
+                dataItemSnap.put("conc", rs.getDouble("s.conciliations"));
                 dataItemSnap.put("sales", rs.getDouble("s.sales"));
                 dataItemSnap.put("name", rs.getString("i.name"));
                 dataItemSnap.put("onlyDelivery", rs.getBoolean("s.isOnlyDelivery"));
@@ -2196,7 +2261,11 @@ public class JDBCUtilDAO implements UtilDAO {
             rs = ps.executeQuery();
             rs.last();
             Date dInit = rs.getTimestamp("init");
-            Date dEnd = new Date(); //Problematico ver historico
+            int status = rs.getInt("status");
+            Date dEnd = new Date();
+            if (status == 0) {
+                dEnd = rs.getTimestamp("end");
+            }            
             Object[] parameters = {idItem, EVENT, dInit, dEnd};
 
             ps = sqlStatements.buildSQLStatement(conn, COUNT_ITEM_SNAP_EVENT_KEY, parameters);
@@ -2244,7 +2313,11 @@ public class JDBCUtilDAO implements UtilDAO {
             rs = ps.executeQuery();
             rs.last();
             Date dInit = rs.getTimestamp("init");
-            Date dEnd = new Date(); //Problematico ver historico
+            int status = rs.getInt("status");
+            Date dEnd = new Date();
+            if (status == 0) {
+                dEnd = rs.getTimestamp("end");
+            }
             Object[] parameters = {idItem, dInit, dEnd};
 
             ps = sqlStatements.buildSQLStatement(conn, COUNT_ITEM_CONCILIATION_EVENT_KEY, parameters);
@@ -2309,7 +2382,7 @@ public class JDBCUtilDAO implements UtilDAO {
             throw new DAOException("Could not properly retrieve the Categories List", e);
         } catch (IOException e) {
             throw new DAOException("Could not properly retrieve the Categories List", e);
-}
+        }
 
         Connection conn = null;
         PreparedStatement retrieve = null;
@@ -2333,10 +2406,10 @@ public class JDBCUtilDAO implements UtilDAO {
         }
         return categories;
     }
-    
-    public ArrayList<String> getExpensesCategoriesList(String where, String orderBy) throws DAOException {
+
+    public ArrayList<CashMov.Category> getExpensesCategoriesList(String where, String orderBy) throws DAOException {
         String retrieveUnit;
-        ArrayList<String> categories = new ArrayList<>();
+        ArrayList<CashMov.Category> categories = new ArrayList<>();
         try {
             SQLExtractor sqlExtractorWhere = new SQLExtractor(where, SQLExtractor.Type.WHERE);
             SQLExtractor sqlExtractorOrderBy = new SQLExtractor(orderBy, SQLExtractor.Type.ORDER_BY);
@@ -2354,14 +2427,15 @@ public class JDBCUtilDAO implements UtilDAO {
         Connection conn = null;
         PreparedStatement retrieve = null;
         ResultSet rs = null;
-        String category = null;
+        CashMov.Category category;
         try {
             conn = dataSource.getConnection();
             retrieve = conn.prepareStatement(retrieveUnit);
             rs = retrieve.executeQuery();
 
             while (rs.next()) {
-                category = rs.getString("category");
+                category = new CashMov.Category(rs.getString("category"));
+                category.setId(rs.getLong("id"));;
                 categories.add(category);
             }
         } catch (SQLException e) {
@@ -2373,7 +2447,7 @@ public class JDBCUtilDAO implements UtilDAO {
         }
         return categories;
     }
-    
+
     public void addExpenseCategory(String category) throws DAOException {
         Connection conn = null;
         PreparedStatement ps = null;
@@ -2392,6 +2466,27 @@ public class JDBCUtilDAO implements UtilDAO {
         } catch (IOException e) {
             DBManager.rollbackConn(conn);
             throw new DAOException("Cannot add Category", e);
+        } finally {
+            DBManager.closeStatement(ps);
+            DBManager.closeConnection(conn);
+        }
+    }
+
+    public void deleteExpenseCategory(String category) throws DAOException {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        try {
+            conn = dataSource.getConnection();
+            conn.setAutoCommit(false);
+            Object[] parameters = {category};
+            ps = sqlStatements.buildSQLStatement(conn, DELETE_EXPENSES_CATEGORY_KEY, parameters);
+            ps.executeUpdate();
+            conn.commit();
+        } catch (SQLException e) {
+            DBManager.rollbackConn(conn);
+            throw new DAOException("Cannot delete the Category", e);
+        } catch (IOException e) {
+            throw new DAOException("Cannot delete the Category", e);
         } finally {
             DBManager.closeStatement(ps);
             DBManager.closeConnection(conn);
@@ -2420,7 +2515,7 @@ public class JDBCUtilDAO implements UtilDAO {
             DBManager.closeConnection(conn);
         }
     }
-    
+
     public void addExpenseIncome(HashMap data) throws DAOException {
         Connection conn = null;
         PreparedStatement ps = null;

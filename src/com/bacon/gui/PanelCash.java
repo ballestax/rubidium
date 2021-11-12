@@ -386,11 +386,12 @@ public class PanelCash extends PanelCapturaMod implements ActionListener, ListSe
             if (cycle.getStatus() == 1) {
                 cycle.setStatus(0);
                 cycle.setEnd(new Date());
+                app.getControl().saveSnapshotData(cycle);
                 app.getControl().updateCycle(cycle);
                 showCycle(cycle);
             }
         } else if (AC_REFRESH.equals(e.getActionCommand())) {
-            loadCycle();
+            loadCycle();            
         } else if (AC_ADD_GASTO.equals(e.getActionCommand())) {
             app.getGuiManager().showPanelAddExtra(this);
         } else if (AC_FILTER.equals(e.getActionCommand())) {
