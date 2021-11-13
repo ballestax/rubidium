@@ -46,6 +46,7 @@ import com.bacon.gui.PanelList;
 import com.bacon.gui.PanelNewConciliacion;
 import com.bacon.gui.PanelNewCycle;
 import com.bacon.gui.PanelNewLocation;
+import com.bacon.gui.PanelOrders;
 import com.bacon.gui.PanelOtherProduct;
 import com.bacon.gui.PanelPayInvoice;
 import com.bacon.gui.PanelPressProduct;
@@ -146,6 +147,7 @@ public class GUIManager {
     private PanelBasic panelBasicProducts;
     private PanelProducts panelProducts;
     private PanelSnapShot panelSnapshot;
+    private PanelOrders pnOrders;
 
     private GUIManager() {
 
@@ -945,6 +947,13 @@ public class GUIManager {
             pnPedido = new PanelPedido(app);
         }
         return pnPedido;
+    }
+    
+    public PanelOrders getPanelOrders() {
+        if (pnOrders == null) {
+            pnOrders = new PanelOrders(app);
+        }
+        return pnOrders;
     }
 
     public void showCustomPedido(Product product, PropertyChangeListener pcl) {

@@ -314,7 +314,7 @@ public class PrinterService {
             escpos.feed(5);
 
             escpos.cut(EscPos.CutMode.FULL);
-
+            
             escpos.close();
 
         } catch (IOException ex) {
