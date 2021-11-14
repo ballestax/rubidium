@@ -156,10 +156,12 @@ public class PanelCategory extends PanelCapturaMod implements PropertyChangeList
                     PanelProduct4 pnProd = new PanelProduct4(app, product);
                     pnProd.setColor(getCategoriesColor(product.getCategory()));
                     pnProd.addPropertyChangeListener(app.getGuiManager().getPanelPedido());
+                    pnProd.addPropertyChangeListener(app.getGuiManager().getPanelOrders());
                     publish(new Object[]{pnProd, product.getId()});
 
                     PanelProduct2 pnProd2 = new PanelProduct2(app, product);
                     pnProd2.addPropertyChangeListener(app.getGuiManager().getPanelPedido());
+                    pnProd2.addPropertyChangeListener(app.getGuiManager().getPanelOrders());
                     publish(new Object[]{pnProd2, product.getId()});
 
                 });

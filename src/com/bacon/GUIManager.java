@@ -55,6 +55,7 @@ import com.bacon.gui.PanelReportSales;
 import com.bacon.gui.PanelSelCategory;
 import com.bacon.gui.PanelSelItem;
 import com.bacon.gui.PanelSnapShot;
+import com.bacon.gui.PanelTakeOrders;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -148,6 +149,8 @@ public class GUIManager {
     private PanelProducts panelProducts;
     private PanelSnapShot panelSnapshot;
     private PanelOrders pnOrders;
+    private PanelBasic panelBasicPOS;
+    private PanelTakeOrders panelTakeOrders;
 
     private GUIManager() {
 
@@ -248,6 +251,13 @@ public class GUIManager {
         }
         return panelModPedidos;
     }
+    
+    private PanelTakeOrders getPanelTakeOrders() {
+        if (panelTakeOrders == null) {
+            panelTakeOrders = new PanelTakeOrders(app);
+        }
+        return panelTakeOrders;
+    }
 
     private PanelListPedidos getPanelListPedidos() {
         if (panelListPedidos == null) {
@@ -299,6 +309,14 @@ public class GUIManager {
             panelBasicPedidos = new PanelBasic(app, "Pedidos", icon, getPanelModPedidos());
         }
         return panelBasicPedidos;
+    }
+    
+    public PanelBasic getPanelBasicPOS() {
+        if (panelBasicPOS == null) {
+            ImageIcon icon = new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "shoping-basket.png", 30, 30));
+            panelBasicPOS = new PanelBasic(app, "Ordens", icon, getPanelTakeOrders());
+        }
+        return panelBasicPOS;
     }
 
     public PanelBasic getPanelBasicListPedidos() {
@@ -629,6 +647,11 @@ public class GUIManager {
             perm = app.getControl().getPermissionByName("show-products-module");
             if (user != null && app.getControl().hasPermission(user, perm)) {
                 toolbar.add((app.getAction(Aplication.ACTION_SHOW_PRODUCTS)));
+            }
+            
+            perm = app.getControl().getPermissionByName("show-pos-module");
+            if (user != null && app.getControl().hasPermission(user, perm)) {
+                toolbar.add((app.getAction(Aplication.ACTION_SHOW_POS)));
             }
 
             perm = app.getControl().getPermissionByName("show-admin-module");

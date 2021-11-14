@@ -15,6 +15,7 @@ import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -117,6 +118,11 @@ public class PanelModPedidos extends PanelCapturaMod
         panelCategory.addPropertyChangeListener(pnPedido);
         panelCategory.addPropertyChangeListener(pnOrders);
         panelTopSearch.addPropertyChangeListener(panelCategory);
+        PropertyChangeListener[] propertyListeners = panelCategory.getPropertyListeners();
+        for (PropertyChangeListener propertyListener : propertyListeners) {
+            System.out.println(propertyListener);
+        }
+        
         
         panelLeft.add(panelCategory);
     }
@@ -128,8 +134,7 @@ public class PanelModPedidos extends PanelCapturaMod
             orderBy = "name";
         } else if (PanelCategory.ORDEN_PRICE.equalsIgnoreCase(order)) {
             orderBy = "price, name";
-        }
-        
+        }        
         productsList = app.getControl().getProductsList("enabled=1", orderBy);
     }
 

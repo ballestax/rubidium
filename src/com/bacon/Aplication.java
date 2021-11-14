@@ -63,6 +63,7 @@ public final class Aplication implements ActionListener, PropertyChangeListener,
     public static final String ACTION_SHOW_REPORTS = "acShowReports";
     public static final String ACTION_SHOW_INVENTORY = "acShowInventory";
     public static final String ACTION_SHOW_PRODUCTS = "acShowProducts";
+    public static final String ACTION_SHOW_POS = "acShowPOS";
 
     public static final String ACTION_RETURN_TO_MENU = "acReturnToMenu";
     public static final String ACTION_CLOSE_SESION = "acCLoseSesion";
@@ -117,6 +118,7 @@ public final class Aplication implements ActionListener, PropertyChangeListener,
     private ProgAction acShowReports;
     private ProgAction acShowInventory;
     private ProgAction acShowProducts;
+    private ProgAction acShowPOS;
 
     public Aplication() {
         Properties properties = new Properties();
@@ -411,6 +413,16 @@ public final class Aplication implements ActionListener, PropertyChangeListener,
         acShowOrders.setSmallIcon(new ImageIcon(imgManager.getImagen(getFolderIcons() + "shop.png", 25, 25)));
         acShowOrders.setLargeIcon(new ImageIcon(imgManager.getImagen(getFolderIcons() + "shop.png", 32, 32)));
 
+        acShowPOS = new ProgAction("Orders",
+                null, "Ver modulo POS", 'a') {
+            public void actionPerformed(ActionEvent e) {
+                Permission perm = getControl().getPermissionByName("show-pos-module");
+                getGuiManager().showBasicPanel(getGuiManager().getPanelBasicPOS(), perm);
+            }
+        };
+        acShowPOS.setSmallIcon(new ImageIcon(imgManager.getImagen(getFolderIcons() + "shoping-basket.png", 25, 25)));
+        acShowPOS.setLargeIcon(new ImageIcon(imgManager.getImagen(getFolderIcons() + "shoping-basket.png", 32, 32)));
+
         acShowOrderList = new ProgAction("Lista de pedidos",
                 null, "Ver Lista de pedidos", 'a') {
             public void actionPerformed(ActionEvent e) {
@@ -456,7 +468,7 @@ public final class Aplication implements ActionListener, PropertyChangeListener,
             public void actionPerformed(ActionEvent e) {
                 Permission perm = getControl().getPermissionByName("show-products-module");
                 getGuiManager().showBasicPanel(getGuiManager().getPanelBasicProducts(), perm);
-            }   
+            }
         };
         acShowProducts.setSmallIcon(new ImageIcon(imgManager.getImagen(getFolderIcons() + "shopping-bag-purple.png", 25, 25)));
         acShowProducts.setLargeIcon(new ImageIcon(imgManager.getImagen(getFolderIcons() + "shopping-bag-purple.png", 32, 32)));
@@ -489,6 +501,9 @@ public final class Aplication implements ActionListener, PropertyChangeListener,
 
             case ACTION_SHOW_ORDER:
                 return acShowOrders;
+
+            case ACTION_SHOW_POS:
+                return acShowPOS;
 
             case ACTION_SHOW_ORDER_LIST:
                 return acShowOrderList;
