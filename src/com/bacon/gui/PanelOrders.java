@@ -9,6 +9,7 @@ import static com.bacon.gui.PanelPedido.TIPO_LOCAL;
 import com.bacon.gui.util.MyPopupListener;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
@@ -20,11 +21,18 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.DefaultListSelectionModel;
+import javax.swing.ImageIcon;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
+import javax.swing.ListSelectionModel;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.SwingConstants;
 import javax.swing.SwingWorker;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import org.apache.commons.collections.keyvalue.MultiKey;
@@ -37,7 +45,7 @@ import org.dz.PanelCapturaMod;
  * @author lrod
  */
 public class PanelOrders extends PanelCapturaMod implements
-        TableModelListener, PropertyChangeListener {
+        ActionListener, ListSelectionListener, TableModelListener, PropertyChangeListener {
 
     private final Aplication app;
     private MyDefaultTableModel modelTable;
@@ -117,14 +125,57 @@ public class PanelOrders extends PanelCapturaMod implements
         tbProducts.getColumnModel().getColumn(1).setCellRenderer(prodRenderer);
         tbProducts.getColumnModel().getColumn(2).setCellRenderer(formatRenderer);
         tbProducts.getColumnModel().getColumn(3).setCellRenderer(formatRenderer);
+
+        ListSelectionModel selectionModel = new DefaultListSelectionModel();
+        selectionModel.addListSelectionListener(this);
+
+        tbProducts.setSelectionModel(selectionModel);
+
+        Font fontBtns = new Font("Sans", 1, 14);
+        btAdd.setText("+");
+        btAdd.setFocusPainted(false);
+        btAdd.setActionCommand(AC_ADD_QUANTITY);
+        btAdd.addActionListener(this);
+        btAdd.setFont(fontBtns);
+        btAdd.setMargin(new Insets(0, 0, 0, 0));
+        btMinus.setText("-");
+        btMinus.setFocusPainted(false);
+        btMinus.setActionCommand(AC_MINUS_QUANTITY);
+        btMinus.addActionListener(this);
+        btMinus.setFont(fontBtns);
+        btMinus.setMargin(new Insets(0, 0, 0, 0));
+        lbQuantity.setText("1");
+        lbQuantity.setFont(fontBtns.deriveFont(16f));
+        lbQuantity.setForeground(Color.BLUE.darker());
+        lbQuantity.setHorizontalAlignment(SwingConstants.CENTER);
+        lbQuantity.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
+
+        ImageIcon icon = new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "delete.png", 12, 12));
+        btDelete.setMargin(new Insets(0, 0, 0, 0));
+        btDelete.setIcon(icon);
+        btDelete.setActionCommand(AC_DELETE_ITEM);
+        btDelete.addActionListener(this);
+        btDelete.setText("Eliminar");
+
+        icon = new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "send.png", 12, 12));
+        btSend.setIcon(icon);
+        btSend.setMargin(new Insets(0, 0, 0, 0));
+        btSend.setText("Enviar");
+        btSend.setActionCommand(AC_SEND_ORDER);
+        btSend.addActionListener(this);
+
     }
-    
+    public static final String AC_SEND_ORDER = "AC_SEND_ORDER";
+    public static final String AC_DELETE_ITEM = "AC_DELETE_ITEM";
+    public static final String AC_MINUS_QUANTITY = "AC_MINUS_QUANTITY";
+    public static final String AC_ADD_QUANTITY = "AC_ADD_QUANTITY";
+
     public void addProduct(Product producto, double precio, Presentation pres) {
         ProductoPed productoPed = new ProductoPed(producto);
         productoPed.setPresentation(pres);
         productoPed.setPrecio(precio);
         addProductPed(productoPed, 1, precio);
-    }    
+    }
 
     public void addProductPed(ProductoPed productPed, int cantidad, double price) {
         if (block) {
@@ -162,6 +213,8 @@ public class PanelOrders extends PanelCapturaMod implements
             checkInventory();
         }
 
+        tbProducts.getSelectionModel().clearSelection();
+
         if (products.contains(productPed) && price == productPed.getPrecio()) {
             try {
                 int row = products.indexOf(productPed);
@@ -169,6 +222,7 @@ public class PanelOrders extends PanelCapturaMod implements
                 modelTable.setValueAt(cant + cantidad, row, 0);
                 productPed.setCantidad(cantidad);
                 products.set(row, productPed);
+                tbProducts.getSelectionModel().addSelectionInterval(row, row);
             } catch (Exception e) {
             }
         } else {
@@ -187,8 +241,10 @@ public class PanelOrders extends PanelCapturaMod implements
                     int size = 11 * (int) Math.ceil(productPed.getAdicionales().size() / 2.0);
                     tbProducts.setRowHeight(modelTable.getRowCount() - 1, 35 + size);
                 }
-                modelTable.setRowEditable(modelTable.getRowCount() - 1, false);
-                modelTable.setCellEditable(modelTable.getRowCount() - 1, 0, true);
+                int row = modelTable.getRowCount() - 1;
+                modelTable.setRowEditable(row, false);
+                modelTable.setCellEditable(row, 0, true);
+                tbProducts.getSelectionModel().addSelectionInterval(row, row);
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());
             }
@@ -232,6 +288,14 @@ public class PanelOrders extends PanelCapturaMod implements
         jLabel1 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         tbProducts = new javax.swing.JTable();
+        jPanel1 = new javax.swing.JPanel();
+        btMinus = new javax.swing.JButton();
+        lbQuantity = new javax.swing.JLabel();
+        btAdd = new javax.swing.JButton();
+        btDelete = new javax.swing.JButton();
+        btSend = new javax.swing.JButton();
+        btHold = new javax.swing.JButton();
+        btStay = new javax.swing.JButton();
 
         jLabel1.setText("jLabel1");
 
@@ -245,15 +309,57 @@ public class PanelOrders extends PanelCapturaMod implements
         ));
         jScrollPane1.setViewportView(tbProducts);
 
+        jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(btMinus, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(2, 2, 2)
+                .addComponent(lbQuantity, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(2, 2, 2)
+                .addComponent(btAdd, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(btDelete, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                    .addComponent(btMinus, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lbQuantity)
+                    .addComponent(btAdd)
+                    .addComponent(btDelete, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(33, Short.MAX_VALUE))
+        );
+
+        jPanel1Layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {btAdd, btMinus, lbQuantity});
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(registro1, javax.swing.GroupLayout.PREFERRED_SIZE, 236, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
             .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(registro1, javax.swing.GroupLayout.PREFERRED_SIZE, 236, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(btStay, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btHold, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btSend, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -262,22 +368,83 @@ public class PanelOrders extends PanelCapturaMod implements
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(registro1, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 275, Short.MAX_VALUE)
-                .addGap(153, 153, 153))
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 282, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btSend, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btHold, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btStay, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btAdd;
+    private javax.swing.JButton btDelete;
+    private javax.swing.JButton btHold;
+    private javax.swing.JButton btMinus;
+    private javax.swing.JButton btSend;
+    private javax.swing.JButton btStay;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JLabel lbQuantity;
     private org.dz.Registro registro1;
     private javax.swing.JTable tbProducts;
     // End of variables declaration//GEN-END:variables
 
     @Override
+    public void actionPerformed(ActionEvent e) {
+        if (AC_ADD_QUANTITY.equals(e.getActionCommand())) {
+            try {
+                int quantity = Integer.parseInt(lbQuantity.getText());
+                if (quantity < 100) {
+                    quantity++;
+                    lbQuantity.setText(String.valueOf(quantity));
+                    int row = tbProducts.getSelectedRow();
+                    tbProducts.setValueAt(quantity, row, 0);
+                }
+            } catch (Exception ex) {
+            }
+        } else if (AC_MINUS_QUANTITY.equals(e.getActionCommand())) {
+            try {
+                int quantity = Integer.parseInt(lbQuantity.getText());
+                if (quantity > 1) {
+                    quantity--;
+                    lbQuantity.setText(String.valueOf(quantity));
+                    int row = tbProducts.getSelectedRow();
+                    tbProducts.setValueAt(quantity, row, 0);
+                }
+            } catch (Exception ex) {
+            }
+        } else if (AC_DELETE_ITEM.equals(e.getActionCommand())) {
+            int r = tbProducts.getSelectedRow();
+            if (r != -1) {
+                ProductoPed pp = (ProductoPed) tbProducts.getValueAt(r, 1);
+                modelTable.removeRow(r);
+                boolean del = products.remove(pp);
+            }
+        }
+    }
+
+    @Override
+    public void valueChanged(ListSelectionEvent e) {
+        int row = tbProducts.getSelectedRow();
+        if (row >= 0) {
+            try {
+                int quantity = Integer.parseInt(modelTable.getValueAt(row, 0).toString());
+                lbQuantity.setText(String.valueOf(quantity));
+            } catch (Exception ex) {
+            }
+        }
+    }
+
+    @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        System.out.println("evt:"+evt.getPropertyName());
+        System.out.println("evt:" + evt.getPropertyName());
         if (PanelProduct2.AC_ADD_QUICK.equals(evt.getPropertyName())) {
             Product prod = (Product) evt.getNewValue();
             Presentation pres = app.getControl().getPresentationsByDefault(prod.getId());
@@ -295,7 +462,7 @@ public class PanelOrders extends PanelCapturaMod implements
 
     @Override
     public void tableChanged(TableModelEvent e) {
-        
+
         switch (e.getType()) {
             case TableModelEvent.UPDATE:
                 if (e.getColumn() == 0) {
@@ -303,6 +470,7 @@ public class PanelOrders extends PanelCapturaMod implements
                     int cant = Integer.parseInt(tbProducts.getValueAt(e.getLastRow(), 0).toString());
                     ProductoPed prd = products.get(e.getLastRow());
                     prd.setCantidad(cant);
+                    lbQuantity.setText(String.valueOf(cant));
 
                     //update map inventory
                     SwingWorker sw = new SwingWorker() {
@@ -348,12 +516,11 @@ public class PanelOrders extends PanelCapturaMod implements
         calcularValores();
 
     }
-    
+
     private void calcularValores() {
-        
 
     }
-    
+
     private double calculatePrecio(int row) {
         double total = 0;
         try {
@@ -365,5 +532,5 @@ public class PanelOrders extends PanelCapturaMod implements
         }
         return total;
     }
-    
+
 }

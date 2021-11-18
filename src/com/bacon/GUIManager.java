@@ -173,7 +173,7 @@ public class GUIManager {
     private JMenuBar menubar;
     private JStatusbar statusbar;
     private JPanel container;
-    private JPanel panelPresentation;
+    private PanelDash panelPresentation;
 
     public void configurar() {
 
@@ -197,6 +197,8 @@ public class GUIManager {
 
         wHandler = new WindowHandler();
 
+        getPanelPresentation().setVisible(false);
+        
         getContPane().removeAll();
         getContPane().add(getPanelPresentation(), BorderLayout.CENTER);
 //        getSplitpane().setResizeWeight(1.0);
@@ -220,8 +222,11 @@ public class GUIManager {
         setWaitCursor();
         getContenedor().remove(getToolbar());
         toolbar = null;
+        getPanelPresentation().setVisible(true);
+        getToolbar().setVisible(true);
         getContenedor().add(getToolbar(), BorderLayout.NORTH);
         getContenedor().updateUI();
+        getContPane().updateUI();
         setDefaultCursor();
     }
 
@@ -360,7 +365,7 @@ public class GUIManager {
         return panelBasicInventory;
     }
 
-    private Component getPanelPresentation() {
+    private PanelDash getPanelPresentation() {
         if (panelPresentation == null) {
             panelPresentation = new PanelDash(app);
         }
@@ -881,6 +886,9 @@ public class GUIManager {
         showPanelControlAccess();
         iUser.setText("<html>Usuario:<font size=3 color=" + Utiles.toHex(getColor()) + ">"
                 + app.getUser().getUsername() + "</font></html>");
+//        getPanelPresentation().setVisible(false);
+//        getToolbar().setVisible(false);
+//        getContPane().updateUI();
     }
 
     private void showPanelNewUser() {
@@ -908,7 +916,7 @@ public class GUIManager {
     private void showPanelControlAccess() {
         user = app.getUser();
         setWaitCursor();
-        final JDialog dialog = new MyDialogEsc();
+        final JDialog dialog = new JDialog();
         dialog.setModalityType(Dialog.ModalityType.TOOLKIT_MODAL);
         int w = 350;
         int h = 220;
