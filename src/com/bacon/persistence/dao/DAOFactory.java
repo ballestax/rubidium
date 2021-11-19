@@ -72,17 +72,19 @@ public abstract class DAOFactory {
     public abstract ProductDAO getProductDAO() throws DAOException;
 
     public abstract IngredientDAO getIngredientDAO() throws DAOException;
-    
+
     public abstract AdditionalDAO getAdditionalDAO() throws DAOException;
-    
+
     public abstract InvoiceDAO getInvoiceDAO() throws DAOException;
-    
+
+    public abstract OrderDAO getOrderDAO() throws DAOException;
+
     public abstract ClientDAO getClientDAO() throws DAOException;
-    
+
     public abstract ItemDAO getItemDAO() throws DAOException;
-    
+
     public abstract ConciliacionDAO getConciliacionDAO() throws DAOException;
-    
+
     public abstract LocationDAO getLocationDAO() throws DAOException;
 
 }

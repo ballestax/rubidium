@@ -30,6 +30,7 @@
                     |CREATE_PRODUCT_INGREDIENT_TABLE|GET_INGREDIENTS_BY_PRODUCT
                     |CREATE_ADDITIONALS_TABLE|ADD_ADDITIONAL|GET_ADDITIONAL|DELETE_ADDITIONAL|UPDATE_ADDITIONAL
                     |CREATE_INVOICES_TABLE|ADD_INVOICE|GET_INVOICE|DELETE_INVOICE|UPDATE_INVOICE
+                    |CREATE_ORDERS_TABLE|ADD_ORDER|GET_ORDER|DELETE_ORDER|UPDATE_ORDER
                     |CREATE_WAITERS_TABLE|CREATE_TABLES_TABLE|CREATE_INVOICE_PRODUCT_TABLE
                     |GET_WAITERS|GET_TABLES|ADD_INVOICE_PRODUCT|GET_INVOICE_PRODUCT
                     |CREATE_ADDITIONAL_PRODUCT_TABLE|ADD_ADDITIONAL_PRODUCT|GET_ADDITIONAL_PRODUCT
@@ -945,6 +946,70 @@
             <SQLFragment excludeIfNamedParamEmpty="TRUE">
                 ORDER BY {orderby}
             </SQLFragment>        
+        </SQLStatement>
+        
+        <SQLStatement method="CREATE_ORDERS_TABLE">
+            <SQLFragment>
+                CREATE TABLE orders(
+                id INTEGER AUTO_INCREMENT,
+                take_date DATETIME,
+                deliveryType INTEGER,
+                value DECIMAL(20,2),
+                idClient VARCHAR(11),
+                idWaiter INTEGER,
+                idTable INTEGER,
+                idCycle INTEGER,
+                notes VARCHAR(500),
+                status TINYINT(1) NOT NULL DEFAULT '0',
+                lastUpdatedTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                PRIMARY KEY (id)
+                )ENGINE=InnoDB DEFAULT CHARSET=latin1;
+            </SQLFragment>
+        </SQLStatement>	
+        
+        <SQLStatement method="ADD_ORDER">
+            <SQLFragment>
+                INSERT INTO orders (take_date,deliveryType,value,idClient,idWaiter,idTable,idCycle,notes,status) VALUES (?,?,?,?,?,?,?,?,?);
+            </SQLFragment>
+        </SQLStatement>        
+        
+        <SQLStatement method="GET_ORDER">
+            <SQLFragment>
+                SELECT
+            </SQLFragment>
+            <SQLFragment>
+                * FROM orders
+            </SQLFragment>
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                WHERE {where}
+            </SQLFragment>    
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                ORDER BY {orderby}
+            </SQLFragment>
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                LIMIT {start}, {num}
+            </SQLFragment>        
+        </SQLStatement>
+        
+        <SQLStatement method="DELETE_ORDER">
+            <SQLFragment>
+                DELETE FROM orders WHERE id = ?;
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="UPDATE_ORDER">
+            <SQLFragment>
+                UPDATE orders SET          
+                deliveryType=?,
+                value=?,                
+                idClient=?,
+                idWaiter=?,
+                idTable=?,
+                idCycle=?,
+                notes=?,
+                status=?
+                WHERE id = ?
+            </SQLFragment>
         </SQLStatement>
         
                         

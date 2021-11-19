@@ -993,6 +993,7 @@ public class GUIManager {
         dialog.setPreferredSize(null);
         PanelCustomPedido pnCustomPed = new PanelCustomPedido(app, product);
         pnCustomPed.addPropertyChangeListener(getPanelPedido());
+        pnCustomPed.addPropertyChangeListener(getPanelOrders());
         dialog.add(pnCustomPed);
         dialog.setResizable(false);
         dialog.setTitle(product.getName());

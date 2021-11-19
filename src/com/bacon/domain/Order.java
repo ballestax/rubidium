@@ -15,8 +15,11 @@ public class Order {
     private Date fecha;
     private BigDecimal valor;
     private String nota;
+    private long idClient;
     private int idWaitress;
+    private int deliveryType;
     private int table;
+    private int status;
     private List<ProductoPed> products;
 
     public Order() {
@@ -68,6 +71,14 @@ public class Order {
         this.nota = nota;
     }
 
+    public long getIdClient() {
+        return idClient;
+    }
+
+    public void setIdClient(long idClient) {
+        this.idClient = idClient;
+    }
+
     public int getIdWaitress() {
         return idWaitress;
     }
@@ -90,6 +101,26 @@ public class Order {
 
     public void setProducts(List<ProductoPed> products) {
         this.products = products;
+    }
+
+    public void addProduct(ProductoPed product) {
+        this.products.add(product);
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
+    public int getDeliveryType() {
+        return deliveryType;
+    }
+
+    public void setDeliveryType(int deliveryType) {
+        this.deliveryType = deliveryType;
     }
 
 }

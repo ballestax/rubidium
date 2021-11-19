@@ -35,6 +35,7 @@ import com.bacon.persistence.JDBC.JDBCIngredientDAO;
 import com.bacon.persistence.JDBC.JDBCInvoiceDAO;
 import com.bacon.persistence.JDBC.JDBCItemDAO;
 import com.bacon.persistence.JDBC.JDBCLocationDAO;
+import com.bacon.persistence.JDBC.JDBCOrderDAO;
 import com.bacon.persistence.JDBC.JDBCProductDAO;
 import com.bacon.persistence.JDBC.JDBCUserDAO;
 import com.bacon.persistence.JDBC.JDBCUtilDAO;
@@ -106,8 +107,13 @@ public class Control {
             JDBCLocationDAO locationDAO = (JDBCLocationDAO) DAOFactory.getInstance().getLocationDAO();
             locationDAO.init();
 
+            JDBCOrderDAO orderDAO = (JDBCOrderDAO) DAOFactory.getInstance().getOrderDAO();
+            orderDAO.init();
+            
             JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
             utilDAO.init();
+            
+            
 
         } catch (Exception e) {
             logger.error("Error initializing database", e);
