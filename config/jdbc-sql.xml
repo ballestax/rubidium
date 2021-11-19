@@ -66,6 +66,7 @@
                     |GET_PRODUCTS_BY_VARPRICE_RANK_LIST
                     |CREATE_CATEGORIES_TABLE|ADD_CATEGORY|GET_CATEGORY_PROD|UPDATE_CATEGORY
                     |ADD_PRESENTATION|UPDATE_PRESENTATION|UPDATE_PRESENTATION_TO_DEFAULT|UPDATE_PRESENTATION_TO_DEFAULT_BY_ID
+                    |ADD_ORDER_PRODUCT|GET_ORDER_PRODUCT
                     ) #REQUIRED
                     
 	>
@@ -1071,6 +1072,7 @@
                 CREATE TABLE invoice_product(
                 id INTEGER AUTO_INCREMENT,
                 id_invoice INTEGER NOT NULL,
+                id_order INTEGER,
                 id_product INTEGER NOT NULL,
                 id_presentation INTEGER NOT NULL,
                 price DECIMAL(20,2),
@@ -1082,7 +1084,7 @@
         
         <SQLStatement method="ADD_INVOICE_PRODUCT">
             <SQLFragment>
-                INSERT INTO invoice_product (id_invoice, id_product, id_presentation, price, cantidad) VALUES (?,?,?,?,?);
+                INSERT INTO invoice_product (id_invoice, id_order, id_product, id_presentation, price, cantidad) VALUES (?,?,?,?,?,?);
             </SQLFragment>
         </SQLStatement>
         
@@ -1091,6 +1093,14 @@
                 SELECT p.id, p.name, p.code, p.description, p.price, p.variable, p.image, p.category, ip.price, ip.cantidad, ip.id, ip.id_presentation
                 FROM products p, invoice_product ip, invoices i 
                 WHERE p.id = ip.id_product AND ip.id_invoice = i.id  AND i.code=?
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="GET_ORDER_PRODUCT">
+            <SQLFragment>
+                SELECT p.id, p.name, p.code, p.description, p.price, p.variable, p.image, p.category, ip.price, ip.cantidad, ip.id, ip.id_presentation
+                FROM products p, invoice_product ip, orders o 
+                WHERE p.id = ip.id_product AND ip.id_order = o.id  AND o.id=?
             </SQLFragment>
         </SQLStatement>
         

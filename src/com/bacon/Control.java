@@ -17,6 +17,7 @@ import com.bacon.domain.InventoryEvent;
 import com.bacon.domain.Invoice;
 import com.bacon.domain.Item;
 import com.bacon.domain.Location;
+import com.bacon.domain.Order;
 import com.bacon.domain.Permission;
 import com.bacon.domain.Presentation;
 import com.bacon.domain.Product;
@@ -109,11 +110,9 @@ public class Control {
 
             JDBCOrderDAO orderDAO = (JDBCOrderDAO) DAOFactory.getInstance().getOrderDAO();
             orderDAO.init();
-            
+
             JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
             utilDAO.init();
-            
-            
 
         } catch (Exception e) {
             logger.error("Error initializing database", e);
@@ -1003,7 +1002,7 @@ public class Control {
             return false;
         }
     }
-    
+
     public void deleteItem(long id) {
         try {
             JDBCItemDAO itemDAO = (JDBCItemDAO) DAOFactory.getInstance().getItemDAO();
@@ -1443,7 +1442,7 @@ public class Control {
         if (!lastCycle.isOpened()) {
             end = lastCycle.getEnd();
         }
-    
+
         boolean onlyDelivery = Boolean.parseBoolean(map.get("onlyDelivery").toString()); // item is only delivery
         for (Object[] get : presentationsByItem) {
             long idPres = Long.parseLong(get[0].toString());
@@ -1489,6 +1488,16 @@ public class Control {
         data.put("real", real);
 
         return data;
+    }
+
+    public void addOrder(Order order) {
+        try {
+            JDBCOrderDAO orderDAO = (JDBCOrderDAO) DAOFactory.getInstance().getOrderDAO();
+            orderDAO.addOrder(order);
+        } catch (DAOException ex) {
+            logger.error("Error adding order.", ex);
+            GUIManager.showErrorMessage(null, "Error agregando orden", "Error");
+        }
     }
 
 }

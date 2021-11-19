@@ -2,9 +2,13 @@ package com.bacon.gui;
 
 import com.bacon.Aplication;
 import com.bacon.GUIManager;
+import com.bacon.domain.Cycle;
+import com.bacon.domain.Order;
 import com.bacon.domain.Presentation;
 import com.bacon.domain.Product;
 import com.bacon.domain.ProductoPed;
+import com.bacon.domain.Table;
+import com.bacon.domain.Waiter;
 import static com.bacon.gui.PanelPedido.TIPO_LOCAL;
 import com.bacon.gui.util.MyPopupListener;
 import java.awt.CardLayout;
@@ -20,6 +24,7 @@ import java.beans.PropertyChangeListener;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -51,7 +56,7 @@ import org.dz.PanelCapturaMod;
  */
 public class PanelOrders extends PanelCapturaMod implements
         ActionListener, ListSelectionListener, TableModelListener, PropertyChangeListener {
-    
+
     private final Aplication app;
     private MyDefaultTableModel modelTable;
     private JPopupMenu popupTable;
@@ -59,7 +64,7 @@ public class PanelOrders extends PanelCapturaMod implements
     private JMenuItem itemDelete;
     private SpinnerNumberModel spModel;
     private DecimalFormat DCFORM_P;
-    
+
     private List<ProductoPed> products;
     private HashMap<Long, Object[]> checkInventory;
     private MultiValueMap mapInventory;
@@ -79,25 +84,25 @@ public class PanelOrders extends PanelCapturaMod implements
         initComponents();
         createComponents();
     }
-    
+
     private void createComponents() {
-        
+
         String[] cols = {"Cant", "Producto", "Unidad", "V. Total", "LLevar"};
         DCFORM_P = (DecimalFormat) NumberFormat.getInstance();
         DCFORM_P.applyPattern("$ ###,###,###");
         Color color = new Color(184, 25, 2);
-        
+
         modelTable = new MyDefaultTableModel(cols, 0);
-        
+
         tbProducts.setModel(modelTable);
-        
+
         tbProducts.getTableHeader().setReorderingAllowed(false);
-        
+
         int height = 35; // + (showExclusions ? 15 : 0);
         tbProducts.setRowHeight(height);
         tbProducts.setFont(new Font("Tahoma", 0, 14));
         modelTable.addTableModelListener(this);
-        
+
         popupTable = new JPopupMenu();
         popupListenerTable = new MyPopupListener(popupTable, true);
         itemDelete = new JMenuItem("Eliminar...");
@@ -111,32 +116,32 @@ public class PanelOrders extends PanelCapturaMod implements
             }
         });
         popupTable.add(itemDelete);
-        
+
         Font fontTabla = new Font("Sans", 1, 16);
-        
+
         FormatRenderer formatRenderer = new FormatRenderer(DCFORM_P);
         formatRenderer.setFont(fontTabla);
         formatRenderer.setForeground(color);
         ProductRenderer prodRenderer = new ProductRenderer(BoxLayout.Y_AXIS);
-        
+
         int[] colW = new int[]{40, 220, 70, 80, 30};
         for (int i = 0; i < colW.length; i++) {
             tbProducts.getColumnModel().getColumn(i).setMinWidth(colW[i]);
             tbProducts.getColumnModel().getColumn(i).setPreferredWidth(colW[i]);
         }
-        
+
         spModel = new SpinnerNumberModel(1, 1, 100, 1);
         tbProducts.getColumnModel().getColumn(0).setCellEditor(new SpinnerEditor(spModel));
         tbProducts.getColumnModel().getColumn(0).setCellRenderer(new SpinnerRenderer(fontTabla));
         tbProducts.getColumnModel().getColumn(1).setCellRenderer(prodRenderer);
         tbProducts.getColumnModel().getColumn(2).setCellRenderer(formatRenderer);
         tbProducts.getColumnModel().getColumn(3).setCellRenderer(formatRenderer);
-        
+
         ListSelectionModel selectionModel = new DefaultListSelectionModel();
         selectionModel.addListSelectionListener(this);
-        
+
         tbProducts.setSelectionModel(selectionModel);
-        
+
         Font fontBtns = new Font("Sans", 1, 14);
         btAdd.setText("+");
         btAdd.setFocusPainted(false);
@@ -155,38 +160,38 @@ public class PanelOrders extends PanelCapturaMod implements
         lbQuantity.setForeground(Color.BLUE.darker());
         lbQuantity.setHorizontalAlignment(SwingConstants.CENTER);
         lbQuantity.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
-        
+
         ImageIcon icon = new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "delete.png", 12, 12));
         btDelete.setMargin(new Insets(0, 0, 0, 0));
         btDelete.setIcon(icon);
         btDelete.setActionCommand(AC_DELETE_ITEM);
         btDelete.addActionListener(this);
         btDelete.setText("Eliminar");
-        
+
         icon = new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "file-send.png", 20, 20));
         btSend.setIcon(icon);
         btSend.setMargin(new Insets(0, 0, 0, 0));
         btSend.setText("Enviar");
         btSend.setActionCommand(AC_SEND_ORDER);
         btSend.addActionListener(this);
-        
+
         icon = new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "file-warning.png", 20, 20));
         btStay.setIcon(icon);
         btStay.setMargin(new Insets(0, 0, 0, 0));
         btStay.setText("Enviar");
         btStay.setActionCommand(AC_SEND_ORDER);
         btStay.addActionListener(this);
-        
+
         icon = new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "file-pause.png", 20, 20));
         btHold.setIcon(icon);
         btHold.setMargin(new Insets(0, 0, 0, 0));
         btHold.setText("Enviar");
         btHold.setActionCommand(AC_SEND_ORDER);
         btHold.addActionListener(this);
-        
+
         cardLayout = new CardLayout();
         pnCardContain.setLayout(cardLayout);
-        
+
         pnButtonTabs.setLayout(new FlowLayout(SwingConstants.LEADING, 5, 5));
         String[] btnTabs = {"Cantidad", "Adicional", "Ingredientes", "Coccion", "Especial"};
         for (String btnTab : btnTabs) {
@@ -198,32 +203,32 @@ public class PanelOrders extends PanelCapturaMod implements
                     cardLayout.next(pnCardContain);
                 }
             });
-            pnButtonTabs.add(btn);            
-        }        
+            pnButtonTabs.add(btn);
+        }
         cardLayout.addLayoutComponent(pnContenTab, "1");
         cardLayout.addLayoutComponent(pnContenTab1, "2");
-        
+
     }
     public static final String AC_SEND_ORDER = "AC_SEND_ORDER";
     public static final String AC_DELETE_ITEM = "AC_DELETE_ITEM";
     public static final String AC_MINUS_QUANTITY = "AC_MINUS_QUANTITY";
     public static final String AC_ADD_QUANTITY = "AC_ADD_QUANTITY";
-    
+
     public void addProduct(Product producto, double precio, Presentation pres) {
         ProductoPed productoPed = new ProductoPed(producto);
         productoPed.setPresentation(pres);
         productoPed.setPrecio(precio);
         addProductPed(productoPed, 1, precio);
     }
-    
+
     public void addProductPed(ProductoPed productPed, int cantidad, double price) {
         if (block) {
             GUIManager.showErrorMessage(null, "El pedido esta cerrado no se puede agregar más productos", "Pedido cerrado");
             return;
         }
-        
+
         Product producto = productPed.getProduct();
-        
+
         if (productPed.hasPresentation()) {
             HashMap<Integer, HashMap> mapData = app.getControl().checkInventory(productPed.getPresentation().getId());
             productPed.setData(mapData);
@@ -251,9 +256,9 @@ public class PanelOrders extends PanelCapturaMod implements
             }
             checkInventory();
         }
-        
+
         tbProducts.getSelectionModel().clearSelection();
-        
+
         if (products.contains(productPed) && price == productPed.getPrecio()) {
             try {
                 int row = products.indexOf(productPed);
@@ -291,7 +296,94 @@ public class PanelOrders extends PanelCapturaMod implements
 
 //        checkAllInventory();
     }
-    
+
+    public Order getOrder() {
+        String mesa = "";
+        String mesero = "";
+
+        Waiter waitres = new Waiter("LOCAL", 1);//(Waiter) regMesera.getSelectedItem();
+        Table table = new Table("1", 1);//(Table) regMesa.getSelectedItem();
+        boolean validate = true;
+//        if (TIPO_LOCAL == tipo) {
+//            if (waitres == null || regMesera.getSelected() < 1) {
+//                regMesera.setBorderToError();
+//                validate = false;
+//            }
+//            if (table == null) {
+//                regMesa.setBorderToError();
+//                validate = false;
+//            }
+//        } else {
+//            if (regCelular.getText().isEmpty()) {
+//                regCelular.setBorderToError();
+//                validate = false;
+//            }
+//            if (regDireccion.getText().isEmpty()) {
+//                regDireccion.setBorderToError();
+//                validate = false;
+//            }
+//        }
+
+        if (!validate) {
+//            return false;
+        }
+
+//        celular = regCelular.getText();
+//        direccion = regDireccion.getText();
+        verifyQuantitys();
+
+        Order order = new Order();
+
+        Cycle cycle = app.getControl().getLastCycle();
+
+        order.setCiclo(cycle != null ? cycle.getId() : 0);
+        order.setFecha(new Date());
+
+        if (waitres != null) {
+            order.setIdWaitress(waitres.getId());
+        }
+        if (table != null) {
+            order.setTable(table.getId());
+        }
+
+//        if (!celular.isEmpty()) {
+//            Client client = new Client(celular);
+//            client.addAddress(direccion);
+//
+//            int existClave = app.getControl().existClave("clients", "cellphone", celular);
+//
+//            if (existClave > 0) {
+//                app.getControl().updateClient(client);
+//            } else {
+//                app.getControl().addClient(client);
+//            }
+//
+//            invoice.setIdCliente(Long.parseLong(celular));
+//        } else {
+        order.setIdClient(1L);
+//        }
+
+        String tipoEntrega = PanelPedido.ENTREGA_LOCAL;
+        for (int i = 0; i < products.size(); i++) {
+            ProductoPed get = products.get(i);
+        }
+
+        order.setProducts(products);
+
+//        invoice.setValor(totalFact);
+        return order;
+    }
+
+    private void verifyQuantitys() {
+        for (int i = 0; i < products.size(); i++) {
+            ProductoPed pp = products.get(i);
+            int cant = (int) modelTable.getValueAt(i, 0);
+            if (pp.getCantidad() != cant) {
+                products.get(i).setCantidad(cant);
+            }
+        }
+    }
+
     private HashMap<Integer, Double> checkInventory() {
         Set keySet = mapInventory.keySet();
         Iterator<MultiKey> it = keySet.iterator();
@@ -541,9 +633,14 @@ public class PanelOrders extends PanelCapturaMod implements
                 modelTable.removeRow(r);
                 boolean del = products.remove(pp);
             }
+        } else if (AC_SEND_ORDER.equals(e.getActionCommand())) {
+            Order order = getOrder();
+            if (order != null && !order.isEmpty()) {
+                app.getControl().addOrder(getOrder());
+            }
         }
     }
-    
+
     @Override
     public void valueChanged(ListSelectionEvent e) {
         int row = tbProducts.getSelectedRow();
@@ -555,7 +652,7 @@ public class PanelOrders extends PanelCapturaMod implements
             }
         }
     }
-    
+
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         System.out.println("evt:" + evt.getPropertyName());
@@ -573,10 +670,10 @@ public class PanelOrders extends PanelCapturaMod implements
             addProductPed(prodPed, cant, price);
         }
     }
-    
+
     @Override
     public void tableChanged(TableModelEvent e) {
-        
+
         switch (e.getType()) {
             case TableModelEvent.UPDATE:
                 if (e.getColumn() == 0) {
@@ -626,15 +723,15 @@ public class PanelOrders extends PanelCapturaMod implements
             default:
                 break;
         }
-        
+
         calcularValores();
-        
+
     }
-    
+
     private void calcularValores() {
-        
+
     }
-    
+
     private double calculatePrecio(int row) {
         double total = 0;
         try {
@@ -646,5 +743,5 @@ public class PanelOrders extends PanelCapturaMod implements
         }
         return total;
     }
-    
+
 }

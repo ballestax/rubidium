@@ -594,6 +594,7 @@ public class JDBCOrderDAO implements OrderDAO {
             conn.setAutoCommit(false);
             Object[] parameters = {
                 order.getFecha(),
+                order.getDeliveryType(),
                 order.getValor(),
                 order.getIdClient(),
                 order.getIdWaitress(),
@@ -622,13 +623,14 @@ public class JDBCOrderDAO implements OrderDAO {
             for (int i = 0; i < products.size(); i++) {
                 ProductoPed product = products.get(i);
                 Object[] parameters1 = {
+                    0,
                     idOrder,
                     product.getProduct().getId(),
                     product.hasPresentation() ? product.getPresentation().getId() : 0,
                     product.getPrecio(),
                     product.getCantidad()
                 };
-                ps = sqlStatements.buildSQLStatement(conn, ADD_ORDER_PRODUCT_KEY, parameters1);
+                ps = sqlStatements.buildSQLStatement(conn, JDBCInvoiceDAO.ADD_INVOICE_PRODUCT_KEY, parameters1);
                 ps.executeUpdate();
 
                 HashMap<Integer, HashMap> mData = product.getData();
@@ -659,7 +661,7 @@ public class JDBCOrderDAO implements OrderDAO {
                 int idProduct = 0;
 
                 namedParams = new HashMap<>();
-                namedParams.put(JDBCDAOFactory.NAMED_PARAM_TABLE, "order_product");
+                namedParams.put(JDBCDAOFactory.NAMED_PARAM_TABLE, "invoice_product");
                 String query2 = sqlStatements.getSQLString(GET_MAX_ID_KEY, namedParams);
                 ps = conn.prepareStatement(query2);
                 rs = ps.executeQuery();

@@ -1,6 +1,7 @@
 package com.bacon.domain;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -104,6 +105,9 @@ public class Order {
     }
 
     public void addProduct(ProductoPed product) {
+        if(products==null){
+            products = new ArrayList<>();
+        }
         this.products.add(product);
     }
 
@@ -121,6 +125,10 @@ public class Order {
 
     public void setDeliveryType(int deliveryType) {
         this.deliveryType = deliveryType;
+    }
+
+    public boolean isEmpty() {
+        return products == null || products.isEmpty();
     }
 
 }
