@@ -1500,4 +1500,14 @@ public class Control {
         }
     }
 
+    public List<Order> getOrderslList(String where, String order) {
+        try {
+            JDBCOrderDAO orderList = (JDBCOrderDAO) DAOFactory.getInstance().getOrderDAO();
+            return orderList.getOrderList(where, order);
+        } catch (DAOException ex) {
+            logger.error("Error getting Order list.", ex);
+            return null;
+        }
+    }
+
 }

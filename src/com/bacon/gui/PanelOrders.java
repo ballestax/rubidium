@@ -3,6 +3,8 @@ package com.bacon.gui;
 import com.bacon.Aplication;
 import com.bacon.GUIManager;
 import com.bacon.domain.Cycle;
+import com.bacon.domain.Ingredient;
+import com.bacon.domain.Item;
 import com.bacon.domain.Order;
 import com.bacon.domain.Presentation;
 import com.bacon.domain.Product;
@@ -13,41 +15,55 @@ import static com.bacon.gui.PanelPedido.TIPO_LOCAL;
 import com.bacon.gui.util.MyPopupListener;
 import java.awt.CardLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.IntStream;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.ImageIcon;
-import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.JRadioButton;
+import javax.swing.JTable;
+import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingWorker;
+import javax.swing.UIDefaults;
+import javax.swing.UIManager;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
+import javax.swing.table.TableCellRenderer;
 import org.apache.commons.collections.keyvalue.MultiKey;
 import org.apache.commons.collections.map.MultiValueMap;
 import org.dz.MyDefaultTableModel;
+import org.dz.MyDialogEsc;
 import org.dz.PanelCapturaMod;
 
 /**
@@ -70,6 +86,12 @@ public class PanelOrders extends PanelCapturaMod implements
     private MultiValueMap mapInventory;
     private boolean block;
     private CardLayout cardLayout;
+    private JPanel pnContenTab1;
+    private ProductoPed product;
+    private JPanel pnIngredients;
+    private JPanel pnCoccion;
+    private JPanel pnCooking;
+    private int tipo;
 
     /**
      * Creates new form PanelOrders
@@ -81,11 +103,19 @@ public class PanelOrders extends PanelCapturaMod implements
         products = new ArrayList<>();
         checkInventory = new HashMap<>();
         mapInventory = new MultiValueMap();
+        tipo = TIPO_LOCAL;
         initComponents();
         createComponents();
     }
 
     private void createComponents() {
+
+        UIDefaults defaults = UIManager.getLookAndFeelDefaults();
+        if (defaults.get("Table.alternateRowColor") == null) {
+            defaults.put("Table.alternateRowColor", new Color(240, 240, 240));
+        }
+
+        Font font = new Font("Arial", 1, 18);
 
         String[] cols = {"Cant", "Producto", "Unidad", "V. Total", "LLevar"};
         DCFORM_P = (DecimalFormat) NumberFormat.getInstance();
@@ -98,7 +128,7 @@ public class PanelOrders extends PanelCapturaMod implements
 
         tbProducts.getTableHeader().setReorderingAllowed(false);
 
-        int height = 35; // + (showExclusions ? 15 : 0);
+        int height = 35; // + (showExclusions ? 15 : 0);        
         tbProducts.setRowHeight(height);
         tbProducts.setFont(new Font("Tahoma", 0, 14));
         modelTable.addTableModelListener(this);
@@ -136,6 +166,17 @@ public class PanelOrders extends PanelCapturaMod implements
         tbProducts.getColumnModel().getColumn(1).setCellRenderer(prodRenderer);
         tbProducts.getColumnModel().getColumn(2).setCellRenderer(formatRenderer);
         tbProducts.getColumnModel().getColumn(3).setCellRenderer(formatRenderer);
+        tbProducts.getColumnModel().getColumn(4).setCellRenderer(new CheckCellRenderer());
+        tbProducts.getColumnModel().getColumn(4).setCellEditor(tbProducts.getDefaultEditor(Boolean.class));
+
+        ActionListener actionListener = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                tbProducts.clearSelection();
+            }
+        };
+        KeyStroke stroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
+        tbProducts.registerKeyboardAction(actionListener, stroke, JComponent.WHEN_FOCUSED);
 
         ListSelectionModel selectionModel = new DefaultListSelectionModel();
         selectionModel.addListSelectionListener(this);
@@ -168,6 +209,27 @@ public class PanelOrders extends PanelCapturaMod implements
         btDelete.addActionListener(this);
         btDelete.setText("Eliminar");
 
+        icon = new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "edit.png", 12, 12));
+        btModify.setMargin(new Insets(0, 0, 0, 0));
+        btModify.setIcon(icon);
+        btModify.setActionCommand(AC_MODIFY_ITEM);
+        btModify.addActionListener(this);
+        btModify.setText("Modificar");
+
+        tgDelivery.setText("Llevar");
+        tgDelivery.setActionCommand(AC_CHECK_DELIVERY);
+        tgDelivery.addActionListener(this);
+
+        tgEntry.setText("Entrada");
+        tgEntry.setActionCommand(AC_CHECK_ENTRY);
+        tgEntry.addActionListener(this);
+
+        icon = new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "clean.png", 12, 12));
+        btClear.setMargin(new Insets(0, 0, 0, 0));
+        btClear.setIcon(icon);
+        btClear.setActionCommand(AC_CLEAR_ORDER);
+        btClear.addActionListener(this);
+
         icon = new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "file-send.png", 20, 20));
         btSend.setIcon(icon);
         btSend.setMargin(new Insets(0, 0, 0, 0));
@@ -189,26 +251,29 @@ public class PanelOrders extends PanelCapturaMod implements
         btHold.setActionCommand(AC_SEND_ORDER);
         btHold.addActionListener(this);
 
-        cardLayout = new CardLayout();
-        pnCardContain.setLayout(cardLayout);
+        regSubtotal.setTextAligment(SwingConstants.RIGHT);
+        regSubtotal.setForeground(color);
+        regSubtotal.setFontCampo(font);
+        regSubtotal.setLabelText("Subtotal");
+        regSubtotal.setText(DCFORM_P.format(0));
 
-        pnButtonTabs.setLayout(new FlowLayout(SwingConstants.LEADING, 5, 5));
-        String[] btnTabs = {"Cantidad", "Adicional", "Ingredientes", "Coccion", "Especial"};
-        for (String btnTab : btnTabs) {
-            JButton btn = new JButton(btnTab);
-            btn.setPreferredSize(new Dimension(120, 28));
-            btn.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    cardLayout.next(pnCardContain);
-                }
-            });
-            pnButtonTabs.add(btn);
-        }
-        cardLayout.addLayoutComponent(pnContenTab, "1");
-        cardLayout.addLayoutComponent(pnContenTab1, "2");
+//        iconOk = new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "package-accept.png", 18, 18));
+//        iconWarning = new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "package-warning.png", 18, 18));
+        ImageIcon iconDefault = new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "package-info.png", 18, 18));
+
+        btShowInventary.setIcon(iconDefault);
+        btShowInventary.setActionCommand(AC_SHOW_INVENTORY);
+        btShowInventary.addActionListener(this);
+
+        pnCardContain.add(pnContenTab, "1");
+
+        pnCardContain.setVisible(false);
 
     }
+    public static final String AC_CHECK_DELIVERY = "AC_CHECK_DELIVERY";
+    public static final String AC_MODIFY_ITEM = "AC_MODIFY_ITEM";
+
+    public static final String AC_CLEAR_ORDER = "AC_CLEAR_ORDER";
     public static final String AC_SEND_ORDER = "AC_SEND_ORDER";
     public static final String AC_DELETE_ITEM = "AC_DELETE_ITEM";
     public static final String AC_MINUS_QUANTITY = "AC_MINUS_QUANTITY";
@@ -222,6 +287,10 @@ public class PanelOrders extends PanelCapturaMod implements
     }
 
     public void addProductPed(ProductoPed productPed, int cantidad, double price) {
+        addProductPed(productPed, cantidad, price, -1);
+    }
+
+    public void addProductPed(ProductoPed productPed, int cantidad, double price, int rowSelected) {
         if (block) {
             GUIManager.showErrorMessage(null, "El pedido esta cerrado no se puede agregar más productos", "Pedido cerrado");
             return;
@@ -261,6 +330,9 @@ public class PanelOrders extends PanelCapturaMod implements
 
         if (products.contains(productPed) && price == productPed.getPrecio()) {
             try {
+                if (rowSelected != -1) {
+                    modelTable.removeRow(rowSelected);
+                }
                 int row = products.indexOf(productPed);
                 int cant = Integer.valueOf(modelTable.getValueAt(row, 0).toString());
                 modelTable.setValueAt(cant + cantidad, row, 0);
@@ -271,6 +343,9 @@ public class PanelOrders extends PanelCapturaMod implements
             }
         } else {
             try {
+                if (rowSelected != -1) {
+                    modelTable.removeRow(rowSelected);
+                }
                 productPed.setCantidad(cantidad);
                 products.add(productPed);
                 double totalProd = (producto.isVariablePrice() || productPed.hasPresentation() ? price : producto.getPrice()) + productPed.getValueAdicionales();
@@ -279,15 +354,16 @@ public class PanelOrders extends PanelCapturaMod implements
                     productPed,
                     totalProd,
                     totalProd * cantidad,
-                    false
+                    Boolean.FALSE
                 });
-                if (productPed.hasAdditionals()) {
-                    int size = 11 * (int) Math.ceil(productPed.getAdicionales().size() / 2.0);
-                    tbProducts.setRowHeight(modelTable.getRowCount() - 1, 35 + size);
-                }
+//                if (productPed.hasAdditionals()) {
+//                    int size = 11 * (int) Math.ceil(productPed.getAdicionales().size() / 2.0);
+//                    tbProducts.setRowHeight(modelTable.getRowCount() - 1, 35 + size);
+//                }
                 int row = modelTable.getRowCount() - 1;
                 modelTable.setRowEditable(row, false);
                 modelTable.setCellEditable(row, 0, true);
+                modelTable.setCellEditable(row, 4, true);
                 tbProducts.getSelectionModel().addSelectionInterval(row, row);
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());
@@ -295,6 +371,21 @@ public class PanelOrders extends PanelCapturaMod implements
         }
 
 //        checkAllInventory();
+    }
+
+    public static void updateRowHeights(int column, int width, JTable table) {
+        for (int row = 0; row < table.getRowCount(); row++) {
+            int rowHeight = table.getRowHeight();
+            Component comp = table.prepareRenderer(table.getCellRenderer(row, column), row, column);
+            Dimension d = comp.getPreferredSize();
+            // first set the size to the new width
+            comp.setSize(new Dimension(width, d.height));
+            // then get the preferred size
+            d = comp.getPreferredSize();
+            rowHeight = Math.max(rowHeight, d.height);
+            // finally set the height of the table
+            table.setRowHeight(row, rowHeight);
+        }
     }
 
     public Order getOrder() {
@@ -406,6 +497,76 @@ public class PanelOrders extends PanelCapturaMod implements
         return invSimple;
     }
 
+    private void loadIngredients() {
+        List<Ingredient> ingredients = Collections.EMPTY_LIST;
+        if (product != null) {
+            ingredients = app.getControl().getIngredientsByProduct(product.getProduct().getCode());
+        }
+        pnIngredients.removeAll();
+        for (int i = 0; i < ingredients.size(); i++) {
+            Ingredient ing = ingredients.get(i);
+            if (ing.isOpcional()) {
+                JCheckBox check = new JCheckBox("Sin " + ing.getName());
+                check.setActionCommand(ing.getCode());
+                check.setBorderPainted(true);
+                check.setBorder(BorderFactory.createCompoundBorder(
+                        BorderFactory.createEtchedBorder(),
+                        BorderFactory.createEmptyBorder(5, 10, 5, 10)
+                ));
+                pnIngredients.add(check);
+            }
+        }
+    }
+
+    private void loadCooking() {
+        List<String> cookingList = Collections.EMPTY_LIST;
+        if (product != null) {
+            String[] cooking = {"1/2", "3/4", "BA"};
+            cookingList = Arrays.asList(cooking);
+        }
+        pnCooking.removeAll();
+        ButtonGroup btgCooks = new ButtonGroup();
+        for (int i = 0; i < cookingList.size(); i++) {
+            String cook = cookingList.get(i);
+            JRadioButton rbCook = new JRadioButton(cook);
+//                check.setActionCommand(cook);
+            rbCook.setBorderPainted(true);
+            rbCook.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createEtchedBorder(),
+                    BorderFactory.createEmptyBorder(5, 10, 5, 10)
+            ));
+            btgCooks.add(rbCook);
+            pnCooking.add(rbCook);
+
+        }
+    }
+
+    private String htmlInfoInventory(HashMap<Integer, Double> simpInv) {
+
+        Set<Integer> keys = simpInv.keySet();
+
+        StringBuilder stb = new StringBuilder();
+        stb.append("<html><table border=1>");
+        stb.append("<thead>");
+        stb.append("<td>ITEM</td><td>INVENTARIO</td><td>CANTIDAD</td>");
+        stb.append("</thead>");
+        stb.append("<tbody>");
+        for (Integer next : keys) {
+            Item item = app.getControl().getItemWhere("id=" + next);
+            Double cant = (item.isOnlyDelivery() && tipo == TIPO_LOCAL) ? 0 : simpInv.get(next);
+            String color = (item.isOnlyDelivery() && tipo == TIPO_LOCAL) ? "#ff30a5" : (item.getQuantity() >= cant) ? "#00ff32" : "#ff4400";
+            stb.append("<tr>")
+                    .append("<td><font size=+1 color=").append(color).append(">").append(item.getName().toUpperCase()).append("</font></td>")
+                    .append("<td><font size=+1> ").append(item.getQuantity()).append("</font></td>")
+                    .append("<td><font size=+1 color=blue>").append(cant).append("</font></td>")
+                    .append("</tr>");
+        }
+        stb.append("</tbody>");
+        stb.append("</table></html>");
+
+        return stb.toString();
+    }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -420,11 +581,9 @@ public class PanelOrders extends PanelCapturaMod implements
         lbQuantity = new javax.swing.JLabel();
         btAdd = new javax.swing.JButton();
         btDelete = new javax.swing.JButton();
-        pnContenTab1 = new javax.swing.JPanel();
-        btMinus1 = new javax.swing.JButton();
-        lbQuantity1 = new javax.swing.JLabel();
-        btAdd1 = new javax.swing.JButton();
-        btDelete1 = new javax.swing.JButton();
+        btModify = new javax.swing.JButton();
+        tgEntry = new javax.swing.JToggleButton();
+        tgDelivery = new javax.swing.JToggleButton();
         registro1 = new org.dz.Registro();
         jLabel1 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -432,9 +591,12 @@ public class PanelOrders extends PanelCapturaMod implements
         btSend = new javax.swing.JButton();
         btHold = new javax.swing.JButton();
         btStay = new javax.swing.JButton();
-        pnButtonTabs = new javax.swing.JPanel();
+        pnTotals = new javax.swing.JPanel();
+        regSubtotal = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "","",60);
         registro2 = new org.dz.Registro();
         pnCardContain = new javax.swing.JPanel();
+        btClear = new javax.swing.JButton();
+        btShowInventary = new javax.swing.JButton();
 
         pnContenTab.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
@@ -449,52 +611,32 @@ public class PanelOrders extends PanelCapturaMod implements
                 .addComponent(lbQuantity, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(2, 2, 2)
                 .addComponent(btAdd, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 272, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 72, Short.MAX_VALUE)
+                .addComponent(tgDelivery, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(tgEntry, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btModify, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btDelete, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
         pnContenTabLayout.setVerticalGroup(
             pnContenTabLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnContenTabLayout.createSequentialGroup()
-                .addGap(3, 3, 3)
+                .addGap(2, 2, 2)
                 .addGroup(pnContenTabLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
                     .addComponent(btMinus, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(lbQuantity)
                     .addComponent(btAdd)
-                    .addComponent(btDelete, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(btDelete, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btModify, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(tgEntry, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(tgDelivery, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(30, Short.MAX_VALUE))
         );
 
-        pnContenTabLayout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {btAdd, btMinus, lbQuantity});
-
-        pnContenTab1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-
-        javax.swing.GroupLayout pnContenTab1Layout = new javax.swing.GroupLayout(pnContenTab1);
-        pnContenTab1.setLayout(pnContenTab1Layout);
-        pnContenTab1Layout.setHorizontalGroup(
-            pnContenTab1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnContenTab1Layout.createSequentialGroup()
-                .addGap(6, 6, 6)
-                .addComponent(btMinus1, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(2, 2, 2)
-                .addComponent(lbQuantity1, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(2, 2, 2)
-                .addComponent(btAdd1, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 244, Short.MAX_VALUE)
-                .addComponent(btDelete1, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
-        );
-        pnContenTab1Layout.setVerticalGroup(
-            pnContenTab1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnContenTab1Layout.createSequentialGroup()
-                .addGap(3, 3, 3)
-                .addGroup(pnContenTab1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
-                    .addComponent(btMinus1, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lbQuantity1)
-                    .addComponent(btAdd1)
-                    .addComponent(btDelete1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
+        pnContenTabLayout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {btAdd, btDelete, btMinus, lbQuantity});
 
         jLabel1.setText("jLabel1");
 
@@ -508,34 +650,33 @@ public class PanelOrders extends PanelCapturaMod implements
         ));
         jScrollPane1.setViewportView(tbProducts);
 
-        javax.swing.GroupLayout pnButtonTabsLayout = new javax.swing.GroupLayout(pnButtonTabs);
-        pnButtonTabs.setLayout(pnButtonTabsLayout);
-        pnButtonTabsLayout.setHorizontalGroup(
-            pnButtonTabsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
+        regSubtotal.setMinimumSize(new java.awt.Dimension(160, 31));
+        regSubtotal.setPreferredSize(new java.awt.Dimension(160, 31));
+
+        javax.swing.GroupLayout pnTotalsLayout = new javax.swing.GroupLayout(pnTotals);
+        pnTotals.setLayout(pnTotalsLayout);
+        pnTotalsLayout.setHorizontalGroup(
+            pnTotalsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnTotalsLayout.createSequentialGroup()
+                .addGap(310, 310, 310)
+                .addComponent(regSubtotal, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
         );
-        pnButtonTabsLayout.setVerticalGroup(
-            pnButtonTabsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 30, Short.MAX_VALUE)
+        pnTotalsLayout.setVerticalGroup(
+            pnTotalsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnTotalsLayout.createSequentialGroup()
+                .addComponent(regSubtotal, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
 
-        javax.swing.GroupLayout pnCardContainLayout = new javax.swing.GroupLayout(pnCardContain);
-        pnCardContain.setLayout(pnCardContainLayout);
-        pnCardContainLayout.setHorizontalGroup(
-            pnCardContainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
-        );
-        pnCardContainLayout.setVerticalGroup(
-            pnCardContainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 63, Short.MAX_VALUE)
-        );
+        pnCardContain.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        pnCardContain.setLayout(new java.awt.CardLayout());
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-            .addComponent(pnButtonTabs, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(pnTotals, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(btStay, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -543,32 +684,39 @@ public class PanelOrders extends PanelCapturaMod implements
                 .addComponent(btHold, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btSend, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                .addGap(1, 1, 1))
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(5, 5, 5)
+                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(registro1, javax.swing.GroupLayout.PREFERRED_SIZE, 145, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(5, 5, 5)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(registro2, javax.swing.GroupLayout.PREFERRED_SIZE, 123, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 3, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btShowInventary, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btClear, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
             .addComponent(pnCardContain, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
-        layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {jLabel1, registro1, registro2});
+        layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {registro1, registro2});
 
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(registro1, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(registro2, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(registro2, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btClear, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btShowInventary, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 287, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 275, Short.MAX_VALUE)
+                .addGap(2, 2, 2)
+                .addComponent(pnTotals, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(pnButtonTabs, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(pnCardContain, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(pnCardContain, javax.swing.GroupLayout.DEFAULT_SIZE, 41, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(btSend, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -581,25 +729,26 @@ public class PanelOrders extends PanelCapturaMod implements
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btAdd;
-    private javax.swing.JButton btAdd1;
+    private javax.swing.JButton btClear;
     private javax.swing.JButton btDelete;
-    private javax.swing.JButton btDelete1;
     private javax.swing.JButton btHold;
     private javax.swing.JButton btMinus;
-    private javax.swing.JButton btMinus1;
+    private javax.swing.JButton btModify;
     private javax.swing.JButton btSend;
+    private javax.swing.JButton btShowInventary;
     private javax.swing.JButton btStay;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lbQuantity;
-    private javax.swing.JLabel lbQuantity1;
-    private javax.swing.JPanel pnButtonTabs;
     private javax.swing.JPanel pnCardContain;
     private javax.swing.JPanel pnContenTab;
-    private javax.swing.JPanel pnContenTab1;
+    private javax.swing.JPanel pnTotals;
+    private com.bacon.gui.util.Registro regSubtotal;
     private org.dz.Registro registro1;
     private org.dz.Registro registro2;
     private javax.swing.JTable tbProducts;
+    private javax.swing.JToggleButton tgDelivery;
+    private javax.swing.JToggleButton tgEntry;
     // End of variables declaration//GEN-END:variables
 
     @Override
@@ -627,29 +776,95 @@ public class PanelOrders extends PanelCapturaMod implements
             } catch (Exception ex) {
             }
         } else if (AC_DELETE_ITEM.equals(e.getActionCommand())) {
-            int r = tbProducts.getSelectedRow();
-            if (r != -1) {
-                ProductoPed pp = (ProductoPed) tbProducts.getValueAt(r, 1);
-                modelTable.removeRow(r);
-                boolean del = products.remove(pp);
-            }
+            IntStream.of(tbProducts.getSelectedRows())
+                    .boxed()
+                    .sorted(Collections.reverseOrder())
+                    .map(tbProducts::convertRowIndexToModel)
+                    .forEach(modelTable::removeRow);
+
         } else if (AC_SEND_ORDER.equals(e.getActionCommand())) {
             Order order = getOrder();
             if (order != null && !order.isEmpty()) {
                 app.getControl().addOrder(getOrder());
+            }
+        } else if (AC_CLEAR_ORDER.equals(e.getActionCommand())) {
+            modelTable.setRowCount(0);
+            products.clear();
+        } else if (AC_MODIFY_ITEM.equals(e.getActionCommand())) {
+            ProductoPed productSelected = getProductSelected();
+            int row = tbProducts.getSelectedRow();
+            if (productSelected != null) {
+                app.getGuiManager().showCustomPedido(productSelected, this, row);
+            }
+        } else if (AC_SHOW_INVENTORY.equals(e.getActionCommand())) {
+            HashMap<Integer, Double> inventory = checkInventory();
+            if (!inventory.isEmpty()) {
+                String htmlInv = htmlInfoInventory(inventory);
+                MyDialogEsc dialog = new MyDialogEsc(app.getGuiManager().getFrame());
+                dialog.add(new JLabel(htmlInv));
+                dialog.pack();
+                dialog.setLocationRelativeTo(null);
+                dialog.setVisible(true);
+            }
+        } else if (AC_CHECK_DELIVERY.equals(e.getActionCommand())) {
+            int[] selectedRows = tbProducts.getSelectedRows();
+            if (selectedRows.length == 1) {
+                int row = selectedRows[0];
+                boolean check = Boolean.parseBoolean(modelTable.getValueAt(row, 4).toString());
+                modelTable.setValueAt(!check, selectedRows[0], 4);
+            } else {
+                for (int row : selectedRows) {
+                    boolean check = Boolean.parseBoolean(modelTable.getValueAt(row, 4).toString());
+
+                    if (!check) {
+                        modelTable.setValueAt(true, row, 4);
+                    }
+                }
+            }
+        } else if (AC_CHECK_ENTRY.equals(e.getActionCommand())) {
+            int[] selectedRows = tbProducts.getSelectedRows();
+            if (selectedRows.length == 1) {
+                int row = selectedRows[0];
+                int cRow = tbProducts.convertRowIndexToModel(row);
+                ProductoPed prod = (ProductoPed) modelTable.getValueAt(cRow, 1);
+                prod.setEntry(tgEntry.isSelected());
+                modelTable.setValueAt(prod, cRow, 1);
             }
         }
     }
 
     @Override
     public void valueChanged(ListSelectionEvent e) {
-        int row = tbProducts.getSelectedRow();
-        if (row >= 0) {
-            try {
-                int quantity = Integer.parseInt(modelTable.getValueAt(row, 0).toString());
-                lbQuantity.setText(String.valueOf(quantity));
-            } catch (Exception ex) {
+        int[] selecteds = tbProducts.getSelectedRows();
+        int length = selecteds.length;
+        if (length == 1) {
+            int row = selecteds[0];
+            if (row >= 0) {
+                try {
+                    int quantity = Integer.parseInt(modelTable.getValueAt(row, 0).toString());
+                    boolean paraLlevar = Boolean.parseBoolean(modelTable.getValueAt(row, 4).toString());
+                    lbQuantity.setText(String.valueOf(quantity));
+                    product = (ProductoPed) modelTable.getValueAt(row, 1);
+                    tgDelivery.setSelected(paraLlevar);
+                    tgEntry.setSelected(product.isEntry());
+                    btMinus.setEnabled(true);
+                    btAdd.setEnabled(true);
+                    btModify.setEnabled(true);
+                    pnCardContain.setVisible(true);
+                } catch (Exception ex) {
+                }
             }
+        } else if (length > 1) {
+            int sum = 0;
+            for (int sel : selecteds) {
+                sum += Integer.parseInt(modelTable.getValueAt(sel, 0).toString());
+                lbQuantity.setText(String.valueOf(sum));
+            }
+            btMinus.setEnabled(false);
+            btAdd.setEnabled(false);
+            btModify.setEnabled(false);
+        } else {
+            pnCardContain.setVisible(false);
         }
     }
 
@@ -668,6 +883,15 @@ public class PanelOrders extends PanelCapturaMod implements
                 price = prodPed.getPresentation().getPrice();
             }
             addProductPed(prodPed, cant, price);
+        } else if (PanelCustomPedido.AC_CUSTOM_MOD.equals(evt.getPropertyName())) {
+            ProductoPed prodPed = (ProductoPed) evt.getNewValue();
+            int cant = (int) ((Object[]) evt.getOldValue())[0];
+            double price = (double) ((Object[]) evt.getOldValue())[1];
+            int row = (int) ((Object[]) evt.getOldValue())[2];
+            if (prodPed.getPresentation() != null) {
+                price = prodPed.getPresentation().getPrice();
+            }
+            addProductPed(prodPed, cant, price, row);
         }
     }
 
@@ -681,6 +905,7 @@ public class PanelOrders extends PanelCapturaMod implements
                     int cant = Integer.parseInt(tbProducts.getValueAt(e.getLastRow(), 0).toString());
                     ProductoPed prd = products.get(e.getLastRow());
                     prd.setCantidad(cant);
+                    tbProducts.setValueAt(prd, e.getLastRow(), 1);
                     lbQuantity.setText(String.valueOf(cant));
 
                     //update map inventory
@@ -701,6 +926,9 @@ public class PanelOrders extends PanelCapturaMod implements
                     };
                     sw.execute();
 //                    checkInventory();
+                } else if (e.getColumn() == 4) {
+                    boolean paraLlevar = Boolean.parseBoolean(modelTable.getValueAt(e.getLastRow(), 4).toString());
+                    tgDelivery.setSelected(paraLlevar);
                 }
                 break;
             case TableModelEvent.INSERT:
@@ -727,9 +955,39 @@ public class PanelOrders extends PanelCapturaMod implements
         calcularValores();
 
     }
+    public static final String AC_CHECK_ENTRY = "AC_CHECK_ENTRY";
+    public static final String AC_SHOW_INVENTORY = "AC_SHOW_INVENTORY";
+
+    public ProductoPed getProductSelected() {
+        int COL = 1;
+        ProductoPed prod = null;
+        int row = tbProducts.getSelectedRow();
+
+        if (row >= 0) {
+            prod = (ProductoPed) modelTable.getValueAt(row, COL);
+        }
+        return prod;
+    }
 
     private void calcularValores() {
+        double subtotal = calculateTotal();
+        regSubtotal.setText(DCFORM_P.format(subtotal));
+    }
 
+    private double calculateTotal() {
+        int ROWS = tbProducts.getRowCount();
+        double total = 0;
+        for (int i = 0; i < ROWS; i++) {
+            double valorProductos = 0;
+            try {
+                Double value = Double.parseDouble(tbProducts.getValueAt(i, 3).toString());
+                valorProductos = value;
+            } catch (Exception e) {
+                System.err.println("ex.parse number Total: " + e.getMessage());
+            }
+            total += valorProductos;
+        }
+        return total;
     }
 
     private double calculatePrecio(int row) {
@@ -744,4 +1002,51 @@ public class PanelOrders extends PanelCapturaMod implements
         return total;
     }
 
+    public class CheckCellRenderer extends JComponent implements TableCellRenderer {
+
+        private Color COLOR_CHECK = new Color(145, 100, 45);
+
+        public void CheckCellRenderer() {
+            COLOR_CHECK = new Color(100, 220, 159);
+
+            setOpaque(true);
+        }
+
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+
+            JCheckBox component = (JCheckBox) table.getDefaultRenderer(Boolean.class).
+                    getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+            component.setFont(new Font("sans", 0, 24));
+
+//            if ((Boolean) value) {
+            component.setBackground(row % 2 == 0 ? table.getBackground() : UIManager.getColor("Table.alternateRowColor"));
+            component.setForeground(Color.white);
+
+//                    if (hasFocus) {
+//                        component.setBorder(BorderFactory.createLineBorder(Color.red));
+//                    } else {
+//                        component.setBorder(BorderFactory.createLineBorder(Color.ORANGE));
+//                    }
+//                } else {
+//                    component.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.ORANGE));
+//                }
+            if (isSelected) {
+                component.setForeground(table.getSelectionForeground());
+                component.setBackground(table.getSelectionBackground());
+                if (hasFocus) {
+                    component.setBorder(BorderFactory.createLineBorder(Color.darkGray));
+                } else {
+                    component.setBorder(BorderFactory.createLineBorder(Color.lightGray));
+                }
+            } else {
+                component.setBackground(row % 2 == 0 ? table.getBackground() : UIManager.getColor("Table.alternateRowColor"));
+                component.setForeground(table.getForeground());
+                component.setBorder(UIManager.getBorder("Table.cellBorder"));
+            }
+//        }
+            return component;
+
+        }
+    }
 }

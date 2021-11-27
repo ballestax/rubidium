@@ -242,6 +242,7 @@ public class PanelTopSearch extends PanelCaptura implements ActionListener {
             ConfigDB config = app.getControl().getConfig(Configuration.PRINTER_SELECTED);
             String printer = config != null ? config.getValor() : "";
             app.getPrinterService().sendPulsePin(printer);
+            app.getGuiManager().switchPanel();
         }
 
     }

@@ -48,6 +48,7 @@ public class PanelModPedidos extends PanelCapturaMod
     private Comparator<Product> compAlpha;
     private Comparator<Product> compPrice;
     private PanelOrders pnOrders;
+    int cont =0;
 
     /**
      * Creates new form PanelPedidos
@@ -107,8 +108,8 @@ public class PanelModPedidos extends PanelCapturaMod
         pnPedido = app.getGuiManager().getPanelPedido();
         pnOrders = app.getGuiManager().getPanelOrders();
         
-//        splitPane.setRightComponent(pnPedido);
-        splitPane.setRightComponent(pnOrders);
+        splitPane.setRightComponent(pnPedido);
+//        splitPane.setRightComponent(pnOrders);
         splitPane.setOneTouchExpandable(true);
         
         productsList = new ArrayList<>();
@@ -126,6 +127,16 @@ public class PanelModPedidos extends PanelCapturaMod
         
         panelLeft.add(panelCategory);
     }
+    
+    public void switchPanel() {
+        cont++;
+        if(cont%2==0)
+        splitPane.setRightComponent(pnOrders);
+        else
+            splitPane.setRightComponent(pnPedido);
+    }
+    
+    
     
     private void loadAllProducts() {
         String order = app.getConfiguration().getProperty(Configuration.PROD_ORDER, "----");

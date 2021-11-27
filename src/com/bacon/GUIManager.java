@@ -12,6 +12,7 @@ import com.bacon.domain.Item;
 import com.bacon.domain.Permission;
 import com.bacon.domain.Presentation;
 import com.bacon.domain.Product;
+import com.bacon.domain.ProductoPed;
 import com.bacon.domain.Rol;
 import com.bacon.domain.User;
 import com.bacon.gui.GuiPanelNewUser;
@@ -93,10 +94,10 @@ import javax.swing.JToolBar;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
+import javax.swing.UIDefaults;
 import javax.swing.UIManager;
 import static org.dz.GuiUtil.centrarFrame;
 import org.dz.MyDialogEsc;
-
 
 /**
  *
@@ -189,6 +190,11 @@ public class GUIManager {
         } catch (Exception exception) {
 
         }
+        
+        UIDefaults defaults = UIManager.getLookAndFeelDefaults();
+        if (defaults.get("Table.alternateRowColor") == null) {
+            defaults.put("Table.alternateRowColor", new Color(240, 240, 240));
+        }
 
         centrarFrame(getFrame());
         getFrame().setTitle(Aplication.TITLE + " " + Aplication.VERSION);
@@ -198,7 +204,7 @@ public class GUIManager {
         wHandler = new WindowHandler();
 
         getPanelPresentation().setVisible(false);
-        
+
         getContPane().removeAll();
         getContPane().add(getPanelPresentation(), BorderLayout.CENTER);
 //        getSplitpane().setResizeWeight(1.0);
@@ -230,6 +236,10 @@ public class GUIManager {
         setDefaultCursor();
     }
 
+    public void switchPanel() {
+        getPanelModPedidos().switchPanel();
+    }
+
     public void setWaitCursor() {
         Cursor waitCursor = Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR);
         getFrame().setCursor(waitCursor);
@@ -256,7 +266,7 @@ public class GUIManager {
         }
         return panelModPedidos;
     }
-    
+
     private PanelTakeOrders getPanelTakeOrders() {
         if (panelTakeOrders == null) {
             panelTakeOrders = new PanelTakeOrders(app);
@@ -278,7 +288,7 @@ public class GUIManager {
         }
         return panelCash;
     }
-    
+
     private PanelProducts getPanelProducts() {
         if (panelProducts == null) {
             panelProducts = new PanelProducts(app);
@@ -315,7 +325,7 @@ public class GUIManager {
         }
         return panelBasicPedidos;
     }
-    
+
     public PanelBasic getPanelBasicPOS() {
         if (panelBasicPOS == null) {
             ImageIcon icon = new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "shoping-basket.png", 30, 30));
@@ -339,8 +349,7 @@ public class GUIManager {
         }
         return panelBasicCash;
     }
-    
-    
+
     public PanelBasic getPanelBasicProducts() {
         if (panelBasicProducts == null) {
             ImageIcon icon = new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "shopping-bag-purple.png", 30, 30));
@@ -441,7 +450,7 @@ public class GUIManager {
         }
         return panelSelCategory;
     }
-    
+
     public PanelSnapShot getPanelSnapShot() {
         if (panelSnapshot == null) {
             panelSnapshot = new PanelSnapShot(app);
@@ -452,9 +461,10 @@ public class GUIManager {
     public PanelSelItem getPanelSelItem() {
         return getPanelSelItem(null);
     }
+
     public PanelSelItem getPanelSelItem(Item item) {
         if (panelSelItem == null) {
-            panelSelItem = new PanelSelItem(app, null);            
+            panelSelItem = new PanelSelItem(app, null);
         }
         panelSelItem.reset();
         panelSelItem.setItem(item);
@@ -464,7 +474,7 @@ public class GUIManager {
     public PanelDownItem getPanelDownItem() {
         return getPanelDownItem(null);
     }
-    
+
     public PanelDownItem getPanelDownItem(Item item) {
         if (panelDownItem == null) {
             panelDownItem = new PanelDownItem(app, null);
@@ -648,12 +658,12 @@ public class GUIManager {
             if (user != null && perm != null && app.getControl().hasPermission(user, perm)) {
                 toolbar.add((app.getAction(Aplication.ACTION_SHOW_INVENTORY)));
             }
-            
+
             perm = app.getControl().getPermissionByName("show-products-module");
             if (user != null && app.getControl().hasPermission(user, perm)) {
                 toolbar.add((app.getAction(Aplication.ACTION_SHOW_PRODUCTS)));
             }
-            
+
             perm = app.getControl().getPermissionByName("show-pos-module");
             if (user != null && app.getControl().hasPermission(user, perm)) {
                 toolbar.add((app.getAction(Aplication.ACTION_SHOW_POS)));
@@ -847,7 +857,7 @@ public class GUIManager {
 
     public void showNewRol(PropertyChangeListener pcl, Rol role) {
         setWaitCursor();
-        JDialog dialog = getDialog(true);        
+        JDialog dialog = getDialog(true);
         dialog.setPreferredSize(null);
         dialog.add(getPanelNewRol(pcl, role));
         dialog.setResizable(false);
@@ -944,7 +954,7 @@ public class GUIManager {
         }
         if (limpiar) {
             myDialog.getContentPane().removeAll();
-        }        
+        }
         return myDialog;
     }
 
@@ -979,7 +989,7 @@ public class GUIManager {
         }
         return pnPedido;
     }
-    
+
     public PanelOrders getPanelOrders() {
         if (pnOrders == null) {
             pnOrders = new PanelOrders(app);
@@ -997,6 +1007,27 @@ public class GUIManager {
         dialog.add(pnCustomPed);
         dialog.setResizable(false);
         dialog.setTitle(product.getName());
+        dialog.pack();
+        dialog.setLocationRelativeTo(getFrame());
+        setDefaultCursor();
+        dialog.setVisible(true);
+    }
+
+    public void showCustomPedido(ProductoPed product, PropertyChangeListener pcl) {
+        showCustomPedido(product, pcl, -1);
+    }
+
+    public void showCustomPedido(ProductoPed product, PropertyChangeListener pcl, int row) {
+        setWaitCursor();
+        JDialog dialog = getDialog(true);
+        dialog.setPreferredSize(null);
+        PanelCustomPedido pnCustomPed = new PanelCustomPedido(app, product.getProduct());
+        pnCustomPed.addPropertyChangeListener(getPanelPedido());
+        pnCustomPed.addPropertyChangeListener(getPanelOrders());
+        pnCustomPed.showProductPed(product, row);
+        dialog.add(pnCustomPed);
+        dialog.setResizable(false);
+        dialog.setTitle(product.getProduct().getName().toUpperCase());
         dialog.pack();
         dialog.setLocationRelativeTo(getFrame());
         setDefaultCursor();
@@ -1127,7 +1158,7 @@ public class GUIManager {
         setDefaultCursor();
         dialog.setVisible(true);
     }
-    
+
     public void showPanelSnapShot() {
         setWaitCursor();
         JDialog dialog = new MyDialogEsc();
@@ -1218,7 +1249,7 @@ public class GUIManager {
         setDefaultCursor();
         dialog.setVisible(true);
     }
-    
+
     public void showPanelSelItem(PropertyChangeListener listener) {
         showPanelSelItem(null, listener);
     }
@@ -1241,7 +1272,7 @@ public class GUIManager {
     public void showPanelDownItem(PropertyChangeListener listener) {
         showPanelDownItem(null, listener);
     }
-    
+
     public void showPanelDownItem(Item item, PropertyChangeListener listener) {
         setWaitCursor();
         JDialog dialog = new MyDialogEsc();
@@ -1335,7 +1366,7 @@ public class GUIManager {
         }
         return pnConfigTicket;
     }
-    
+
     public void showPanelNewCategory(String title, PropertyChangeListener listener, List lista) {
         setWaitCursor();
         JDialog dialog = new MyDialogEsc();
@@ -1348,7 +1379,7 @@ public class GUIManager {
         setDefaultCursor();
         dialog.setVisible(true);
     }
-    
+
     public void showPanelAddPress(PropertyChangeListener listener, Product product) {
         setWaitCursor();
         JDialog dialog = new MyDialogEsc();
@@ -1371,7 +1402,7 @@ public class GUIManager {
         setDefaultCursor();
         dialog.setVisible(true);
     }
-    
+
     public void showPanelEditPress(PropertyChangeListener listener, Presentation presentation) {
         setWaitCursor();
         JDialog dialog = new MyDialogEsc();

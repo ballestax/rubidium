@@ -26,6 +26,8 @@ import java.beans.PropertyChangeEvent;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
@@ -60,6 +62,8 @@ public class PanelCustomPedido extends PanelCapturaMod implements ActionListener
     private ButtonGroup bgPres;
     private JPanel pnAdditionals;
     private JPanel pnCoccion;
+    private boolean modeEdit;
+    private int rowSelected;
 
     /**
      * Creates new form PanelCustomPedido
@@ -75,6 +79,7 @@ public class PanelCustomPedido extends PanelCapturaMod implements ActionListener
     }
 
     private void createComponents() {
+        modeEdit = false;
 
         spModel = new SpinnerNumberModelo(1, 1, null, 1);
         spPriceModel = new SpinnerNumberModelo(product.getPrice(), product.getPrice(), null, 1000d);
@@ -140,6 +145,10 @@ public class PanelCustomPedido extends PanelCapturaMod implements ActionListener
         });
 
         spCantidad.requestFocus();
+        
+        chEntry.setActionCommand("AC_CHECK_ENTRY");
+        chEntry.addActionListener(this);
+        chEntry.setText("Entrada");
 
         btConfirm.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "success.png", 10, 10)));
         btConfirm.setBackground(new Color(153, 255, 153));
@@ -154,8 +163,6 @@ public class PanelCustomPedido extends PanelCapturaMod implements ActionListener
         pnIngredients.setLayout(new GridLayout(0, 3, 5, 5));
         ingredients = app.getControl().getIngredientsByProduct(product.getCode());
 
-        
-        
         for (int i = 0; i < ingredients.size(); i++) {
             Ingredient ing = ingredients.get(i);
             if (ing.isOpcional()) {
@@ -163,7 +170,7 @@ public class PanelCustomPedido extends PanelCapturaMod implements ActionListener
                 check.setActionCommand(ing.getCode());
                 check.setBorderPainted(true);
                 check.setBorder(BorderFactory.createCompoundBorder(
-                        BorderFactory.createEtchedBorder(), 
+                        BorderFactory.createEtchedBorder(),
                         BorderFactory.createEmptyBorder(5, 10, 5, 10)
                 ));
                 pnIngredients.add(check);
@@ -195,7 +202,7 @@ public class PanelCustomPedido extends PanelCapturaMod implements ActionListener
             for (int i = 0; i < presList.size(); i++) {
                 Presentation pres = presList.get(i);
                 if (pres.isEnabled()) {
-                    PanelPresentation panPres = new PanelPresentation(app, pres);                    
+                    PanelPresentation panPres = new PanelPresentation(app, pres);
                     panPres.setSelected(pres.isDefault());
                     panPres.setActionCommand(AC_SEL_PRES);
                     panPres.addActionListener(this);
@@ -222,7 +229,7 @@ public class PanelCustomPedido extends PanelCapturaMod implements ActionListener
         pnCoccion.setLayout(new FlowLayout(FlowLayout.LEADING, 10, 10));
 
         ButtonGroup btgTerminos = new ButtonGroup();
-        String[] terminos = {"1/2", "3/4", "Completo", "Over"};
+        String[] terminos = {"1/2", "3/4", "Bien asada"};
         for (String termino : terminos) {
             JRadioButton rbTermino = new JRadioButton(termino);
             rbTermino.setPreferredSize(new Dimension(120, 20));
@@ -273,6 +280,80 @@ public class PanelCustomPedido extends PanelCapturaMod implements ActionListener
         lbInfo.setText(cant + " " + product.getName() + " (" + product.getPrice() + stValAdds + ") x " + DCFORM_P.format(total));
     }
 
+    public void showProductPed(ProductoPed productPed, int row) {
+        modeEdit = true;
+        this.rowSelected = row;
+        Product product = productPed.getProduct();
+        spPriceModel.setMinimum(product.getPrice());
+        spPriceModel.setValue(product.getPrice());
+        lbPrice.setText(NF.format(product.getPrice()));
+        spModel.setValue(productPed.getCantidad());
+        chEntry.setSelected(productPed.isEntry());
+        selectPresentation(productPed.getPresentation());
+        selectAdditionals(productPed.getAdicionales());
+        selectIngredients(productPed.getExclusiones());
+        selectTermino(productPed.getTermino());
+    }
+
+    private void selectPresentation(Presentation presentation) {
+        if (presentation != null) {
+            for (Component component : pnPresentations.getComponents()) {
+                PanelPresentation pnPres = (PanelPresentation) component;
+                Presentation pres = pnPres.getPresentation();
+                if (pres.equals(presentation)) {
+                    pnPres.setSelected(true);
+                    return;
+                }
+            }
+        }
+    }
+
+    private void selectAdditionals(ArrayList<AdditionalPed> adicionales) {
+        List<Additional> collect = adicionales.stream().map(adicional -> adicional.getAdditional()).collect(Collectors.toList());
+        for (Component component : pnAdditionals.getComponents()) {
+            if (component instanceof PanelAddition) {
+                PanelAddition pnAdd = (PanelAddition) component;
+                Additional add = pnAdd.getAddition();
+                if (collect.contains(add)) {
+                    int indexOf = collect.indexOf(add);
+                    pnAdd.setQuantity(adicionales.get(indexOf).getCantidad());
+                    pnAdd.activate(true);
+                }
+            }
+        }
+
+    }
+
+    private void selectIngredients(ArrayList<Ingredient> exclusiones) {
+        List<String> collect = exclusiones.stream().map(ingred -> ingred.getName()).collect(Collectors.toList());
+        for (Component component : pnIngredients.getComponents()) {
+            if (component instanceof JCheckBox) {
+                String text = ((JCheckBox) component).getText();
+                try {
+                    String name = text.substring(4);
+                    if (collect.contains(name)) {
+                        ((JCheckBox) component).setSelected(true);
+                    }
+                } catch (Exception e) {
+                }
+
+            }
+        }
+    }
+
+    private void selectTermino(String termino) {
+        if (termino != null) {
+            for (Component component : pnCoccion.getComponents()) {
+                JRadioButton rbTerm = (JRadioButton) component;
+                String term = rbTerm.getText();
+                if (term.equals(termino)) {
+                    rbTerm.setSelected(true);
+                    return;
+                }
+            }
+        }
+    }
+
     public ProductoPed parseProduct() {
         double price = 0;
 
@@ -294,6 +375,10 @@ public class PanelCustomPedido extends PanelCapturaMod implements ActionListener
         prodPed.setPresentation(getPresentation());
 
         prodPed.setAdicionales(getArrayAdditionals());
+
+        prodPed.setTermino(getTermino());
+        
+        prodPed.setEntry(chEntry.isSelected());
 
         prodPed.setEspecificaciones(taObs.getText());
         return prodPed;
@@ -330,6 +415,20 @@ public class PanelCustomPedido extends PanelCapturaMod implements ActionListener
         return null;
     }
 
+    public String getTermino() {
+        Component[] componentes;
+        componentes = pnCoccion.getComponents();
+        for (Component componente : componentes) {
+            if (componente instanceof JRadioButton) {
+                JRadioButton rbTerm = (JRadioButton) componente;
+                if (rbTerm.isSelected()) {
+                    return rbTerm.getText();
+                }
+            }
+        }
+        return null;
+    }
+
     public double getValueAdicionales(ArrayList<AdditionalPed> adicionales) {
         double value = 0;
         for (int i = 0; i < adicionales.size(); i++) {
@@ -356,7 +455,11 @@ public class PanelCustomPedido extends PanelCapturaMod implements ActionListener
                 }
 
                 prodPed.setPrecio(value);
-                pcs.firePropertyChange(AC_CUSTOM_ADD, new Object[]{cant, value}, prodPed);
+                if (modeEdit) {
+                    pcs.firePropertyChange(AC_CUSTOM_MOD, new Object[]{cant, value, rowSelected}, prodPed);
+                } else {
+                    pcs.firePropertyChange(AC_CUSTOM_ADD, new Object[]{cant, value}, prodPed);
+                }
 
                 getRootPane().getParent().setVisible(false);
             }
@@ -368,6 +471,7 @@ public class PanelCustomPedido extends PanelCapturaMod implements ActionListener
         }
     }
     public static final String AC_CUSTOM_ADD = "AC_CUSTOM_ADD";
+    public static final String AC_CUSTOM_MOD = "AC_CUSTOM_MOD";
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
@@ -399,6 +503,7 @@ public class PanelCustomPedido extends PanelCapturaMod implements ActionListener
         pnPresentations = new javax.swing.JPanel();
         spPrice = new javax.swing.JSpinner();
         pnContainer = new javax.swing.JPanel();
+        chEntry = new javax.swing.JCheckBox();
 
         pnIngredients.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
@@ -470,6 +575,8 @@ public class PanelCustomPedido extends PanelCapturaMod implements ActionListener
             .addGap(0, 327, Short.MAX_VALUE)
         );
 
+        chEntry.setText("jCheckBox1");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -494,6 +601,8 @@ public class PanelCustomPedido extends PanelCapturaMod implements ActionListener
                     .addComponent(jScrollPane1)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(lbInfo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(chEntry)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btConfirm, javax.swing.GroupLayout.PREFERRED_SIZE, 159, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(lbTitle3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -530,7 +639,8 @@ public class PanelCustomPedido extends PanelCapturaMod implements ActionListener
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(lbInfo, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btConfirm, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(btConfirm, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chEntry, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
 
@@ -543,6 +653,7 @@ public class PanelCustomPedido extends PanelCapturaMod implements ActionListener
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btConfirm;
+    private javax.swing.JCheckBox chEntry;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lbCant;
     private javax.swing.JLabel lbDescription;

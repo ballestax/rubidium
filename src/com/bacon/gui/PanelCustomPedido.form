@@ -68,7 +68,9 @@
                   <Component id="jScrollPane1" alignment="0" max="32767" attributes="0"/>
                   <Group type="102" alignment="0" attributes="0">
                       <Component id="lbInfo" max="32767" attributes="0"/>
-                      <EmptySpace min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="chEntry" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
                       <Component id="btConfirm" min="-2" pref="159" max="-2" attributes="0"/>
                   </Group>
                   <Component id="lbTitle3" alignment="0" max="32767" attributes="0"/>
@@ -114,6 +116,7 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Component id="lbInfo" linkSize="2" min="-2" pref="40" max="-2" attributes="0"/>
                   <Component id="btConfirm" linkSize="2" min="-2" pref="40" max="-2" attributes="0"/>
+                  <Component id="chEntry" alignment="1" max="32767" attributes="0"/>
               </Group>
               <EmptySpace min="-2" max="-2" attributes="0"/>
           </Group>
@@ -267,5 +270,10 @@
         </DimensionLayout>
       </Layout>
     </Container>
+    <Component class="javax.swing.JCheckBox" name="chEntry">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="jCheckBox1"/>
+      </Properties>
+    </Component>
   </SubComponents>
 </Form>

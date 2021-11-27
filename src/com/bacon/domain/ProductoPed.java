@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Objects;
 import org.apache.commons.collections.CollectionUtils;
+import sun.jvm.hotspot.tools.PMap;
 
 /**
  *
@@ -12,12 +13,15 @@ import org.apache.commons.collections.CollectionUtils;
 public class ProductoPed {
 
     protected Product producto;
+    protected String termino;
+    protected String corte;
     protected ArrayList<AdditionalPed> adicionales;
     protected ArrayList<Ingredient> exclusiones;
     protected Presentation presentation;
     protected String especificaciones;
     protected int cantidad;
     protected double precio;
+    protected boolean entry;
     protected HashMap<Integer, HashMap> data;
 
     public ProductoPed() {
@@ -27,6 +31,9 @@ public class ProductoPed {
 
     public ProductoPed(Product producto) {
         this.producto = producto;
+        termino = null;
+        corte = null;
+        entry = false;
         adicionales = new ArrayList<>();
         exclusiones = new ArrayList<>();
         this.precio = producto.getPrice();
@@ -172,6 +179,38 @@ public class ProductoPed {
         this.exclusiones.add(excluision);
     }
 
+    public void setTermino(String termino) {
+        this.termino = termino;
+    }
+
+    public String getTermino() {
+        return termino;
+    }
+
+    public boolean hasTermino() {
+        return termino.trim().isEmpty();
+    }
+
+    public String getCorte() {
+        return corte;
+    }
+
+    public void setCorte(String corte) {
+        this.corte = corte;
+    }
+
+    public boolean hasCorte() {
+        return corte.trim().isEmpty();
+    }
+
+    public boolean isEntry() {
+        return entry;
+    }
+
+    public void setEntry(boolean entry) {
+        this.entry = entry;
+    }
+
     public HashMap<Integer, HashMap> getData() {
         return data;
     }
@@ -216,17 +255,31 @@ public class ProductoPed {
             return false;
         }
 
+        if (termino != null && !termino.equals(prod.getTermino())) {
+            System.out.println(":" + termino);
+            System.out.println("::" + prod.getTermino());
+            System.out.println("distinc termino");
+            return false;
+        }
+        if (corte != null && !corte.equals(prod.getCorte())) {
+            System.out.println("distinc corte");
+            return false;
+        }
+
         return true;
     }
 
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 97 * hash + Objects.hashCode(this.producto);
-        hash = 97 * hash + Objects.hashCode(this.adicionales);
-        hash = 97 * hash + Objects.hashCode(this.exclusiones);
-        hash = 97 * hash + Objects.hashCode(this.presentation);
-        hash = 97 * hash + (int) (Double.doubleToLongBits(this.precio) ^ (Double.doubleToLongBits(this.precio) >>> 32));
+        hash = 11 * hash + Objects.hashCode(this.producto);
+        hash = 11 * hash + Objects.hashCode(this.termino);
+        hash = 11 * hash + Objects.hashCode(this.corte);
+        hash = 11 * hash + Objects.hashCode(this.adicionales);
+        hash = 11 * hash + Objects.hashCode(this.exclusiones);
+        hash = 11 * hash + Objects.hashCode(this.presentation);
+        hash = 11 * hash + Objects.hashCode(this.especificaciones);
+        hash = 11 * hash + (int) (Double.doubleToLongBits(this.precio) ^ (Double.doubleToLongBits(this.precio) >>> 32));
         return hash;
     }
 

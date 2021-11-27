@@ -2,6 +2,7 @@ package com.bacon.gui;
 
 import com.bacon.Aplication;
 import com.bacon.domain.Additional;
+import com.bacon.domain.AdditionalPed;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -18,7 +19,7 @@ import org.dz.PanelCaptura;
  * @author lrod
  */
 public class PanelAddition extends PanelCaptura implements ActionListener {
-    
+
     private final Aplication app;
     private final Additional addition;
     private int lastValue;
@@ -36,9 +37,9 @@ public class PanelAddition extends PanelCaptura implements ActionListener {
         initComponents();
         createComponents();
     }
-    
+
     private void createComponents() {
-        
+
         MouseAdapter mouseClick = new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -46,26 +47,26 @@ public class PanelAddition extends PanelCaptura implements ActionListener {
                 activate(chSel.isSelected());
             }
         };
-        
+
         setBorder(BorderFactory.createLineBorder(Color.lightGray, 1, true));
         lbPrice.setForeground(Color.blue.darker());
         lbPrice.addMouseListener(mouseClick);
-        
+
         lbName.setPreferredSize(new Dimension(160, 20));
         lbName.setMinimumSize(new Dimension(160, 20));
         lbName.addMouseListener(mouseClick);
-        
+
         lbName.setText(StringUtils.capitalize(addition.getName()));
         lbName.setToolTipText(StringUtils.capitalize(addition.getName()));
         lbPrice.setToolTipText(StringUtils.capitalize(addition.getName()));
         lbPrice.setText(app.getCurrencyFormat().format(addition.getPrecio()));
-        
+
         SpinnerNumberModel spModel = new SpinnerNumberModel(1, 1, 100, 1);
         spCant.setModel(spModel);
-        
+
         chSel.setActionCommand(AC_SEL_ADDITION);
         chSel.addActionListener(this);
-        
+
         activate(false);
     }
 
@@ -136,39 +137,48 @@ public class PanelAddition extends PanelCaptura implements ActionListener {
     @Override
     public void reset() {
     }
-    
+
     @Override
     public void actionPerformed(ActionEvent e) {
         if (AC_SEL_ADDITION.equals(e.getActionCommand())) {
             activate(chSel.isSelected());
         }
     }
-    
-    private void activate(boolean act) {
+
+    public void activate(boolean act) {
         lbName.setEnabled(act);
         lbPrice.setEnabled(act);
         spCant.setEnabled(act);
         lastValue = Integer.parseInt(spCant.getValue().toString());
+        chSel.setSelected(act);
         if (act) {
             spCant.setValue(lastValue);
         } else {
             spCant.setValue(1);
         }
-        
+
     }
-    
+
     public Additional getAddition() {
         return addition;
     }
-    
+
+    public AdditionalPed getAdditionPed() {
+        return new AdditionalPed(addition, getQuantity());
+    }
+
     public int getQuantity() {
         return Integer.parseInt(spCant.getValue().toString());
     }
-    
+
+    public void setQuantity(int quantity) {
+        spCant.setValue(quantity);
+    }
+
     public boolean isSelected() {
         return chSel.isSelected();
     }
-    
+
     public static final String AC_SEL_ADDITION = "AC_SEL_ADDITION";
-    
+
 }
