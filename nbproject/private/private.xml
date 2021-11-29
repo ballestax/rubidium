@@ -12,18 +12,21 @@
     </editor-bookmarks>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/gui/PanelAddItem.java</file>
             <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/Aplication.java</file>
             <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/gui/PanelOrders.java</file>
-            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/gui/PanelAddition.java</file>
             <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/domain/AdditionalPed.java</file>
+            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/gui/FormatRenderer.java</file>
+            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/gui/ProductRenderer.java</file>
+            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/gui/PanelProduct4.java</file>
+            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/gui/SpinnerRenderer.java</file>
+            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/gui/PanelPedido.java</file>
+            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/gui/PanelAddItem.java</file>
+            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/gui/PanelAddition.java</file>
+            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/ImageManager.java</file>
             <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/GUIManager.java</file>
             <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/domain/ProductoPed.java</file>
             <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/gui/util/TableSelectCellRenderer.java</file>
             <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/gui/PanelCustomPedido.java</file>
-            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/gui/ProductRenderer.java</file>
-            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/gui/PanelProduct4.java</file>
-            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/gui/PanelPedido.java</file>
         </group>
     </open-files>
 </project-private>

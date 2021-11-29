@@ -52,7 +52,9 @@ public class PanelCategory extends PanelCapturaMod implements PropertyChangeList
     public static final String ORDEN_RATING = "RATING";
     private HashMap<Long, PanelProduct4> mapProdsV2;
     private HashMap<Long, PanelProduct2> mapProdsV1;
+    private HashMap<Long, PanelProduct> mapProdsV3;
     private List<Category> categoriesList;
+    private int viewSelect;
 
     /**
      * Creates new form PanelCategory
@@ -70,6 +72,8 @@ public class PanelCategory extends PanelCapturaMod implements PropertyChangeList
         this.selectedSort = null;
         mapProdsV1 = new HashMap<>();
         mapProdsV2 = new HashMap<>();
+        mapProdsV3 = new HashMap<>();
+        viewSelect=1;
 
         initComponents();
         pbLoading.setVisible(false);
@@ -86,6 +90,7 @@ public class PanelCategory extends PanelCapturaMod implements PropertyChangeList
         this.selectedSort = null;
         mapProdsV1 = new HashMap<>();
         mapProdsV2 = new HashMap<>();
+        mapProdsV3 = new HashMap<>();
 
         initComponents();
         pbLoading.setVisible(false);
@@ -153,16 +158,21 @@ public class PanelCategory extends PanelCapturaMod implements PropertyChangeList
                 pbLoading.setMaximum(size);
                 pbLoading.setVisible(true);
                 products.forEach((product) -> {
-                    PanelProduct4 pnProd = new PanelProduct4(app, product);
-                    pnProd.setColor(getCategoriesColor(product.getCategory()));
-                    pnProd.addPropertyChangeListener(app.getGuiManager().getPanelPedido());
-                    pnProd.addPropertyChangeListener(app.getGuiManager().getPanelOrders());
-                    publish(new Object[]{pnProd, product.getId()});
+                    PanelProduct4 pnProd4 = new PanelProduct4(app, product);
+                    pnProd4.setColor(getCategoriesColor(product.getCategory()));
+                    pnProd4.addPropertyChangeListener(app.getGuiManager().getPanelPedido());
+                    pnProd4.addPropertyChangeListener(app.getGuiManager().getPanelOrders());
+                    publish(new Object[]{pnProd4, product.getId()});
 
                     PanelProduct2 pnProd2 = new PanelProduct2(app, product);
                     pnProd2.addPropertyChangeListener(app.getGuiManager().getPanelPedido());
                     pnProd2.addPropertyChangeListener(app.getGuiManager().getPanelOrders());
                     publish(new Object[]{pnProd2, product.getId()});
+                    
+                    PanelProduct pnProd1 = new PanelProduct(app, product);
+                    pnProd1.addPropertyChangeListener(app.getGuiManager().getPanelPedido());
+                    pnProd1.addPropertyChangeListener(app.getGuiManager().getPanelOrders());
+                    publish(new Object[]{pnProd1, product.getId()});
 
                 });
                 return true;
@@ -178,6 +188,9 @@ public class PanelCategory extends PanelCapturaMod implements PropertyChangeList
                     } else if (chunk[0] instanceof PanelProduct4) {
                         long prodId = Long.parseLong(chunk[1].toString());
                         mapProdsV2.put(prodId, (PanelProduct4) chunk[0]);
+                    }else if (chunk[0] instanceof PanelProduct) {
+                        long prodId = Long.parseLong(chunk[1].toString());
+                        mapProdsV3.put(prodId, (PanelProduct) chunk[0]);
                     }
                     count++;
                     pbLoading.setValue(count / 2);
@@ -222,6 +235,52 @@ public class PanelCategory extends PanelCapturaMod implements PropertyChangeList
                         break;
                     }
                     PanelProduct4 pnProd = mapProdsV2.get(products.get(c).getId());
+                    if (pnProd != null) {
+                        pnItems.add(pnProd,
+                                new GridBagConstraints(j, i, 1, 1,
+                                        0.1, 0,
+                                        GridBagConstraints.NORTH,
+                                        GridBagConstraints.HORIZONTAL,
+                                        new Insets(2, 2, 2, 2),
+                                        0, 0));
+                    }
+                    c++;
+                }
+            }
+            pnItems.add(Box.createVerticalGlue(),
+                    new GridBagConstraints(j + 1, i, 1, 1,
+                            0, 0.1,
+                            GridBagConstraints.SOUTH,
+                            GridBagConstraints.BOTH,
+                            new Insets(1, 1, 1, 1),
+                            1, 1));
+
+        }
+        pnItems.updateUI();
+        app.getGuiManager().setDefaultCursor();
+    }
+    
+    public void showView3() {
+        view = 3;
+        app.getGuiManager().setWaitCursor();
+        pnItems.removeAll();
+        pnItems.setLayout(new GridBagLayout());
+
+        ConfigDB config = app.getControl().getConfig(Configuration.NUM_COLUMNS_VIEW2);
+        int COLS = config != null ? (int) config.castValor() : 2;
+
+        if (products != null) {
+
+            int LX = products.size() / COLS;
+            int LY = (int) Math.ceil(products.size() / COLS);
+            int c = 0;
+            int i = 0, j = 0;
+            for (i = 0; i <= LY; i++) {
+                for (j = 0; j < COLS; j++) {
+                    if (c >= products.size()) {
+                        break;
+                    }
+                    PanelProduct pnProd = mapProdsV3.get(products.get(c).getId());
                     if (pnProd != null) {
                         pnItems.add(pnProd,
                                 new GridBagConstraints(j, i, 1, 1,
@@ -297,7 +356,22 @@ public class PanelCategory extends PanelCapturaMod implements PropertyChangeList
                     pcs.firePropertyChange(evt.getPropertyName(), null, evt.getNewValue());
                     break;
                 case PanelTopSearch.AC_SELECT_VIEW1:
-                    showView1();
+                    switch (viewSelect) {
+                        case 1:
+                            showView1();
+                            break;
+                        case 2:
+                            showView2();
+                            break;
+                        case 3:
+                            showView3();
+                            break;
+                    }
+                    viewSelect++;
+                    if (viewSelect == 4) {
+                        viewSelect = 1;
+                    }
+
                     break;
                 case PanelTopSearch.AC_SELECT_VIEW2:
                     showView2();

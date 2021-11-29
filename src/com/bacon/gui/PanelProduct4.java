@@ -106,6 +106,7 @@ public class PanelProduct4 extends PanelCapturaMod implements ActionListener{
 
         lbImage.setIcon(icon);
         lbImage.setBorder(BorderFactory.createLineBorder(color, 1));
+        lbImage.setVisible(false);
         
         btAddQuick.setActionCommand(PanelProduct2.AC_ADD_QUICK);
         btAddQuick.setMargin(new Insets(1, 1, 1, 1));

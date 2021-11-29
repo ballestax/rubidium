@@ -133,6 +133,7 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
     private ImageIcon iconTLGreen;
     private ImageIcon iconTLRed;
     private Client lastClient;
+    private JMenuItem itemModify;
 
     /**
      * Creates new form PanelPedido
@@ -397,6 +398,19 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
             }
         });
         popupTabla.add(itemDelete);
+
+        itemModify = new JMenuItem("Modificar");
+        itemModify.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int r = tbListado.getSelectedRow();
+                ProductoPed pp = (ProductoPed) tbListado.getValueAt(r, 1);
+                if (pp != null) {
+                    app.getGuiManager().showCustomPedido(pp, PanelPedido.this);
+                }
+            }
+        });
+        popupTabla.add(itemModify);
 
         tbListado.addMouseListener(popupListenerTabla);
 

@@ -71,17 +71,17 @@ public class PanelTopSearch extends PanelCaptura implements ActionListener {
             }
         });
 
-        btView1.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "packing1.png", 20, 20)));
-        btView1.setActionCommand(AC_SELECT_VIEW1);
-        btView1.addActionListener(this);
+        btView.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "packing1.png", 20, 20)));
+        btView.setActionCommand(AC_SELECT_VIEW1);
+        btView.addActionListener(this);
 
 //        btView1.setForeground(colorLocal);
-        btView2.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "packing2.png", 20, 20)));
-        btView2.setActionCommand(AC_SELECT_VIEW2);
-        btView2.addActionListener(this);
+//        btView2.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "packing2.png", 20, 20)));
+//        btView2.setActionCommand(AC_SELECT_VIEW2);
+//        btView2.addActionListener(this);
 //        btView2.setForeground(colorDelivery);
 
-        btView2.setSelected(true);
+//        btView2.setSelected(true);
 
         btRefresh.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "update.png", 20, 20)));
         btRefresh.setActionCommand(AC_REFRESH_PRODUCTS);
@@ -138,21 +138,15 @@ public class PanelTopSearch extends PanelCaptura implements ActionListener {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        buttonGroup1 = new javax.swing.ButtonGroup();
         regSearch = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Buscar", "");
         btBuscar = new javax.swing.JButton();
         btCustomProduct = new javax.swing.JButton();
-        btView2 = new javax.swing.JToggleButton();
-        btView1 = new javax.swing.JToggleButton();
         cbSort = new javax.swing.JComboBox<>();
         lbSort = new javax.swing.JLabel();
         btRefresh = new javax.swing.JButton();
+        btView = new javax.swing.JButton();
 
         setBorder(javax.swing.BorderFactory.createEtchedBorder());
-
-        buttonGroup1.add(btView2);
-
-        buttonGroup1.add(btView1);
 
         lbSort.setText("jLabel1");
 
@@ -165,16 +159,14 @@ public class PanelTopSearch extends PanelCaptura implements ActionListener {
                 .addComponent(regSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(1, 1, 1)
                 .addComponent(btBuscar, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 45, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 179, Short.MAX_VALUE)
                 .addComponent(lbSort)
                 .addGap(3, 3, 3)
                 .addComponent(cbSort, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btCustomProduct, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btView1, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, 0)
-                .addComponent(btView2, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(1, 1, 1)
+                .addComponent(btView, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btRefresh, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(6, 6, 6))
@@ -187,15 +179,14 @@ public class PanelTopSearch extends PanelCaptura implements ActionListener {
                     .addComponent(cbSort, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btBuscar, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btCustomProduct, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btView1, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btView2, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(regSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(lbSort)
-                    .addComponent(btRefresh, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(btRefresh, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btView, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(2, 2, 2))
         );
 
-        layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {btBuscar, btCustomProduct, btView1, btView2, cbSort, lbSort, regSearch});
+        layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {btBuscar, btCustomProduct, cbSort, lbSort, regSearch});
 
     }// </editor-fold>//GEN-END:initComponents
 
@@ -204,9 +195,7 @@ public class PanelTopSearch extends PanelCaptura implements ActionListener {
     private javax.swing.JButton btBuscar;
     private javax.swing.JButton btCustomProduct;
     private javax.swing.JButton btRefresh;
-    private javax.swing.JToggleButton btView1;
-    private javax.swing.JToggleButton btView2;
-    private javax.swing.ButtonGroup buttonGroup1;
+    private javax.swing.JButton btView;
     private javax.swing.JComboBox<String> cbSort;
     private javax.swing.JLabel lbSort;
     private com.bacon.gui.util.Registro regSearch;
