@@ -68,7 +68,7 @@ public class PanelProduct4 extends PanelCapturaMod implements ActionListener{
         }
 
         Font font1 = new Font("Sans", 1, 12);
-        Font font2 = new Font("Serif", 2, 10);
+        Font font2 = new Font("Serif", 2, 9);
         Font font3 = new Font("Tahoma", 1, 14);
 
         NumberFormat NF = DecimalFormat.getCurrencyInstance();

@@ -38,6 +38,7 @@ public class PanelConfigOthers extends javax.swing.JPanel implements ActionListe
     private Registro regNumColumnsV1;
     private Registro regNumColumnsV2;
     private Registro regNumCategories;
+    private Registro regShowToolbar;
 
     /**
      * Creates new form PanelConfigMotor
@@ -160,6 +161,16 @@ public class PanelConfigOthers extends javax.swing.JPanel implements ActionListe
         cCont.setBackgroundTitle(new Color(200,210,220));
         cCont.setTitle("Numero de categorias a visualizar");
         cCont.addCampo(regNumCategories);
+        jPanel1.add(cCont);        
+        jPanel1.add(Box.createVerticalStrut(5));
+        
+        regShowToolbar = new Registro(BoxLayout.X_AXIS, "Mostrar toolbar", false, 100);
+        regShowToolbar.setBackground(color1);
+        regShowToolbar.setFontCampo(font);
+        cCont = new ConfigCont(app);
+        cCont.setBackgroundTitle(new Color(200,210,220));
+        cCont.setTitle("Mostrar toolbar");
+        cCont.addCampo(regShowToolbar);
         jPanel1.add(cCont);
         jPanel1.add(Box.createVerticalGlue());
         jPanel1.add(Box.createVerticalStrut(5));
@@ -209,6 +220,10 @@ public class PanelConfigOthers extends javax.swing.JPanel implements ActionListe
         config = app.getControl().getConfig(Configuration.MAX_CATEGORIES_LIST);
         int numCategories = config != null ? (int) config.castValor() : 5;
         regNumCategories.setText(app.getDCFORM_W().format(numCategories));
+        
+        config = app.getControl().getConfig(Configuration.SHOW_TOOLBAR);
+        boolean showToolbar = config != null ? (boolean) config.castValor() : true;
+        regShowToolbar.setSelected(showToolbar);
 
     }
 
@@ -306,7 +321,16 @@ public class PanelConfigOthers extends javax.swing.JPanel implements ActionListe
             
             String categories = regNumCategories.getText();
             app.getControl().addConfig(new ConfigDB(Configuration.MAX_CATEGORIES_LIST, ConfigDB.INTEGER, categories));
+            
+            boolean selected4 = regShowToolbar.isSelected();
+            app.getControl().addConfig(new ConfigDB(com.bacon.Configuration.SHOW_TOOLBAR, ConfigDB.BOOLEAN, String.valueOf(selected4)));
 
+            if(Boolean.getBoolean(app.getControl().getConfig(Configuration.SHOW_TOOLBAR).getValor()) != selected){
+                System.out.println("reloading toolbar");
+                app.getGuiManager().reloadToolbar();
+            }
+            
+            
             app.getConfiguration().save();
         }
     }

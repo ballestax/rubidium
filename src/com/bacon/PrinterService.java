@@ -240,26 +240,30 @@ public class PrinterService {
         EscPos escpos;
         try {
 
-            Style font2 = new Style().setFontSize(Style.FontSize._1, Style.FontSize._1).setJustification(EscPosConst.Justification.Center);
-            Style font3 = new Style().setFontSize(Style.FontSize._2, Style.FontSize._2);
+            Style font2 = new Style().setFontSize(Style.FontSize._1, Style.FontSize._1);
+            Style font3 = new Style().setFontSize(Style.FontSize._2, Style.FontSize._1);
             Style font4 = new Style().setFontSize(Style.FontSize._1, Style.FontSize._1).setJustification(EscPosConst.Justification.Right);
             Style font5 = new Style().setFontSize(Style.FontSize._2, Style.FontSize._2).setJustification(EscPosConst.Justification.Right);
+            Style font6 = new Style().setFontSize(Style.FontSize._2, Style.FontSize._2);
+            Style font7 = new Style().setFontSize(Style.FontSize._1, Style.FontSize._2);
 
             escpos = new EscPos(new PrinterOutputStream(printService));
             escpos.feed(1);
 
-            escpos.writeLF(font3, String.format("%1s", invoice.getFactura()));
-            escpos.write(font2, String.format("%20.20s", app.DF_SL.format(invoice.getFecha())));
-            escpos.write(font3, String.format("%8.8s", app.DF_TIME.format(invoice.getFecha())));
+            escpos.write(font2, "Comanda  :");
+            escpos.writeLF(font6, String.format(" %1s", invoice.getFactura()));
+            escpos.writeLF("");
+            escpos.write(font3, String.format("%20.20s", app.DF_SL.format(invoice.getFecha())));
+            escpos.write(font6, String.format("%8.8s", app.DF_TIME.format(invoice.getFecha())));
             escpos.writeLF("");
 
             if (invoice.getTipoEntrega() == PanelPedido.TIPO_LOCAL) {
                 escpos.write(font2, "Mesa:   ");
-                escpos.writeLF(font5, (table != null ? table.getName() : "- - -"));
+                escpos.writeLF(font6, (table != null ? table.getName() : "- - -"));
                 escpos.write(font2, "Mesero: ");
-                escpos.writeLF(font5, (waiter != null ? waiter.getName() : "- - -"));
+                escpos.writeLF(font6, (waiter != null ? waiter.getName() : "- - -"));
             } else {
-                escpos.writeLF(font5, "Domicilio");
+                escpos.writeLF(font6, "Domicilio");
             }
             escpos.feed(1);
 
@@ -280,8 +284,11 @@ public class PrinterService {
                 String stPres = "";
                 if (presentation != null) {
                     stPres = " (" + presentation.getName() + ")";
-                    escpos.writeLF("    " + stPres);
+                    
+                }if(product.hasTermino()){
+                    stPres += "  ["+product.getTermino()+"]";
                 }
+                escpos.writeLF(font3,"    " + stPres);
 
                 StringBuilder stb = new StringBuilder();
                 if (product.getExclusiones().size() > 0) {
@@ -308,9 +315,12 @@ public class PrinterService {
             }
 
             escpos.writeLF(font2, "================================================");
+            
 
             escpos.feed(1);
 
+            escpos.writeLF(font2, "****  COCINA ****");
+            
             escpos.feed(5);
 
             escpos.cut(EscPos.CutMode.FULL);
@@ -443,7 +453,8 @@ public class PrinterService {
         EscPos escpos;
         try {
             escpos = new EscPos(new PrinterOutputStream(printService));
-//            escpos.
+//            escpos.write("\\x1b\\x42").write(1).write(20);
+            escpos.write(27).write(42).write(0).write(25).write(250);
             escpos.close();
         } catch (IOException ex) {
             java.util.logging.Logger.getLogger(PrintService.class.getName()).log(Level.SEVERE, null, ex);

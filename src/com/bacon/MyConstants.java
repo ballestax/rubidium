@@ -47,7 +47,7 @@ public class MyConstants {
 
     public static final Permission[] PERMISSIONS = {
         new Permission("show-admin-module", "Ver el modulo administrador"),
-        new Permission("show-pedidos-module", "Ver el modulo pedidos"),
+        new Permission("show-orders-module", "Ver el modulo pedidos"),
         new Permission("show-cash-module", "Ver el modulo caja"),
         new Permission("show-reports-module", "Ver el modulo reportes"),
         new Permission("show-orderlist-module", "Ver el modulo lista de pedidos"),
@@ -56,6 +56,10 @@ public class MyConstants {
         new Permission("show-tab-users", "Ver el modulo administrador"),
         new Permission("show-inventory-module", "Ver el modulo inventario"),
         new Permission("show-products-module", "Ver el modulo productos"),
+        new Permission("show-pos-module", "Ver el modulo POS"),
+        new Permission("allow-cancel-product-order", "Cancelar producto en una orden"),
+        new Permission("allow-modify-product-order", "Modificar producto en una orden"),
+        
     };
 
     public static final SimpleDateFormat FORMAT_DATE = new SimpleDateFormat("dd-MM-yyyy");

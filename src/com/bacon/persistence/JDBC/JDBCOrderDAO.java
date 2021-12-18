@@ -25,6 +25,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -147,6 +148,11 @@ public class JDBCOrderDAO implements OrderDAO {
                         ProductoPed productoPed = new ProductoPed(product);
                         productoPed.setPrecio(rs1.getBigDecimal(9).doubleValue());
                         productoPed.setCantidad(rs1.getInt(10));
+                        productoPed.setDelivery(rs1.getBoolean(13));
+                        productoPed.setTermino(rs1.getString(14));
+                        productoPed.setEntry(rs1.getBoolean(15));
+                        productoPed.setEspecificaciones(rs1.getString(16));
+                        productoPed.setStatus(rs1.getInt(17));
 
                         int idProdPed = rs1.getInt(11);
                         int idPresentation = rs1.getInt(12);
@@ -428,6 +434,11 @@ public class JDBCOrderDAO implements OrderDAO {
 
                         productoPed.setPrecio(rs1.getBigDecimal(9).doubleValue());
                         productoPed.setCantidad(rs1.getInt(10));
+                        productoPed.setDelivery(rs1.getBoolean(13));
+                        productoPed.setTermino(rs1.getString(14));
+                        productoPed.setEntry(rs1.getBoolean(15));
+                        productoPed.setEspecificaciones(rs1.getString(16));
+                        productoPed.setStatus(rs1.getInt(17));
 
                         int idProdPed = rs1.getInt(11);
 
@@ -581,13 +592,14 @@ public class JDBCOrderDAO implements OrderDAO {
     }
 
     @Override
-    public void addOrder(Order order) throws DAOException {
+    public long addOrder(Order order) throws DAOException {
         if (order == null) {
             throw new IllegalArgumentException("Null order");
         }
         Connection conn = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
+        long idOrder = 0;
 
         try {
             conn = dataSource.getConnection();
@@ -603,20 +615,23 @@ public class JDBCOrderDAO implements OrderDAO {
                 order.getNota(),
                 order.getStatus()
             };
-            ps = sqlStatements.buildSQLStatement(conn, ADD_ORDER_KEY, parameters);
-
+            ps = sqlStatements.buildSQLStatement(conn, ADD_ORDER_KEY, parameters, Statement.RETURN_GENERATED_KEYS);
             ps.executeUpdate();
 
-            int idOrder = 0;
+            try ( ResultSet generatedKeys = ps.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    idOrder = generatedKeys.getLong(1);
+                }
+            }
 
             Map<String, String> namedParams = new HashMap<>();
-            namedParams.put(JDBCDAOFactory.NAMED_PARAM_TABLE, "orders");
-            String query = sqlStatements.getSQLString(GET_MAX_ID_KEY, namedParams);
-            ps = conn.prepareStatement(query);
-            rs = ps.executeQuery();
-            while (rs.next()) {
-                idOrder = rs.getInt(1);
-            }
+//            namedParams.put(JDBCDAOFactory.NAMED_PARAM_TABLE, "orders");
+//            String query = sqlStatements.getSQLString(GET_MAX_ID_KEY, namedParams);
+//            ps = conn.prepareStatement(query);
+//            rs = ps.executeQuery();
+//            while (rs.next()) {
+//                idOrder = rs.getInt(1);
+//            }
 
             List<ProductoPed> products = order.getProducts();
 
@@ -628,7 +643,12 @@ public class JDBCOrderDAO implements OrderDAO {
                     product.getProduct().getId(),
                     product.hasPresentation() ? product.getPresentation().getId() : 0,
                     product.getPrecio(),
-                    product.getCantidad()
+                    product.getCantidad(),
+                    product.isDelivery(),
+                    product.getTermino(),
+                    product.isEntry(),
+                    product.getEspecificaciones(),
+                    product.getStatus()
                 };
                 ps = sqlStatements.buildSQLStatement(conn, JDBCInvoiceDAO.ADD_INVOICE_PRODUCT_KEY, parameters1);
                 ps.executeUpdate();
@@ -707,6 +727,8 @@ public class JDBCOrderDAO implements OrderDAO {
             DBManager.closeStatement(ps);
             DBManager.closeConnection(conn);
         }
+
+        return idOrder;
     }
 
     @Override
@@ -811,6 +833,11 @@ public class JDBCOrderDAO implements OrderDAO {
                         ProductoPed productoPed = new ProductoPed(product);
                         productoPed.setPrecio(rs1.getBigDecimal(9).doubleValue());
                         productoPed.setCantidad(rs1.getInt(10));
+                        productoPed.setDelivery(rs1.getBoolean(13));
+                        productoPed.setTermino(rs1.getString(14));
+                        productoPed.setEntry(rs1.getBoolean(15));
+                        productoPed.setEspecificaciones(rs1.getString(16));
+                        productoPed.setStatus(rs1.getInt(17));
 
                         int idProdPed = rs1.getInt(11);
                         int idPresentation = rs1.getInt(12);
@@ -1104,6 +1131,113 @@ public class JDBCOrderDAO implements OrderDAO {
             DBManager.closeConnection(conn);
         }
         return orders;
+    }
+
+    public long addProductsOrder(long idOrder, List<ProductoPed> products) throws DAOException {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;        
+
+        try {
+            conn = dataSource.getConnection();
+            conn.setAutoCommit(false);
+
+            Map<String, String> namedParams = new HashMap<>();
+
+            for (int i = 0; i < products.size(); i++) {
+                ProductoPed product = products.get(i);
+                Object[] parameters1 = {
+                    0,
+                    idOrder,
+                    product.getProduct().getId(),
+                    product.hasPresentation() ? product.getPresentation().getId() : 0,
+                    product.getPrecio(),
+                    product.getCantidad(),
+                    product.isDelivery(),
+                    product.getTermino(),
+                    product.isEntry(),
+                    product.getEspecificaciones(),
+                    product.getStatus()
+                };
+                ps = sqlStatements.buildSQLStatement(conn, JDBCInvoiceDAO.ADD_INVOICE_PRODUCT_KEY, parameters1);
+                ps.executeUpdate();
+
+                HashMap<Integer, HashMap> mData = product.getData();
+
+                //fix issue para productos sin presentacion
+                if (mData != null && !mData.isEmpty()) {
+//                    double exist = Double.parseDouble(data.get("exist").toString());
+
+                    Set<Integer> keys = mData.keySet();
+                    for (Integer key : keys) {
+                        HashMap data = mData.get(key);
+                        boolean onlyDelivery = Boolean.parseBoolean(data.get("onlyDelivery").toString());
+                        double quant = Double.parseDouble(data.get("quantity").toString());
+                        double res = (quant * product.getCantidad() * -1);
+                        if (onlyDelivery) {
+                            res = 0;
+                        }
+                        Object[] parameterx = {
+                            res,
+                            data.get("id")
+                        };
+                        ps = sqlStatements.buildSQLStatement(conn, JDBCUtilDAO.ADD_INVENTORY_QUANTITY_KEY, parameterx);
+                        ps.executeUpdate();
+                    }
+
+                }
+
+                int idProduct = 0;
+
+                namedParams = new HashMap<>();
+                namedParams.put(JDBCDAOFactory.NAMED_PARAM_TABLE, "invoice_product");
+                String query2 = sqlStatements.getSQLString(GET_MAX_ID_KEY, namedParams);
+                ps = conn.prepareStatement(query2);
+                rs = ps.executeQuery();
+                while (rs.next()) {
+                    idProduct = rs.getInt(1);
+                }
+
+                ArrayList<AdditionalPed> additionals = product.getAdicionales();
+
+                for (int j = 0; j < additionals.size(); j++) {
+                    AdditionalPed additional = additionals.get(j);
+                    Object[] parameters2 = {
+                        idProduct,
+                        additional.getAdditional().getId(),
+                        additional.getAdditional().getPrecio(),
+                        additional.getCantidad()
+                    };
+                    ps = sqlStatements.buildSQLStatement(conn, JDBCUtilDAO.ADD_ADDITIONAL_PRODUCT_KEY, parameters2);
+                    ps.executeUpdate();
+                }
+
+                ArrayList<Ingredient> exclusions = product.getExclusiones();
+
+                for (int k = 0; k < exclusions.size(); k++) {
+                    Ingredient exclusion = exclusions.get(k);
+                    Object[] parameters3 = {
+                        idProduct,
+                        exclusion.getId()
+                    };
+                    ps = sqlStatements.buildSQLStatement(conn, JDBCUtilDAO.ADD_EXCLUSION_PRODUCT_KEY, parameters3);
+                    ps.executeUpdate();
+                }
+            }
+
+            conn.commit();
+        } catch (SQLException e) {
+            DBManager.rollbackConn(conn);
+            throw new DAOException("Cannot add Order", e);
+        } catch (IOException e) {
+            DBManager.rollbackConn(conn);
+            throw new DAOException("Cannot add Order", e);
+        } finally {
+            DBManager.closeStatement(ps);
+            DBManager.closeConnection(conn);
+        }
+
+        return idOrder;
     }
 
 }

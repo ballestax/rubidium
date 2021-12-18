@@ -23,7 +23,6 @@ import com.bacon.domain.Waiter;
 import com.bacon.gui.util.MyPopupListener;
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Font;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
@@ -51,7 +50,6 @@ import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
@@ -482,7 +480,7 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
         waiters.add(0, new Waiter("-----", 0));
         regMesera.setText(waiters.toArray());
         regMesera.setFontCampo(new Font("Sans", 1, 16));
-        ((JComboBox) regMesera.getComponent()).setRenderer(new WaiterListCellRender());
+        ((JComboBox) regMesera.getComponent()).setRenderer(new WaiterListCellRenderer());
         regMesera.setActionCommand(AC_CHANGE_SELECTED);
         regMesera.addActionListener(this);
 
@@ -2282,38 +2280,6 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
                 String text = Jsoup.parse(fact).text();
                 regCelular.setText(text);
             }
-        }
-    }
-
-    public class WaiterListCellRender extends JLabel implements javax.swing.ListCellRenderer<Object> {
-
-        public WaiterListCellRender() {
-            setOpaque(true);
-            setForeground(Utiles.colorAleatorio(0, 255));
-            setBorder(BorderFactory.createEmptyBorder(3, 2, 3, 2));
-            setFont(new Font("Sans", 1, 16));
-        }
-
-        @Override
-        public Component getListCellRendererComponent(JList<? extends Object> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-            if (value != null && value instanceof Waiter) {
-                Waiter waiter = (Waiter) value;
-
-                setText(waiter.getName().toUpperCase());
-                Color color = Color.BLACK;
-                try {
-                    color = Color.decode(waiter.getColor());
-                } catch (Exception e) {
-                }
-
-                setForeground(color);
-                if (isSelected) {
-                    setBackground(list.getSelectionBackground());
-                } else {
-                    setBackground(list.getBackground());
-                }
-            }
-            return this;
         }
     }
 

@@ -50,7 +50,7 @@ import org.dz.Utiles;
  * @author lrod
  */
 public class PanelCustomPedido extends PanelCapturaMod implements ActionListener {
-
+    
     private final Aplication app;
     private final Product product;
     private DecimalFormat DCFORM_P;
@@ -77,24 +77,24 @@ public class PanelCustomPedido extends PanelCapturaMod implements ActionListener
         initComponents();
         createComponents();
     }
-
+    
     private void createComponents() {
         modeEdit = false;
-
+        
         spModel = new SpinnerNumberModelo(1, 1, null, 1);
         spPriceModel = new SpinnerNumberModelo(product.getPrice(), product.getPrice(), null, 1000d);
-
+        
         String image = product.getImage();
-
+        
         ImageIcon icon = new ImageIcon(app.getImgManager().getImagen(image, 100, 100));
-
+        
         Font font1 = new Font("Tahoma", 1, 17);
         Font font2 = new Font("Serif", 2, 12);
         Font font3 = new Font("Sans", 1, 16);
-
+        
         NF = DecimalFormat.getCurrencyInstance();
         NF.setMaximumFractionDigits(0);
-
+        
         lbImage.setIcon(icon);
         lbName.setFont(font1);
         lbName.setText(product.getName().toUpperCase());
@@ -111,7 +111,7 @@ public class PanelCustomPedido extends PanelCapturaMod implements ActionListener
         lbPrice.setOpaque(true);
         lbPrice.setForeground(Color.red.darker());
         lbPrice.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 2, Color.red));
-
+        
         spPrice.setValue((product.getPrice()));
         spPrice.setFont(font3);
         spPrice.setOpaque(true);
@@ -120,36 +120,36 @@ public class PanelCustomPedido extends PanelCapturaMod implements ActionListener
 //        spPrice.setHorizontalAlignment(SwingConstants.RIGHT);
 
         spPrice.setModel(spPriceModel);
-
+        
         DCFORM_P = (DecimalFormat) NumberFormat.getInstance();
         DCFORM_P.applyPattern("$ ###,###,###");
-
+        
         lbCant.setText("Cantidad");
         spCantidad.setModel(spModel);
         spCantidad.setForeground(Color.red.darker());
-
+        
         spCantidad.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
                 mostrarTotal();
             }
-
+            
         });
-
+        
         spPrice.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
                 mostrarTotal();
             }
-
+            
         });
-
+        
         spCantidad.requestFocus();
         
         chEntry.setActionCommand("AC_CHECK_ENTRY");
         chEntry.addActionListener(this);
         chEntry.setText("Entrada");
-
+        
         btConfirm.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "success.png", 10, 10)));
         btConfirm.setBackground(new Color(153, 255, 153));
         btConfirm.setMargin(new Insets(1, 1, 1, 1));
@@ -157,12 +157,12 @@ public class PanelCustomPedido extends PanelCapturaMod implements ActionListener
         btConfirm.setActionCommand(AC_CONFIRMAR_PEDIDO);
         btConfirm.addActionListener(this);
         btConfirm.setText("CONFIRMAR");
-
+        
         lbInfo.setText(spCantidad.getValue() + " " + product.getName());
-
+        
         pnIngredients.setLayout(new GridLayout(0, 3, 5, 5));
         ingredients = app.getControl().getIngredientsByProduct(product.getCode());
-
+        
         for (int i = 0; i < ingredients.size(); i++) {
             Ingredient ing = ingredients.get(i);
             if (ing.isOpcional()) {
@@ -176,11 +176,11 @@ public class PanelCustomPedido extends PanelCapturaMod implements ActionListener
                 pnIngredients.add(check);
             }
         }
-
+        
         pnAdditionals = new JPanel();
         pnAdditionals.setBorder(BorderFactory.createEmptyBorder(5, 2, 5, 15));
         spAddtionals.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-
+        
         ArrayList<Additional> adds = app.getControl().getAdditionalList("", "i.name");
         int COLS = 4;
         pnAdditionals.setLayout(new GridLayout(0, COLS, 5, 5));
@@ -191,7 +191,7 @@ public class PanelCustomPedido extends PanelCapturaMod implements ActionListener
 //            panAdd.setActionCommand(add.getCode());
             pnAdditionals.add(panAdd);
         }
-
+        
         lbTitle3.setText("Elige la presentación");
         lbTitle3.setBackground(Utiles.colorAleatorio(100, 220));
         ArrayList<Presentation> presList = app.getControl().getPresentationsByProduct(product.getId());
@@ -210,13 +210,13 @@ public class PanelCustomPedido extends PanelCapturaMod implements ActionListener
                     pnPresentations.add(panPres);
                 }
             }
-
+            
         } else {
             lbTitle3.setVisible(false);
             pnPresentations.setVisible(false);
-
+            
         }
-
+        
         if (product.isVariablePrice()) {
             spPrice.setVisible(true);
             lbPrice.setVisible(false);
@@ -224,10 +224,10 @@ public class PanelCustomPedido extends PanelCapturaMod implements ActionListener
             lbPrice.setVisible(true);
             spPrice.setVisible(false);
         }
-
+        
         pnCoccion = new JPanel();
         pnCoccion.setLayout(new FlowLayout(FlowLayout.LEADING, 10, 10));
-
+        
         ButtonGroup btgTerminos = new ButtonGroup();
         String[] terminos = {"1/2", "3/4", "Bien asada"};
         for (String termino : terminos) {
@@ -240,46 +240,46 @@ public class PanelCustomPedido extends PanelCapturaMod implements ActionListener
                     BorderFactory.createEmptyBorder(5, 10, 5, 10)
             ));
             btgTerminos.add(rbTermino);
-
+            
             pnCoccion.add(rbTermino);
         }
-
+        
         JTabbedPane tabs = new JTabbedPane();
         tabs.add("Adicionales", spAddtionals);
         tabs.add("Ingredientes", pnIngredients);
         tabs.add("Coccion", pnCoccion);
-
+        
         pnContainer.setLayout(new BorderLayout());
         pnContainer.add(tabs);
         pnContainer.updateUI();
-
+        
         mostrarTotal();
-
+        
     }
     public static final String AC_SEL_PRES = "AC_SEL_PRES";
-
+    
     public static final String AC_CONFIRMAR_PEDIDO = "AC_CONFIRMAR_PEDIDO";
-
+    
     public void mostrarTotal() {
         int cant = (int) spCantidad.getValue();
         double price = 0;
-
+        
         if (product.isVariablePrice()) {
             price = spPriceModel.getNumber().doubleValue();
         } else {
             price = product.getPrice();
         }
-
+        
         ArrayList<AdditionalPed> additionals = getArrayAdditionals();
-
+        
         boolean adds = !additionals.isEmpty();
         double valAdds = getValueAdicionales(additionals);
-
+        
         double total = cant * (price + valAdds);
         String stValAdds = adds ? " + " + String.valueOf(valAdds) : "";
         lbInfo.setText(cant + " " + product.getName() + " (" + product.getPrice() + stValAdds + ") x " + DCFORM_P.format(total));
     }
-
+    
     public void showProductPed(ProductoPed productPed, int row) {
         modeEdit = true;
         this.rowSelected = row;
@@ -293,8 +293,10 @@ public class PanelCustomPedido extends PanelCapturaMod implements ActionListener
         selectAdditionals(productPed.getAdicionales());
         selectIngredients(productPed.getExclusiones());
         selectTermino(productPed.getTermino());
+        taObs.setText(productPed.getEspecificaciones());
+        
     }
-
+    
     private void selectPresentation(Presentation presentation) {
         if (presentation != null) {
             for (Component component : pnPresentations.getComponents()) {
@@ -307,7 +309,7 @@ public class PanelCustomPedido extends PanelCapturaMod implements ActionListener
             }
         }
     }
-
+    
     private void selectAdditionals(ArrayList<AdditionalPed> adicionales) {
         List<Additional> collect = adicionales.stream().map(adicional -> adicional.getAdditional()).collect(Collectors.toList());
         for (Component component : pnAdditionals.getComponents()) {
@@ -321,9 +323,9 @@ public class PanelCustomPedido extends PanelCapturaMod implements ActionListener
                 }
             }
         }
-
+        
     }
-
+    
     private void selectIngredients(ArrayList<Ingredient> exclusiones) {
         List<String> collect = exclusiones.stream().map(ingred -> ingred.getName()).collect(Collectors.toList());
         for (Component component : pnIngredients.getComponents()) {
@@ -336,11 +338,11 @@ public class PanelCustomPedido extends PanelCapturaMod implements ActionListener
                     }
                 } catch (Exception e) {
                 }
-
+                
             }
         }
     }
-
+    
     private void selectTermino(String termino) {
         if (termino != null) {
             for (Component component : pnCoccion.getComponents()) {
@@ -353,12 +355,12 @@ public class PanelCustomPedido extends PanelCapturaMod implements ActionListener
             }
         }
     }
-
+    
     public ProductoPed parseProduct() {
         double price = 0;
-
+        
         ProductoPed prodPed = new ProductoPed(product);
-
+        
         Component[] componentes = pnIngredients.getComponents();
         for (int i = 0; i < componentes.length; i++) {
             Component componente = componentes[i];
@@ -371,19 +373,19 @@ public class PanelCustomPedido extends PanelCapturaMod implements ActionListener
                 }
             }
         }
-
+        
         prodPed.setPresentation(getPresentation());
-
+        
         prodPed.setAdicionales(getArrayAdditionals());
-
+        
         prodPed.setTermino(getTermino());
         
         prodPed.setEntry(chEntry.isSelected());
-
+        
         prodPed.setEspecificaciones(taObs.getText());
         return prodPed;
     }
-
+    
     public ArrayList<AdditionalPed> getArrayAdditionals() {
         ArrayList<AdditionalPed> adicionales = new ArrayList<>();
         Component[] componentes;
@@ -400,7 +402,7 @@ public class PanelCustomPedido extends PanelCapturaMod implements ActionListener
         }
         return adicionales;
     }
-
+    
     public Presentation getPresentation() {
         Component[] componentes;
         componentes = pnPresentations.getComponents();
@@ -414,7 +416,7 @@ public class PanelCustomPedido extends PanelCapturaMod implements ActionListener
         }
         return null;
     }
-
+    
     public String getTermino() {
         Component[] componentes;
         componentes = pnCoccion.getComponents();
@@ -426,9 +428,9 @@ public class PanelCustomPedido extends PanelCapturaMod implements ActionListener
                 }
             }
         }
-        return null;
+        return "";
     }
-
+    
     public double getValueAdicionales(ArrayList<AdditionalPed> adicionales) {
         double value = 0;
         for (int i = 0; i < adicionales.size(); i++) {
@@ -438,7 +440,7 @@ public class PanelCustomPedido extends PanelCapturaMod implements ActionListener
         }
         return value;
     }
-
+    
     @Override
     public void actionPerformed(ActionEvent e) {
         if (AC_CONFIRMAR_PEDIDO.equals(e.getActionCommand())) {
@@ -453,14 +455,14 @@ public class PanelCustomPedido extends PanelCapturaMod implements ActionListener
                 } else {
                     value = product.getPrice();
                 }
-
+                
                 prodPed.setPrecio(value);
                 if (modeEdit) {
                     pcs.firePropertyChange(AC_CUSTOM_MOD, new Object[]{cant, value, rowSelected}, prodPed);
                 } else {
                     pcs.firePropertyChange(AC_CUSTOM_ADD, new Object[]{cant, value}, prodPed);
                 }
-
+                
                 getRootPane().getParent().setVisible(false);
             }
         } else if (AC_SEL_PRES.equals(e.getActionCommand())) {
@@ -472,7 +474,7 @@ public class PanelCustomPedido extends PanelCapturaMod implements ActionListener
     }
     public static final String AC_CUSTOM_ADD = "AC_CUSTOM_ADD";
     public static final String AC_CUSTOM_MOD = "AC_CUSTOM_MOD";
-
+    
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.

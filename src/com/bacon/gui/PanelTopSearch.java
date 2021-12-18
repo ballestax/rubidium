@@ -13,11 +13,13 @@ import com.bacon.domain.Product;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
+import javax.swing.SwingConstants;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import org.dz.PanelCaptura;
@@ -42,6 +44,8 @@ public class PanelTopSearch extends PanelCaptura implements ActionListener {
 
         Font font1 = new Font("Sans", 1, 14);
 
+        ImageIcon searchIcon = new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "search.png", 16, 16));
+
         btBuscar.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "cancel.png", 18, 18)));
         btBuscar.setActionCommand(AC_CLEAR_FIELD);
         btBuscar.addActionListener(this);
@@ -50,6 +54,9 @@ public class PanelTopSearch extends PanelCaptura implements ActionListener {
         btCustomProduct.setActionCommand(AC_SEND_PIN);
         btCustomProduct.addActionListener(this);
 //        btCustomProduct.setEnabled(false);
+
+        regSearch.setLabelIcon(searchIcon);
+        regSearch.setLabelHorizontalAlignment(SwingConstants.CENTER);
 
         regSearch.setFontCampo(font1);
 
@@ -80,9 +87,7 @@ public class PanelTopSearch extends PanelCaptura implements ActionListener {
 //        btView2.setActionCommand(AC_SELECT_VIEW2);
 //        btView2.addActionListener(this);
 //        btView2.setForeground(colorDelivery);
-
 //        btView2.setSelected(true);
-
         btRefresh.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "update.png", 20, 20)));
         btRefresh.setActionCommand(AC_REFRESH_PRODUCTS);
         btRefresh.addActionListener(this);
@@ -138,7 +143,7 @@ public class PanelTopSearch extends PanelCaptura implements ActionListener {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        regSearch = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "Buscar", "");
+        regSearch = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "", "");
         btBuscar = new javax.swing.JButton();
         btCustomProduct = new javax.swing.JButton();
         cbSort = new javax.swing.JComboBox<>();
@@ -156,10 +161,10 @@ public class PanelTopSearch extends PanelCaptura implements ActionListener {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(6, 6, 6)
-                .addComponent(regSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(regSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 131, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(1, 1, 1)
                 .addComponent(btBuscar, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 179, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 208, Short.MAX_VALUE)
                 .addComponent(lbSort)
                 .addGap(3, 3, 3)
                 .addComponent(cbSort, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -223,7 +228,7 @@ public class PanelTopSearch extends PanelCaptura implements ActionListener {
             pcs.firePropertyChange(AC_CHANGE_SORT, null, cbSort.getSelectedItem());
         } else if (AC_REFRESH_PRODUCTS.equals(e.getActionCommand())) {
             pcs.firePropertyChange(AC_REFRESH_PRODUCTS, null, null);
-            
+
             if (!regSearch.getText().isEmpty()) {
                 filtrar(regSearch.getText(), 1);
             }
@@ -231,7 +236,9 @@ public class PanelTopSearch extends PanelCaptura implements ActionListener {
             ConfigDB config = app.getControl().getConfig(Configuration.PRINTER_SELECTED);
             String printer = config != null ? config.getValor() : "";
             app.getPrinterService().sendPulsePin(printer);
-            app.getGuiManager().switchPanel();
+//            Integer[] data = {1, 2, 3, 4, 5};
+//            app.getPrinterService().sendBuzzerPin(printer);
+//            app.getGuiManager().switchPanel();
         }
 
     }

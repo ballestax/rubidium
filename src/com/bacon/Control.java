@@ -1490,14 +1490,26 @@ public class Control {
         return data;
     }
 
-    public void addOrder(Order order) {
+    public long addOrder(Order order) {
         try {
             JDBCOrderDAO orderDAO = (JDBCOrderDAO) DAOFactory.getInstance().getOrderDAO();
-            orderDAO.addOrder(order);
+            return orderDAO.addOrder(order);
         } catch (DAOException ex) {
             logger.error("Error adding order.", ex);
             GUIManager.showErrorMessage(null, "Error agregando orden", "Error");
         }
+        return 0;
+    }
+    
+    public long addProductOrder(long idOrder, List<ProductoPed> products) {
+        try {
+            JDBCOrderDAO orderDAO = (JDBCOrderDAO) DAOFactory.getInstance().getOrderDAO();
+            return orderDAO.addProductsOrder(idOrder, products);
+        } catch (DAOException ex) {
+            logger.error("Error adding products order.", ex);
+            GUIManager.showErrorMessage(null, "Error agregando products orden", "Error");
+        }
+        return 0;
     }
 
     public List<Order> getOrderslList(String where, String order) {

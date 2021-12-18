@@ -6,6 +6,7 @@
 package com.bacon;
 
 import com.bacon.domain.Client;
+import com.bacon.domain.ConfigDB;
 import com.bacon.domain.Cycle;
 import com.bacon.domain.Invoice;
 import com.bacon.domain.Item;
@@ -47,6 +48,7 @@ import com.bacon.gui.PanelList;
 import com.bacon.gui.PanelNewConciliacion;
 import com.bacon.gui.PanelNewCycle;
 import com.bacon.gui.PanelNewLocation;
+import com.bacon.gui.PanelOrderList;
 import com.bacon.gui.PanelOrders;
 import com.bacon.gui.PanelOtherProduct;
 import com.bacon.gui.PanelPayInvoice;
@@ -55,6 +57,7 @@ import com.bacon.gui.PanelProducts;
 import com.bacon.gui.PanelReportSales;
 import com.bacon.gui.PanelSelCategory;
 import com.bacon.gui.PanelSelItem;
+import com.bacon.gui.PanelSelProducts;
 import com.bacon.gui.PanelSnapShot;
 import com.bacon.gui.PanelTakeOrders;
 import java.awt.BorderLayout;
@@ -63,6 +66,8 @@ import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dialog;
 import java.awt.Dimension;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
@@ -119,12 +124,12 @@ public class GUIManager {
     private boolean basic = true;
 
     private User user;
-    private PanelBasic panelBasicPedidos;
+    private PanelBasic panelBasicOrders;
     private PanelModPedidos panelModPedidos;
     private JPanel contPane;
     private PanelPedido pnPedido;
-    private PanelBasic panelBasicListPedidos;
-    private PanelListPedidos panelListPedidos;
+    private PanelBasic panelBasicSalesList;
+    private PanelListPedidos panelSalesList;
     private PanelConfigPrint pnConfigPrint;
     private PanelBasic panelBasicCash;
     private PanelBasic panelBasicReports;
@@ -152,6 +157,9 @@ public class GUIManager {
     private PanelOrders pnOrders;
     private PanelBasic panelBasicPOS;
     private PanelTakeOrders panelTakeOrders;
+    private PanelBasic panelBasicOrdersList;
+    private PanelOrderList panelOrderList;
+    private PanelSelProducts panelSelProducts;
 
     private GUIManager() {
 
@@ -190,7 +198,7 @@ public class GUIManager {
         } catch (Exception exception) {
 
         }
-        
+
         UIDefaults defaults = UIManager.getLookAndFeelDefaults();
         if (defaults.get("Table.alternateRowColor") == null) {
             defaults.put("Table.alternateRowColor", new Color(240, 240, 240));
@@ -198,7 +206,11 @@ public class GUIManager {
 
         centrarFrame(getFrame());
         getFrame().setTitle(Aplication.TITLE + " " + Aplication.VERSION);
-        getContenedor().add(getToolbar(), BorderLayout.NORTH);
+        ConfigDB config = app.getControl().getConfig("cf.showtoolbar");
+        if (config != null && Boolean.getBoolean(config.getValor())) {
+            getContenedor().add(getToolbar(), BorderLayout.NORTH);
+            getFrame().add(getMenu(), BorderLayout.NORTH);
+        }
         getContenedor().add(getContPane(), BorderLayout.CENTER);
 
         wHandler = new WindowHandler();
@@ -208,7 +220,11 @@ public class GUIManager {
         getContPane().removeAll();
         getContPane().add(getPanelPresentation(), BorderLayout.CENTER);
 //        getSplitpane().setResizeWeight(1.0);
-        getFrame().add(getMenu(), BorderLayout.NORTH);
+
+//        config = app.getControl().getConfig("cf.showmenubar");
+//        if (config != null && Boolean.getBoolean(config.getValor())) {
+            getFrame().add(getMenu(), BorderLayout.NORTH);
+//        }
         getFrame().add(getContenedor(), BorderLayout.CENTER);
         getFrame().addWindowListener(getwHandler());
         getFrame().setVisible(true);
@@ -229,15 +245,37 @@ public class GUIManager {
         getContenedor().remove(getToolbar());
         toolbar = null;
         getPanelPresentation().setVisible(true);
-        getToolbar().setVisible(true);
-        getContenedor().add(getToolbar(), BorderLayout.NORTH);
+//        ConfigDB config = app.getControl().getConfig("cf.showtoolbar");
+//        if (config != null && Boolean.getBoolean(config.getValor())) {
+            getToolbar().setVisible(true);
+            getContenedor().add(getToolbar(), BorderLayout.NORTH);
+//        }
         getContenedor().updateUI();
         getContPane().updateUI();
+//        setToFullScreen();
         setDefaultCursor();
     }
 
     public void switchPanel() {
         getPanelModPedidos().switchPanel();
+    }
+
+    public void setToFullScreen() {
+        GraphicsEnvironment lGrapEnv = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        GraphicsDevice device = lGrapEnv.getDefaultScreenDevice();
+        if (device.isFullScreenSupported()) {
+            try {
+//                getFrame().setUndecorated(true);
+//                getFrame().setResizable(false);
+                device.setFullScreenWindow(getFrame().getOwner());
+            } catch (Exception e) {
+                GUIManager.showErrorMessage(getFrame(), "Error al cambiar a modo fullscreen: " + e, "Error");
+            } finally {
+                device.setFullScreenWindow(null);
+            }
+        } else {
+            GUIManager.showErrorMessage(getFrame(), "FullScreen mode no soportado", "Advertencia");
+        }
     }
 
     public void setWaitCursor() {
@@ -267,19 +305,27 @@ public class GUIManager {
         return panelModPedidos;
     }
 
-    private PanelTakeOrders getPanelTakeOrders() {
+    public PanelTakeOrders getPanelTakeOrders() {
         if (panelTakeOrders == null) {
             panelTakeOrders = new PanelTakeOrders(app);
         }
         return panelTakeOrders;
     }
 
-    private PanelListPedidos getPanelListPedidos() {
-        if (panelListPedidos == null) {
-            panelListPedidos = new PanelListPedidos(app);
-            panelListPedidos.addPropertyChangeListener(getPanelPedido());
+    private PanelListPedidos getPanelSalesList() {
+        if (panelSalesList == null) {
+            panelSalesList = new PanelListPedidos(app);
+            panelSalesList.addPropertyChangeListener(getPanelPedido());
         }
-        return panelListPedidos;
+        return panelSalesList;
+    }
+
+    private PanelOrderList getPanelOrderslList() {
+        if (panelOrderList == null) {
+            panelOrderList = new PanelOrderList(app);
+
+        }
+        return panelOrderList;
     }
 
     private PanelCash getPanelCash(Cycle cycle) {
@@ -309,6 +355,13 @@ public class GUIManager {
         }
         return panelInventory;
     }
+    
+    public PanelSelProducts getPaneSelProducts() {
+        if (panelSelProducts == null) {
+            panelSelProducts = new PanelSelProducts(app);
+        }
+        return panelSelProducts;
+    }
 
     public PanelBasic getPanelBasicAdminModule() {
         if (panelBasicAdminModule == null) {
@@ -318,28 +371,36 @@ public class GUIManager {
         return panelBasicAdminModule;
     }
 
-    public PanelBasic getPanelBasicPedidos() {
-        if (panelBasicPedidos == null) {
+    public PanelBasic getPanelBasicOrders() {
+        if (panelBasicOrders == null) {
             ImageIcon icon = new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "shop.png", 30, 30));
-            panelBasicPedidos = new PanelBasic(app, "Pedidos", icon, getPanelModPedidos());
+            panelBasicOrders = new PanelBasic(app, "Pedidos", icon, getPanelModPedidos());
         }
-        return panelBasicPedidos;
+        return panelBasicOrders;
     }
 
     public PanelBasic getPanelBasicPOS() {
         if (panelBasicPOS == null) {
-            ImageIcon icon = new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "shoping-basket.png", 30, 30));
-            panelBasicPOS = new PanelBasic(app, "Ordens", icon, getPanelTakeOrders());
+            ImageIcon icon = new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "monitor.png", 30, 30));
+            panelBasicPOS = new PanelBasic(app, "POS", icon, getPanelTakeOrders());
         }
         return panelBasicPOS;
     }
 
-    public PanelBasic getPanelBasicListPedidos() {
-        if (panelBasicListPedidos == null) {
-            ImageIcon icon = new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "ordering.png", 30, 30));
-            panelBasicListPedidos = new PanelBasic(app, "Lista Pedidos", icon, getPanelListPedidos());
+    public PanelBasic getPanelBasicSalesList() {
+        if (panelBasicSalesList == null) {
+            ImageIcon icon = new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "sales-report.png", 30, 30));
+            panelBasicSalesList = new PanelBasic(app, "Lista Ventas", icon, getPanelSalesList());
         }
-        return panelBasicListPedidos;
+        return panelBasicSalesList;
+    }
+
+    public PanelBasic getPanelBasicOrdersList() {
+        if (panelBasicOrdersList == null) {
+            ImageIcon icon = new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "ordering.png", 30, 30));
+            panelBasicOrdersList = new PanelBasic(app, "Lista Pedidos", icon, getPanelOrderslList());
+        }
+        return panelBasicOrdersList;
     }
 
     public PanelBasic getPanelBasicCash() {
@@ -634,9 +695,14 @@ public class GUIManager {
             toolbar.removeAll();
             toolbar.updateUI();
 
-            Permission perm = app.getControl().getPermissionByName("show-pedidos-module");
+            Permission perm = app.getControl().getPermissionByName("show-orders-module");
             if (user != null && app.getControl().hasPermission(user, perm)) {
                 toolbar.add((app.getAction(Aplication.ACTION_SHOW_ORDER)));
+            }
+
+            perm = app.getControl().getPermissionByName("show-saleslist-module");
+            if (user != null && app.getControl().hasPermission(user, perm)) {
+                toolbar.add((app.getAction(Aplication.ACTION_SHOW_SALES_LIST)));
             }
 
             perm = app.getControl().getPermissionByName("show-orderlist-module");
@@ -792,7 +858,7 @@ public class GUIManager {
 
                 if (e.getClickCount() >= 4) {
                     String msg = "Hello fucking world!!";
-                    JOptionPane.showMessageDialog(null, msg, "DCE", JOptionPane.PLAIN_MESSAGE);
+                    JOptionPane.showMessageDialog(null, msg, "13171x", JOptionPane.PLAIN_MESSAGE);
                 }
             }
         });

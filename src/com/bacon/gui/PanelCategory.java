@@ -55,6 +55,7 @@ public class PanelCategory extends PanelCapturaMod implements PropertyChangeList
     private HashMap<Long, PanelProduct> mapProdsV3;
     private List<Category> categoriesList;
     private int viewSelect;
+    private PropertyChangeListener listener;
 
     /**
      * Creates new form PanelCategory
@@ -63,13 +64,14 @@ public class PanelCategory extends PanelCapturaMod implements PropertyChangeList
      * @param products
      * @param app
      */
-    public PanelCategory(Category category, ArrayList products, Aplication app) {
+    public PanelCategory(Category category, ArrayList products, Aplication app, PropertyChangeListener listener) {
         this.app = app;
         pcs = new PropertyChangeSupport(this);
         this.category = category;
         this.categoriesList = Collections.EMPTY_LIST;
         this.products = products;
         this.selectedSort = null;
+        this.listener = listener;
         mapProdsV1 = new HashMap<>();
         mapProdsV2 = new HashMap<>();
         mapProdsV3 = new HashMap<>();
@@ -81,12 +83,13 @@ public class PanelCategory extends PanelCapturaMod implements PropertyChangeList
         createComponents();
     }
 
-    public PanelCategory(List<Category> categoriesList, ArrayList products, Aplication app) {
+    public PanelCategory(List<Category> categoriesList, ArrayList products, Aplication app, PropertyChangeListener listener) {
         this.app = app;
         pcs = new PropertyChangeSupport(this);
         this.categoriesList = categoriesList;
         this.category = categoriesList.get(0);
         this.products = products;
+        this.listener = listener;
         this.selectedSort = null;
         mapProdsV1 = new HashMap<>();
         mapProdsV2 = new HashMap<>();
@@ -160,18 +163,15 @@ public class PanelCategory extends PanelCapturaMod implements PropertyChangeList
                 products.forEach((product) -> {
                     PanelProduct4 pnProd4 = new PanelProduct4(app, product);
                     pnProd4.setColor(getCategoriesColor(product.getCategory()));
-                    pnProd4.addPropertyChangeListener(app.getGuiManager().getPanelPedido());
-                    pnProd4.addPropertyChangeListener(app.getGuiManager().getPanelOrders());
+                    pnProd4.addPropertyChangeListener(listener);
                     publish(new Object[]{pnProd4, product.getId()});
 
                     PanelProduct2 pnProd2 = new PanelProduct2(app, product);
-                    pnProd2.addPropertyChangeListener(app.getGuiManager().getPanelPedido());
-                    pnProd2.addPropertyChangeListener(app.getGuiManager().getPanelOrders());
+                    pnProd2.addPropertyChangeListener(listener);
                     publish(new Object[]{pnProd2, product.getId()});
                     
                     PanelProduct pnProd1 = new PanelProduct(app, product);
-                    pnProd1.addPropertyChangeListener(app.getGuiManager().getPanelPedido());
-                    pnProd1.addPropertyChangeListener(app.getGuiManager().getPanelOrders());
+                    pnProd1.addPropertyChangeListener(listener);
                     publish(new Object[]{pnProd1, product.getId()});
 
                 });

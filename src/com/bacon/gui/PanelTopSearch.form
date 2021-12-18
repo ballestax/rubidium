@@ -25,10 +25,10 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
-              <Component id="regSearch" min="-2" pref="160" max="-2" attributes="0"/>
+              <Component id="regSearch" min="-2" pref="131" max="-2" attributes="0"/>
               <EmptySpace min="-2" pref="1" max="-2" attributes="0"/>
               <Component id="btBuscar" min="-2" pref="35" max="-2" attributes="0"/>
-              <EmptySpace pref="179" max="32767" attributes="0"/>
+              <EmptySpace pref="208" max="32767" attributes="0"/>
               <Component id="lbSort" min="-2" max="-2" attributes="0"/>
               <EmptySpace min="-2" pref="3" max="-2" attributes="0"/>
               <Component id="cbSort" min="-2" max="-2" attributes="0"/>
@@ -63,7 +63,7 @@
   <SubComponents>
     <Component class="com.bacon.gui.util.Registro" name="regSearch">
       <AuxValues>
-        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, &quot;Buscar&quot;, &quot;&quot;)"/>
+        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, &quot;&quot;, &quot;&quot;)"/>
       </AuxValues>
     </Component>
     <Component class="javax.swing.JButton" name="btBuscar">

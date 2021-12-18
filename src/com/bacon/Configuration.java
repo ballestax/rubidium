@@ -48,6 +48,8 @@ public class Configuration {
     public static final String PRINT_PREV_DELIVERY = "cf.printprevius";
     public static final String SHOW_EXCLUSIONS = "cf.showexclusions";
     public static final String MAX_CATEGORIES_LIST = "cf.maxcategorieslist";
+    public static final String SHOW_TOOLBAR = "cf.showtoolbar";
+    public static final String SHOW_MENUBAR = "cf.showmenubar";
     public static final String PN_ENTRADA_PERIODO = "cf.listperiodo";
     public static final String INVOICE_OUT_STOCK = "cf.invoiceoutstock";
     public static final String DOCUMENT_NAME = "cf.documentname";

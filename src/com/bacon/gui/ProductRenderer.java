@@ -13,23 +13,16 @@ import com.bacon.domain.ProductoPed;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.FontMetrics;
 import java.util.ArrayList;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JTable;
-import javax.swing.JTextArea;
 import javax.swing.UIManager;
 import javax.swing.table.TableCellRenderer;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.text.WordUtils;
 import org.dz.Resources;
 
 /**
@@ -45,7 +38,12 @@ public class ProductRenderer extends Box implements TableCellRenderer {
     private Font f1;
     private Color alterRowColor;
     private Box boxTop;
-    private JLabel lbIconDelivery, lbIconEntry;
+    private JLabel lbIconSended, lbIconEntry;
+    private ImageIcon iconSend1;
+    private ImageIcon iconSend2;
+    private ImageIcon iconSend3;
+    private ImageIcon iconPlus;
+    private ImageIcon iconMinus;
 
     /*
          *   Use the specified formatter to format the Object
@@ -70,10 +68,14 @@ public class ProductRenderer extends Box implements TableCellRenderer {
 
         boxTop = new Box(BoxLayout.X_AXIS);
 
-//        ImageIcon iconDel = new ImageIcon(Resources.getImagen("gui/img/icons/" + "shopping-cart-insert.png", Aplication.class, 15, 15));
+        iconSend1 = new ImageIcon(Resources.getImagen("gui/img/icons/" + "right_green.png", Aplication.class, 20, 20));
+        iconSend2 = new ImageIcon(Resources.getImagen("gui/img/icons/" + "right_orange.png", Aplication.class, 20, 20));
+        iconSend3 = new ImageIcon(Resources.getImagen("gui/img/icons/" + "right_red.png", Aplication.class, 20, 20));
+        iconPlus = new ImageIcon(Resources.getImagen("gui/img/icons/" + "plus.png", Aplication.class, 20, 20));
+        iconMinus = new ImageIcon(Resources.getImagen("gui/img/icons/" + "minus.png", Aplication.class, 20, 20));
 //        ImageIcon iconEntry = new ImageIcon(Resources.getImagen("gui/img/icons/" + "clock.png", Aplication.class, 15, 15));
-//        lbIconDelivery = new JLabel();
-//        lbIconDelivery.setIcon(iconDel);
+        lbIconSended = new JLabel();
+        lbIconSended.setIcon(null);
 //        lbIconEntry = new JLabel();
 //        lbIconEntry.setIcon(iconEntry);
 //        labelName.setPreferredSize(new Dimension(Short.MAX_VALUE, Short.MAX_VALUE));
@@ -98,12 +100,13 @@ public class ProductRenderer extends Box implements TableCellRenderer {
         labelIngredients.setFont(f1);
         labelEsp.setFont(f1);
 
-//        boxTop.setAlignmentX(0);
-//        boxTop.add(labelName);
-//        boxTop.add(lbIconDelivery);
+//        lbIconSended.setVisible(false);
+        boxTop.setAlignmentX(0);
+        boxTop.add(labelName);
+        boxTop.add(lbIconSended);
 //        boxTop.add(lbIconEntry);
-//        add(boxTop);
-        add(labelName);
+        add(boxTop);
+//        add(labelName);
         add(labelAdicion);
         add(labelIngredients);
 //        add(labelEsp);
@@ -163,7 +166,7 @@ public class ProductRenderer extends Box implements TableCellRenderer {
                 }
                 String termino = prodPed.getTermino();
                 String stTerm = "";
-                if (termino != null) {
+                if (termino != null && !termino.trim().isEmpty()) {
                     stTerm = " [" + prodPed.getTermino() + "]";
                 }
 
@@ -173,8 +176,34 @@ public class ProductRenderer extends Box implements TableCellRenderer {
                     stEntry = " [" + "ENTRADA" + "]";
                 }
 
-//                String stExclusion = prodPed.getStExclusiones();
-                labelName.setText(("<html><p>" + prodPed.getProduct().getName() + "</p><font size=2 color=blue>"
+                switch (prodPed.getStatus()) {
+                    case ProductoPed.ST_SENDED:
+                    case ProductoPed.ST_SENDED_MOD:
+                        lbIconSended.setIcon(iconSend1);
+                        break;
+
+                    case ProductoPed.ST_MOD_ADD_CANT:
+                    case ProductoPed.ST_NEW_ADD:
+                        lbIconSended.setIcon(iconPlus);
+                        break;
+                    case ProductoPed.ST_MOD_MIN_CANT:
+                        lbIconSended.setIcon(iconMinus);
+                        break;
+
+                    case ProductoPed.ST_AVOIDED:
+                        lbIconSended.setIcon(iconSend3);
+                        break;
+                    default:
+                        lbIconSended.setIcon(null);
+                }
+
+                //                String stExclusion = prodPed.getStExclusiones();
+                String color = prodPed.getStatus() == ProductoPed.ST_MOD_ADD_CANT ? "#ff2345" : "#000";
+                if (prodPed.getStatus() == ProductoPed.ST_NEW_ADD) {
+                    color = "#c54e00";
+                }
+                labelName.setText(("<html><p><font color=" + color + ">" + prodPed.getProduct().getName()
+                        + "</font></p><font size=2 color=blue>"
                         + stPres
                         + stTerm
                         + "<font color=#fe3917>" + stEntry + "</font>"

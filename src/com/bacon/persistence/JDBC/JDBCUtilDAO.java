@@ -172,6 +172,9 @@ public class JDBCUtilDAO implements UtilDAO {
     public static final String UPDATE_PRESENTATION_TO_DEFAULT_KEY = "UPDATE_PRESENTATION_TO_DEFAULT";
     public static final String UPDATE_PRESENTATION_TO_DEFAULT_BY_ID_KEY = "UPDATE_PRESENTATION_TO_DEFAULT_BY_ID";
 
+    public static final String CREATE_STATIONS_TABLE_KEY = "CREATE_STATIONS_TABLE";
+    public static final String CREATE_PRODUCT_STATION_TABLE_KEY = "CREATE_PRODUCT_STATION_TABLE";
+    
     private static final Logger logger = Logger.getLogger(JDBCUtilDAO.class.getCanonicalName());
 
     public static final String NAMED_PARAM_KEY = "{key}";
@@ -251,6 +254,12 @@ public class JDBCUtilDAO implements UtilDAO {
 
         TABLE_NAME = "categories";
         createTable(TABLE_NAME, CREATE_CATEGORIES_TABLE_KEY);
+        
+        TABLE_NAME = "stations";
+        createTable(TABLE_NAME, CREATE_STATIONS_TABLE_KEY);
+        
+        TABLE_NAME = "product_station";
+        createTable(TABLE_NAME, CREATE_PRODUCT_STATION_TABLE_KEY);
 
     }
 

@@ -23,6 +23,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import javax.swing.AbstractAction;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
@@ -43,6 +45,7 @@ public class PanelDash extends JPanel {
 
     public PanelDash(Aplication app) {
         this.app = app;
+        setOpaque(true);
         setLayout(new GridBagLayout());
 //        Font f1 = new Font("Tahoma", 1, 18);
 //        Image centrarTexto = org.balx.Imagenes.centrarTexto(WC, WC, "DERO CAMPAÑA ELECTORAL", f1, Color.white, Color.blue);
@@ -59,12 +62,30 @@ public class PanelDash extends JPanel {
         add(newButton(app.getAction(Aplication.ACTION_SHOW_ORDER)), constrains(1, 1, 30));
         add(newButton(app.getAction(Aplication.ACTION_SHOW_POS)), constrains(2, 1, 30));
         add(newButton(app.getAction(Aplication.ACTION_SHOW_ORDER_LIST)), constrains(3, 1, 30));
-        add(newButton(app.getAction(Aplication.ACTION_SHOW_CASH)), constrains(4, 1, 30));
+        add(newButton(app.getAction(Aplication.ACTION_SHOW_SALES_LIST)), constrains(4, 1, 30));
 
-        add(newButton(app.getAction(Aplication.ACTION_SHOW_PRODUCTS)), constrains(1, 2, 30));
-        add(newButton(app.getAction(Aplication.ACTION_SHOW_INVENTORY)), constrains(2, 2, 30));
-        add(newButton(app.getAction(Aplication.ACTION_SHOW_REPORTS)), constrains(3, 2, 30));
-        add(newButton(app.getAction(Aplication.ACTION_SHOW_ADMIN)), constrains(4, 2, 30));
+        add(newButton(app.getAction(Aplication.ACTION_SHOW_CASH)), constrains(1, 2, 30));
+        add(newButton(app.getAction(Aplication.ACTION_SHOW_PRODUCTS)), constrains(2, 2, 30));
+        add(newButton(app.getAction(Aplication.ACTION_SHOW_INVENTORY)), constrains(3, 2, 30));
+        add(newButton(app.getAction(Aplication.ACTION_SHOW_REPORTS)), constrains(4, 2, 30));
+
+        add(newButton(app.getAction(Aplication.ACTION_SHOW_ADMIN)), constrains(1, 3, 30));
+
+        Box box = new Box(BoxLayout.X_AXIS);
+        box.setAlignmentY(BOTTOM_ALIGNMENT);
+        JButton btn = new JButton(app.getAction(Aplication.ACTION_EXIT_APP));
+        btn.setText("");
+        btn.setPreferredSize(new Dimension(30, 30));
+        btn.setMinimumSize(new Dimension(30, 30));
+        box.add(btn);
+
+//        
+
+        add(box, new GridBagConstraints(4, 3, 0, 0, 0, 0,
+                GridBagConstraints.CENTER,
+                GridBagConstraints.NONE,
+                new Insets(30, 30, 30, 30), 100, 100));
+
     }
 
     @Override
@@ -102,14 +123,16 @@ public class PanelDash extends JPanel {
 //            if(imgMas!=null)
 ////            g2.drawImage(imgMas, px, py, this);
         }
-    } 
+
+    }
 
     private JButton newButton(AbstractAction action) {
         final JButton bt1 = new JButton();
 //        bt1.setBorderPainted(false);
         bt1.setPreferredSize(new Dimension(50, 50));
+        bt1.setMinimumSize(new Dimension(50, 50));
         bt1.setFocusPainted(false);
-        bt1.setBackground(new Color(200,210,230));
+        bt1.setBackground(new Color(200, 210, 230));
 //        bt1.setContentAreaFilled(false);
         bt1.setFont(new Font("tahoma", 1, 16));
         bt1.setAction(action);

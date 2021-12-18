@@ -6,6 +6,7 @@ import com.bacon.domain.Cycle;
 import com.bacon.domain.Ingredient;
 import com.bacon.domain.Item;
 import com.bacon.domain.Order;
+import com.bacon.domain.Permission;
 import com.bacon.domain.Presentation;
 import com.bacon.domain.Product;
 import com.bacon.domain.ProductoPed;
@@ -24,6 +25,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -33,6 +35,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.IntStream;
 import javax.swing.BorderFactory;
@@ -41,9 +44,11 @@ import javax.swing.ButtonGroup;
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JRadioButton;
@@ -82,6 +87,7 @@ public class PanelOrders extends PanelCapturaMod implements
     private DecimalFormat DCFORM_P;
 
     private List<ProductoPed> products;
+    private Map<Integer, Map> productsOld;
     private HashMap<Long, Object[]> checkInventory;
     private MultiValueMap mapInventory;
     private boolean block;
@@ -92,6 +98,11 @@ public class PanelOrders extends PanelCapturaMod implements
     private JPanel pnCoccion;
     private JPanel pnCooking;
     private int tipo;
+    private BigDecimal totalOrder;
+    private Table selTable;
+    private ImageIcon iconCancel;
+    private ImageIcon iconBack;
+    private boolean mod = false;
 
     /**
      * Creates new form PanelOrders
@@ -101,6 +112,7 @@ public class PanelOrders extends PanelCapturaMod implements
     public PanelOrders(Aplication app) {
         this.app = app;
         products = new ArrayList<>();
+        productsOld = new HashMap<>();
         checkInventory = new HashMap<>();
         mapInventory = new MultiValueMap();
         tipo = TIPO_LOCAL;
@@ -114,6 +126,8 @@ public class PanelOrders extends PanelCapturaMod implements
         if (defaults.get("Table.alternateRowColor") == null) {
             defaults.put("Table.alternateRowColor", new Color(240, 240, 240));
         }
+
+        lbInfo.setBorder(BorderFactory.createEtchedBorder());
 
         Font font = new Font("Arial", 1, 18);
 
@@ -211,18 +225,23 @@ public class PanelOrders extends PanelCapturaMod implements
 
         icon = new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "edit.png", 12, 12));
         btModify.setMargin(new Insets(0, 0, 0, 0));
+        btModify.setFocusPainted(false);
         btModify.setIcon(icon);
         btModify.setActionCommand(AC_MODIFY_ITEM);
         btModify.addActionListener(this);
         btModify.setText("Modificar");
 
         tgDelivery.setText("Llevar");
+        tgDelivery.setMargin(new Insets(0, 0, 0, 0));
         tgDelivery.setActionCommand(AC_CHECK_DELIVERY);
         tgDelivery.addActionListener(this);
+        tgDelivery.setFocusPainted(false);
 
         tgEntry.setText("Entrada");
+        tgEntry.setMargin(new Insets(0, 0, 0, 0));
         tgEntry.setActionCommand(AC_CHECK_ENTRY);
         tgEntry.addActionListener(this);
+        tgEntry.setFocusPainted(false);
 
         icon = new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "clean.png", 12, 12));
         btClear.setMargin(new Insets(0, 0, 0, 0));
@@ -243,6 +262,21 @@ public class PanelOrders extends PanelCapturaMod implements
         btStay.setText("Enviar");
         btStay.setActionCommand(AC_SEND_ORDER);
         btStay.addActionListener(this);
+
+        iconCancel = new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "cancel.png", 20, 20));
+        iconBack = new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "back.png", 20, 20));
+        btCancel.setIcon(icon);
+        btCancel.setMargin(new Insets(0, 0, 0, 0));
+        btCancel.setText("Cancelar");
+        btCancel.setActionCommand(AC_CANCEL_ORDER);
+        btCancel.addActionListener(this);
+
+        btCancelMods.setIcon(iconCancel);
+        btCancelMods.setMargin(new Insets(0, 0, 0, 0));
+//        btCancelMods.setText("Cancelar");
+        btCancelMods.setActionCommand(AC_CANCEL_MODS);
+        btCancelMods.addActionListener(this);
+        btCancelMods.setVisible(false);
 
         icon = new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "file-pause.png", 20, 20));
         btHold.setIcon(icon);
@@ -265,68 +299,159 @@ public class PanelOrders extends PanelCapturaMod implements
         btShowInventary.setActionCommand(AC_SHOW_INVENTORY);
         btShowInventary.addActionListener(this);
 
+        lbIndicator.setBorder(BorderFactory.createEtchedBorder());
+        lbIndicator.setOpaque(true);
+        lbIndicator.setVisible(false);
+
+        font = new Font("Sans", 1, 16);
+        regTable.setFontCampo(font);
+        regWaiter.setFontCampo(font);
+        ((JComboBox) regWaiter.getComponent()).setRenderer(new WaiterListCellRenderer());
+        regWaiter.setActionCommand(AC_CHANGE_SELECTED);
+        regWaiter.addActionListener(this);
+
         pnCardContain.add(pnContenTab, "1");
 
         pnCardContain.setVisible(false);
 
+        loadDatas();
+
     }
+    public Font font;
+
+    public void loadDatas() {
+        SwingWorker sw = new SwingWorker() {
+            @Override
+            protected Object doInBackground() throws Exception {
+                ArrayList<Waiter> waitresslList = app.getControl().getWaitresslList("status=1", "name");
+                regWaiter.setText(waitresslList.toArray());
+
+                ArrayList<Table> tablelList = app.getControl().getTableslList("", "id");
+                regTable.setText(tablelList.toArray());
+                return true;
+            }
+        };
+
+        sw.execute();
+    }
+
+    public void setupData(Waiter waiter, Table table) {
+        regWaiter.setSelected(waiter);
+        regTable.setSelected(table);
+        selTable = table;
+        block = false;
+        if (table.getIdOrder() > 0) {
+            modelTable.setRowCount(0);
+            products.clear();
+            productsOld.clear();
+
+            lbInfo.setText("<html><font color=blue>Orden: </font><font color=blue size=+1>#" + table.getIdOrder() + "</font></html>");
+
+            List<Order> orderslList = app.getControl().getOrderslList("id=" + table.getIdOrder(), "");
+            if (orderslList.size() > 0) {
+                Order order = orderslList.get(0);
+                System.out.println(":::" + order.getProducts().size());
+                for (ProductoPed product : order.getProducts()) {
+                    addProductPed(product, product.getCantidad(), product.getPrecio(), false);
+                }
+            }
+
+            productsOld = copyProductsToMap(products);
+            block = true;
+            btSend.setEnabled(false);
+            btCancel.setIcon(iconBack);
+            btCancel.setText("Regresar");
+            btCancel.setActionCommand(AC_BACK_TO_TABLES);
+        }
+    }
+
+    public Map<Integer, Map> copyProductsToMap(List<ProductoPed> list) {
+        Map map = new HashMap<Integer, Map>();
+        list.stream().forEach(prod -> {
+            Map value = new HashMap();
+            value.put("cant", prod.getCantidad());
+            value.put("prod", prod);
+            map.put(prod.hashCode(), value);
+        });
+
+        return map;
+    }
+
     public static final String AC_CHECK_DELIVERY = "AC_CHECK_DELIVERY";
     public static final String AC_MODIFY_ITEM = "AC_MODIFY_ITEM";
 
     public static final String AC_CLEAR_ORDER = "AC_CLEAR_ORDER";
     public static final String AC_SEND_ORDER = "AC_SEND_ORDER";
+    public static final String AC_CANCEL_ORDER = "AC_CANCEL_ORDER";
+    public static final String AC_CANCEL_MODS = "AC_CANCEL_MODS";
     public static final String AC_DELETE_ITEM = "AC_DELETE_ITEM";
     public static final String AC_MINUS_QUANTITY = "AC_MINUS_QUANTITY";
     public static final String AC_ADD_QUANTITY = "AC_ADD_QUANTITY";
 
-    public void addProduct(Product producto, double precio, Presentation pres) {
-        ProductoPed productoPed = new ProductoPed(producto);
-        productoPed.setPresentation(pres);
-        productoPed.setPrecio(precio);
-        addProductPed(productoPed, 1, precio);
+    public void addProduct(Product product, double price, Presentation pres) {
+        ProductoPed productPed = new ProductoPed(product);
+        productPed.setPresentation(pres);
+        productPed.setPrecio(price);
+        productPed.setTermino("");
+        productPed.setEspecificaciones("");
+        addProductPed(productPed, 1, price);
     }
 
     public void addProductPed(ProductoPed productPed, int cantidad, double price) {
-        addProductPed(productPed, cantidad, price, -1);
+
+        addProductPed(productPed, cantidad, price, -1, true);
     }
 
-    public void addProductPed(ProductoPed productPed, int cantidad, double price, int rowSelected) {
-        if (block) {
+    public void addProductPed(ProductoPed productPed, int cantidad, double price, boolean edit) {
+        addProductPed(productPed, cantidad, price, -1, edit);
+    }
+
+    public void addProductPed(ProductoPed productPed, int cantidad, double price, int rowSelected, boolean edit) {
+        if (block & !edit) {
             GUIManager.showErrorMessage(null, "El pedido esta cerrado no se puede agregar más productos", "Pedido cerrado");
             return;
         }
 
         Product producto = productPed.getProduct();
 
-        if (productPed.hasPresentation()) {
-            HashMap<Integer, HashMap> mapData = app.getControl().checkInventory(productPed.getPresentation().getId());
-            productPed.setData(mapData);
-            if (mapData != null && !mapData.isEmpty()) {
-                Set<Integer> keys = mapData.keySet();
-                for (Integer key : keys) {
-                    HashMap data = mapData.get(key);
-                    double res = Double.valueOf(data.get("quantity").toString()) * cantidad;
-                    MultiKey mKey = new MultiKey(data.get("id"), productPed.hashCode());
-                    mapInventory.put(mKey, res);
+        if (!edit) {
+            if (productPed.hasPresentation()) {
+                HashMap<Integer, HashMap> mapData = app.getControl().checkInventory(productPed.getPresentation().getId());
+                productPed.setData(mapData);
+                if (mapData != null && !mapData.isEmpty()) {
+                    Set<Integer> keys = mapData.keySet();
+                    for (Integer key : keys) {
+                        HashMap data = mapData.get(key);
+                        double res = Double.valueOf(data.get("quantity").toString()) * cantidad;
+                        MultiKey mKey = new MultiKey(data.get("id"), productPed.hashCode());
+                        mapInventory.put(mKey, res);
+                    }
                 }
-            }
-            checkInventory();
-        } else {
-            HashMap<Integer, HashMap> mapData = app.getControl().checkInventoryProduct(productPed.getProduct().getId());
-            productPed.setData(mapData);
-            if (mapData != null && !mapData.isEmpty()) {
-                Set<Integer> keys = mapData.keySet();
-                for (Integer key : keys) {
-                    HashMap data = mapData.get(key);
-                    double res = Double.valueOf(data.get("quantity").toString()) * cantidad;
-                    MultiKey mKey = new MultiKey(data.get("id"), productPed.hashCode());
-                    mapInventory.put(mKey, res);
+                checkInventory();
+            } else {
+                HashMap<Integer, HashMap> mapData = app.getControl().checkInventoryProduct(productPed.getProduct().getId());
+                productPed.setData(mapData);
+                if (mapData != null && !mapData.isEmpty()) {
+                    Set<Integer> keys = mapData.keySet();
+                    for (Integer key : keys) {
+                        HashMap data = mapData.get(key);
+                        double res = Double.valueOf(data.get("quantity").toString()) * cantidad;
+                        MultiKey mKey = new MultiKey(data.get("id"), productPed.hashCode());
+                        mapInventory.put(mKey, res);
+                    }
                 }
+                checkInventory();
             }
-            checkInventory();
         }
 
         tbProducts.getSelectionModel().clearSelection();
+
+        //si el pedido esta bloqueado contar como una adicion posterior
+        if (block) {
+            productPed.setStatus(ProductoPed.ST_MOD_ADD_CANT);
+            mod = true;
+            btSend.setEnabled(true);
+        }
 
         if (products.contains(productPed) && price == productPed.getPrecio()) {
             try {
@@ -338,6 +463,7 @@ public class PanelOrders extends PanelCapturaMod implements
                 modelTable.setValueAt(cant + cantidad, row, 0);
                 productPed.setCantidad(cantidad);
                 products.set(row, productPed);
+                tbProducts.setValueAt(productPed, row, 1);
                 tbProducts.getSelectionModel().addSelectionInterval(row, row);
             } catch (Exception e) {
             }
@@ -354,19 +480,19 @@ public class PanelOrders extends PanelCapturaMod implements
                     productPed,
                     totalProd,
                     totalProd * cantidad,
-                    Boolean.FALSE
+                    productPed.isDelivery()
                 });
-//                if (productPed.hasAdditionals()) {
-//                    int size = 11 * (int) Math.ceil(productPed.getAdicionales().size() / 2.0);
-//                    tbProducts.setRowHeight(modelTable.getRowCount() - 1, 35 + size);
-//                }
+
                 int row = modelTable.getRowCount() - 1;
                 modelTable.setRowEditable(row, false);
-                modelTable.setCellEditable(row, 0, true);
-                modelTable.setCellEditable(row, 4, true);
+                modelTable.setCellEditable(row, 0, edit);
+                modelTable.setCellEditable(row, 4, edit);
                 tbProducts.getSelectionModel().addSelectionInterval(row, row);
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());
+            }
+            if (block) {
+                productPed.setStatus(ProductoPed.ST_NEW_ADD);
             }
         }
 
@@ -392,8 +518,8 @@ public class PanelOrders extends PanelCapturaMod implements
         String mesa = "";
         String mesero = "";
 
-        Waiter waitres = new Waiter("LOCAL", 1);//(Waiter) regMesera.getSelectedItem();
-        Table table = new Table("1", 1);//(Table) regMesa.getSelectedItem();
+        Waiter waitres = (Waiter) regWaiter.getSelectedItem();
+        Table table = (Table) regTable.getSelectedItem();
         boolean validate = true;
 //        if (TIPO_LOCAL == tipo) {
 //            if (waitres == null || regMesera.getSelected() < 1) {
@@ -461,7 +587,7 @@ public class PanelOrders extends PanelCapturaMod implements
 
         order.setProducts(products);
 
-//        invoice.setValor(totalFact);
+        order.setValor(totalOrder);
         return order;
     }
 
@@ -541,6 +667,28 @@ public class PanelOrders extends PanelCapturaMod implements
         }
     }
 
+    public void setStatusProducts(List<ProductoPed> products, int status) {
+        products.stream().forEach(prod -> prod.setStatus(status));
+    }
+
+    public List<ProductoPed> diffProducts(List<ProductoPed> products) {
+        List<ProductoPed> productDiff = new ArrayList<>();
+        products.stream().forEach(prod -> {
+            prod.setStatus(ProductoPed.ST_SENDED_MOD);
+            if (productsOld.containsKey(prod.hashCode())) {
+                int cantOld = (Integer) productsOld.get(prod.hashCode()).get("cant");
+                int cantNew = prod.getCantidad();
+                if (cantNew > cantOld) {
+                    prod.setCantidad(cantNew - cantOld);                    
+                    productDiff.add(prod);
+                }
+            } else {
+                productDiff.add(prod);
+            }
+        });
+        return productDiff;
+    }
+
     private String htmlInfoInventory(HashMap<Integer, Double> simpInv) {
 
         Set<Integer> keys = simpInv.keySet();
@@ -584,8 +732,9 @@ public class PanelOrders extends PanelCapturaMod implements
         btModify = new javax.swing.JButton();
         tgEntry = new javax.swing.JToggleButton();
         tgDelivery = new javax.swing.JToggleButton();
-        registro1 = new org.dz.Registro();
-        jLabel1 = new javax.swing.JLabel();
+        btCancelMods = new javax.swing.JButton();
+        regWaiter = new org.dz.Registro(BoxLayout.X_AXIS, "Mesero", new String[1], 60);
+        lbInfo = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         tbProducts = new javax.swing.JTable();
         btSend = new javax.swing.JButton();
@@ -593,10 +742,12 @@ public class PanelOrders extends PanelCapturaMod implements
         btStay = new javax.swing.JButton();
         pnTotals = new javax.swing.JPanel();
         regSubtotal = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "","",60);
-        registro2 = new org.dz.Registro();
+        regTable = new org.dz.Registro(BoxLayout.X_AXIS, "Mesa", new String[1], 60);
         pnCardContain = new javax.swing.JPanel();
         btClear = new javax.swing.JButton();
         btShowInventary = new javax.swing.JButton();
+        lbIndicator = new javax.swing.JLabel();
+        btCancel = new javax.swing.JButton();
 
         pnContenTab.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
@@ -611,7 +762,9 @@ public class PanelOrders extends PanelCapturaMod implements
                 .addComponent(lbQuantity, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(2, 2, 2)
                 .addComponent(btAdd, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 72, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btCancelMods, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 26, Short.MAX_VALUE)
                 .addComponent(tgDelivery, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(tgEntry, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -621,6 +774,9 @@ public class PanelOrders extends PanelCapturaMod implements
                 .addComponent(btDelete, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
+
+        pnContenTabLayout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {btAdd, btCancelMods});
+
         pnContenTabLayout.setVerticalGroup(
             pnContenTabLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnContenTabLayout.createSequentialGroup()
@@ -632,13 +788,12 @@ public class PanelOrders extends PanelCapturaMod implements
                     .addComponent(btDelete, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btModify, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(tgEntry, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(tgDelivery, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(tgDelivery, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btCancelMods, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(30, Short.MAX_VALUE))
         );
 
-        pnContenTabLayout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {btAdd, btDelete, btMinus, lbQuantity});
-
-        jLabel1.setText("jLabel1");
+        pnContenTabLayout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {btAdd, btCancelMods, btDelete, btMinus, lbQuantity});
 
         tbProducts.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -678,7 +833,9 @@ public class PanelOrders extends PanelCapturaMod implements
             .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
             .addComponent(pnTotals, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap()
+                .addComponent(btCancel, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(btStay, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btHold, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -686,49 +843,54 @@ public class PanelOrders extends PanelCapturaMod implements
                 .addComponent(btSend, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(1, 1, 1))
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(lbInfo, javax.swing.GroupLayout.DEFAULT_SIZE, 89, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(registro1, javax.swing.GroupLayout.PREFERRED_SIZE, 145, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(regWaiter, javax.swing.GroupLayout.DEFAULT_SIZE, 145, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(registro2, javax.swing.GroupLayout.PREFERRED_SIZE, 123, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(regTable, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
                 .addComponent(btShowInventary, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btClear, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
+                .addComponent(btClear, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
             .addComponent(pnCardContain, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(lbIndicator, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
-
-        layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {registro1, registro2});
-
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(registro1, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(registro2, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lbInfo, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(regWaiter, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(regTable, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btClear, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btShowInventary, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 275, Short.MAX_VALUE)
+                .addGap(2, 2, 2)
+                .addComponent(lbIndicator, javax.swing.GroupLayout.PREFERRED_SIZE, 7, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(3, 3, 3)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 263, Short.MAX_VALUE)
                 .addGap(2, 2, 2)
                 .addComponent(pnTotals, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(pnCardContain, javax.swing.GroupLayout.DEFAULT_SIZE, 41, Short.MAX_VALUE)
+                .addComponent(pnCardContain, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(btSend, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btHold, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btStay, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(btStay, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btCancel, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
+
+        layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {btClear, btShowInventary, lbInfo, regTable, regWaiter});
+
     }// </editor-fold>//GEN-END:initComponents
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btAdd;
+    private javax.swing.JButton btCancel;
+    private javax.swing.JButton btCancelMods;
     private javax.swing.JButton btClear;
     private javax.swing.JButton btDelete;
     private javax.swing.JButton btHold;
@@ -737,15 +899,16 @@ public class PanelOrders extends PanelCapturaMod implements
     private javax.swing.JButton btSend;
     private javax.swing.JButton btShowInventary;
     private javax.swing.JButton btStay;
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JLabel lbIndicator;
+    private javax.swing.JLabel lbInfo;
     private javax.swing.JLabel lbQuantity;
     private javax.swing.JPanel pnCardContain;
     private javax.swing.JPanel pnContenTab;
     private javax.swing.JPanel pnTotals;
     private com.bacon.gui.util.Registro regSubtotal;
-    private org.dz.Registro registro1;
-    private org.dz.Registro registro2;
+    private org.dz.Registro regTable;
+    private org.dz.Registro regWaiter;
     private javax.swing.JTable tbProducts;
     private javax.swing.JToggleButton tgDelivery;
     private javax.swing.JToggleButton tgEntry;
@@ -785,7 +948,19 @@ public class PanelOrders extends PanelCapturaMod implements
         } else if (AC_SEND_ORDER.equals(e.getActionCommand())) {
             Order order = getOrder();
             if (order != null && !order.isEmpty()) {
-                app.getControl().addOrder(getOrder());
+                long idOrder = 0;
+                if (!mod) {
+                    setStatusProducts(order.getProducts(), ProductoPed.ST_SENDED);
+                    idOrder = app.getControl().addOrder(order);
+                } else {
+                    idOrder = selTable.getIdOrder();
+                    System.out.println("idOrder = " + idOrder);
+                    List<ProductoPed> diffProducts = diffProducts(order.getProducts());
+                    app.getControl().addProductOrder(idOrder, diffProducts);
+                }
+                app.getGuiManager().getPanelTakeOrders().showTables();
+                selTable.setStatus(Table.TABLE_ST_PEDIDO_EN_COCINA);
+                pcs.firePropertyChange(PanelTakeOrders.AC_UPDATE_TABLE, idOrder, selTable);
             }
         } else if (AC_CLEAR_ORDER.equals(e.getActionCommand())) {
             modelTable.setRowCount(0);
@@ -811,12 +986,15 @@ public class PanelOrders extends PanelCapturaMod implements
             if (selectedRows.length == 1) {
                 int row = selectedRows[0];
                 boolean check = Boolean.parseBoolean(modelTable.getValueAt(row, 4).toString());
+                ProductoPed prod = (ProductoPed) modelTable.getValueAt(row, 1);
+                prod.setDelivery(!check);
                 modelTable.setValueAt(!check, selectedRows[0], 4);
             } else {
                 for (int row : selectedRows) {
                     boolean check = Boolean.parseBoolean(modelTable.getValueAt(row, 4).toString());
-
                     if (!check) {
+                        ProductoPed prod = (ProductoPed) modelTable.getValueAt(row, 1);
+                        prod.setDelivery(!check);
                         modelTable.setValueAt(true, row, 4);
                     }
                 }
@@ -830,8 +1008,53 @@ public class PanelOrders extends PanelCapturaMod implements
                 prod.setEntry(tgEntry.isSelected());
                 modelTable.setValueAt(prod, cRow, 1);
             }
+        } else if (AC_CHANGE_SELECTED.equals(e.getActionCommand())) {
+            Waiter waitres = (Waiter) regWaiter.getSelectedItem();
+            Color color = Color.BLACK;
+            try {
+                color = Color.decode(waitres.getColor());
+            } catch (Exception ex) {
+            }
+            regWaiter.setForeground(color);
+            lbIndicator.setBackground(color);
+            lbIndicator.setVisible(regWaiter.getSelected() >= 0);
+
+        } else if (AC_CANCEL_ORDER.equals(e.getActionCommand())) {
+            if (products.size() > 0) {
+                String msg = "<html>El pedido no esta vacio, <br>¿Desea cancelar todo y volver al menu de seleccion de mesas?</html>";
+
+                int showConfirmDialog = JOptionPane.showConfirmDialog(null, msg, "Advertencia", JOptionPane.YES_NO_OPTION);
+                if (showConfirmDialog == JOptionPane.YES_OPTION) {
+                    modelTable.setRowCount(0);
+                    products.clear();
+                    app.getGuiManager().getPanelTakeOrders().showTables();
+                }
+            } else {
+                app.getGuiManager().getPanelTakeOrders().showTables();
+                selTable.setStatus(Table.TABLE_ST_LIMPIA);
+                pcs.firePropertyChange(PanelTakeOrders.AC_CLEAR_TABLE, null, selTable);
+            }
+
+        } else if (AC_BACK_TO_TABLES.equals(e.getActionCommand())) {
+            app.getGuiManager().getPanelTakeOrders().showTables();
+        } else if (AC_CANCEL_MODS.equals(e.getActionCommand())) {
+            int[] selectedRows = tbProducts.getSelectedRows();
+            for (int row : selectedRows) {
+                int cRow = tbProducts.convertRowIndexToModel(row);
+                ProductoPed prodSelected = getProductSelected();
+                Map value = productsOld.get(prodSelected.hashCode());
+                if (value != null) {
+                    Integer cant = (Integer) value.get("cant");
+                    ProductoPed prod = (ProductoPed) value.get("prod");
+                    lbQuantity.setText(String.valueOf(cant));
+                    modelTable.setValueAt(cant, cRow, 0);
+                    modelTable.setValueAt(prod, cRow, 1);
+                }
+            }
         }
     }
+    public static final String AC_BACK_TO_TABLES = "AC_BACK_TO_TABLES";
+    public static final String AC_CHANGE_SELECTED = "AC_CHANGE_SELECTED";
 
     @Override
     public void valueChanged(ListSelectionEvent e) {
@@ -846,12 +1069,21 @@ public class PanelOrders extends PanelCapturaMod implements
                     lbQuantity.setText(String.valueOf(quantity));
                     product = (ProductoPed) modelTable.getValueAt(row, 1);
                     tgDelivery.setSelected(paraLlevar);
-                    tgEntry.setSelected(product.isEntry());
+                    if (product != null) {
+                        tgEntry.setSelected(product.isEntry());
+                    }
+                    int status = product.getStatus();
+                    btCancelMods.setVisible(status == ProductoPed.ST_MOD_ADD_CANT || status == ProductoPed.ST_MOD_MIN_CANT);
+
                     btMinus.setEnabled(true);
                     btAdd.setEnabled(true);
-                    btModify.setEnabled(true);
+                    Permission perm = app.getControl().getPermissionByName("allow-cancel-product-order");
+                    btModify.setEnabled(app.getControl().hasPermission(app.getUser(), perm));
+                    perm = app.getControl().getPermissionByName("allow-modify-product-order");
+                    btDelete.setEnabled(app.getControl().hasPermission(app.getUser(), perm));
                     pnCardContain.setVisible(true);
                 } catch (Exception ex) {
+                    System.err.println("ex:" + ex);
                 }
             }
         } else if (length > 1) {
@@ -891,7 +1123,7 @@ public class PanelOrders extends PanelCapturaMod implements
             if (prodPed.getPresentation() != null) {
                 price = prodPed.getPresentation().getPrice();
             }
-            addProductPed(prodPed, cant, price, row);
+            addProductPed(prodPed, cant, price, row, true);
         }
     }
 
@@ -987,6 +1219,7 @@ public class PanelOrders extends PanelCapturaMod implements
             }
             total += valorProductos;
         }
+        totalOrder = new BigDecimal(total);
         return total;
     }
 

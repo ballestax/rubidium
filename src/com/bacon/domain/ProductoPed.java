@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Objects;
 import org.apache.commons.collections.CollectionUtils;
-import sun.jvm.hotspot.tools.PMap;
 
 /**
  *
@@ -22,7 +21,17 @@ public class ProductoPed {
     protected int cantidad;
     protected double precio;
     protected boolean entry;
+    protected boolean delivery;
     protected HashMap<Integer, HashMap> data;
+    protected int status;
+
+    public static final int ST_NORMAL = 0;
+    public static final int ST_SENDED = 1;
+    public static final int ST_SENDED_MOD = 2;
+    public static final int ST_MOD_ADD_CANT = 3;
+    public static final int ST_MOD_MIN_CANT = 4;
+    public static final int ST_NEW_ADD = 5;
+    public static final int ST_AVOIDED = 6;
 
     public ProductoPed() {
         this(new Product());
@@ -159,6 +168,14 @@ public class ProductoPed {
         return presentation != null;
     }
 
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
     public String getStExclusiones() {
         StringBuilder stb = new StringBuilder();
         for (int i = 0; i < exclusiones.size(); i++) {
@@ -188,7 +205,7 @@ public class ProductoPed {
     }
 
     public boolean hasTermino() {
-        return termino.trim().isEmpty();
+        return termino != null && termino.trim().isEmpty();
     }
 
     public String getCorte() {
@@ -200,7 +217,7 @@ public class ProductoPed {
     }
 
     public boolean hasCorte() {
-        return corte.trim().isEmpty();
+        return corte != null && corte.trim().isEmpty();
     }
 
     public boolean isEntry() {
@@ -209,6 +226,14 @@ public class ProductoPed {
 
     public void setEntry(boolean entry) {
         this.entry = entry;
+    }
+
+    public boolean isDelivery() {
+        return delivery;
+    }
+
+    public void setDelivery(boolean delivery) {
+        this.delivery = delivery;
     }
 
     public HashMap<Integer, HashMap> getData() {

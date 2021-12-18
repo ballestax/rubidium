@@ -12,24 +12,30 @@
     </editor-bookmarks>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
+            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/gui/WaiterListCellRenderer.java</file>
             <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/Aplication.java</file>
             <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/gui/PanelOrders.java</file>
-            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/domain/AdditionalPed.java</file>
-            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/gui/FormatRenderer.java</file>
+            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/gui/PanelTakeOrders.java</file>
             <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/gui/PanelTopSearch.java</file>
-            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/gui/ProductRenderer.java</file>
+            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/gui/PanelOrderList.java</file>
             <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/gui/PanelProduct4.java</file>
-            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/gui/SpinnerRenderer.java</file>
             <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/gui/PanelModPedidos.java</file>
+            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/gui/BoxContain.java</file>
+            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/gui/PanelInventory.java</file>
+            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/gui/util/Registro.java</file>
+            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/config/jdbc-dao-local.properties</file>
             <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/gui/PanelPedido.java</file>
-            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/gui/PanelCategory.java</file>
-            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/gui/PanelAddItem.java</file>
-            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/gui/PanelAddition.java</file>
-            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/ImageManager.java</file>
+            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/gui/GUiPanelViewFacture.java</file>
+            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/PrinterService.java</file>
+            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/domain/Table.java</file>
+            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/gui/PanelSelProducts.java</file>
+            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/persistence/JDBC/JDBCOrderDAO.java</file>
+            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/gui/TableRender.java</file>
+            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/config/jdbc-dao.properties</file>
             <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/GUIManager.java</file>
-            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/domain/ProductoPed.java</file>
-            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/gui/util/TableSelectCellRenderer.java</file>
-            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/gui/PanelCustomPedido.java</file>
+            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/gui/PanelListPedidos.java</file>
+            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/gui/PanelConfirmPedido.java</file>
+            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/gui/PanelDash.java</file>
         </group>
     </open-files>
 </project-private>

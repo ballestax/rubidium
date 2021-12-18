@@ -67,6 +67,7 @@
                     |CREATE_CATEGORIES_TABLE|ADD_CATEGORY|GET_CATEGORY_PROD|UPDATE_CATEGORY
                     |ADD_PRESENTATION|UPDATE_PRESENTATION|UPDATE_PRESENTATION_TO_DEFAULT|UPDATE_PRESENTATION_TO_DEFAULT_BY_ID
                     |ADD_ORDER_PRODUCT|GET_ORDER_PRODUCT
+                    |CREATE_STATIONS_TABLE|ADD_STATION|GET_STATIONS|CREATE_PRODUCT_STATION_TABLE
                     ) #REQUIRED
                     
 	>
@@ -1077,6 +1078,10 @@
                 id_presentation INTEGER NOT NULL,
                 price DECIMAL(20,2),
                 cantidad INTEGER,
+                delivery TINYINT(1),
+                term VARCHAR(30),
+                entry TINYINT(1),
+                request VARCHAR(200),
                 PRIMARY KEY (id)                
                 )ENGINE=InnoDB DEFAULT CHARSET=latin1;
             </SQLFragment>
@@ -1084,7 +1089,7 @@
         
         <SQLStatement method="ADD_INVOICE_PRODUCT">
             <SQLFragment>
-                INSERT INTO invoice_product (id_invoice, id_order, id_product, id_presentation, price, cantidad) VALUES (?,?,?,?,?,?);
+                INSERT INTO invoice_product (id_invoice, id_order, id_product, id_presentation, price, cantidad, delivery, term, entry, request, status) VALUES (?,?,?,?,?,?,?,?,?,?,?);
             </SQLFragment>
         </SQLStatement>
         
@@ -1098,7 +1103,8 @@
         
         <SQLStatement method="GET_ORDER_PRODUCT">
             <SQLFragment>
-                SELECT p.id, p.name, p.code, p.description, p.price, p.variable, p.image, p.category, ip.price, ip.cantidad, ip.id, ip.id_presentation
+                SELECT p.id, p.name, p.code, p.description, p.price, p.variable, p.image, p.category, ip.price, ip.cantidad, ip.id, ip.id_presentation,
+                ip.delivery,ip.term,ip.entry,ip.request,ip.status
                 FROM products p, invoice_product ip, orders o 
                 WHERE p.id = ip.id_product AND ip.id_order = o.id  AND o.id=?
             </SQLFragment>
@@ -2109,6 +2115,50 @@
             </SQLFragment>
             
         </SQLStatement> 
+        
+        <SQLStatement method="CREATE_STATIONS_TABLE">
+            <SQLFragment>
+                CREATE TABLE stations(
+                id INTEGER AUTO_INCREMENT,
+                name VARCHAR(255) NOT NULL UNIQUE,                
+                PRIMARY KEY (id)
+                )ENGINE=InnoDB DEFAULT CHARSET=latin1;
+            </SQLFragment>
+        </SQLStatement>	
+        
+        <SQLStatement method="ADD_STATION">
+            <SQLFragment>
+                INSERT INTO stations (name) VALUES (?);
+            </SQLFragment>
+        </SQLStatement>        
+        
+        <SQLStatement method="GET_STATIONS">
+            <SQLFragment>
+                SELECT
+            </SQLFragment>
+            <SQLFragment>
+                * FROM stations
+            </SQLFragment>
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                WHERE {where}
+            </SQLFragment>    
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                ORDER BY {orderby}
+            </SQLFragment>        
+        </SQLStatement>
+        
+        <SQLStatement method="CREATE_PRODUCT_STATION_TABLE">
+            <SQLFragment>
+                CREATE TABLE product_station(
+                id INTEGER AUTO_INCREMENT,
+                product_id INTEGER NOT NULL,                
+                station_id INTEGER NOT NULL,
+                PRIMARY KEY (id),
+                FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE ON UPDATE CASCADE,                
+                FOREIGN KEY (station_id) REFERENCES stations(id) ON DELETE CASCADE ON UPDATE CASCADE
+                )ENGINE=InnoDB DEFAULT CHARSET=latin1;
+            </SQLFragment>
+        </SQLStatement>	
         
     </DAOStatements>
 </DAOConfiguration>

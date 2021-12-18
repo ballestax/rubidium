@@ -19,7 +19,7 @@ public interface OrderDAO {
 
     public ArrayList<Order> getOrderList() throws com.bacon.persistence.dao.DAOException;
 
-    public void addOrder(Order order) throws com.bacon.persistence.dao.DAOException;
+    public long addOrder(Order order) throws com.bacon.persistence.dao.DAOException;
 
     public void deleteOrder(int id) throws com.bacon.persistence.dao.DAOException;
 
