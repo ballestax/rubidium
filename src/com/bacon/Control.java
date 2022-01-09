@@ -169,6 +169,18 @@ public class Control {
         }
     }
 
+    public ConfigDB getConfigLocal(String clave) {
+        try {
+            String userName = app.getUser().getUsername();
+            String userDevice = Aplication.getUserDevice();            
+            JDBCConfigDAO configDAO = (JDBCConfigDAO) DAOFactory.getInstance().getConfigDAO();
+            return configDAO.getConfigDB(clave, userName, userDevice);
+        } catch (Exception e) {
+            logger.error("Error getting config.", e);
+            return new ConfigDB();
+        }
+    }
+
     public ConfigDB getConfig(String clave) {
         try {
             JDBCConfigDAO configDAO = (JDBCConfigDAO) DAOFactory.getInstance().getConfigDAO();
@@ -188,10 +200,10 @@ public class Control {
         }
     }
 
-    public boolean existConfig(String code) {
+    public boolean existConfig(String code, String user, String device) {
         try {
             JDBCConfigDAO configDAO = (JDBCConfigDAO) DAOFactory.getInstance().getConfigDAO();
-            return configDAO.existConfig(code) >= 1;
+            return configDAO.existConfig(code, user, device) >= 1;
         } catch (Exception e) {
             logger.error("Error checking config.", e);
             return false;
@@ -997,7 +1009,7 @@ public class Control {
             return false;
         }
     }
-    
+
     public void deleteItem(long id) {
         try {
             JDBCItemDAO itemDAO = (JDBCItemDAO) DAOFactory.getInstance().getItemDAO();
@@ -1437,7 +1449,7 @@ public class Control {
         if (!lastCycle.isOpened()) {
             end = lastCycle.getEnd();
         }
-    
+
         boolean onlyDelivery = Boolean.parseBoolean(map.get("onlyDelivery").toString()); // item is only delivery
         for (Object[] get : presentationsByItem) {
             long idPres = Long.parseLong(get[0].toString());

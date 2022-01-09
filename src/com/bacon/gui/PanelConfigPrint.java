@@ -47,7 +47,7 @@ public class PanelConfigPrint extends javax.swing.JPanel implements ActionListen
 
         lbInfo.setText("Selecccione la impresora POS");
 
-        ConfigDB config = app.getControl().getConfig(com.bacon.Configuration.PRINTER_SELECTED);
+        ConfigDB config = app.getControl().getConfigLocal(com.bacon.Configuration.PRINTER_SELECTED);
         printerName = config != null ? config.getValor() : app.getConfiguration().getProperty(com.bacon.Configuration.PRINTER_SELECTED, "");
         lbPrinter.setText("<html>Impresora seleccionada: <font color=blue>" + printerName + "</font></html>");
 
@@ -138,14 +138,16 @@ public class PanelConfigPrint extends javax.swing.JPanel implements ActionListen
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        String userName = app.getUser().getUsername();
+        String userDevice = Aplication.getUserDevice();
         if (ACTION_APPLY.equals(e.getActionCommand())) {
             String value = printerName;
-            app.getControl().addConfig(new ConfigDB(Configuration.PRINTER_SELECTED, ConfigDB.STRING, value));
+            app.getControl().addConfig(new ConfigDB(Configuration.PRINTER_SELECTED, ConfigDB.STRING, value, userName, userDevice));
         } else if (AC_SEL_PRINTER.equals(e.getActionCommand())) {
             PrintService printer = (PrintService) regPrinter.getSelectedItem();
             lbPrinter.setText("<html>Impresora seleccionada: <font color=blue>" + printer.getName() + "</font></html>");
             String value = printer.getName();
-            app.getControl().addConfig(new ConfigDB(Configuration.PRINTER_SELECTED, ConfigDB.STRING, value));
+            app.getControl().addConfig(new ConfigDB(Configuration.PRINTER_SELECTED, ConfigDB.STRING, value, userName, userDevice));
         }
     }
 }

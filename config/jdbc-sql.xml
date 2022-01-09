@@ -590,10 +590,13 @@
             <SQLFragment>
                 CREATE TABLE config (
                 id INTEGER AUTO_INCREMENT,
-                code VARCHAR(100) NOT NULL UNIQUE,
+                code VARCHAR(100) NOT NULL,
                 value VARCHAR(255),
                 type VARCHAR(255),
-                PRIMARY KEY (id));
+                user VARCHAR(100) NOT NULL,
+                device VARCHAR(100) NOT NULL,
+                PRIMARY KEY (id),
+                UNIQUE KEY unique_id(code,user,device));
             </SQLFragment>
         </SQLStatement>	
         
@@ -612,7 +615,7 @@
         
         <SQLStatement method="ADD_CONFIG">
             <SQLFragment>
-                INSERT INTO config (code,value, type) VALUES (?,?,?)
+                INSERT INTO config (code,value, type, user, device) VALUES (?,?,?,?,?)
             </SQLFragment>
             <SQLFragment>
                 ON DUPLICATE KEY UPDATE value= VALUES(value), type=VALUES(type)
@@ -630,13 +633,13 @@
                 UPDATE config SET 
                 value=?,
                 type=? 
-                WHERE code = ?
+                WHERE code = ? AND user = ? AND device = ?
             </SQLFragment>
         </SQLStatement>    
         
         <SQLStatement method="EXIST_CONFIG">
             <SQLFragment>
-                SELECT count(code) FROM config WHERE code=?;
+                SELECT count(code) FROM config WHERE code=? AND user=? AND device=?;
             </SQLFragment>
         </SQLStatement>    
         

@@ -232,33 +232,33 @@ public class PanelConfigTicket extends javax.swing.JPanel implements ActionListe
         jPanel2.add(Box.createVerticalGlue());
         jPanel2.add(Box.createVerticalStrut(space));
 
-        ConfigDB config = app.getControl().getConfig(com.bacon.Configuration.BS_NAME);
+        ConfigDB config = app.getControl().getConfigLocal(com.bacon.Configuration.BS_NAME);
         regName.setText(config != null ? config.getValor() : "NOMBRE");
-        config = app.getControl().getConfig(com.bacon.Configuration.BS_ID);
+        config = app.getControl().getConfigLocal(com.bacon.Configuration.BS_ID);
         regID.setText(config != null ? config.getValor() : "000000000-0");
-        config = app.getControl().getConfig(com.bacon.Configuration.BS_PHONE);
+        config = app.getControl().getConfigLocal(com.bacon.Configuration.BS_PHONE);
         regPhone.setText(config != null ? config.getValor() : "300 0000000");
-        config = app.getControl().getConfig(com.bacon.Configuration.BS_ADDRESS);
+        config = app.getControl().getConfigLocal(com.bacon.Configuration.BS_ADDRESS);
         regAddress.setText(config != null ? config.getValor() : "Direcion");
-        config = app.getControl().getConfig(com.bacon.Configuration.BS_CUSTOM_TOP);
+        config = app.getControl().getConfigLocal(com.bacon.Configuration.BS_CUSTOM_TOP);
         regCustom1.setText(config != null ? config.getValor() : "Personalizado 1");
-        config = app.getControl().getConfig(com.bacon.Configuration.BS_CUSTOM_BOTTON);
+        config = app.getControl().getConfigLocal(com.bacon.Configuration.BS_CUSTOM_BOTTON);
         regCustom2.setText(config != null ? config.getValor() : "Personalizado 2");
                         
-        config = app.getControl().getConfig(com.bacon.Configuration.BS_CUSTOM_QUALITY_MSG);
+        config = app.getControl().getConfigLocal(com.bacon.Configuration.BS_CUSTOM_QUALITY_MSG);
         regQualityMsg.setText(config != null ? config.getValor() : "");
-        config = app.getControl().getConfig(com.bacon.Configuration.BS_CUSTOM_QUALITY_SCALE);
+        config = app.getControl().getConfigLocal(com.bacon.Configuration.BS_CUSTOM_QUALITY_SCALE);
         regQualityScl.setText(config != null ? config.getValor() : "");
         
 
-        config = app.getControl().getConfig(CF_FACTURA_INICIAL);
+        config = app.getControl().getConfigLocal(CF_FACTURA_INICIAL);
         regInvoiceInit.setText(config != null ? config.getValor() : "1");
-        config = app.getControl().getConfig(CF_FACTURA_FINAL);
+        config = app.getControl().getConfigLocal(CF_FACTURA_FINAL);
         regInvoiceEnd.setText(config != null ? config.getValor() : "1");
-        config = app.getControl().getConfig(CF_FACTURA_ACTUAL);
+        config = app.getControl().getConfigLocal(CF_FACTURA_ACTUAL);
         regInvoice.setText(config != null ? config.getValor() : "1");
 
-        config = app.getControl().getConfig(com.bacon.Configuration.BS_CUSTOM_QUALITY_ENABLED);
+        config = app.getControl().getConfigLocal(com.bacon.Configuration.BS_CUSTOM_QUALITY_ENABLED);
         boolean selected = Boolean.valueOf(config != null ? config.getValor() : "false");
         cContQuality.setSelected(selected);        
         regQualityMsg.setEnabled(selected);
@@ -339,48 +339,51 @@ public class PanelConfigTicket extends javax.swing.JPanel implements ActionListe
     @Override
     public void actionPerformed(ActionEvent e) {
         if (ACTION_APPLY.equals(e.getActionCommand())) {
+            String userName = app.getUser().getUsername();
+            String userDevice = Aplication.getUserDevice();
+            
             String value = regName.getText();
-            app.getControl().addConfig(new ConfigDB(Configuration.BS_NAME, ConfigDB.STRING, value));
+            app.getControl().addConfig(new ConfigDB(Configuration.BS_NAME, ConfigDB.STRING, value, userName, userDevice));
 
             value = regID.getText();
 //            app.getConfiguration().setProperty(com.bacon.Configuration.BS_ID, value);
-            app.getControl().addConfig(new ConfigDB(Configuration.BS_ID, ConfigDB.STRING, value));
+            app.getControl().addConfig(new ConfigDB(Configuration.BS_ID, ConfigDB.STRING, value, userName, userDevice));
 
             value = regAddress.getText();
 //            app.getConfiguration().setProperty(com.bacon.Configuration.BS_ADDRESS, value);
-            app.getControl().addConfig(new ConfigDB(Configuration.BS_ADDRESS, ConfigDB.STRING, value));
+            app.getControl().addConfig(new ConfigDB(Configuration.BS_ADDRESS, ConfigDB.STRING, value, userName, userDevice));
 
             value = regPhone.getText();
-            app.getControl().addConfig(new ConfigDB(Configuration.BS_PHONE, ConfigDB.STRING, value));
+            app.getControl().addConfig(new ConfigDB(Configuration.BS_PHONE, ConfigDB.STRING, value, userName, userDevice));
 //            app.getConfiguration().setProperty(com.bacon.Configuration.BS_PHONE, value);
 
             value = regCustom1.getText();
-            app.getControl().addConfig(new ConfigDB(Configuration.BS_CUSTOM_TOP, ConfigDB.STRING, value));
+            app.getControl().addConfig(new ConfigDB(Configuration.BS_CUSTOM_TOP, ConfigDB.STRING, value, userName, userDevice));
 //            app.getConfiguration().setProperty(com.bacon.Configuration.BS_CUSTOM_TOP, value);
 
             value = regCustom2.getText();
-            app.getControl().addConfig(new ConfigDB(Configuration.BS_CUSTOM_BOTTON, ConfigDB.STRING, value));
+            app.getControl().addConfig(new ConfigDB(Configuration.BS_CUSTOM_BOTTON, ConfigDB.STRING, value, userName, userDevice));
 //            app.getConfiguration().setProperty(com.bacon.Configuration.BS_CUSTOM_BOTTON, value);
 
             value = regInvoiceInit.getText();
-            app.getControl().addConfig(new ConfigDB(CF_FACTURA_INICIAL, ConfigDB.INTEGER, value));
+            app.getControl().addConfig(new ConfigDB(CF_FACTURA_INICIAL, ConfigDB.INTEGER, value, userName, userDevice));
 
             value = regInvoiceEnd.getText();
-            app.getControl().addConfig(new ConfigDB(CF_FACTURA_FINAL, ConfigDB.INTEGER, value));
+            app.getControl().addConfig(new ConfigDB(CF_FACTURA_FINAL, ConfigDB.INTEGER, value, userName, userDevice));
 
             value = regInvoice.getText();
-            app.getControl().addConfig(new ConfigDB(CF_FACTURA_ACTUAL, ConfigDB.INTEGER, value));
+            app.getControl().addConfig(new ConfigDB(CF_FACTURA_ACTUAL, ConfigDB.INTEGER, value, userName, userDevice));
 
             value = regQualityMsg.getText();
-            app.getControl().addConfig(new ConfigDB(Configuration.BS_CUSTOM_QUALITY_MSG, ConfigDB.STRING, value));
+            app.getControl().addConfig(new ConfigDB(Configuration.BS_CUSTOM_QUALITY_MSG, ConfigDB.STRING, value, userName, userDevice));
 //            app.getConfiguration().setProperty(com.bacon.Configuration.BS_CUSTOM_QUALITY_MSG, value);
 
             value = regQualityScl.getText();
-            app.getControl().addConfig(new ConfigDB(Configuration.BS_CUSTOM_QUALITY_SCALE, ConfigDB.STRING, value));
+            app.getControl().addConfig(new ConfigDB(Configuration.BS_CUSTOM_QUALITY_SCALE, ConfigDB.STRING, value, userName, userDevice));
 //            app.getConfiguration().setProperty(com.bacon.Configuration.BS_CUSTOM_QUALITY_SCALE, value);
 
             boolean selected = cContQuality.isSelected();
-            app.getControl().addConfig(new ConfigDB(Configuration.BS_CUSTOM_QUALITY_ENABLED, ConfigDB.BOOLEAN, String.valueOf(selected)));
+            app.getControl().addConfig(new ConfigDB(Configuration.BS_CUSTOM_QUALITY_ENABLED, ConfigDB.BOOLEAN, String.valueOf(selected), userName, userDevice));
             app.getConfiguration().setProperty(com.bacon.Configuration.BS_CUSTOM_QUALITY_ENABLED, Boolean.toString(selected));
 
             app.getConfiguration().save();

@@ -167,7 +167,7 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
 
         showDescuento = false;
 
-        ConfigDB config = app.getControl().getConfig(Configuration.DOCUMENT_NAME);
+        ConfigDB config = app.getControl().getConfigLocal(Configuration.DOCUMENT_NAME);
         String docName = config != null && !config.getValor().isEmpty() ? config.getValor() : "Ticket";
         lbTitle.setText(docName);
         lbTitle.setToolTipText(getInfoCiclo(app.getControl().getLastCycle()));
@@ -244,7 +244,7 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
         lbEntregas.setHorizontalAlignment(SwingConstants.RIGHT);
         lbEntregas.setFont(font);
 
-        config = app.getControl().getConfig(Configuration.DELIVERY_VALUE);
+        config = app.getControl().getConfigLocal(Configuration.DELIVERY_VALUE);
         double valueDelivery = config != null ? (double) config.castValor() : 0;
         lbEntregas.setText(DCFORM_P.format(valueDelivery));
         lbDescuento1.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -476,7 +476,7 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
         regMesa.setText(tables.toArray());
 
 //        regService.setEnabled(true);
-        config = app.getControl().getConfig(Configuration.PRINT_PREV_DELIVERY);
+        config = app.getControl().getConfigLocal(Configuration.PRINT_PREV_DELIVERY);
         btPrint.setVisible(config != null ? (Boolean.valueOf(config.getValor())) : false);
 //        btPrint.setVisible(false);
         btPrint1.setVisible(false);
@@ -573,7 +573,7 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
         } else if (AC_CHANGE_DOMICILIO.equals(e.getActionCommand())) {
             String dom = regDomicilio.getText();
             if (entregasDom[0].equals(dom)) {  // DOMICILIO
-                ConfigDB config = app.getControl().getConfig(Configuration.DELIVERY_VALUE);
+                ConfigDB config = app.getControl().getConfigLocal(Configuration.DELIVERY_VALUE);
                 double valueDelivery = config != null ? (double) config.castValor() : 0;
                 if (spModelDel != null) {
                     spModelDel.setValue(1);
@@ -618,11 +618,11 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
             lbFactura.setText("<html><font>" + calculateProximoRegistro() + "</font></html>");
             lbFactura.addMouseListener(lbFacturaMouseListener);
 
-            ConfigDB config = app.getControl().getConfig(Configuration.PRINT_PREV_DELIVERY);
+            ConfigDB config = app.getControl().getConfigLocal(Configuration.PRINT_PREV_DELIVERY);
             if (config != null ? Boolean.valueOf(config.getValor()) : false) {
                 btPrint.setVisible(true);
             }
-            config = app.getControl().getConfig(Configuration.DOCUMENT_NAME);
+            config = app.getControl().getConfigLocal(Configuration.DOCUMENT_NAME);
             String docName = config != null && !config.getValor().isEmpty() ? config.getValor() : "Ticket";
             lbTitle.setText(docName);
 
@@ -635,12 +635,12 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
             showLocal();
         } else if (AC_PRINT_BILL.equals(e.getActionCommand())) {
             if (invoice != null) {
-                ConfigDB config = app.getControl().getConfig(Configuration.PRINTER_SELECTED);
+                ConfigDB config = app.getControl().getConfigLocal(Configuration.PRINTER_SELECTED);
                 String propPrinter = config != null ? config.getValor() : "";
                 app.getPrinterService().imprimirFactura(invoice, propPrinter);
             }
         } else if (AC_PRINT_ORDER.equals(e.getActionCommand())) {
-            ConfigDB config = app.getControl().getConfig(Configuration.PRINTER_SELECTED);
+            ConfigDB config = app.getControl().getConfigLocal(Configuration.PRINTER_SELECTED);
             String propPrinter = config != null ? config.getValor() : "";
             if (invoice != null) {
                 app.getPrinterService().imprimirGuide(invoice, propPrinter);
@@ -876,7 +876,7 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
     }
 
     private void calcularDelivery() {
-        ConfigDB config = app.getControl().getConfig(Configuration.DELIVERY_VALUE);
+        ConfigDB config = app.getControl().getConfigLocal(Configuration.DELIVERY_VALUE);
         double valueDelivery = config != null ? (double) config.castValor() : 0;
         int num = 0;
         if (tipo == TIPO_DOMICILIO) {
@@ -1393,7 +1393,7 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
         }
 
         if (!checkAllInventory()) {
-            ConfigDB config = app.getControl().getConfig(Configuration.INVOICE_OUT_STOCK);
+            ConfigDB config = app.getControl().getConfigLocal(Configuration.INVOICE_OUT_STOCK);
             String property = config != null ? config.getValor() : "false";
             boolean permit = Boolean.valueOf(property);
             GUIManager.showErrorMessage(null, "Los productos exceden las existencias en inventario.\n"
@@ -1692,7 +1692,7 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
     }
 
     private String calculateProximoRegistro() {
-        ConfigDB config = app.getControl().getConfig(Configuration.PREFIX_INVOICES);
+        ConfigDB config = app.getControl().getConfigLocal(Configuration.PREFIX_INVOICES);
         String prefijo = config != null ? config.getValor() : "";
 
         //get el numero de ceros a la izquierda para formatear el numero
@@ -1727,7 +1727,7 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
 
         String consFactura = "000";
 
-        ConfigDB cfFactura = app.getControl().getConfig(MyConstants.CF_FACTURA_ACTUAL);
+        ConfigDB cfFactura = app.getControl().getConfigLocal(MyConstants.CF_FACTURA_ACTUAL);
         if (cfFactura != null) {
 
             Integer consecutivo = (Integer) cfFactura.castValor();

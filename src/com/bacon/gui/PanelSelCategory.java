@@ -57,7 +57,7 @@ public class PanelSelCategory extends PanelCapturaMod implements ActionListener 
         boxContainer.removeAll();
         remove(boxContainer);
         
-        ConfigDB config = app.getControl().getConfig(Configuration.MAX_CATEGORIES_LIST);
+        ConfigDB config = app.getControl().getConfigLocal(Configuration.MAX_CATEGORIES_LIST);        
         int MAX = config != null ? (int) config.castValor() : 6;
 
         if (categories != null) {

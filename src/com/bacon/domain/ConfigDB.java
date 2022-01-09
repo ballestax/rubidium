@@ -18,6 +18,8 @@ public class ConfigDB {
     private String clave;
     private String tipo;
     private String valor;
+    private String user;
+    private String device;
     public static final String INTEGER = "INTEGER";
     public static final String STRING = "STRING";
     public static final String DOUBLE = "DOUBLE";
@@ -33,6 +35,14 @@ public class ConfigDB {
         this.clave = clave;
         this.tipo = tipo;
         this.valor = valor;
+    }
+
+    public ConfigDB(String clave, String tipo, String valor, String user, String device) {
+        this.clave = clave;
+        this.tipo = tipo;
+        this.valor = valor;
+        this.user = user;
+        this.device = device;
     }
 
     public int getId() {
@@ -67,6 +77,22 @@ public class ConfigDB {
         this.valor = valor;
     }
 
+    public String getUser() {
+        return user;
+    }
+
+    public void setUser(String user) {
+        this.user = user;
+    }
+
+    public void setDevice(String device) {
+        this.device = device;
+    }
+
+    public String getDevice() {
+        return device;
+    }
+
     public java.util.Date castValorToDate() throws Exception {
         if (!DATE.equals(tipo)) {
             throw new Exception("Tipo no valido");
@@ -82,29 +108,29 @@ public class ConfigDB {
         switch (tipo) {
             case INTEGER:
                 try {
-                    return Integer.parseInt(valor);
-                } catch (Exception e) {
-                    return null;
-                }
+                return Integer.parseInt(valor);
+            } catch (Exception e) {
+                return null;
+            }
             case DATE:
                 try {
-                    return DATE_FORMAT.parse(valor);
-                } catch (Exception e) {
-                    System.err.println("CastValor:"+e.getMessage());
-                    return null;
-                }
+                return DATE_FORMAT.parse(valor);
+            } catch (Exception e) {
+                System.err.println("CastValor:" + e.getMessage());
+                return null;
+            }
             case BOOLEAN:
                 try {
-                    return Boolean.valueOf(valor);
-                } catch (Exception e) {
-                    return null;
-                }
+                return Boolean.valueOf(valor);
+            } catch (Exception e) {
+                return null;
+            }
             case DOUBLE:
                 try {
-                    return Double.valueOf(valor);
-                } catch (Exception e) {
-                    return null;
-                }
+                return Double.valueOf(valor);
+            } catch (Exception e) {
+                return null;
+            }
             default:
                 throw new AssertionError();
         }
@@ -112,7 +138,7 @@ public class ConfigDB {
 
     @Override
     public String toString() {
-        return clave + "(" + tipo + ")->" + valor;
+        return clave + "(" + tipo + ")->" + valor + "[" + user + "/" + device + "]";
     }
 
 }

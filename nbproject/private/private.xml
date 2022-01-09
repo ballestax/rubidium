@@ -12,22 +12,19 @@
     </editor-bookmarks>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
+            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/persistence/JDBC/JDBCConfigDAO.java</file>
             <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/Aplication.java</file>
-            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/gui/PanelSnapShot.java</file>
-            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/gui/PanelAddProduct.java</file>
-            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/gui/PanelProducts.java</file>
+            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/gui/PanelConfigTicket.java</file>
+            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/Install.java</file>
+            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/gui/PanelSelCategory.java</file>
+            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/TimeWaste.java</file>
             <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/config/jdbc-sql.xml</file>
-            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/domain/CashMov.java</file>
-            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/gui/PanelInventory.java</file>
-            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/domain/Cycle.java</file>
-            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/gui/PanelAddItem.java</file>
+            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/gui/PanelConfigPrint.java</file>
             <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/Control.java</file>
-            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/gui/PanelCash.java</file>
-            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/gui/PanelAddExtra.java</file>
-            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/GUIManager.java</file>
-            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/gui/PanelListPedidos.java</file>
-            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/gui/PanelList.java</file>
-            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/persistence/JDBC/JDBCUtilDAO.java</file>
+            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/config/jdbc-dao.properties</file>
+            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/gui/PanelConfigOthers.java</file>
+            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/domain/ConfigDB.java</file>
+            <file>file:/home/lrod/Develop/NetBeansProjects/Bacon/src/com/bacon/LevenshteinDistance.java</file>
         </group>
     </open-files>
 </project-private>

@@ -81,7 +81,7 @@ public class PanelModPedidos extends PanelCapturaMod
         
         categorys = app.getControl().getCategoriesList();
         categorys.stream().forEach(category -> category.setColor(Utiles.colorAleatorio(200, 250)));
-        ConfigDB config = app.getControl().getConfig(Configuration.MAX_CATEGORIES_LIST);
+        ConfigDB config = app.getControl().getConfigLocal(Configuration.MAX_CATEGORIES_LIST);
         int MAX = config != null ? (int) config.castValor() : 4;
         if (categorys.size() < MAX) {
             categorys = app.getControl().getAllCategoriesList();
