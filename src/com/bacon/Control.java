@@ -1500,7 +1500,7 @@ public class Control {
         }
         return 0;
     }
-    
+
     public long addProductOrder(long idOrder, List<ProductoPed> products) {
         try {
             JDBCOrderDAO orderDAO = (JDBCOrderDAO) DAOFactory.getInstance().getOrderDAO();
@@ -1518,6 +1518,36 @@ public class Control {
             return orderList.getOrderList(where, order);
         } catch (DAOException ex) {
             logger.error("Error getting Order list.", ex);
+            return null;
+        }
+    }
+
+    public List<ProductoPed> getOrderProducts(long id) {
+        try {
+            JDBCOrderDAO orderList = (JDBCOrderDAO) DAOFactory.getInstance().getOrderDAO();
+            return orderList.getOrderProducts(id);
+        } catch (DAOException ex) {
+            logger.error("Error getting Order products.", ex);
+            return null;
+        }
+    }
+
+    public String getProductStations(long idProduct) {
+        try {
+            JDBCUtilDAO utilList = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
+            return utilList.getProductStations(idProduct);
+        } catch (DAOException ex) {
+            logger.error("Error getting stations by product.", ex);
+            return null;
+        }
+    }
+
+    public String getStation(int idStation) {
+        try {
+            JDBCUtilDAO utilList = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
+            return utilList.getStation(idStation);
+        } catch (DAOException ex) {
+            logger.error("Error getting stations by product.", ex);
             return null;
         }
     }

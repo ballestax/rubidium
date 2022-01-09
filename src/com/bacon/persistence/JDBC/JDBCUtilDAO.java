@@ -174,7 +174,9 @@ public class JDBCUtilDAO implements UtilDAO {
 
     public static final String CREATE_STATIONS_TABLE_KEY = "CREATE_STATIONS_TABLE";
     public static final String CREATE_PRODUCT_STATION_TABLE_KEY = "CREATE_PRODUCT_STATION_TABLE";
-    
+    public static final String GET_PRODUCT_STATIONS_KEY = "GET_PRODUCT_STATIONS";
+    public static final String GET_STATION_KEY = "GET_STATION_BY_ID";
+
     private static final Logger logger = Logger.getLogger(JDBCUtilDAO.class.getCanonicalName());
 
     public static final String NAMED_PARAM_KEY = "{key}";
@@ -231,11 +233,11 @@ public class JDBCUtilDAO implements UtilDAO {
         TABLE_NAME = "invoice_otherproduct";
         createTable(TABLE_NAME, CREATE_INVOICE_OTHER_PRODUCT_TABLE_KEY);
 
-        TABLE_NAME = "expenses_incomes";
-        createTable(TABLE_NAME, CREATE_EXPENSES_INCOMES_TABLE_KEY);
-
         TABLE_NAME = "expenses_categories";
         createTable(TABLE_NAME, CREATE_EXPENSES_CATEGORIES_TABLE_KEY);
+
+        TABLE_NAME = "expenses_incomes";
+        createTable(TABLE_NAME, CREATE_EXPENSES_INCOMES_TABLE_KEY);
 
         TABLE_NAME = "units";
         createTable(TABLE_NAME, CREATE_UNITS_TABLE_KEY);
@@ -254,10 +256,10 @@ public class JDBCUtilDAO implements UtilDAO {
 
         TABLE_NAME = "categories";
         createTable(TABLE_NAME, CREATE_CATEGORIES_TABLE_KEY);
-        
+
         TABLE_NAME = "stations";
         createTable(TABLE_NAME, CREATE_STATIONS_TABLE_KEY);
-        
+
         TABLE_NAME = "product_station";
         createTable(TABLE_NAME, CREATE_PRODUCT_STATION_TABLE_KEY);
 
@@ -2274,7 +2276,7 @@ public class JDBCUtilDAO implements UtilDAO {
             Date dEnd = new Date();
             if (status == 0) {
                 dEnd = rs.getTimestamp("end");
-            }            
+            }
             Object[] parameters = {idItem, EVENT, dInit, dEnd};
 
             ps = sqlStatements.buildSQLStatement(conn, COUNT_ITEM_SNAP_EVENT_KEY, parameters);
@@ -2552,6 +2554,52 @@ public class JDBCUtilDAO implements UtilDAO {
             DBManager.closeStatement(ps);
             DBManager.closeConnection(conn);
         }
+    }
+
+    public String getProductStations(long idProduct) throws DAOException {
+        String stations = "";
+        Connection conn = null;
+        PreparedStatement retrieve = null;
+        ResultSet rs = null;
+        Object[] parameters = {idProduct};
+        try {
+            conn = dataSource.getConnection();
+            retrieve = sqlStatements.buildSQLStatement(conn, GET_PRODUCT_STATIONS_KEY, parameters);
+            rs = retrieve.executeQuery();
+            while (rs.next()) {
+                stations = rs.getString("stations");
+            }
+        } catch (SQLException | IOException e) {
+            throw new DAOException("Could not properly retrieve the item presentations: " + e);
+        } finally {
+            DBManager.closeResultSet(rs);
+            DBManager.closeStatement(retrieve);
+            DBManager.closeConnection(conn);
+        }
+        return stations;
+    }
+    
+    public String getStation(long idStation) throws DAOException {
+        String station = "";
+        Connection conn = null;
+        PreparedStatement retrieve = null;
+        ResultSet rs = null;
+        Object[] parameters = {idStation};
+        try {
+            conn = dataSource.getConnection();
+            retrieve = sqlStatements.buildSQLStatement(conn, GET_STATION_KEY, parameters);
+            rs = retrieve.executeQuery();
+            while (rs.next()) {
+                station = rs.getString("name");
+            }
+        } catch (SQLException | IOException e) {
+            throw new DAOException("Could not properly retrieve the station: " + e);
+        } finally {
+            DBManager.closeResultSet(rs);
+            DBManager.closeStatement(retrieve);
+            DBManager.closeConnection(conn);
+        }
+        return station;
     }
 
 }

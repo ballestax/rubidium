@@ -21,12 +21,15 @@ public class Order {
     private int deliveryType;
     private int table;
     private int status;
+    private String consecutive;
     private List<ProductoPed> products;
 
     public Order() {
+        products = new ArrayList<>();
     }
 
     public Order(Long ciclo, int idWaitress, int table) {
+        products = new ArrayList<>();
         this.ciclo = ciclo;
         this.idWaitress = idWaitress;
         this.table = table;
@@ -130,6 +133,15 @@ public class Order {
     public boolean isEmpty() {
         return products == null || products.isEmpty();
     }
+
+    public String getConsecutive() {
+        return consecutive;
+    }
+
+    public void setConsecutive(String consecutive) {
+        this.consecutive = consecutive;
+    }
+    
     
 
 }

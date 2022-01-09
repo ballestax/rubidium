@@ -46,8 +46,6 @@ public class PanelSelProducts extends JPanel implements ActionListener, Property
 
     private void createComponents() {
         
-        System.out.println("creating components");
-
         compAlpha = Comparator.comparing(product -> product.getName().toLowerCase());
         compPrice = Comparator.comparing(Product::getPrice)
                 .thenComparing(product -> product.getName().toLowerCase());
@@ -61,7 +59,7 @@ public class PanelSelProducts extends JPanel implements ActionListener, Property
 
         panelTop.add(panelTopSearch);
 
-        panelSelCategory = app.getGuiManager().getPanelSelCategory();
+        panelSelCategory = new PanelSelCategory(app, null);
         panelSelCategory.addPropertyChangeListener(this);
         panelTopSearch.addPropertyChangeListener(panelSelCategory);
 
@@ -92,9 +90,9 @@ public class PanelSelProducts extends JPanel implements ActionListener, Property
         
         pnOrders = app.getGuiManager().getPanelOrders();
 
-        panelCategory = new PanelCategory(categorys, productsList, app, pnOrders);
-//        panelCategory.addPropertyChangeListener(pnPedido);
-//        panelCategory.addPropertyChangeListener(pnOrders);
+        panelCategory = new PanelCategory(categorys, productsList, app, pnOrders, PanelCategory.CARD_VIEW_2);
+        panelCategory.addPropertyChangeListener(pnOrders);
+        
         panelTopSearch.addPropertyChangeListener(panelCategory);
         PropertyChangeListener[] propertyListeners = panelCategory.getPropertyListeners();
         for (PropertyChangeListener propertyListener : propertyListeners) {

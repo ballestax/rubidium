@@ -181,7 +181,6 @@ public class ProductRenderer extends Box implements TableCellRenderer {
                     case ProductoPed.ST_SENDED_MOD:
                         lbIconSended.setIcon(iconSend1);
                         break;
-
                     case ProductoPed.ST_MOD_ADD_CANT:
                     case ProductoPed.ST_NEW_ADD:
                         lbIconSended.setIcon(iconPlus);
@@ -189,7 +188,6 @@ public class ProductRenderer extends Box implements TableCellRenderer {
                     case ProductoPed.ST_MOD_MIN_CANT:
                         lbIconSended.setIcon(iconMinus);
                         break;
-
                     case ProductoPed.ST_AVOIDED:
                         lbIconSended.setIcon(iconSend3);
                         break;

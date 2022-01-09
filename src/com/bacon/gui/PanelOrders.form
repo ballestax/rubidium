@@ -190,15 +190,19 @@
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="1" attributes="0">
-                  <EmptySpace min="-2" pref="310" max="-2" attributes="0"/>
-                  <Component id="regSubtotal" pref="0" max="32767" attributes="0"/>
+                  <Component id="lbStatus" max="32767" attributes="0"/>
+                  <EmptySpace min="-2" max="-2" attributes="0"/>
+                  <Component id="regSubtotal" pref="345" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
         <DimensionLayout dim="1">
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="0" attributes="0">
-                  <Component id="regSubtotal" min="-2" pref="30" max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                      <Component id="regSubtotal" min="-2" pref="30" max="-2" attributes="0"/>
+                      <Component id="lbStatus" max="32767" attributes="0"/>
+                  </Group>
                   <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
               </Group>
           </Group>
@@ -217,6 +221,11 @@
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, &quot;&quot;,&quot;&quot;,60)"/>
           </AuxValues>
+        </Component>
+        <Component class="javax.swing.JLabel" name="lbStatus">
+          <Properties>
+            <Property name="opaque" type="boolean" value="true"/>
+          </Properties>
         </Component>
       </SubComponents>
     </Container>

@@ -126,6 +126,7 @@ public class JDBCOrderDAO implements OrderDAO {
                 order.setCiclo(rs.getLong("idCycle"));
                 order.setNota(rs.getString("notes"));
                 order.setDeliveryType(rs.getInt("deliveryType"));
+                order.setConsecutive(rs.getString("consecutive"));
                 order.setStatus(rs.getInt("status"));
 
                 Object[] parameters = {order.getId()};
@@ -153,6 +154,7 @@ public class JDBCOrderDAO implements OrderDAO {
                         productoPed.setEntry(rs1.getBoolean(15));
                         productoPed.setEspecificaciones(rs1.getString(16));
                         productoPed.setStatus(rs1.getInt(17));
+                        productoPed.setStations(rs1.getString(18));
 
                         int idProdPed = rs1.getInt(11);
                         int idPresentation = rs1.getInt(12);
@@ -312,6 +314,7 @@ public class JDBCOrderDAO implements OrderDAO {
                 order.setCiclo(rs.getLong("idCycle"));
                 order.setNota(rs.getString("notes"));
                 order.setDeliveryType(rs.getInt("deliveryType"));
+                order.setConsecutive(rs.getString("consecutive"));
                 order.setStatus(rs.getInt("status"));
                 orders.add(order);
             }
@@ -363,6 +366,7 @@ public class JDBCOrderDAO implements OrderDAO {
                 order.setCiclo(rs.getLong("idCycle"));
                 order.setNota(rs.getString("notes"));
                 order.setDeliveryType(rs.getInt("deliveryType"));
+                order.setConsecutive(rs.getString("consecutive"));
                 order.setStatus(rs.getInt("status"));
                 orders.add(order);
             }
@@ -412,6 +416,7 @@ public class JDBCOrderDAO implements OrderDAO {
                 order.setCiclo(rs.getLong("idCycle"));
                 order.setNota(rs.getString("notes"));
                 order.setDeliveryType(rs.getInt("deliveryType"));
+                order.setConsecutive(rs.getString("consecutive"));
                 order.setStatus(rs.getInt("status"));
 
                 Object[] parameters = {order.getId()};
@@ -419,6 +424,7 @@ public class JDBCOrderDAO implements OrderDAO {
                 try {
                     retrieve = sqlStatements.buildSQLStatement(conn, GET_ORDER_PRODUCT_KEY, parameters);
                     rs1 = retrieve.executeQuery();
+                    System.out.println(retrieve);
                     Product product;
                     while (rs1.next()) { //add products
                         product = new Product();
@@ -439,6 +445,7 @@ public class JDBCOrderDAO implements OrderDAO {
                         productoPed.setEntry(rs1.getBoolean(15));
                         productoPed.setEspecificaciones(rs1.getString(16));
                         productoPed.setStatus(rs1.getInt(17));
+                        productoPed.setStations(rs1.getString(18));
 
                         int idProdPed = rs1.getInt(11);
 
@@ -510,8 +517,17 @@ public class JDBCOrderDAO implements OrderDAO {
                             throw new DAOException("Could not properly retrieve the additional: " + e);
 
                         }
-//                        System.out.println("ADD to :" + order.getFactura() + " ->" + productoPed.getProduct().getName());
-                        order.addProduct(productoPed);
+
+                        if (order.getProducts().contains(productoPed)) {
+                            System.out.println("order contain product");
+                            int idx = order.getProducts().indexOf(productoPed);
+                            int cant = productoPed.getCantidad();
+                            ProductoPed prod = order.getProducts().get(idx);
+                            prod.setCantidad(prod.getCantidad() + cant);
+                            order.getProducts().set(idx, prod);
+                        } else {
+                            order.addProduct(productoPed);
+                        }
                     }
                 } catch (SQLException e) {
                     throw new DAOException("Could not properly retrieve the product " + e);
@@ -533,6 +549,147 @@ public class JDBCOrderDAO implements OrderDAO {
             DBManager.closeConnection(conn);
         }
         return orders;
+    }
+
+    public ArrayList<ProductoPed> getOrderProducts(long orderId) throws DAOException {
+        
+        ArrayList<ProductoPed> products = new ArrayList<>();
+
+        Connection conn = null;
+        PreparedStatement retrieve = null;
+        ResultSet rs = null, rs1 = null, rs2 = null, rs3 = null, rsx = null;
+        
+        try {
+            conn = dataSource.getConnection();
+
+            Object[] parameters = {orderId};
+
+            try {
+                retrieve = sqlStatements.buildSQLStatement(conn, GET_ORDER_PRODUCT_KEY, parameters);
+                rs1 = retrieve.executeQuery();
+        
+                Product product;
+                while (rs1.next()) { //add products
+                    product = new Product();
+                    product.setId(rs1.getInt(1));
+                    product.setName(rs1.getString(2));
+                    product.setCode(rs1.getString(3));
+                    product.setDescription(rs1.getString(4));
+                    product.setPrice(rs1.getBigDecimal(5).doubleValue());
+                    product.setImage(rs1.getString(6));
+                    product.setCategory(rs1.getString(7));
+                    product.setVariablePrice(rs1.getBoolean(8));
+                    ProductoPed productoPed = new ProductoPed(product);
+
+                    productoPed.setPrecio(rs1.getBigDecimal(9).doubleValue());
+                    productoPed.setCantidad(rs1.getInt(10));
+                    productoPed.setDelivery(rs1.getBoolean(13));
+                    productoPed.setTermino(rs1.getString(14));
+                    productoPed.setEntry(rs1.getBoolean(15));
+                    productoPed.setEspecificaciones(rs1.getString(16));
+                    productoPed.setStatus(rs1.getInt(17));
+                    productoPed.setStations(rs1.getString(18));
+
+                    int idProdPed = rs1.getInt(11);
+
+                    Object[] parameters2 = {idProdPed};
+                    int idPresentation = rs1.getInt(12);
+
+                    Object[] parameters1 = {idPresentation};
+                    try {
+                        retrieve = sqlStatements.buildSQLStatement(conn, GET_PRESENTATION_KEY, parameters1);
+                        rsx = retrieve.executeQuery();
+                        Presentation pres = null;
+                        while (rsx.next()) {
+                            pres = new Presentation();
+                            pres.setId(rsx.getInt(1));
+                            pres.setIDProd(rsx.getInt(2));
+                            pres.setSerie(rsx.getInt(3));
+                            pres.setName(rsx.getString(4));
+                            pres.setPrice(rsx.getDouble(5));
+                            pres.setDefault(rsx.getBoolean(6));
+                            pres.setEnabled(rsx.getBoolean(7));
+                        }
+                        productoPed.setPresentation(pres);
+                    } catch (SQLException e) {
+                        throw new DAOException("Could not properly retrieve the presentation " + e);
+                    } catch (IOException e) {
+                        throw new DAOException("Could not properly retrieve the presentation: " + e);
+                    }
+
+                    try {
+                        retrieve = sqlStatements.buildSQLStatement(conn, GET_ADDITIONAL_PRODUCT_KEY, parameters2);
+                        rs2 = retrieve.executeQuery();
+                        Additional addition;
+                        while (rs2.next()) {
+
+                            addition = new Additional();
+                            addition.setId(rs2.getInt(1));
+                            addition.setName(rs2.getString(2));
+                            addition.setMeasure(rs2.getString(4));
+                            addition.setPrecio(rs2.getBigDecimal(5).doubleValue());
+
+                            int cant = rs2.getInt(6);
+
+                            productoPed.addAdicional(addition, cant);
+                        }
+                    } catch (SQLException e) {
+                        throw new DAOException("Could not properly retrieve the additional " + e);
+                    } catch (IOException e) {
+                        throw new DAOException("Could not properly retrieve the additional: " + e);
+
+                    }
+
+                    try {
+                        retrieve = sqlStatements.buildSQLStatement(conn, GET_EXCLUSION_PRODUCT_KEY, parameters2);
+                        rs3 = retrieve.executeQuery();
+                        Ingredient ingredient;
+                        while (rs3.next()) {
+
+                            ingredient = new Ingredient();
+                            ingredient.setId(rs3.getInt(1));
+                            ingredient.setName(rs3.getString(2));
+                            ingredient.setCode(rs3.getString(3));
+                            ingredient.setMeasure(rs3.getString(4));
+
+                            productoPed.addExclusion(ingredient);
+                        }
+                    } catch (SQLException e) {
+                        throw new DAOException("Could not properly retrieve the additional " + e);
+                    } catch (IOException e) {
+                        throw new DAOException("Could not properly retrieve the additional: " + e);
+
+                    }
+
+                    if (products.contains(productoPed)) {
+                        System.out.println("order contain product");
+                        int idx = products.indexOf(productoPed);
+                        int cant = productoPed.getCantidad();
+                        ProductoPed prod = products.get(idx);
+                        prod.setCantidad(prod.getCantidad() + cant);
+                        products.set(idx, prod);
+                    } else {
+                        products.add(productoPed);
+                    }
+                }
+            } catch (SQLException e) {
+                throw new DAOException("Could not properly retrieve the product " + e);
+            } catch (IOException e) {
+                throw new DAOException("Could not properly retrieve the product: " + e);
+            }
+
+        } catch (SQLException e) {
+            throw new DAOException("Could not proper retrieve the Order: " + e);
+        } finally {
+            DBManager.closeResultSet(rs3);
+            DBManager.closeResultSet(rs2);
+            DBManager.closeResultSet(rsx);
+            DBManager.closeResultSet(rs1);
+            DBManager.closeResultSet(rs);
+            DBManager.closeStatement(retrieve);
+            DBManager.closeConnection(conn);
+        }
+        return products;
     }
 
     public ArrayList<Order> getOrderListWhitProducts(String where, String orderBy) throws DAOException {
@@ -571,6 +728,7 @@ public class JDBCOrderDAO implements OrderDAO {
                 order.setCiclo(rs.getLong("idCycle"));
                 order.setNota(rs.getString("notes"));
                 order.setDeliveryType(rs.getInt("deliveryType"));
+                order.setConsecutive(rs.getString("consecutive"));
                 order.setStatus(rs.getInt("status"));
 
                 order.addProduct(new ProductoPed(new Product(rs.getInt(18), rs.getString(19), 0, "")));
@@ -607,6 +765,7 @@ public class JDBCOrderDAO implements OrderDAO {
             Object[] parameters = {
                 order.getFecha(),
                 order.getDeliveryType(),
+                order.getConsecutive(),
                 order.getValor(),
                 order.getIdClient(),
                 order.getIdWaitress(),
@@ -810,6 +969,7 @@ public class JDBCOrderDAO implements OrderDAO {
                 order.setCiclo(rs.getLong("idCycle"));
                 order.setNota(rs.getString("notes"));
                 order.setDeliveryType(rs.getInt("deliveryType"));
+                order.setConsecutive(rs.getString("consecutive"));
                 order.setStatus(rs.getInt("status"));
                 orders.add(order);
 
@@ -838,6 +998,7 @@ public class JDBCOrderDAO implements OrderDAO {
                         productoPed.setEntry(rs1.getBoolean(15));
                         productoPed.setEspecificaciones(rs1.getString(16));
                         productoPed.setStatus(rs1.getInt(17));
+                        productoPed.setStations(rs1.getString(18));
 
                         int idProdPed = rs1.getInt(11);
                         int idPresentation = rs1.getInt(12);
@@ -912,7 +1073,16 @@ public class JDBCOrderDAO implements OrderDAO {
 
                         }
 
-                        order.addProduct(productoPed);
+                        if (order.getProducts().contains(productoPed)) {
+                            System.out.println("order contain product");
+                            int idx = order.getProducts().indexOf(productoPed);
+                            int cant = productoPed.getCantidad();
+                            ProductoPed prod = order.getProducts().get(idx);
+                            prod.setCantidad(prod.getCantidad() + cant);
+                            order.getProducts().set(idx, prod);
+                        } else {
+                            order.addProduct(productoPed);
+                        }
                     }
                 } catch (SQLException e) {
                     throw new DAOException("Could not properly retrieve the product " + e);
@@ -1119,6 +1289,7 @@ public class JDBCOrderDAO implements OrderDAO {
                 order.setCiclo(rs.getLong("idCycle"));
                 order.setNota(rs.getString("notes"));
                 order.setDeliveryType(rs.getInt("deliveryType"));
+                order.setConsecutive(rs.getString("consecutive"));
                 order.setStatus(rs.getInt("status"));
                 orders.add(order);
 
@@ -1136,7 +1307,7 @@ public class JDBCOrderDAO implements OrderDAO {
     public long addProductsOrder(long idOrder, List<ProductoPed> products) throws DAOException {
         Connection conn = null;
         PreparedStatement ps = null;
-        ResultSet rs = null;        
+        ResultSet rs = null;
 
         try {
             conn = dataSource.getConnection();

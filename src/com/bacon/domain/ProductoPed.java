@@ -24,6 +24,7 @@ public class ProductoPed {
     protected boolean delivery;
     protected HashMap<Integer, HashMap> data;
     protected int status;
+    protected String stations;
 
     public static final int ST_NORMAL = 0;
     public static final int ST_SENDED = 1;
@@ -234,6 +235,14 @@ public class ProductoPed {
 
     public void setDelivery(boolean delivery) {
         this.delivery = delivery;
+    }
+
+    public void setStations(String stations) {
+        this.stations = stations;
+    }
+
+    public String getStations() {
+        return stations;
     }
 
     public HashMap<Integer, HashMap> getData() {

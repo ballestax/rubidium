@@ -4,7 +4,6 @@ import com.bacon.Aplication;
 import com.bacon.domain.Table;
 import com.bacon.domain.Waiter;
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
@@ -14,11 +13,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
-import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import org.dz.PanelCapturaMod;
-import org.dz.Utiles;
 
 /**
  *
@@ -85,10 +82,7 @@ public class PanelTakeOrders extends PanelCapturaMod implements ActionListener {
         if (evt.getPropertyName().contains(AC_SEL_TABLE_)) {
             Table table = (Table) evt.getOldValue();
             if (table.getIdOrder() > 0) {
-                System.out.println("idOrder:"+table.getIdOrder());
-                System.out.println("idWaiter:" +table.getIdWaiter());
                 Waiter waiter = app.getControl().getWaitressByID(table.getIdWaiter());
-                System.out.println("waiter = " + waiter);
                 showTakeOrder(waiter, table);
                 return;
             }
@@ -100,10 +94,10 @@ public class PanelTakeOrders extends PanelCapturaMod implements ActionListener {
 
             if (selected != null) {
                 Waiter mesero = (Waiter) selected;
-//                System.out.println("Selecciono:" + mesero.getName());
                 TableRender render = (TableRender) evt.getNewValue();
                 String html = "<html><font color=" + mesero.getColor() + ">" + mesero.getName().toUpperCase() + "</html>";
-                render.setPeople(Utiles.aleatorio(1, 4));
+//                render.setPeople(Utiles.aleatorio(1, 4));
+                
                 render.setWaiter(html);
                 showTakeOrder(mesero, render.getTable());
             }
@@ -122,6 +116,7 @@ public class PanelTakeOrders extends PanelCapturaMod implements ActionListener {
             if (render != null) {
                 if (table.getStatus() == Table.TABLE_ST_PEDIDO_EN_COCINA) {
                     Image imagen = app.getImgManager().getImagen(app.getFolderIcons() + "upload.png", 20, 20);
+                    render.setOrder("#"+idOrder);
                     render.setStatus(table.getStatus());
                     render.setIcon(new ImageIcon(imagen));
                 }
@@ -133,24 +128,24 @@ public class PanelTakeOrders extends PanelCapturaMod implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (e.getActionCommand().contains(AC_SEL_TABLE_)) {
-            String table = e.getActionCommand().substring(AC_SEL_TABLE_.length());
-            ArrayList<Waiter> waitresslList = app.getControl().getWaitresslList("status=1", "name");
-            Object selected = JOptionPane.showInputDialog(null, "Seleccione mesero:", "Mesero",
-                    JOptionPane.QUESTION_MESSAGE, null,
-                    waitresslList.toArray(), null);
-
-            if (selected != null) {
-                Waiter mesero = (Waiter) selected;                
-                JButton btn = ((JButton) e.getSource());
-                btn.setText("<html>Mesa:<br><font color=blue size=+1>" + table + "<br><font color=red>" + mesero.getName() + "</html>");
-            }
-
-        }
+//        if (e.getActionCommand().contains(AC_SEL_TABLE_)) {
+//            String table = e.getActionCommand().substring(AC_SEL_TABLE_.length());
+//            ArrayList<Waiter> waitresslList = app.getControl().getWaitresslList("status=1", "name");
+//            Object selected = JOptionPane.showInputDialog(null, "Seleccione mesero:", "Mesero",
+//                    JOptionPane.QUESTION_MESSAGE, null,
+//                    waitresslList.toArray(), null);
+//
+//            if (selected != null) {
+//                Waiter mesero = (Waiter) selected;                
+//                JButton btn = ((JButton) e.getSource());
+//                btn.setText("<html>Mesa:<br><font color=blue size=+1>" + table + "<br><font color=red>" + mesero.getName() + "</html>");
+//            }
+//
+//        }
     }
 
     private void showTakeOrder(Waiter waiter, Table table) {
-
+        
         pnOrders.setupData(waiter, table);
         table.setIdWaiter(waiter.getId());
 
@@ -165,7 +160,6 @@ public class PanelTakeOrders extends PanelCapturaMod implements ActionListener {
     }
 
     public void showTables() {
-
         pnContainer.removeAll();
         pnContainer.add(pnTables);
         pnContainer.updateUI();

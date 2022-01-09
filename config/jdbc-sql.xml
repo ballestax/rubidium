@@ -67,7 +67,8 @@
                     |CREATE_CATEGORIES_TABLE|ADD_CATEGORY|GET_CATEGORY_PROD|UPDATE_CATEGORY
                     |ADD_PRESENTATION|UPDATE_PRESENTATION|UPDATE_PRESENTATION_TO_DEFAULT|UPDATE_PRESENTATION_TO_DEFAULT_BY_ID
                     |ADD_ORDER_PRODUCT|GET_ORDER_PRODUCT
-                    |CREATE_STATIONS_TABLE|ADD_STATION|GET_STATIONS|CREATE_PRODUCT_STATION_TABLE
+                    |CREATE_STATIONS_TABLE|ADD_STATION|GET_STATIONS|CREATE_PRODUCT_STATION_TABLE|GET_PRODUCT_STATIONS
+                    |GET_STATION_BY_ID
                     ) #REQUIRED
                     
 	>
@@ -953,9 +954,10 @@
         <SQLStatement method="CREATE_ORDERS_TABLE">
             <SQLFragment>
                 CREATE TABLE orders(
-                id INTEGER AUTO_INCREMENT,
+                id INTEGER AUTO_INCREMENT,                 
                 take_date DATETIME,
                 deliveryType INTEGER,
+                consecutive VARCHAR(11),
                 value DECIMAL(20,2),
                 idClient VARCHAR(11),
                 idWaiter INTEGER,
@@ -971,7 +973,7 @@
         
         <SQLStatement method="ADD_ORDER">
             <SQLFragment>
-                INSERT INTO orders (take_date,deliveryType,value,idClient,idWaiter,idTable,idCycle,notes,status) VALUES (?,?,?,?,?,?,?,?,?);
+                INSERT INTO orders (take_date,deliveryType,consecutive,value,idClient,idWaiter,idTable,idCycle,notes,status) VALUES (?,?,?,?,?,?,?,?,?,?);
             </SQLFragment>
         </SQLStatement>        
         
@@ -1082,6 +1084,7 @@
                 term VARCHAR(30),
                 entry TINYINT(1),
                 request VARCHAR(200),
+                status TINYINT(1) NOT NULL DEFAULT '0',
                 PRIMARY KEY (id)                
                 )ENGINE=InnoDB DEFAULT CHARSET=latin1;
             </SQLFragment>
@@ -1104,9 +1107,19 @@
         <SQLStatement method="GET_ORDER_PRODUCT">
             <SQLFragment>
                 SELECT p.id, p.name, p.code, p.description, p.price, p.variable, p.image, p.category, ip.price, ip.cantidad, ip.id, ip.id_presentation,
-                ip.delivery,ip.term,ip.entry,ip.request,ip.status
-                FROM products p, invoice_product ip, orders o 
-                WHERE p.id = ip.id_product AND ip.id_order = o.id  AND o.id=?
+                ip.delivery,ip.term,ip.entry,ip.request,ip.status, GROUP_CONCAT(ps.station_id ORDER By ps.station_id ASC) AS stations
+                FROM products p, invoice_product ip, orders o, product_station ps
+                WHERE p.id = ip.id_product AND ip.id_order = o.id AND ps.product_id=p.id AND o.id=?
+                GROUP BY ip.id
+            </SQLFragment>
+        </SQLStatement>
+        
+        
+        <SQLStatement method="GET_PRODUCT_STATIONS">
+            <SQLFragment>
+                SELECT GROUP_CONCAT(ps.station_id) AS stations
+                FROM product_station ps
+                WHERE ps.product_id=?
             </SQLFragment>
         </SQLStatement>
         
@@ -1435,7 +1448,7 @@
                 CREATE TABLE expenses_incomes(
                 id INTEGER AUTO_INCREMENT,
                 type INTEGER NOT NULL,
-                desc VARCHAR(100),
+                description VARCHAR(100),
                 value DECIMAL(20,2),
                 note VARCHAR(255),
                 cycle_id INTEGER NOT NULL,
@@ -1449,7 +1462,7 @@
         
         <SQLStatement method="ADD_EXPENSE_INCOME">
             <SQLFragment>
-                INSERT INTO expenses_incomes (type,desc,value,note,cycle_id,category_id) 
+                INSERT INTO expenses_incomes (type,description,value,note,cycle_id,category_id) 
                 VALUES (?,?,?,?,?,?)
             </SQLFragment>
         </SQLStatement>
@@ -2159,6 +2172,12 @@
                 )ENGINE=InnoDB DEFAULT CHARSET=latin1;
             </SQLFragment>
         </SQLStatement>	
+        
+        <SQLStatement method="GET_STATION_BY_ID">
+            <SQLFragment>
+                SELECT * from stations WHERE id=?;
+            </SQLFragment>   
+        </SQLStatement>
         
     </DAOStatements>
 </DAOConfiguration>

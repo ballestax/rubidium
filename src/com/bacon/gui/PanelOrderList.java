@@ -22,6 +22,8 @@ import javax.swing.DefaultListSelectionModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingWorker;
@@ -83,7 +85,27 @@ public class PanelOrderList extends javax.swing.JPanel implements ListSelectionL
         labelInfo = new JLabel();
 
         panelDetail.setLayout(new BorderLayout());
-        panelDetail.add(labelInfo);
+
+        JPanel panelInfo = new JPanel(new BorderLayout());
+        Box boxButtons = new Box(BoxLayout.X_AXIS);
+        JButton btGenInvoice = new JButton("Facturar");
+        JButton btCancelar = new JButton("Cancelar");
+        JButton btComandas = new JButton("Camandas");
+        JButton btGuia = new JButton("Guia");
+        JButton btFactura = new JButton("Factura");
+        boxButtons.add(btGenInvoice);
+        boxButtons.add(btCancelar);
+        boxButtons.add(btComandas);
+        boxButtons.add(btGuia);
+        boxButtons.add(btFactura);
+
+        JScrollPane scroll = new JScrollPane();
+        scroll.setViewportView(labelInfo);
+
+        panelInfo.add(scroll, BorderLayout.CENTER);
+        panelInfo.add(boxButtons, BorderLayout.SOUTH);
+
+        panelDetail.add(panelInfo);
 
         splitPane.setLeftComponent(scTableOrders);
         splitPane.setRightComponent(panelDetail);
@@ -119,39 +141,37 @@ public class PanelOrderList extends javax.swing.JPanel implements ListSelectionL
     public void showTable(Order order) {
         List<ProductoPed> productos = order.getProducts();
         StringBuilder str = new StringBuilder();
-            str.append("<html><table width=\"600\" cellspacing=\"0\" border=\"1\">");
-            str.append("<tr bgcolor=\"#A4C1FF\">");
-            str.append("<td>").append("Producto").append("</td>");
+        str.append("<html><table width=\"600\" cellspacing=\"0\" border=\"1\">");
+        str.append("<tr bgcolor=\"#A4C1FF\">");
+        str.append("<td>").append("Producto").append("</td>");
 //            str.append("<td>").append("Codigo").append("</td>");
-            str.append("<td>").append("Cant.").append("</td>");
-            str.append("<td>").append("V. Uni").append("</td>");
-            str.append("<td>").append("V. total").append("</td></tr>");
-            
-            double total = 0;
+        str.append("<td>").append("Cant.").append("</td>");
+        str.append("<td>").append("V. Uni").append("</td>");
+        str.append("<td>").append("V. total").append("</td></tr>");
 
-            for (ProductoPed product : productos) {
+        double total = 0;
 
-                int cantidad = product.getCantidad();
-                double price = product.getValueAdicionales() + product.getPrecio();
-                total += cantidad * price;
-                str.append("<tr><td bgcolor=\"#F6FFDB\">").append((product.getPresentation() != null
-                        ? (product.getProduct().getName() + " (" + product.getPresentation().getName() + ")") : product.getProduct().getName()).toUpperCase());
-                for (AdditionalPed adicional : product.getAdicionales()) {
-                    str.append("<br><font color=blue size=2> +").append(adicional.getAdditional().getName())
-                            .append("(x").append(adicional.getCantidad()).append(")").append("</font>");
-                }
-                
-                str.append("<br>").append(product.hasExcluisones() ? "Sin: " : "").append("<font color=red size=2>").append(product.getStExclusiones()).append("</font></td>");
-//                str.append("<td bgcolor=\"#FFFFFF\">").append(product.getProduct().getCode()).append("</td>");
-                str.append("<td bgcolor=\"#FFFFFF\" align=\"right\">").append(app.DCFORM_P.format(cantidad)).append("</td>");
-                str.append("<td bgcolor=\"#FFFFFF\" align=\"right\">").append(app.DCFORM_P.format(price)).append("</td>");
-                str.append("<td bgcolor=\"#FFFFFF\" align=\"right\">").append(app.DCFORM_P.format(cantidad * price)).append("</td>");
-                str.append("</tr>");
+        for (ProductoPed product : productos) {
+
+            int cantidad = product.getCantidad();
+            double price = product.getValueAdicionales() + product.getPrecio();
+            total += cantidad * price;
+            str.append("<tr><td bgcolor=\"#F6FFDB\">").append((product.getPresentation() != null
+                    ? (product.getProduct().getName() + " (" + product.getPresentation().getName() + ")") : product.getProduct().getName()).toUpperCase());
+            for (AdditionalPed adicional : product.getAdicionales()) {
+                str.append("<br><font color=blue size=2> +").append(adicional.getAdditional().getName())
+                        .append("(x").append(adicional.getCantidad()).append(")").append("</font>");
             }
-            str.append("</table></html>");
 
-            
-        
+            str.append("<br>").append(product.hasExcluisones() ? "Sin: " : "").append("<font color=red size=2>").append(product.getStExclusiones()).append("</font></td>");
+//                str.append("<td bgcolor=\"#FFFFFF\">").append(product.getProduct().getCode()).append("</td>");
+            str.append("<td bgcolor=\"#FFFFFF\" align=\"right\">").append(app.DCFORM_P.format(cantidad)).append("</td>");
+            str.append("<td bgcolor=\"#FFFFFF\" align=\"right\">").append(app.DCFORM_P.format(price)).append("</td>");
+            str.append("<td bgcolor=\"#FFFFFF\" align=\"right\">").append(app.DCFORM_P.format(cantidad * price)).append("</td>");
+            str.append("</tr>");
+        }
+        str.append("</table></html>");
+
         labelInfo.setText(str.toString());
     }
 

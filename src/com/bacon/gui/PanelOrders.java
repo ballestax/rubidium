@@ -1,7 +1,9 @@
 package com.bacon.gui;
 
 import com.bacon.Aplication;
+import com.bacon.Configuration;
 import com.bacon.GUIManager;
+import com.bacon.domain.ConfigDB;
 import com.bacon.domain.Cycle;
 import com.bacon.domain.Ingredient;
 import com.bacon.domain.Item;
@@ -103,6 +105,7 @@ public class PanelOrders extends PanelCapturaMod implements
     private ImageIcon iconCancel;
     private ImageIcon iconBack;
     private boolean mod = false;
+    private Order order;
 
     /**
      * Creates new form PanelOrders
@@ -121,12 +124,10 @@ public class PanelOrders extends PanelCapturaMod implements
     }
 
     private void createComponents() {
-
         UIDefaults defaults = UIManager.getLookAndFeelDefaults();
         if (defaults.get("Table.alternateRowColor") == null) {
             defaults.put("Table.alternateRowColor", new Color(240, 240, 240));
         }
-
         lbInfo.setBorder(BorderFactory.createEtchedBorder());
 
         Font font = new Font("Arial", 1, 18);
@@ -243,7 +244,7 @@ public class PanelOrders extends PanelCapturaMod implements
         tgEntry.addActionListener(this);
         tgEntry.setFocusPainted(false);
 
-        icon = new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "clean.png", 12, 12));
+        icon = new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "trash.png", 12, 12));
         btClear.setMargin(new Insets(0, 0, 0, 0));
         btClear.setIcon(icon);
         btClear.setActionCommand(AC_CLEAR_ORDER);
@@ -262,6 +263,7 @@ public class PanelOrders extends PanelCapturaMod implements
         btStay.setText("Enviar");
         btStay.setActionCommand(AC_SEND_ORDER);
         btStay.addActionListener(this);
+        btStay.setVisible(false);
 
         iconCancel = new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "cancel.png", 20, 20));
         iconBack = new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "back.png", 20, 20));
@@ -282,7 +284,7 @@ public class PanelOrders extends PanelCapturaMod implements
         btHold.setIcon(icon);
         btHold.setMargin(new Insets(0, 0, 0, 0));
         btHold.setText("Enviar");
-        btHold.setActionCommand(AC_SEND_ORDER);
+        btHold.setActionCommand(AC_SEND_AND_HOLD_ORDER);
         btHold.addActionListener(this);
 
         regSubtotal.setTextAligment(SwingConstants.RIGHT);
@@ -317,6 +319,7 @@ public class PanelOrders extends PanelCapturaMod implements
         loadDatas();
 
     }
+    public static final String AC_SEND_AND_HOLD_ORDER = "AC_SEND_AND_HOLD_ORDER";
     public Font font;
 
     public void loadDatas() {
@@ -337,31 +340,51 @@ public class PanelOrders extends PanelCapturaMod implements
 
     public void setupData(Waiter waiter, Table table) {
         regWaiter.setSelected(waiter);
+        regWaiter.setEditable(false);
         regTable.setSelected(table);
+        regTable.setEditable(false);
         selTable = table;
+
+        modelTable.setRowCount(0);
+        products.clear();
+        productsOld.clear();
         block = false;
+
+        int status = 0;
         if (table.getIdOrder() > 0) {
-            modelTable.setRowCount(0);
-            products.clear();
-            productsOld.clear();
 
             lbInfo.setText("<html><font color=blue>Orden: </font><font color=blue size=+1>#" + table.getIdOrder() + "</font></html>");
 
             List<Order> orderslList = app.getControl().getOrderslList("id=" + table.getIdOrder(), "");
             if (orderslList.size() > 0) {
                 Order order = orderslList.get(0);
-                System.out.println(":::" + order.getProducts().size());
                 for (ProductoPed product : order.getProducts()) {
                     addProductPed(product, product.getCantidad(), product.getPrecio(), false);
                 }
+                status = order.getStatus();
+
+                productsOld = copyProductsToMap(order.getProducts());
             }
 
-            productsOld = copyProductsToMap(products);
             block = true;
             btSend.setEnabled(false);
+            btStay.setEnabled(false);
             btCancel.setIcon(iconBack);
             btCancel.setText("Regresar");
             btCancel.setActionCommand(AC_BACK_TO_TABLES);
+            btClear.setEnabled(false);
+            lbStatus.setBackground(new Color(200, 200, 220));
+            lbStatus.setText("<html><font color=#22a>Pedido enviado a cocina</font></html>");
+
+        } else {
+            btCancel.setActionCommand(AC_CANCEL_ORDER);
+            btCancel.setIcon(iconCancel);
+            btCancel.setText("Cancelar");
+            lbStatus.setBackground(null);
+            lbStatus.setText("");
+            btSend.setEnabled(true);
+            btStay.setEnabled(true);
+            btHold.setEnabled(true);
         }
     }
 
@@ -398,7 +421,6 @@ public class PanelOrders extends PanelCapturaMod implements
     }
 
     public void addProductPed(ProductoPed productPed, int cantidad, double price) {
-
         addProductPed(productPed, cantidad, price, -1, true);
     }
 
@@ -414,34 +436,32 @@ public class PanelOrders extends PanelCapturaMod implements
 
         Product producto = productPed.getProduct();
 
-        if (!edit) {
-            if (productPed.hasPresentation()) {
-                HashMap<Integer, HashMap> mapData = app.getControl().checkInventory(productPed.getPresentation().getId());
-                productPed.setData(mapData);
-                if (mapData != null && !mapData.isEmpty()) {
-                    Set<Integer> keys = mapData.keySet();
-                    for (Integer key : keys) {
-                        HashMap data = mapData.get(key);
-                        double res = Double.valueOf(data.get("quantity").toString()) * cantidad;
-                        MultiKey mKey = new MultiKey(data.get("id"), productPed.hashCode());
-                        mapInventory.put(mKey, res);
-                    }
+        if (productPed.hasPresentation()) {
+            HashMap<Integer, HashMap> mapData = app.getControl().checkInventory(productPed.getPresentation().getId());
+            productPed.setData(mapData);
+            if (mapData != null && !mapData.isEmpty()) {
+                Set<Integer> keys = mapData.keySet();
+                for (Integer key : keys) {
+                    HashMap data = mapData.get(key);
+                    double res = Double.valueOf(data.get("quantity").toString()) * cantidad;
+                    MultiKey mKey = new MultiKey(data.get("id"), productPed.hashCode());
+                    mapInventory.put(mKey, res);
                 }
-                checkInventory();
-            } else {
-                HashMap<Integer, HashMap> mapData = app.getControl().checkInventoryProduct(productPed.getProduct().getId());
-                productPed.setData(mapData);
-                if (mapData != null && !mapData.isEmpty()) {
-                    Set<Integer> keys = mapData.keySet();
-                    for (Integer key : keys) {
-                        HashMap data = mapData.get(key);
-                        double res = Double.valueOf(data.get("quantity").toString()) * cantidad;
-                        MultiKey mKey = new MultiKey(data.get("id"), productPed.hashCode());
-                        mapInventory.put(mKey, res);
-                    }
-                }
-                checkInventory();
             }
+            checkInventory();
+        } else {
+            HashMap<Integer, HashMap> mapData = app.getControl().checkInventoryProduct(productPed.getProduct().getId());
+            productPed.setData(mapData);
+            if (mapData != null && !mapData.isEmpty()) {
+                Set<Integer> keys = mapData.keySet();
+                for (Integer key : keys) {
+                    HashMap data = mapData.get(key);
+                    double res = Double.valueOf(data.get("quantity").toString()) * cantidad;
+                    MultiKey mKey = new MultiKey(data.get("id"), productPed.hashCode());
+                    mapInventory.put(mKey, res);
+                }
+            }
+            checkInventory();
         }
 
         tbProducts.getSelectionModel().clearSelection();
@@ -451,6 +471,7 @@ public class PanelOrders extends PanelCapturaMod implements
             productPed.setStatus(ProductoPed.ST_MOD_ADD_CANT);
             mod = true;
             btSend.setEnabled(true);
+            btHold.setEnabled(true);
         }
 
         if (products.contains(productPed) && price == productPed.getPrecio()) {
@@ -514,6 +535,118 @@ public class PanelOrders extends PanelCapturaMod implements
         }
     }
 
+    private boolean verifyOrder() {
+        try {
+            tbProducts.getCellEditor().stopCellEditing();
+        } catch (Exception e) {
+        }
+
+        //checkCiclo
+        Cycle lastCycle = app.getControl().getLastCycle();
+        if (lastCycle.getStatus() == Cycle.CLOSED) {
+            GUIManager.showErrorMessage(null, "El ciclo: " + lastCycle.getId() + " esta cerrado\n"
+                    + "Empiece un nuevo ciclo para facturar", "Ciclo cerrado");
+            return false;
+        }
+
+        if (products.isEmpty()) {
+            GUIManager.showErrorMessage(null, "No hay productos en la lista", "Pedido vacio");
+            return false;
+        }
+
+        if (!checkAllInventory()) {
+            ConfigDB config = app.getControl().getConfig(Configuration.INVOICE_OUT_STOCK);
+            String property = config != null ? config.getValor() : "false";
+            boolean permit = Boolean.valueOf(property);
+            GUIManager.showErrorMessage(null, "Los productos exceden las existencias en inventario.\n"
+                    + "Esta " + (permit ? "habilitado" : "deshabilitado") + " facturar sin existencias", "Producto agotado");
+            if (!permit) {
+                return false;
+            }
+        }
+
+        Waiter waitres = (Waiter) regWaiter.getSelectedItem();
+        Table table = (Table) regTable.getSelectedItem();
+        boolean validate = true;
+        if (TIPO_LOCAL == tipo) {
+            if (waitres == null || regTable.getSelected() < 0) {
+                regWaiter.setBorderToError();
+                validate = false;
+            }
+            if (table == null) {
+                regTable.setBorderToError();
+                validate = false;
+            }
+        }
+
+        if (!validate) {
+            return false;
+        }
+
+        verifyQuantitys();
+
+        Order order = new Order();
+
+        Cycle cycle = app.getControl().getLastCycle();
+
+        order.setCiclo(cycle != null ? cycle.getId() : 0);
+        order.setFecha(new Date());
+
+        if (waitres != null) {
+            order.setIdWaitress(waitres.getId());
+        }
+        if (table != null) {
+            order.setTable(table.getId());
+        }
+
+        order.setIdClient(1L);
+//        }
+
+        String tipoEntrega = PanelPedido.ENTREGA_LOCAL;
+
+        order.setDeliveryType(PanelPedido.TIPO_LOCAL);
+        for (int i = 0; i < products.size(); i++) {
+            ProductoPed get = products.get(i);
+        }
+
+        order.setConsecutive(generateConsecutive(PanelPedido.TIPO_LOCAL));
+
+        order.setProducts(products);
+
+        order.setValor(totalOrder);
+
+        this.order = order;
+        long idOrder = sendOrder(order);
+
+        if (idOrder > 0) {
+            selTable.setStatus(Table.TABLE_ST_PEDIDO_EN_COCINA);
+            pcs.firePropertyChange(PanelTakeOrders.AC_UPDATE_TABLE, idOrder, selTable);
+        }
+
+        return true;
+
+    }
+
+    private synchronized boolean checkAllInventory() {
+
+        HashMap<Integer, Double> simpInv = checkInventory();
+        Set<Integer> keys = simpInv.keySet();
+
+        boolean band;
+
+        for (Integer next : keys) {
+            Item item = app.getControl().getItemWhere("id=" + next);
+            Double cant = simpInv.get(next);
+            band = item.getQuantity() < cant;
+            if (tipo != TIPO_LOCAL && band) {
+                return false;
+            } else if (!item.isOnlyDelivery() && band) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public Order getOrder() {
         String mesa = "";
         String mesero = "";
@@ -521,25 +654,6 @@ public class PanelOrders extends PanelCapturaMod implements
         Waiter waitres = (Waiter) regWaiter.getSelectedItem();
         Table table = (Table) regTable.getSelectedItem();
         boolean validate = true;
-//        if (TIPO_LOCAL == tipo) {
-//            if (waitres == null || regMesera.getSelected() < 1) {
-//                regMesera.setBorderToError();
-//                validate = false;
-//            }
-//            if (table == null) {
-//                regMesa.setBorderToError();
-//                validate = false;
-//            }
-//        } else {
-//            if (regCelular.getText().isEmpty()) {
-//                regCelular.setBorderToError();
-//                validate = false;
-//            }
-//            if (regDireccion.getText().isEmpty()) {
-//                regDireccion.setBorderToError();
-//                validate = false;
-//            }
-//        }
 
         if (!validate) {
 //            return false;
@@ -581,9 +695,13 @@ public class PanelOrders extends PanelCapturaMod implements
 //        }
 
         String tipoEntrega = PanelPedido.ENTREGA_LOCAL;
+
+        order.setDeliveryType(PanelPedido.TIPO_LOCAL);
         for (int i = 0; i < products.size(); i++) {
             ProductoPed get = products.get(i);
         }
+
+        order.setConsecutive(generateConsecutive(PanelPedido.TIPO_LOCAL));
 
         order.setProducts(products);
 
@@ -679,7 +797,7 @@ public class PanelOrders extends PanelCapturaMod implements
                 int cantOld = (Integer) productsOld.get(prod.hashCode()).get("cant");
                 int cantNew = prod.getCantidad();
                 if (cantNew > cantOld) {
-                    prod.setCantidad(cantNew - cantOld);                    
+                    prod.setCantidad(cantNew - cantOld);
                     productDiff.add(prod);
                 }
             } else {
@@ -687,6 +805,28 @@ public class PanelOrders extends PanelCapturaMod implements
             }
         });
         return productDiff;
+    }
+
+    public boolean checkChanges(List<ProductoPed> products) {
+        for (ProductoPed prod : products) {
+            System.out.println("Analizing prod:" + prod.getProduct().getName() + "::" + prod.getCantidad());
+            if (productsOld.containsKey(prod.hashCode())) {
+                Map map = productsOld.get(prod.hashCode());
+                System.out.println("in Old:" + ((ProductoPed) map.get("prod")).getProduct().getName());
+                int cantOld = (Integer) productsOld.get(prod.hashCode()).get("cant");
+                int cantNew = prod.getCantidad();
+                System.out.println("Old:" + cantOld + "<>New:" + cantNew);
+                System.out.println("Res:" + (cantNew != cantOld));
+                if (cantNew != cantOld) {
+                    return true;
+                }
+            } else {
+                System.out.println("out Old:" + true);
+                return true;
+            }
+        }
+        System.out.println("nothing false");
+        return false;
     }
 
     private String htmlInfoInventory(HashMap<Integer, Double> simpInv) {
@@ -713,6 +853,10 @@ public class PanelOrders extends PanelCapturaMod implements
         stb.append("</table></html>");
 
         return stb.toString();
+    }
+
+    public void checkBlockAndPermisions() {
+
     }
 
     /**
@@ -742,6 +886,7 @@ public class PanelOrders extends PanelCapturaMod implements
         btStay = new javax.swing.JButton();
         pnTotals = new javax.swing.JPanel();
         regSubtotal = new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, "","",60);
+        lbStatus = new javax.swing.JLabel();
         regTable = new org.dz.Registro(BoxLayout.X_AXIS, "Mesa", new String[1], 60);
         pnCardContain = new javax.swing.JPanel();
         btClear = new javax.swing.JButton();
@@ -808,18 +953,23 @@ public class PanelOrders extends PanelCapturaMod implements
         regSubtotal.setMinimumSize(new java.awt.Dimension(160, 31));
         regSubtotal.setPreferredSize(new java.awt.Dimension(160, 31));
 
+        lbStatus.setOpaque(true);
+
         javax.swing.GroupLayout pnTotalsLayout = new javax.swing.GroupLayout(pnTotals);
         pnTotals.setLayout(pnTotalsLayout);
         pnTotalsLayout.setHorizontalGroup(
             pnTotalsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnTotalsLayout.createSequentialGroup()
-                .addGap(310, 310, 310)
-                .addComponent(regSubtotal, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                .addComponent(lbStatus, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(regSubtotal, javax.swing.GroupLayout.DEFAULT_SIZE, 345, Short.MAX_VALUE))
         );
         pnTotalsLayout.setVerticalGroup(
             pnTotalsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnTotalsLayout.createSequentialGroup()
-                .addComponent(regSubtotal, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(pnTotalsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(regSubtotal, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lbStatus, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(0, 0, Short.MAX_VALUE))
         );
 
@@ -903,6 +1053,7 @@ public class PanelOrders extends PanelCapturaMod implements
     private javax.swing.JLabel lbIndicator;
     private javax.swing.JLabel lbInfo;
     private javax.swing.JLabel lbQuantity;
+    private javax.swing.JLabel lbStatus;
     private javax.swing.JPanel pnCardContain;
     private javax.swing.JPanel pnContenTab;
     private javax.swing.JPanel pnTotals;
@@ -919,23 +1070,76 @@ public class PanelOrders extends PanelCapturaMod implements
         if (AC_ADD_QUANTITY.equals(e.getActionCommand())) {
             try {
                 int quantity = Integer.parseInt(lbQuantity.getText());
+                ProductoPed productSelected = getProductSelected();
+                int row = tbProducts.getSelectedRow();
+                int status = productSelected.getStatus();
+                if (status == ProductoPed.ST_SENDED
+                        || status == ProductoPed.ST_MOD_MIN_CANT
+                        || status == ProductoPed.ST_MOD_ADD_CANT) {
+
+                    Map value = productsOld.get(productSelected.hashCode());
+                    if (value != null) {
+                        Integer cant = (Integer) value.get("cant");
+                        if (cant == quantity + 1) {
+                            productSelected.setStatus(ProductoPed.ST_SENDED);
+                            tbProducts.setValueAt(productSelected, row, 1);
+                            btCancelMods.setVisible(false);
+                        } else {
+                            productSelected.setStatus(ProductoPed.ST_MOD_ADD_CANT);
+                            tbProducts.setValueAt(productSelected, row, 1);
+                            btCancelMods.setVisible(true);
+                            enableSends(true);
+                        }
+                    }
+                }
                 if (quantity < 100) {
                     quantity++;
                     lbQuantity.setText(String.valueOf(quantity));
-                    int row = tbProducts.getSelectedRow();
                     tbProducts.setValueAt(quantity, row, 0);
+                    enableSends(checkChanges(products));
+                    btMinus.setEnabled(true);
+                }
+                if (quantity == 100) {
+                    btAdd.setEnabled(false);
                 }
             } catch (Exception ex) {
             }
         } else if (AC_MINUS_QUANTITY.equals(e.getActionCommand())) {
             try {
                 int quantity = Integer.parseInt(lbQuantity.getText());
+                ProductoPed productSelected = getProductSelected();
+
+                int row = tbProducts.getSelectedRow();
+                int status = productSelected.getStatus();
+                if (status == ProductoPed.ST_SENDED
+                        || status == ProductoPed.ST_MOD_MIN_CANT
+                        || status == ProductoPed.ST_MOD_ADD_CANT) {
+                    Map value = productsOld.get(productSelected.hashCode());
+                    if (value != null) {
+                        Integer cant = (Integer) value.get("cant");
+                        if (cant == quantity - 1) {
+                            productSelected.setStatus(ProductoPed.ST_SENDED);
+                            tbProducts.setValueAt(productSelected, row, 1);
+                            btCancelMods.setVisible(false);
+                        } else {
+                            productSelected.setStatus(ProductoPed.ST_MOD_MIN_CANT);
+                            tbProducts.setValueAt(productSelected, row, 1);
+                            btCancelMods.setVisible(true);
+                            enableSends(true);
+                        }
+                    }
+                }
                 if (quantity > 1) {
                     quantity--;
                     lbQuantity.setText(String.valueOf(quantity));
-                    int row = tbProducts.getSelectedRow();
                     tbProducts.setValueAt(quantity, row, 0);
+                    enableSends(checkChanges(products));
+                    btAdd.setEnabled(true);
                 }
+                if (quantity == 1) {
+                    btMinus.setEnabled(false);
+                }
+
             } catch (Exception ex) {
             }
         } else if (AC_DELETE_ITEM.equals(e.getActionCommand())) {
@@ -944,23 +1148,21 @@ public class PanelOrders extends PanelCapturaMod implements
                     .sorted(Collections.reverseOrder())
                     .map(tbProducts::convertRowIndexToModel)
                     .forEach(modelTable::removeRow);
+            enableSends(checkChanges(products));
 
         } else if (AC_SEND_ORDER.equals(e.getActionCommand())) {
-            Order order = getOrder();
-            if (order != null && !order.isEmpty()) {
-                long idOrder = 0;
-                if (!mod) {
-                    setStatusProducts(order.getProducts(), ProductoPed.ST_SENDED);
-                    idOrder = app.getControl().addOrder(order);
-                } else {
-                    idOrder = selTable.getIdOrder();
-                    System.out.println("idOrder = " + idOrder);
-                    List<ProductoPed> diffProducts = diffProducts(order.getProducts());
-                    app.getControl().addProductOrder(idOrder, diffProducts);
-                }
+            if (verifyOrder()) {
                 app.getGuiManager().getPanelTakeOrders().showTables();
-                selTable.setStatus(Table.TABLE_ST_PEDIDO_EN_COCINA);
-                pcs.firePropertyChange(PanelTakeOrders.AC_UPDATE_TABLE, idOrder, selTable);
+                disableButtonInSend();
+                lbStatus.setBackground(new Color(200, 200, 220));
+                lbStatus.setText("<html><font color=#22a>Pedido enviado a cocina</font></html>");
+            }
+
+        } else if (AC_SEND_AND_HOLD_ORDER.equals(e.getActionCommand())) {
+            if (verifyOrder()) {
+                disableButtonInSend();
+                lbStatus.setBackground(new Color(200, 200, 220));
+                lbStatus.setText("<html><font color=#22a>Pedido enviado a cocina</font></html>");
             }
         } else if (AC_CLEAR_ORDER.equals(e.getActionCommand())) {
             modelTable.setRowCount(0);
@@ -971,6 +1173,7 @@ public class PanelOrders extends PanelCapturaMod implements
             if (productSelected != null) {
                 app.getGuiManager().showCustomPedido(productSelected, this, row);
             }
+            enableSends(checkChanges(products));
         } else if (AC_SHOW_INVENTORY.equals(e.getActionCommand())) {
             HashMap<Integer, Double> inventory = checkInventory();
             if (!inventory.isEmpty()) {
@@ -1020,6 +1223,7 @@ public class PanelOrders extends PanelCapturaMod implements
             lbIndicator.setVisible(regWaiter.getSelected() >= 0);
 
         } else if (AC_CANCEL_ORDER.equals(e.getActionCommand())) {
+            System.out.println("cancel order");
             if (products.size() > 0) {
                 String msg = "<html>El pedido no esta vacio, <br>¿Desea cancelar todo y volver al menu de seleccion de mesas?</html>";
 
@@ -1027,16 +1231,22 @@ public class PanelOrders extends PanelCapturaMod implements
                 if (showConfirmDialog == JOptionPane.YES_OPTION) {
                     modelTable.setRowCount(0);
                     products.clear();
-                    app.getGuiManager().getPanelTakeOrders().showTables();
+//                    app.getGuiManager().getPanelTakeOrders().showTables();
                 }
-            } else {
-                app.getGuiManager().getPanelTakeOrders().showTables();
+            }
+//            } else {
+            app.getGuiManager().getPanelTakeOrders().showTables();
+            selTable.setStatus(Table.TABLE_ST_LIMPIA);
+            pcs.firePropertyChange(PanelTakeOrders.AC_CLEAR_TABLE, null, selTable);
+
+        } else if (AC_BACK_TO_TABLES.equals(e.getActionCommand())) {
+            System.out.println("back to tables");
+            if (products.isEmpty()) {
                 selTable.setStatus(Table.TABLE_ST_LIMPIA);
                 pcs.firePropertyChange(PanelTakeOrders.AC_CLEAR_TABLE, null, selTable);
             }
-
-        } else if (AC_BACK_TO_TABLES.equals(e.getActionCommand())) {
             app.getGuiManager().getPanelTakeOrders().showTables();
+
         } else if (AC_CANCEL_MODS.equals(e.getActionCommand())) {
             int[] selectedRows = tbProducts.getSelectedRows();
             for (int row : selectedRows) {
@@ -1046,12 +1256,112 @@ public class PanelOrders extends PanelCapturaMod implements
                 if (value != null) {
                     Integer cant = (Integer) value.get("cant");
                     ProductoPed prod = (ProductoPed) value.get("prod");
+                    prod.setStatus(ProductoPed.ST_SENDED);
                     lbQuantity.setText(String.valueOf(cant));
                     modelTable.setValueAt(cant, cRow, 0);
                     modelTable.setValueAt(prod, cRow, 1);
+                    btCancelMods.setVisible(false);
                 }
             }
+            enableSends(checkChanges(products));
         }
+    }
+
+    public void disableButtonInSend() {
+        btSend.setEnabled(false);
+        btHold.setEnabled(false);
+        btStay.setEnabled(false);
+        btCancel.setIcon(iconBack);
+        btCancel.setText("Regresar");
+        btCancel.setActionCommand(AC_BACK_TO_TABLES);
+        btCancelMods.setVisible(false);
+        disableEditProducts();
+        block = true;
+    }
+
+    private void disableEditProducts() {
+        int rows = modelTable.getRowCount();
+        for (int row = 0; row < rows; row++) {
+            modelTable.setRowEditable(row, false);
+        }
+    }
+
+    private void enableSends(boolean enable) {
+        btHold.setEnabled(enable);
+        btSend.setEnabled(enable);
+    }
+
+    public String generateConsecutive(int type) {
+        int num = 0;
+        String pref = "C";
+        if (type == PanelPedido.TIPO_LOCAL) {
+            ConfigDB config = app.getControl().getConfig(Configuration.CONSECUTIVE_LOCAL);
+            if (config != null) {
+                String cons = config.getValor();
+                num = Integer.parseInt(cons.substring(1));
+            }
+            config = app.getControl().getConfig(Configuration.PREF_CONS_LOCAL);
+            if (config != null) {
+                pref = config.getValor();
+            }
+        } else {
+            ConfigDB config = app.getControl().getConfig(Configuration.CONSECUTIVE_DELIVERY);
+            if (config != null) {
+                String cons = config.getValor();
+                num = Integer.parseInt(cons.substring(1));
+            }
+            config = app.getControl().getConfig(Configuration.PREF_CONS_DELIVERY);
+            if (config != null) {
+                pref = config.getValor();
+            }
+        }
+
+        num++;
+        String consecutive = pref.toUpperCase() + com.bacon.Utiles.getNumeroFormateado(num, 2);
+
+        return consecutive;
+
+    }
+
+    public long sendOrder(Order order) {
+        long idOrder = 0;
+        if (order != null && !order.isEmpty()) {
+            if (!mod) {
+                setStatusProducts(order.getProducts(), ProductoPed.ST_SENDED);
+                idOrder = app.getControl().addOrder(order);
+                if (idOrder != 0) {
+                    order.setId(idOrder);
+                    MultiValueMap classify = classify(order.getProducts());
+
+                    ConfigDB config = app.getControl().getConfig(Configuration.PRINTER_SELECTED);
+                    String propPrinter = config != null ? config.getValor() : "";
+                    classify.keySet().forEach(station -> {
+                        List<ProductoPed> list = (List<ProductoPed>) classify.getCollection(station);
+                        String nameStation = app.getControl().getStation(Integer.valueOf(station.toString()));
+                        app.getPrinterService().imprimirPedidoStations(order, list, nameStation, propPrinter, false);
+                    });
+                } else {
+                    setStatusProducts(order.getProducts(), ProductoPed.ST_NORMAL);
+                }
+
+            } else {
+                idOrder = selTable.getIdOrder();
+                List<ProductoPed> diffProducts = diffProducts(order.getProducts());
+                MultiValueMap classify = classify(diffProducts);
+                app.getControl().addProductOrder(idOrder, diffProducts);
+                ConfigDB config = app.getControl().getConfig(Configuration.PRINTER_SELECTED);
+                String propPrinter = config != null ? config.getValor() : "";
+                classify.keySet().forEach(station -> {
+                    List<ProductoPed> list = (List<ProductoPed>) classify.getCollection(station);
+                    String nameStation = app.getControl().getStation(Integer.valueOf(station.toString()));
+                    app.getPrinterService().imprimirPedidoStations(order, list, nameStation, propPrinter, true);
+                });
+            }
+
+            productsOld = copyProductsToMap(app.getControl().getOrderProducts(idOrder));
+
+        }
+        return idOrder;
     }
     public static final String AC_BACK_TO_TABLES = "AC_BACK_TO_TABLES";
     public static final String AC_CHANGE_SELECTED = "AC_CHANGE_SELECTED";
@@ -1075,12 +1385,17 @@ public class PanelOrders extends PanelCapturaMod implements
                     int status = product.getStatus();
                     btCancelMods.setVisible(status == ProductoPed.ST_MOD_ADD_CANT || status == ProductoPed.ST_MOD_MIN_CANT);
 
-                    btMinus.setEnabled(true);
-                    btAdd.setEnabled(true);
                     Permission perm = app.getControl().getPermissionByName("allow-cancel-product-order");
-                    btModify.setEnabled(app.getControl().hasPermission(app.getUser(), perm));
+                    btDelete.setEnabled(app.getControl().hasPermission(app.getUser(), perm) || !block);
+
                     perm = app.getControl().getPermissionByName("allow-modify-product-order");
-                    btDelete.setEnabled(app.getControl().hasPermission(app.getUser(), perm));
+                    btModify.setEnabled(app.getControl().hasPermission(app.getUser(), perm) || !block);
+                    btAdd.setEnabled(app.getControl().hasPermission(app.getUser(), perm) || !block);
+                    btMinus.setEnabled(app.getControl().hasPermission(app.getUser(), perm) || !block);
+
+                    btMinus.setEnabled(quantity > 1);
+                    btAdd.setEnabled(quantity < 100);
+
                     pnCardContain.setVisible(true);
                 } catch (Exception ex) {
                     System.err.println("ex:" + ex);
@@ -1281,5 +1596,19 @@ public class PanelOrders extends PanelCapturaMod implements
             return component;
 
         }
+    }
+
+    public MultiValueMap classify(List<ProductoPed> products) {
+        MultiValueMap map = new MultiValueMap();
+        for (ProductoPed prod : products) {
+            String stationList = app.getControl().getProductStations(prod.getProduct().getId());
+            if (!stationList.isEmpty()) {
+                String[] stations = stationList.split(",");
+                for (String station : stations) {
+                    map.put(station, prod);
+                }
+            }
+        }
+        return map;
     }
 }

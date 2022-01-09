@@ -5,6 +5,7 @@ import com.bacon.domain.Client;
 import com.bacon.domain.ConfigDB;
 import com.bacon.domain.Ingredient;
 import com.bacon.domain.Invoice;
+import com.bacon.domain.Order;
 import com.bacon.domain.Presentation;
 import com.bacon.domain.ProductoPed;
 import com.bacon.domain.Table;
@@ -26,8 +27,8 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.logging.Level;
 import javax.print.PrintService;
+import org.apache.commons.collections.map.MultiValueMap;
 import org.dz.Imagenes;
-
 
 /**
  *
@@ -284,11 +285,12 @@ public class PrinterService {
                 String stPres = "";
                 if (presentation != null) {
                     stPres = " (" + presentation.getName() + ")";
-                    
-                }if(product.hasTermino()){
-                    stPres += "  ["+product.getTermino()+"]";
+
                 }
-                escpos.writeLF(font3,"    " + stPres);
+                if (product.hasTermino()) {
+                    stPres += "  [" + product.getTermino() + "]";
+                }
+                escpos.writeLF(font3, "    " + stPres);
 
                 StringBuilder stb = new StringBuilder();
                 if (product.getExclusiones().size() > 0) {
@@ -315,16 +317,15 @@ public class PrinterService {
             }
 
             escpos.writeLF(font2, "================================================");
-            
 
             escpos.feed(1);
 
             escpos.writeLF(font2, "****  COCINA ****");
-            
+
             escpos.feed(5);
 
             escpos.cut(EscPos.CutMode.FULL);
-            
+
             escpos.close();
 
         } catch (IOException ex) {
@@ -371,7 +372,7 @@ public class PrinterService {
             escpos.feed(1);
 
             config = app.getControl().getConfig(Configuration.DOCUMENT_NAME);
-            String docName = config != null ? config.getValor() : "Ticket N°:";            
+            String docName = config != null ? config.getValor() : "Ticket N°:";
             escpos.writeLF(font3, String.format(docName + "  %1s", invoice.getFactura()));
             escpos.writeLF(font3, String.format("Fecha:       %1s", app.DF_FULL2.format(invoice.getFecha())));
 
@@ -447,7 +448,7 @@ public class PrinterService {
             java.util.logging.Logger.getLogger(PrintService.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
     public void sendBuzzerPin(String printerName) {
         PrintService printService = PrinterOutputStream.getPrintServiceByName(printerName);
         EscPos escpos;
@@ -458,6 +459,234 @@ public class PrinterService {
             escpos.close();
         } catch (IOException ex) {
             java.util.logging.Logger.getLogger(PrintService.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public void imprimirPedidoStations(Order order, String printerName) {
+
+        Waiter waiter = null;
+        Table table = null;
+        Client client = null;
+        try {
+            waiter = app.getControl().getWaitressByID(order.getIdWaitress());
+            table = app.getControl().getTableByID(order.getTable());
+
+        } catch (Exception e) {
+        }
+
+        PrintService printService = PrinterOutputStream.getPrintServiceByName(printerName);
+        EscPos escpos;
+        try {
+
+            Style font2 = new Style().setFontSize(Style.FontSize._1, Style.FontSize._1);
+            Style font3 = new Style().setFontSize(Style.FontSize._2, Style.FontSize._1);
+            Style font4 = new Style().setFontSize(Style.FontSize._1, Style.FontSize._1).setJustification(EscPosConst.Justification.Right);
+            Style font5 = new Style().setFontSize(Style.FontSize._2, Style.FontSize._2).setJustification(EscPosConst.Justification.Right);
+            Style font6 = new Style().setFontSize(Style.FontSize._2, Style.FontSize._2);
+            Style font7 = new Style().setFontSize(Style.FontSize._1, Style.FontSize._2);
+
+            escpos = new EscPos(new PrinterOutputStream(printService));
+            escpos.feed(1);
+
+            escpos.write(font2, "Comanda  :");
+            escpos.writeLF(font6, String.format(" %1s", order.getId()));
+            escpos.writeLF("");
+            escpos.write(font3, String.format("%20.20s", app.DF_SL.format(order.getFecha())));
+            escpos.write(font6, String.format("%8.8s", app.DF_TIME.format(order.getFecha())));
+            escpos.writeLF("");
+
+            if (order.getDeliveryType() == PanelPedido.TIPO_LOCAL) {
+                escpos.write(font2, "Mesa:   ");
+                escpos.writeLF(font6, (table != null ? table.getName() : "- - -"));
+                escpos.write(font2, "Mesero: ");
+                escpos.writeLF(font6, (waiter != null ? waiter.getName() : "- - -"));
+            } else {
+                escpos.writeLF(font6, "Domicilio");
+            }
+            escpos.feed(1);
+
+            String column1Format = "%3.3s";  // fixed size 3 characters, left aligned
+            String column2Format = "%-20.20s";  // fixed size 8 characters, left aligned
+            String column3Format = "%7.7s";   // fixed size 6 characters, right aligned
+            String column4Format = "%12.12s";   // fixed size 6 characters, right aligned
+            String formatInfo = column1Format + " " + column2Format + " " + column3Format + " " + column4Format;
+
+            escpos.writeLF(font2, "===============================================");
+            List<ProductoPed> products = order.getProducts();
+            for (int i = 0; i < products.size(); i++) {
+                ProductoPed product = products.get(i);
+                Presentation presentation = product.getPresentation();
+                double priceFinal = product.getPrecio() + product.getValueAdicionales();
+                escpos.writeLF(String.format(formatInfo, product.getCantidad(), (product.getProduct().getName()).toUpperCase(),
+                        "", app.DCFORM_P.format(priceFinal)));
+                String stPres = "";
+                if (presentation != null) {
+                    stPres = " (" + presentation.getName() + ")";
+
+                }
+                if (product.hasTermino()) {
+                    stPres += "  [" + product.getTermino() + "]";
+                }
+                escpos.writeLF(font3, "    " + stPres);
+
+                StringBuilder stb = new StringBuilder();
+                if (product.getExclusiones().size() > 0) {
+                    stb.append("Sin: ");
+                    for (int j = 0; j < product.getExclusiones().size(); j++) {
+                        Ingredient ing = product.getExclusiones().get(j);
+                        stb.append(ing.getName()).append(" - ");
+                    }
+                    stb.substring(0, stb.length() - 3);
+                    escpos.writeLF("    " + stb.toString());
+                }
+
+                stb = new StringBuilder();
+                for (int j = 0; j < product.getAdicionales().size(); j++) {
+                    Additional adic = product.getAdicionales().get(j).getAdditional();
+                    int cant = product.getAdicionales().get(j).getCantidad();
+                    stb.append("+").append(adic.getName()).append("(x").append(cant).append(")");
+                    escpos.writeLF("    " + stb.toString());
+                    stb.setLength(0);
+                }
+                if (i != products.size() - 1) {
+                    escpos.writeLF(font2, ". . . . . . . . . . . . . . . . . . . . . .");
+                }
+            }
+
+            escpos.writeLF(font2, "================================================");
+
+            escpos.feed(1);
+
+            escpos.writeLF(font2, "****  COCINA ****");
+
+            escpos.feed(5);
+
+            escpos.cut(EscPos.CutMode.FULL);
+
+            escpos.close();
+
+        } catch (IOException ex) {
+            java.util.logging.Logger.getLogger(PanelPedido.class.getName()).log(Level.ALL.SEVERE, null, ex);
+        }
+    }
+
+    public void imprimirPedidoStations(Order order, List<ProductoPed> products, String station, String printerName, boolean isAdicion) {
+
+        Waiter waiter = null;
+        Table table = null;
+        Client client = null;
+        try {
+            waiter = app.getControl().getWaitressByID(order.getIdWaitress());
+            table = app.getControl().getTableByID(order.getTable());
+
+        } catch (Exception e) {
+        }
+
+        System.out.println("printerName = " + printerName);
+        PrintService printService = PrinterOutputStream.getPrintServiceByName(printerName);
+        EscPos escpos;
+        try {
+
+            Style font2 = new Style().setFontSize(Style.FontSize._1, Style.FontSize._1);
+            Style font3 = new Style().setFontSize(Style.FontSize._2, Style.FontSize._1);
+            Style font4 = new Style().setFontSize(Style.FontSize._1, Style.FontSize._1).setJustification(EscPosConst.Justification.Right);
+            Style font5 = new Style().setFontSize(Style.FontSize._2, Style.FontSize._2).setJustification(EscPosConst.Justification.Right);
+            Style font6 = new Style().setFontSize(Style.FontSize._2, Style.FontSize._2);
+            Style font7 = new Style().setFontSize(Style.FontSize._2, Style.FontSize._1).setJustification(EscPosConst.Justification.Center);;
+            Style font8 = new Style().setFontSize(Style.FontSize._1, Style.FontSize._2);
+            
+            escpos = new EscPos(new PrinterOutputStream(printService));
+            escpos.feed(1);
+
+            if (isAdicion) {
+                escpos.writeLF(font7, "****  ADICION  ****");
+            }
+
+            escpos.write(font2, "Comanda  :");
+            escpos.writeLF(font6, String.format(" #%1s", order.getId()));
+            escpos.writeLF("");
+//            escpos.write(font2, String.format("Fecha:"));
+            escpos.writeLF(font3, String.format(" %23s", app.DF_SL.format(order.getFecha())));
+//            escpos.write(font2, String.format("Hora:"));
+            escpos.writeLF(font6, String.format(" %23s", app.DF_TIME.format(order.getFecha())));            
+            escpos.writeLF(font2, "_______________________________________________");
+            if (order.getDeliveryType() == PanelPedido.TIPO_LOCAL) {
+                escpos.write(font2, "Mesa:   ");
+                escpos.writeLF(font6, (table != null ? table.getName() : "- - -"));
+                escpos.write(font2, "Mesero: ");
+                escpos.writeLF(font6, (waiter != null ? waiter.getName().toUpperCase() : "- - -"));
+            } else {
+                escpos.writeLF(font6, "Domicilio");
+            }
+            escpos.feed(1);
+
+            String column1Format = "%3.3s";  // fixed size 3 characters, left aligned
+            String column2Format = "%-20.20s";  // fixed size 8 characters, left aligned
+            String column3Format = "%7.7s";   // fixed size 6 characters, right aligned
+            String column4Format = "%12.12s";   // fixed size 6 characters, right aligned
+            String formatInfo = column1Format + " " + column2Format + " " + column3Format + " " + column4Format;
+
+            escpos.writeLF(font2, "================================================");
+
+            for (int i = 0; i < products.size(); i++) {
+                ProductoPed product = products.get(i);
+                Presentation presentation = product.getPresentation();
+                double priceFinal = product.getPrecio() + product.getValueAdicionales();
+                escpos.writeLF(String.format(formatInfo, product.getCantidad(), (product.getProduct().getName()).toUpperCase(),
+                        "", app.DCFORM_P.format(priceFinal)));
+                String stPres = "";
+                if (presentation != null) {
+                    stPres = " (" + presentation.getName().toUpperCase() + ")";
+
+                }
+                if (product.hasTermino() && !product.getTermino().isEmpty()) {
+                    stPres += "  [" + product.getTermino() + "]";
+                }
+                escpos.writeLF(font2, "    " + stPres);
+
+                if (product.hasExcluisones()) {
+                    escpos.writeLF(font2, "    - - - - - - - - -  - ");
+                }
+                StringBuilder stb = new StringBuilder();
+                if (product.getExclusiones().size() > 0) {
+                    stb.append("Sin: ");
+                    for (int j = 0; j < product.getExclusiones().size(); j++) {
+                        Ingredient ing = product.getExclusiones().get(j);
+                        stb.append(ing.getName()).append(" - ");
+                    }
+                    stb.substring(0, stb.length() - 3);
+                    escpos.writeLF("    " + stb.toString());
+                }
+                if (product.hasAdditionals()) {
+                    escpos.writeLF(font2, "    - - - - - - - - -  - ");
+                }
+                stb = new StringBuilder();
+                for (int j = 0; j < product.getAdicionales().size(); j++) {
+                    Additional adic = product.getAdicionales().get(j).getAdditional();
+                    int cant = product.getAdicionales().get(j).getCantidad();
+                    stb.append("+ ").append(adic.getName()).append("(x").append(cant).append(")");
+                    escpos.writeLF("    " + stb.toString());
+                    stb.setLength(0);
+                }
+                if (i != products.size() - 1) {
+                    escpos.writeLF(font2, ". . . . . . . . . . . . . . . . . . . . . . . .");
+                }
+            }
+
+            escpos.writeLF(font2, "================================================");
+
+            escpos.feed(1);
+
+            escpos.writeLF(font7, "****  " + station.toUpperCase() + "  ****");
+
+            escpos.feed(5);
+
+            escpos.cut(EscPos.CutMode.FULL);
+
+            escpos.close();
+
+        } catch (IOException ex) {
+            java.util.logging.Logger.getLogger(PanelPedido.class.getName()).log(Level.ALL.SEVERE, null, ex);
         }
     }
 

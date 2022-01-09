@@ -33,7 +33,7 @@ import org.dz.Utiles;
  *
  * @author lrod
  */
-public class PanelProduct4 extends PanelCapturaMod implements ActionListener{
+public class PanelProduct4 extends PanelCapturaMod implements ActionListener {
 
     private final Aplication app;
     private final Product product;
@@ -52,8 +52,8 @@ public class PanelProduct4 extends PanelCapturaMod implements ActionListener{
 
     private void createComponents() {
 
-        setBorder(BorderFactory.createLineBorder(new Color(112,12,44), 2, true));
-        
+        setBorder(BorderFactory.createLineBorder(new Color(112, 12, 44), 2, true));
+
         String image = product.getImage();
 
         String path = app.getConfiguration().getProperty(Configuration.PATH_IMG, "img");
@@ -68,7 +68,7 @@ public class PanelProduct4 extends PanelCapturaMod implements ActionListener{
         }
 
         Font font1 = new Font("Sans", 1, 12);
-        Font font2 = new Font("Serif", 2, 9);
+        Font font2 = new Font("Serif", 2, 10);
         Font font3 = new Font("Tahoma", 1, 14);
 
         NumberFormat NF = DecimalFormat.getCurrencyInstance();
@@ -81,9 +81,9 @@ public class PanelProduct4 extends PanelCapturaMod implements ActionListener{
         if (pName.length() > MAX_LENGTH) {
             pName = pName.substring(0, MAX_LENGTH) + "..";
         }
-        
+
         setBackground(Utiles.colorAleatorio(220, 255));
-        
+
         lbName.setText(pName.toUpperCase());
         lbName.setToolTipText(product.getName().toUpperCase());
         lbName.setFont(font1);
@@ -107,7 +107,6 @@ public class PanelProduct4 extends PanelCapturaMod implements ActionListener{
 //        lbImage.setIcon(icon);
 //        lbImage.setBorder(BorderFactory.createLineBorder(color, 1));
 //        lbImage.setVisible(false);
-        
         btAddQuick.setActionCommand(PanelProduct2.AC_ADD_QUICK);
         btAddQuick.setMargin(new Insets(1, 1, 1, 1));
         btAddQuick.setFocusPainted(false);
@@ -119,6 +118,12 @@ public class PanelProduct4 extends PanelCapturaMod implements ActionListener{
         btAddCustom.setFocusPainted(false);
         btAddCustom.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "process-accept.png", 18, 18)));
         btAddCustom.addActionListener(this);
+
+        btAddPress.setActionCommand(AC_ADD_PRESS);
+        btAddPress.setMargin(new Insets(1, 1, 1, 1));
+        btAddPress.setFocusPainted(false);
+        btAddPress.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "navigate-down.png", 18, 18)));
+        btAddPress.addActionListener(this);
 
         popPres = new JPopupMenu();
 
@@ -134,6 +139,8 @@ public class PanelProduct4 extends PanelCapturaMod implements ActionListener{
                 public void actionPerformed(ActionEvent e) {
                     ProductoPed prod = new ProductoPed(product);
                     prod.setPresentation(press);
+                    prod.setTermino("");
+                    prod.setEspecificaciones("");
                     pcs.firePropertyChange(AC_CUSTOM_ADD, new Object[]{1, press.getPrice()}, prod);
                 }
             });
@@ -157,6 +164,8 @@ public class PanelProduct4 extends PanelCapturaMod implements ActionListener{
                     public void actionPerformed(ActionEvent e) {
                         ProductoPed prod = new ProductoPed(product);
                         prod.setPrecio(price);
+                        prod.setTermino("");
+                        prod.setEspecificaciones("");
                         pcs.firePropertyChange(AC_CUSTOM_ADD, new Object[]{1, price}, prod);
                     }
                 });
@@ -184,8 +193,9 @@ public class PanelProduct4 extends PanelCapturaMod implements ActionListener{
         });
 
     }
-    
-    public void setColor(Color color){
+    public static final String AC_ADD_PRESS = "AC_ADD_PRESS";
+
+    public void setColor(Color color) {
         setBackground(color);
         updateUI();
     }
@@ -193,10 +203,11 @@ public class PanelProduct4 extends PanelCapturaMod implements ActionListener{
     @Override
     public void actionPerformed(ActionEvent e) {
         if (AC_ADD_QUICK.equals(e.getActionCommand())) {
-
             pcs.firePropertyChange(AC_ADD_QUICK, null, product);
         } else if (AC_ADD_CUSTOM.equals(e.getActionCommand())) {
             app.getGuiManager().showCustomPedido(product, app);
+        } else if (AC_ADD_PRESS.equals(e.getActionCommand())) {
+            popPres.show(btAddPress, 0, btAddPress.getHeight());
         }
     }
 
@@ -214,6 +225,7 @@ public class PanelProduct4 extends PanelCapturaMod implements ActionListener{
         lbPrice = new javax.swing.JLabel();
         btAddQuick = new javax.swing.JButton();
         btAddCustom = new javax.swing.JButton();
+        btAddPress = new javax.swing.JButton();
 
         lbName.setText("jLabel1");
 
@@ -225,50 +237,47 @@ public class PanelProduct4 extends PanelCapturaMod implements ActionListener{
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(4, 4, 4)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(lbName, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(3, 3, 3)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(lbPrice, javax.swing.GroupLayout.DEFAULT_SIZE, 112, Short.MAX_VALUE)
-                            .addComponent(lbCategory, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(lbPrice, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(btAddCustom, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(btAddPress, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btAddQuick, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(5, 5, 5))))
+                        .addComponent(btAddCustom, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btAddQuick, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(lbCategory, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(lbName, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(3, 3, 3))
         );
 
-        layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {btAddCustom, btAddQuick});
+        layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {btAddCustom, btAddPress, btAddQuick});
 
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(4, 4, 4)
+                .addGap(3, 3, 3)
                 .addComponent(lbName)
+                .addGap(2, 2, 2)
+                .addComponent(lbCategory)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(2, 2, 2)
-                        .addComponent(lbCategory)
-                        .addGap(2, 2, 2)
-                        .addComponent(lbPrice, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGap(6, 6, 6))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(btAddQuick, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(btAddCustom, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addContainerGap())))
+                    .addComponent(btAddCustom, javax.swing.GroupLayout.DEFAULT_SIZE, 28, Short.MAX_VALUE)
+                    .addComponent(btAddPress, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btAddQuick, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(lbPrice, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)))
         );
 
-        layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {btAddCustom, btAddQuick});
+        layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {btAddCustom, btAddPress, btAddQuick});
 
     }// </editor-fold>//GEN-END:initComponents
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btAddCustom;
+    private javax.swing.JButton btAddPress;
     private javax.swing.JButton btAddQuick;
     private javax.swing.JLabel lbCategory;
     private javax.swing.JLabel lbName;

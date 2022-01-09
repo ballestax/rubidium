@@ -49,6 +49,9 @@ public class TableRender extends PanelCapturaMod implements ActionListener, Mous
         lbName.setFont(new Font("Sans", 1, 18));
         lbName.setHorizontalTextPosition(SwingConstants.CENTER);
         
+        lbOrder.setFont(new Font("Sans", 1, 18));
+        lbOrder.setHorizontalTextPosition(SwingConstants.LEFT);
+        
         lbWaiter.setFont(new Font("Sans", 1, 12));
         
         lbPeople.setFont(new Font("Sans", 1, 12));
@@ -59,7 +62,12 @@ public class TableRender extends PanelCapturaMod implements ActionListener, Mous
         
         popupOptions = new JPopupMenu();
         
-        JMenuItem item = new JMenuItem("Cambiar mesa");
+        JMenuItem item = new JMenuItem("Limpiar mesa");
+        item.addActionListener(this);
+        item.setActionCommand(AC_CLEAN_TABLE);
+        popupOptions.add(item);
+                
+        item = new JMenuItem("Cambiar mesa");
         item.addActionListener(this);
         item.setActionCommand(AC_CHANGE_TABLE);
         popupOptions.add(item);
@@ -74,6 +82,7 @@ public class TableRender extends PanelCapturaMod implements ActionListener, Mous
         addMouseListener(this);
         
     }
+    public static final String AC_CLEAN_TABLE = "AC_CLEAN_TABLE";
     public static final String AC_CHANGE_WAITER = "AC_CHANGE_WAITER";
     public static final String AC_CHANGE_TABLE = "AC_CHANGE_TABLE";
     public static final String AC_SHOW_OPTIONS = "AC_SHOW_OPTIONS";
@@ -88,6 +97,10 @@ public class TableRender extends PanelCapturaMod implements ActionListener, Mous
     
     public void setWaiter(String waiter) {
         lbWaiter.setText(waiter);
+    }
+    
+    public void setOrder(String order) {
+        lbOrder.setText(order);
     }
     
     public void setStatus(int status) {
@@ -139,6 +152,7 @@ public class TableRender extends PanelCapturaMod implements ActionListener, Mous
         lbWaiter = new javax.swing.JLabel();
         lbPeople = new javax.swing.JLabel();
         btActions = new javax.swing.JButton();
+        lbOrder = new javax.swing.JLabel();
 
         lbName.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lbName.setBorder(null);
@@ -150,6 +164,8 @@ public class TableRender extends PanelCapturaMod implements ActionListener, Mous
 
         lbPeople.setBorder(null);
 
+        lbOrder.setBorder(null);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -157,13 +173,18 @@ public class TableRender extends PanelCapturaMod implements ActionListener, Mous
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(lbName, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(0, 9, Short.MAX_VALUE)
+                                .addComponent(lbName, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(lbWaiter, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(lbPeople, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 15, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(lbWaiter, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(lbPeople, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(lbOrder, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(lbStatus, javax.swing.GroupLayout.DEFAULT_SIZE, 28, Short.MAX_VALUE)
                     .addComponent(btActions, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
@@ -171,7 +192,8 @@ public class TableRender extends PanelCapturaMod implements ActionListener, Mous
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(lbOrder, javax.swing.GroupLayout.PREFERRED_SIZE, 18, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(lbName, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
@@ -179,7 +201,7 @@ public class TableRender extends PanelCapturaMod implements ActionListener, Mous
                     .addComponent(lbWaiter, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
             .addGroup(layout.createSequentialGroup()
                 .addComponent(lbStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 12, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 24, Short.MAX_VALUE)
                 .addComponent(btActions, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -188,6 +210,7 @@ public class TableRender extends PanelCapturaMod implements ActionListener, Mous
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btActions;
     private javax.swing.JLabel lbName;
+    private javax.swing.JLabel lbOrder;
     private javax.swing.JLabel lbPeople;
     private javax.swing.JLabel lbStatus;
     private javax.swing.JLabel lbWaiter;

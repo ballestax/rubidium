@@ -46,6 +46,10 @@ public class PanelCategory extends PanelCapturaMod implements PropertyChangeList
     private int view;
     private String selectedSort;
 
+    public static final int CARD_VIEW_1 = 1;
+    public static final int CARD_VIEW_2 = 2;
+    public static final int CARD_VIEW_3 = 3;
+
     public static final String ORDEN_ID = "ORDEN_ID";
     public static final String ORDEN_ALPHA = "ALFABETICO";
     public static final String ORDEN_PRICE = "PRECIO";
@@ -56,6 +60,7 @@ public class PanelCategory extends PanelCapturaMod implements PropertyChangeList
     private List<Category> categoriesList;
     private int viewSelect;
     private PropertyChangeListener listener;
+    private int viewDefault;
 
     /**
      * Creates new form PanelCategory
@@ -75,7 +80,7 @@ public class PanelCategory extends PanelCapturaMod implements PropertyChangeList
         mapProdsV1 = new HashMap<>();
         mapProdsV2 = new HashMap<>();
         mapProdsV3 = new HashMap<>();
-        viewSelect=1;
+        viewSelect = 1;
 
         initComponents();
         pbLoading.setVisible(false);
@@ -83,7 +88,7 @@ public class PanelCategory extends PanelCapturaMod implements PropertyChangeList
         createComponents();
     }
 
-    public PanelCategory(List<Category> categoriesList, ArrayList products, Aplication app, PropertyChangeListener listener) {
+    public PanelCategory(List<Category> categoriesList, ArrayList products, Aplication app, PropertyChangeListener listener, int viewDefault) {
         this.app = app;
         pcs = new PropertyChangeSupport(this);
         this.categoriesList = categoriesList;
@@ -91,10 +96,12 @@ public class PanelCategory extends PanelCapturaMod implements PropertyChangeList
         this.products = products;
         this.listener = listener;
         this.selectedSort = null;
+        this.viewDefault = viewDefault;
         mapProdsV1 = new HashMap<>();
         mapProdsV2 = new HashMap<>();
         mapProdsV3 = new HashMap<>();
 
+        view = viewDefault;
         initComponents();
         pbLoading.setVisible(false);
         createProductsCard(products);
@@ -117,7 +124,17 @@ public class PanelCategory extends PanelCapturaMod implements PropertyChangeList
 
         lbTitle.setVisible(false);
 
-        showView2();
+        switch (viewDefault) {
+            case CARD_VIEW_2:
+                showView2();
+                break;
+            case CARD_VIEW_3:
+                showView3();
+                break;
+            case CARD_VIEW_1:
+                showView1();
+                break;
+        }
 
         oldSize = products != null ? products.size() : 0;
     }
@@ -128,10 +145,16 @@ public class PanelCategory extends PanelCapturaMod implements PropertyChangeList
             pnItems.removeAll();
             return;
         }
-        if (view == 1) {
-            showView1();
-        } else {
-            showView2();
+        switch (view) {
+            case CARD_VIEW_2:
+                showView2();
+                break;
+            case CARD_VIEW_3:
+                showView3();
+                break;
+            case CARD_VIEW_1:
+                showView1();
+                break;
         }
     }
 
@@ -150,6 +173,7 @@ public class PanelCategory extends PanelCapturaMod implements PropertyChangeList
         }
         mapProdsV1.clear();
         mapProdsV2.clear();
+        mapProdsV3.clear();
         int size = products.size();
 
         SwingWorker<Boolean, Object[]> sw = new SwingWorker<Boolean, Object[]>() {
@@ -169,7 +193,7 @@ public class PanelCategory extends PanelCapturaMod implements PropertyChangeList
                     PanelProduct2 pnProd2 = new PanelProduct2(app, product);
                     pnProd2.addPropertyChangeListener(listener);
                     publish(new Object[]{pnProd2, product.getId()});
-                    
+
                     PanelProduct pnProd1 = new PanelProduct(app, product);
                     pnProd1.addPropertyChangeListener(listener);
                     publish(new Object[]{pnProd1, product.getId()});
@@ -188,7 +212,7 @@ public class PanelCategory extends PanelCapturaMod implements PropertyChangeList
                     } else if (chunk[0] instanceof PanelProduct4) {
                         long prodId = Long.parseLong(chunk[1].toString());
                         mapProdsV2.put(prodId, (PanelProduct4) chunk[0]);
-                    }else if (chunk[0] instanceof PanelProduct) {
+                    } else if (chunk[0] instanceof PanelProduct) {
                         long prodId = Long.parseLong(chunk[1].toString());
                         mapProdsV3.put(prodId, (PanelProduct) chunk[0]);
                     }
@@ -200,10 +224,16 @@ public class PanelCategory extends PanelCapturaMod implements PropertyChangeList
 
             @Override
             protected void done() {
-                if (view == 1) {
-                    showView1();
-                } else {
-                    showView2();
+                switch (view) {
+                    case CARD_VIEW_2:
+                        showView2();
+                        break;
+                    case CARD_VIEW_3:
+                        showView3();
+                        break;
+                    case CARD_VIEW_1:
+                        showView1();
+                        break;
                 }
 //                pbLoading.setIndeterminate(false);
                 pbLoading.setVisible(false);
@@ -258,8 +288,9 @@ public class PanelCategory extends PanelCapturaMod implements PropertyChangeList
         }
         pnItems.updateUI();
         app.getGuiManager().setDefaultCursor();
+        System.out.println("view2:");
     }
-    
+
     public void showView3() {
         view = 3;
         app.getGuiManager().setWaitCursor();
@@ -304,6 +335,7 @@ public class PanelCategory extends PanelCapturaMod implements PropertyChangeList
         }
         pnItems.updateUI();
         app.getGuiManager().setDefaultCursor();
+        System.out.println("view3:");
     }
 
     public void showView1() {
@@ -330,6 +362,7 @@ public class PanelCategory extends PanelCapturaMod implements PropertyChangeList
         pnItems.add(Box.createVerticalGlue());
         pnItems.updateUI();
         app.getGuiManager().setDefaultCursor();
+        System.out.println("view1:");
     }
 
     public void resizePanel() {
@@ -371,7 +404,6 @@ public class PanelCategory extends PanelCapturaMod implements PropertyChangeList
                     if (viewSelect == 4) {
                         viewSelect = 1;
                     }
-
                     break;
                 case PanelTopSearch.AC_SELECT_VIEW2:
                     showView2();
