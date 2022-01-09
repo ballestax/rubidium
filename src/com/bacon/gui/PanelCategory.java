@@ -205,7 +205,7 @@ public class PanelCategory extends PanelCapturaMod implements PropertyChangeList
         pnItems.removeAll();
         pnItems.setLayout(new GridBagLayout());
 
-        ConfigDB config = app.getControl().getConfig(Configuration.NUM_COLUMNS_VIEW2);
+        ConfigDB config = app.getControl().getConfigLocal(Configuration.NUM_COLUMNS_VIEW2);
         int COLS = config != null ? (int) config.castValor() : 2;
 
         if (products != null) {
@@ -251,7 +251,7 @@ public class PanelCategory extends PanelCapturaMod implements PropertyChangeList
         pnItems.removeAll();
         pnItems.setLayout(new GridLayout(0, 2, 10, 10));
 
-        ConfigDB config = app.getControl().getConfig(Configuration.NUM_COLUMNS_VIEW1);
+        ConfigDB config = app.getControl().getConfigLocal(Configuration.NUM_COLUMNS_VIEW1);
         int COLS = config != null ? (int) config.castValor() : 2;
 
         pnItems.setLayout(new GridLayout(0, COLS, 10, 10));

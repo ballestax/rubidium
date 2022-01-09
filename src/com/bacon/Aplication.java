@@ -78,7 +78,7 @@ public final class Aplication implements ActionListener, PropertyChangeListener,
     public static final String DEFAULT_EXPORT_DIR = "";
 
     //Correr la aplicacion con configuracion de servidor local
-    private static boolean local = true;
+    private static boolean local = !true;
 
     public DateFormat DF = new SimpleDateFormat("dd-MM-yyyy");
     public DateFormat DF_FULL = new SimpleDateFormat("dd MMMM yyyy hh:mm");
@@ -291,6 +291,10 @@ public final class Aplication implements ActionListener, PropertyChangeListener,
         }
     }
 
+    public static String getUserDevice() {
+        return System.getProperty("user.name");
+    }
+
     protected final String getMap() {
         StringBuilder map = new StringBuilder();
         map.append("APP BASIC").append("\n");
@@ -456,7 +460,7 @@ public final class Aplication implements ActionListener, PropertyChangeListener,
             public void actionPerformed(ActionEvent e) {
                 Permission perm = getControl().getPermissionByName("show-products-module");
                 getGuiManager().showBasicPanel(getGuiManager().getPanelBasicProducts(), perm);
-            }   
+            }
         };
         acShowProducts.setSmallIcon(new ImageIcon(imgManager.getImagen(getFolderIcons() + "shopping-bag-purple.png", 25, 25)));
         acShowProducts.setLargeIcon(new ImageIcon(imgManager.getImagen(getFolderIcons() + "shopping-bag-purple.png", 32, 32)));

@@ -239,7 +239,7 @@ public class PanelTopSearch extends PanelCaptura implements ActionListener {
                 filtrar(regSearch.getText(), 1);
             }
         } else if (AC_SEND_PIN.equals(e.getActionCommand())) {
-            ConfigDB config = app.getControl().getConfig(Configuration.PRINTER_SELECTED);
+            ConfigDB config = app.getControl().getConfigLocal(Configuration.PRINTER_SELECTED);
             String printer = config != null ? config.getValor() : "";
             app.getPrinterService().sendPulsePin(printer);
         }

@@ -5,7 +5,6 @@
  */
 package com.bacon.persistence.JDBC;
 
-
 import com.bacon.DBManager;
 import com.bacon.domain.ConfigDB;
 import com.bacon.persistence.SQLExtractor;
@@ -81,11 +80,13 @@ public class JDBCConfigDAO implements ConfigDAO {
         PreparedStatement ps = null;
         try {
             conn = dataSource.getConnection();
-            conn.setAutoCommit(false);            
+            conn.setAutoCommit(false);
             Object[] parameters = {
                 config.getClave(),
                 config.getValor(),
-                config.getTipo()
+                config.getTipo(),
+                config.getUser(),
+                config.getDevice()
             };
             ps = sqlStatements.buildSQLStatement(conn, ADD_CONFIG_KEY, parameters);
             ps.executeUpdate();
@@ -129,11 +130,57 @@ public class JDBCConfigDAO implements ConfigDAO {
             rs = retrieve.executeQuery();
             while (rs.next()) {
                 configDB = new ConfigDB();
-                configDB.setId(rs.getInt(1));
-                configDB.setClave(rs.getString(2));
-                configDB.setValor(rs.getString(3));
-                configDB.setTipo(rs.getString(4));
+                configDB.setId(rs.getInt("id"));
+                configDB.setClave(rs.getString("code"));
+                configDB.setValor(rs.getString("value"));
+                configDB.setTipo(rs.getString("type"));
+                configDB.setUser(rs.getString("user"));
+                configDB.setValor(rs.getString("device"));
+            }
+        } catch (SQLException e) {
+            throw new DAOException("Could not properly retrieve the ConfigDB: " + e);
+        } finally {
+            DBManager.closeResultSet(rs);
+            DBManager.closeStatement(retrieve);
+            DBManager.closeConnection(conn);
+        }
+        return configDB;
+    }
 
+    public ConfigDB getConfigDB(String code, String user, String device) throws DAOException {
+        String retrieveConfig;
+        if (code == null) {
+            throw new IllegalArgumentException("Null clave");
+        }
+        try {
+            String where = "code='" + code + "' AND user='" + user + "' AND device='" + device + "'";
+            SQLExtractor sqlExtractorWhere = new SQLExtractor(where, SQLExtractor.Type.WHERE);
+            Map<String, String> namedParams = new HashMap<String, String>();
+            namedParams.put(NAMED_PARAM_WHERE, sqlExtractorWhere.extractWhere());
+            retrieveConfig = sqlStatements.getSQLString(GET_CONFIG_KEY, namedParams);
+//            System.out.println("retrieveConfig = " + retrieveConfig);
+        } catch (SQLException e) {
+            throw new DAOException("Could not properly retrieve the ConfigDB", e);
+        } catch (IOException e) {
+            throw new DAOException("Could not properly retrieve the ConfigDB", e);
+        }
+        Connection conn = null;
+        PreparedStatement retrieve = null;
+        ResultSet rs = null;
+        ConfigDB configDB = null;
+        try {
+            conn = dataSource.getConnection();
+            retrieve = conn.prepareStatement(retrieveConfig);
+//            System.out.println("retrieve = " + retrieve);
+            rs = retrieve.executeQuery();
+            while (rs.next()) {
+                configDB = new ConfigDB();
+                configDB.setId(rs.getInt("id"));
+                configDB.setClave(rs.getString("code"));
+                configDB.setValor(rs.getString("value"));
+                configDB.setTipo(rs.getString("type"));
+                configDB.setUser(rs.getString("user"));
+                configDB.setDevice(rs.getString("device"));
             }
         } catch (SQLException e) {
             throw new DAOException("Could not properly retrieve the ConfigDB: " + e);
@@ -176,9 +223,10 @@ public class JDBCConfigDAO implements ConfigDAO {
             conn.setAutoCommit(false);
             Object[] parameters = {
                 configDB.getValor(),
-                configDB.getTipo(),                
-                configDB.getClave()
-            };
+                configDB.getTipo(),
+                configDB.getClave(),
+                configDB.getUser(),
+                configDB.getDevice(),};
             update = sqlStatements.buildSQLStatement(conn, UPDATE_CONFIG_KEY, parameters);
             update.executeUpdate();
             conn.commit();
@@ -194,7 +242,7 @@ public class JDBCConfigDAO implements ConfigDAO {
         }
     }
 
-    public int existConfig(String code) throws DAOException {
+    public int existConfig(String code, String user, String device) throws DAOException {
         String retrieve;
         try {
             retrieve = sqlStatements.getSQLString(EXIST_CONFIG_KEY);
@@ -207,7 +255,7 @@ public class JDBCConfigDAO implements ConfigDAO {
         int count = 0;
         try {
             conn = dataSource.getConnection();
-            Object[] parameters = {code};
+            Object[] parameters = {code, user, device};
 //            pSt = conn.prepareStatement(retrieve);
             pSt = sqlStatements.buildSQLStatement(conn, EXIST_CONFIG_KEY, parameters);
             rs = pSt.executeQuery();

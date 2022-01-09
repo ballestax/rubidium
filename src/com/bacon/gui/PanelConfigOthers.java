@@ -170,43 +170,43 @@ public class PanelConfigOthers extends javax.swing.JPanel implements ActionListe
     }
 
     private void loadData() {
-        ConfigDB config = app.getControl().getConfig(Configuration.DELIVERY_VALUE);
+        ConfigDB config = app.getControl().getConfigLocal(Configuration.DELIVERY_VALUE);
         double deliveryValue = config != null ? (double) config.castValor() : 0;
         regDelivery.setText(app.getDCFORM_W().format(deliveryValue));
 
-        config = app.getControl().getConfig(Configuration.DOCUMENT_NAME);
+        config = app.getControl().getConfigLocal(Configuration.DOCUMENT_NAME);
         String docName = config != null ? config.getValor() : "";
         regDocName.setText(docName);
 
-        config = app.getControl().getConfig(Configuration.ZEROS_INVOICES);
+        config = app.getControl().getConfigLocal(Configuration.ZEROS_INVOICES);
         int zeros = config != null ? (int) config.castValor() : 0;
         regNumZeros.setText(app.getDCFORM_W().format(zeros));
 
-        config = app.getControl().getConfig(Configuration.PREFIX_INVOICES);
+        config = app.getControl().getConfigLocal(Configuration.PREFIX_INVOICES);
         String prefix = config != null ? config.getValor() : "";
         regPrefix.setText(prefix);
 
-        config = app.getControl().getConfig(Configuration.PRINT_PREV_DELIVERY);
+        config = app.getControl().getConfigLocal(Configuration.PRINT_PREV_DELIVERY);
         boolean showPrev = config != null ? (boolean) config.castValor() : false;
         regAllowPreview.setSelected(showPrev);
 
-        config = app.getControl().getConfig(Configuration.SHOW_EXCLUSIONS);
+        config = app.getControl().getConfigLocal(Configuration.SHOW_EXCLUSIONS);
         boolean showExclusions = config != null ? (boolean) config.castValor() : false;
         regShowExclusions.setSelected(showExclusions);
 
-        config = app.getControl().getConfig(Configuration.INVOICE_OUT_STOCK);
+        config = app.getControl().getConfigLocal(Configuration.INVOICE_OUT_STOCK);
         boolean showOutStock = config != null ? (boolean) config.castValor() : false;
         regAllowFact.setSelected(showOutStock);
         
-        config = app.getControl().getConfig(Configuration.NUM_COLUMNS_VIEW1);
+        config = app.getControl().getConfigLocal(Configuration.NUM_COLUMNS_VIEW1);
         int numColumns1 = config != null ? (int) config.castValor() : 2;
         regNumColumnsV1.setText(app.getDCFORM_W().format(numColumns1));
         
-        config = app.getControl().getConfig(Configuration.NUM_COLUMNS_VIEW2);
+        config = app.getControl().getConfigLocal(Configuration.NUM_COLUMNS_VIEW2);
         int numColumns2 = config != null ? (int) config.castValor() : 2;
         regNumColumnsV2.setText(app.getDCFORM_W().format(numColumns2));
         
-        config = app.getControl().getConfig(Configuration.MAX_CATEGORIES_LIST);
+        config = app.getControl().getConfigLocal(Configuration.MAX_CATEGORIES_LIST);
         int numCategories = config != null ? (int) config.castValor() : 5;
         regNumCategories.setText(app.getDCFORM_W().format(numCategories));
 
@@ -275,37 +275,41 @@ public class PanelConfigOthers extends javax.swing.JPanel implements ActionListe
     public void actionPerformed(ActionEvent e) {
         if (ACTION_APPLY.equals(e.getActionCommand())) {
             String value = regDelivery.getText();
-            app.getControl().addConfig(new ConfigDB(com.bacon.Configuration.DELIVERY_VALUE, ConfigDB.DOUBLE, value));
+            
+            String userName = app.getUser().getUsername();
+            String userDevice = Aplication.getUserDevice();
+            
+            app.getControl().addConfig(new ConfigDB(com.bacon.Configuration.DELIVERY_VALUE, ConfigDB.DOUBLE, value, userName, userDevice));
 
             boolean selected = regAllowPreview.isSelected();
 //            app.getConfiguration().setProperty(com.bacon.Configuration.PRINT_PREV_DELIVERY, String.valueOf(selected));
-            app.getControl().addConfig(new ConfigDB(com.bacon.Configuration.PRINT_PREV_DELIVERY, ConfigDB.BOOLEAN, String.valueOf(selected)));
+            app.getControl().addConfig(new ConfigDB(com.bacon.Configuration.PRINT_PREV_DELIVERY, ConfigDB.BOOLEAN, String.valueOf(selected), userName, userDevice));
 
             boolean selected2 = regShowExclusions.isSelected();
 //            app.getConfiguration().setProperty(com.bacon.Configuration.SHOW_EXCLUSIONS, String.valueOf(selected2));
-            app.getControl().addConfig(new ConfigDB(com.bacon.Configuration.SHOW_EXCLUSIONS, ConfigDB.BOOLEAN, String.valueOf(selected2)));
+            app.getControl().addConfig(new ConfigDB(com.bacon.Configuration.SHOW_EXCLUSIONS, ConfigDB.BOOLEAN, String.valueOf(selected2), userName, userDevice));
 
             boolean selected3 = regAllowFact.isSelected();
 //            app.getConfiguration().setProperty(com.bacon.Configuration.INVOICE_OUT_STOCK, String.valueOf(selected3));
-            app.getControl().addConfig(new ConfigDB(com.bacon.Configuration.INVOICE_OUT_STOCK, ConfigDB.BOOLEAN, String.valueOf(selected3)));
+            app.getControl().addConfig(new ConfigDB(com.bacon.Configuration.INVOICE_OUT_STOCK, ConfigDB.BOOLEAN, String.valueOf(selected3), userName, userDevice));
 
             String prefix = regPrefix.getText();
-            app.getControl().addConfig(new ConfigDB(com.bacon.Configuration.PREFIX_INVOICES, ConfigDB.STRING, prefix));
+            app.getControl().addConfig(new ConfigDB(com.bacon.Configuration.PREFIX_INVOICES, ConfigDB.STRING, prefix, userName, userDevice));
 
             String ceros = regNumZeros.getText();
-            app.getControl().addConfig(new ConfigDB(com.bacon.Configuration.ZEROS_INVOICES, ConfigDB.INTEGER, ceros));
+            app.getControl().addConfig(new ConfigDB(com.bacon.Configuration.ZEROS_INVOICES, ConfigDB.INTEGER, ceros, userName, userDevice));
 
             String docName = regDocName.getText();
-            app.getControl().addConfig(new ConfigDB(com.bacon.Configuration.DOCUMENT_NAME, ConfigDB.STRING, docName));
+            app.getControl().addConfig(new ConfigDB(com.bacon.Configuration.DOCUMENT_NAME, ConfigDB.STRING, docName, userName, userDevice));
             
             String columnsV1 = regNumColumnsV1.getText();
-            app.getControl().addConfig(new ConfigDB(Configuration.NUM_COLUMNS_VIEW1, ConfigDB.INTEGER, columnsV1));
+            app.getControl().addConfig(new ConfigDB(Configuration.NUM_COLUMNS_VIEW1, ConfigDB.INTEGER, columnsV1, userName, userDevice));
             
             String columnsV2 = regNumColumnsV2.getText();
-            app.getControl().addConfig(new ConfigDB(Configuration.NUM_COLUMNS_VIEW2, ConfigDB.INTEGER, columnsV2));
+            app.getControl().addConfig(new ConfigDB(Configuration.NUM_COLUMNS_VIEW2, ConfigDB.INTEGER, columnsV2, userName, userDevice));
             
             String categories = regNumCategories.getText();
-            app.getControl().addConfig(new ConfigDB(Configuration.MAX_CATEGORIES_LIST, ConfigDB.INTEGER, categories));
+            app.getControl().addConfig(new ConfigDB(Configuration.MAX_CATEGORIES_LIST, ConfigDB.INTEGER, categories, userName, userDevice));
 
             app.getConfiguration().save();
         }

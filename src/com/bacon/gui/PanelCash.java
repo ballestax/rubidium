@@ -404,7 +404,7 @@ public class PanelCash extends PanelCapturaMod implements ActionListener, ListSe
             }
             loadCycle();
         } else if (AC_OPEN_CASH.equals(e.getActionCommand())) {
-            ConfigDB config = app.getControl().getConfig(Configuration.PRINTER_SELECTED);
+            ConfigDB config = app.getControl().getConfigLocal(Configuration.PRINTER_SELECTED);
             String printer = config != null ? config.getValor() : "";
             app.getPrinterService().sendPulsePin(printer);
         }

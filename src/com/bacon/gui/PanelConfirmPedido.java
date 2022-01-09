@@ -180,7 +180,7 @@ public class PanelConfirmPedido extends javax.swing.JPanel implements ActionList
     @Override
     public void actionPerformed(ActionEvent e) {
         if (AC_PRINT_BILL.equals(e.getActionCommand())) {
-            ConfigDB config = app.getControl().getConfig(Configuration.PRINTER_SELECTED);
+            ConfigDB config = app.getControl().getConfigLocal(Configuration.PRINTER_SELECTED);
             String propPrinter = config != null ? config.getValor() : "";
             if (propPrinter.isEmpty()) {
                 GUIManager.showErrorMessage(null, "No ha seleccionado una impresora valida para imprimir", "Impresora no encontrada");
@@ -196,7 +196,7 @@ public class PanelConfirmPedido extends javax.swing.JPanel implements ActionList
             anularFactura();
 
         } else if (AC_PRINT_GUIDE.equals(e.getActionCommand())) {
-            ConfigDB config = app.getControl().getConfig(Configuration.PRINTER_SELECTED);
+            ConfigDB config = app.getControl().getConfigLocal(Configuration.PRINTER_SELECTED);
             String propPrinter = config != null ? config.getValor() : "";            
             if (propPrinter.isEmpty()) {
                 GUIManager.showErrorMessage(null, "No ha seleccionado una impresora valida para imprimir", "Impresora no encontrada");
