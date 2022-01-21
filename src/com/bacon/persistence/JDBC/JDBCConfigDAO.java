@@ -273,5 +273,37 @@ public class JDBCConfigDAO implements ConfigDAO {
         }
         return count;
     }
+    
+    public int existConfig(String code) throws DAOException {
+        String retrieve;
+        try {
+            retrieve = sqlStatements.getSQLString(EXIST_CONFIG_KEY);
+        } catch (IOException e) {
+            throw new DAOException("Could not properly retrieve the outdated count", e);
+        }
+        Connection conn = null;
+        PreparedStatement pSt = null;
+        ResultSet rs = null;
+        int count = 0;
+        try {
+            conn = dataSource.getConnection();
+            Object[] parameters = {code};
+//            pSt = conn.prepareStatement(retrieve);
+            pSt = sqlStatements.buildSQLStatement(conn, EXIST_CONFIG_KEY, parameters);
+            rs = pSt.executeQuery();
+            while (rs.next()) {
+                count = rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            throw new DAOException("Could not properly retrieve the outdated count: " + e);
+        } catch (IOException ex) {
+            throw new DAOException("Could not properly retrieve the outdated count: " + ex);
+        } finally {
+            DBManager.closeResultSet(rs);
+            DBManager.closeStatement(pSt);
+            DBManager.closeConnection(conn);
+        }
+        return count;
+    }
 
 }

@@ -172,7 +172,7 @@ public class Control {
     public ConfigDB getConfigLocal(String clave) {
         try {
             String userName = app.getUser().getUsername();
-            String userDevice = Aplication.getUserDevice();            
+            String userDevice = Aplication.getUserDevice();
             JDBCConfigDAO configDAO = (JDBCConfigDAO) DAOFactory.getInstance().getConfigDAO();
             return configDAO.getConfigDB(clave, userName, userDevice);
         } catch (Exception e) {

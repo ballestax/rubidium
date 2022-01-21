@@ -50,6 +50,7 @@ import com.bacon.gui.PanelOtherProduct;
 import com.bacon.gui.PanelPayInvoice;
 import com.bacon.gui.PanelPressProduct;
 import com.bacon.gui.PanelProducts;
+import com.bacon.gui.PanelQuickSearch;
 import com.bacon.gui.PanelReportSales;
 import com.bacon.gui.PanelSelCategory;
 import com.bacon.gui.PanelSelItem;
@@ -62,8 +63,11 @@ import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.Insets;
+import java.awt.KeyEventDispatcher;
+import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
@@ -86,15 +90,16 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.JRootPane;
 import javax.swing.JSplitPane;
 import javax.swing.JToolBar;
+import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import static org.dz.GuiUtil.centrarFrame;
 import org.dz.MyDialogEsc;
-
 
 /**
  *
@@ -146,6 +151,9 @@ public class GUIManager {
     private PanelBasic panelBasicProducts;
     private PanelProducts panelProducts;
     private PanelSnapShot panelSnapshot;
+    private PanelQuickSearch panelQSearch;
+
+    private boolean showingInfo = false;
 
     private GUIManager() {
 
@@ -261,7 +269,15 @@ public class GUIManager {
         }
         return panelCash;
     }
-    
+
+    private PanelQuickSearch getPanelQuickSearch() {
+        if (panelQSearch == null) {
+            panelQSearch = new PanelQuickSearch(app);
+            
+        }
+        return panelQSearch;
+    }
+
     private PanelProducts getPanelProducts() {
         if (panelProducts == null) {
             panelProducts = new PanelProducts(app);
@@ -314,8 +330,7 @@ public class GUIManager {
         }
         return panelBasicCash;
     }
-    
-    
+
     public PanelBasic getPanelBasicProducts() {
         if (panelBasicProducts == null) {
             ImageIcon icon = new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "shopping-bag-purple.png", 30, 30));
@@ -416,7 +431,7 @@ public class GUIManager {
         }
         return panelSelCategory;
     }
-    
+
     public PanelSnapShot getPanelSnapShot() {
         if (panelSnapshot == null) {
             panelSnapshot = new PanelSnapShot(app);
@@ -427,9 +442,10 @@ public class GUIManager {
     public PanelSelItem getPanelSelItem() {
         return getPanelSelItem(null);
     }
+
     public PanelSelItem getPanelSelItem(Item item) {
         if (panelSelItem == null) {
-            panelSelItem = new PanelSelItem(app, null);            
+            panelSelItem = new PanelSelItem(app, null);
         }
         panelSelItem.reset();
         panelSelItem.setItem(item);
@@ -439,7 +455,7 @@ public class GUIManager {
     public PanelDownItem getPanelDownItem() {
         return getPanelDownItem(null);
     }
-    
+
     public PanelDownItem getPanelDownItem(Item item) {
         if (panelDownItem == null) {
             panelDownItem = new PanelDownItem(app, null);
@@ -536,6 +552,19 @@ public class GUIManager {
             frame = new JFrame();
             frame.setLayout(new BorderLayout());
             frame.setIconImages(getListIconos());
+
+            KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new KeyEventDispatcher() {
+                @Override
+                public boolean dispatchKeyEvent(KeyEvent e) {
+                    if (e.getKeyCode() == KeyEvent.VK_F3) {
+                        if (!showingInfo) {
+                            showingInfo = true;
+                            showPanelInfo();
+                        }
+                    }
+                    return false;
+                }
+            });
 //            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         }
         return frame;
@@ -623,7 +652,7 @@ public class GUIManager {
             if (user != null && perm != null && app.getControl().hasPermission(user, perm)) {
                 toolbar.add((app.getAction(Aplication.ACTION_SHOW_INVENTORY)));
             }
-            
+
             perm = app.getControl().getPermissionByName("show-products-module");
             if (user != null && app.getControl().hasPermission(user, perm)) {
                 toolbar.add((app.getAction(Aplication.ACTION_SHOW_PRODUCTS)));
@@ -742,6 +771,34 @@ public class GUIManager {
 
     }
 
+    public void showPanelInfo() {
+        setWaitCursor();
+
+        JDialog dialog = new MyDialogEsc(getFrame()) {
+            @Override
+            public void setVisible(boolean b) {
+                super.setVisible(b); //To change body of generated methods, choose Tools | Templates.
+                if (!b) {
+                    showingInfo = false;
+                }
+            }
+        };
+        dialog.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
+        dialog.setModal(true);
+        int w = 800;
+        int h = 500;
+        dialog.setPreferredSize(new Dimension(w, h));
+
+        getPanelQuickSearch().reset();
+//        dialog.setResizable(false);
+        dialog.add(getPanelQuickSearch());
+        dialog.setTitle("Buscar ticket.");
+        dialog.pack();
+        dialog.setLocationRelativeTo(getFrame());
+        setDefaultCursor();
+        dialog.setVisible(true);
+    }
+
     private void mostrarAcercaDe() {
         String msg = Aplication.TITLE + " " + Aplication.VERSION;
         JLabel about = new JLabel(getCopyright());
@@ -817,7 +874,7 @@ public class GUIManager {
 
     public void showNewRol(PropertyChangeListener pcl, Rol role) {
         setWaitCursor();
-        JDialog dialog = getDialog(true);        
+        JDialog dialog = getDialog(true);
         dialog.setPreferredSize(null);
         dialog.add(getPanelNewRol(pcl, role));
         dialog.setResizable(false);
@@ -911,7 +968,7 @@ public class GUIManager {
         }
         if (limpiar) {
             myDialog.getContentPane().removeAll();
-        }        
+        }
         return myDialog;
     }
 
@@ -1086,7 +1143,7 @@ public class GUIManager {
         setDefaultCursor();
         dialog.setVisible(true);
     }
-    
+
     public void showPanelSnapShot() {
         setWaitCursor();
         JDialog dialog = new MyDialogEsc();
@@ -1177,7 +1234,7 @@ public class GUIManager {
         setDefaultCursor();
         dialog.setVisible(true);
     }
-    
+
     public void showPanelSelItem(PropertyChangeListener listener) {
         showPanelSelItem(null, listener);
     }
@@ -1200,7 +1257,7 @@ public class GUIManager {
     public void showPanelDownItem(PropertyChangeListener listener) {
         showPanelDownItem(null, listener);
     }
-    
+
     public void showPanelDownItem(Item item, PropertyChangeListener listener) {
         setWaitCursor();
         JDialog dialog = new MyDialogEsc();
@@ -1294,7 +1351,7 @@ public class GUIManager {
         }
         return pnConfigTicket;
     }
-    
+
     public void showPanelNewCategory(String title, PropertyChangeListener listener, List lista) {
         setWaitCursor();
         JDialog dialog = new MyDialogEsc();
@@ -1307,7 +1364,7 @@ public class GUIManager {
         setDefaultCursor();
         dialog.setVisible(true);
     }
-    
+
     public void showPanelAddPress(PropertyChangeListener listener, Product product) {
         setWaitCursor();
         JDialog dialog = new MyDialogEsc();
@@ -1330,7 +1387,7 @@ public class GUIManager {
         setDefaultCursor();
         dialog.setVisible(true);
     }
-    
+
     public void showPanelEditPress(PropertyChangeListener listener, Presentation presentation) {
         setWaitCursor();
         JDialog dialog = new MyDialogEsc();

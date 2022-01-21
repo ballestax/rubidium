@@ -160,9 +160,9 @@ public class PanelConfigOthers extends javax.swing.JPanel implements ActionListe
         cCont.setBackgroundTitle(new Color(200,210,220));
         cCont.setTitle("Numero de categorias a visualizar");
         cCont.addCampo(regNumCategories);
-        jPanel1.add(cCont);
-        jPanel1.add(Box.createVerticalGlue());
-        jPanel1.add(Box.createVerticalStrut(5));
+            jPanel1.add(cCont);
+            jPanel1.add(Box.createVerticalGlue());
+            jPanel1.add(Box.createVerticalStrut(5));
 
         btApply.setText("Aplicar");
         btApply.setActionCommand(ACTION_APPLY);
