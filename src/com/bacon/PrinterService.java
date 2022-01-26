@@ -72,7 +72,7 @@ public class PrinterService {
 //            URL githubURL = getURL("logo1.png");
 //            System.out.println("githubURL = " + githubURL);
 //            BufferedImage imagen = ImageIO.read(githubURL);
-            Image imagen = app.getImgManager().getImagen("gui/img/" + "logo2.png", 150, 150);
+            Image imagen = app.getImgManager().getImagen("gui/img/" + "logo-2.png", 150, 150);
             BufferedImage buffImagen = Imagenes.toBuffereredImage(imagen);
             EscPosImage escposImage = new EscPosImage(buffImagen, algorithm);
 
