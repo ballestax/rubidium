@@ -346,6 +346,7 @@ public class PanelOrders extends PanelCapturaMod implements
         selTable = table;
 
         modelTable.setRowCount(0);
+        mapInventory.clear();
         products.clear();
         productsOld.clear();
         block = false;
@@ -366,7 +367,7 @@ public class PanelOrders extends PanelCapturaMod implements
                 productsOld = copyProductsToMap(order.getProducts());
             }
 
-            block = true;
+            block = true;            
             btSend.setEnabled(false);
             btStay.setEnabled(false);
             btCancel.setIcon(iconBack);
@@ -514,6 +515,8 @@ public class PanelOrders extends PanelCapturaMod implements
             }
             if (block) {
                 productPed.setStatus(ProductoPed.ST_NEW_ADD);
+                btCancelMods.setVisible(false);
+                btDelete.setEnabled(true);
             }
         }
 
@@ -1148,8 +1151,15 @@ public class PanelOrders extends PanelCapturaMod implements
                     .sorted(Collections.reverseOrder())
                     .map(tbProducts::convertRowIndexToModel)
                     .forEach(modelTable::removeRow);
-            enableSends(checkChanges(products));
-
+            if (tbProducts.getRowCount() > 0) {
+                enableSends(checkChanges(products));
+            }
+        } else if (AC_CANCEL_ITEM.equals(e.getActionCommand())) {
+            ProductoPed productSelected = getProductSelected();
+            productSelected.setStatus(ProductoPed.ST_AVOIDED);
+            int row = tbProducts.getSelectedRow();
+            tbProducts.setValueAt(productSelected, row, 1);
+            
         } else if (AC_SEND_ORDER.equals(e.getActionCommand())) {
             if (verifyOrder()) {
                 app.getGuiManager().getPanelTakeOrders().showTables();
@@ -1166,6 +1176,7 @@ public class PanelOrders extends PanelCapturaMod implements
             }
         } else if (AC_CLEAR_ORDER.equals(e.getActionCommand())) {
             modelTable.setRowCount(0);
+            mapInventory.clear();
             products.clear();
         } else if (AC_MODIFY_ITEM.equals(e.getActionCommand())) {
             ProductoPed productSelected = getProductSelected();
@@ -1223,15 +1234,17 @@ public class PanelOrders extends PanelCapturaMod implements
             lbIndicator.setVisible(regWaiter.getSelected() >= 0);
 
         } else if (AC_CANCEL_ORDER.equals(e.getActionCommand())) {
-            System.out.println("cancel order");
             if (products.size() > 0) {
                 String msg = "<html>El pedido no esta vacio, <br>¿Desea cancelar todo y volver al menu de seleccion de mesas?</html>";
 
                 int showConfirmDialog = JOptionPane.showConfirmDialog(null, msg, "Advertencia", JOptionPane.YES_NO_OPTION);
                 if (showConfirmDialog == JOptionPane.YES_OPTION) {
                     modelTable.setRowCount(0);
+                    mapInventory.clear();
                     products.clear();
 //                    app.getGuiManager().getPanelTakeOrders().showTables();
+                } else {
+                    return;
                 }
             }
 //            } else {
@@ -1258,6 +1271,8 @@ public class PanelOrders extends PanelCapturaMod implements
                     ProductoPed prod = (ProductoPed) value.get("prod");
                     prod.setStatus(ProductoPed.ST_SENDED);
                     lbQuantity.setText(String.valueOf(cant));
+                    btMinus.setEnabled(cant > 1);
+                    btAdd.setEnabled(cant < 100);
                     modelTable.setValueAt(cant, cRow, 0);
                     modelTable.setValueAt(prod, cRow, 1);
                     btCancelMods.setVisible(false);
@@ -1266,6 +1281,7 @@ public class PanelOrders extends PanelCapturaMod implements
             enableSends(checkChanges(products));
         }
     }
+    public static final String AC_CANCEL_ITEM = "AC_CANCEL_ITEM";
 
     public void disableButtonInSend() {
         btSend.setEnabled(false);
@@ -1385,8 +1401,13 @@ public class PanelOrders extends PanelCapturaMod implements
                     int status = product.getStatus();
                     btCancelMods.setVisible(status == ProductoPed.ST_MOD_ADD_CANT || status == ProductoPed.ST_MOD_MIN_CANT);
 
+                    if(product.getStatus() == ProductoPed.ST_SENDED || product.getStatus() == ProductoPed.ST_SENDED_MOD){
+                        btDelete.setText("Cancelar");
+                        btDelete.setActionCommand(AC_CANCEL_ITEM);
+                    }
+                    
                     Permission perm = app.getControl().getPermissionByName("allow-cancel-product-order");
-                    btDelete.setEnabled(app.getControl().hasPermission(app.getUser(), perm) || !block);
+                    btDelete.setEnabled(app.getControl().hasPermission(app.getUser(), perm) || !block || status == ProductoPed.ST_NEW_ADD);
 
                     perm = app.getControl().getPermissionByName("allow-modify-product-order");
                     btModify.setEnabled(app.getControl().hasPermission(app.getUser(), perm) || !block);

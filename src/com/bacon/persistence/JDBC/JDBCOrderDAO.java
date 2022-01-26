@@ -424,7 +424,6 @@ public class JDBCOrderDAO implements OrderDAO {
                 try {
                     retrieve = sqlStatements.buildSQLStatement(conn, GET_ORDER_PRODUCT_KEY, parameters);
                     rs1 = retrieve.executeQuery();
-                    System.out.println(retrieve);
                     Product product;
                     while (rs1.next()) { //add products
                         product = new Product();
@@ -519,7 +518,6 @@ public class JDBCOrderDAO implements OrderDAO {
                         }
 
                         if (order.getProducts().contains(productoPed)) {
-                            System.out.println("order contain product");
                             int idx = order.getProducts().indexOf(productoPed);
                             int cant = productoPed.getCantidad();
                             ProductoPed prod = order.getProducts().get(idx);
@@ -552,13 +550,13 @@ public class JDBCOrderDAO implements OrderDAO {
     }
 
     public ArrayList<ProductoPed> getOrderProducts(long orderId) throws DAOException {
-        
+
         ArrayList<ProductoPed> products = new ArrayList<>();
 
         Connection conn = null;
         PreparedStatement retrieve = null;
         ResultSet rs = null, rs1 = null, rs2 = null, rs3 = null, rsx = null;
-        
+
         try {
             conn = dataSource.getConnection();
 
@@ -567,7 +565,7 @@ public class JDBCOrderDAO implements OrderDAO {
             try {
                 retrieve = sqlStatements.buildSQLStatement(conn, GET_ORDER_PRODUCT_KEY, parameters);
                 rs1 = retrieve.executeQuery();
-        
+
                 Product product;
                 while (rs1.next()) { //add products
                     product = new Product();
@@ -662,7 +660,6 @@ public class JDBCOrderDAO implements OrderDAO {
                     }
 
                     if (products.contains(productoPed)) {
-                        System.out.println("order contain product");
                         int idx = products.indexOf(productoPed);
                         int cant = productoPed.getCantidad();
                         ProductoPed prod = products.get(idx);
@@ -1074,7 +1071,6 @@ public class JDBCOrderDAO implements OrderDAO {
                         }
 
                         if (order.getProducts().contains(productoPed)) {
-                            System.out.println("order contain product");
                             int idx = order.getProducts().indexOf(productoPed);
                             int cant = productoPed.getCantidad();
                             ProductoPed prod = order.getProducts().get(idx);
@@ -1177,7 +1173,7 @@ public class JDBCOrderDAO implements OrderDAO {
             if (oldProducts != null && !oldProducts.equals(products)) {
                 for (ProductoPed oldProduct : oldProducts) {
                     HashMap<Integer, HashMap> data = oldProduct.getData();
-                    System.out.println(Arrays.toString(data.entrySet().toArray()));
+//                    System.out.println(Arrays.toString(data.entrySet().toArray()));
                 }
             }
 

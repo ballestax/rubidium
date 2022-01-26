@@ -14,6 +14,8 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.font.TextAttribute;
+import java.text.AttributedString;
 import java.util.ArrayList;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -35,7 +37,7 @@ public class ProductRenderer extends Box implements TableCellRenderer {
     private JLabel labelAdicion, labelIngredients;
     private ProductoPed prodPed;
     private Object oldValue;
-    private Font f1;
+    private Font f1, fTitle, fTitleAvoid;
     private Color alterRowColor;
     private Box boxTop;
     private JLabel lbIconSended, lbIconEntry;
@@ -44,6 +46,7 @@ public class ProductRenderer extends Box implements TableCellRenderer {
     private ImageIcon iconSend3;
     private ImageIcon iconPlus;
     private ImageIcon iconMinus;
+    private ImageIcon iconCancel;
 
     /*
          *   Use the specified formatter to format the Object
@@ -61,10 +64,14 @@ public class ProductRenderer extends Box implements TableCellRenderer {
     private void createComponent() {
         oldValue = null;
 
+        fTitleAvoid = new Font("Sans", Font.CENTER_BASELINE, 11);
+        fTitle = new Font("Sans", Font.BOLD, 11);
+
         labelName = new JLabel();
         labelName.setBorder(BorderFactory.createEmptyBorder(3, 0, 0, 0));
         labelName.setOpaque(true);
         labelName.setAlignmentX(0);
+        labelName.setFont(fTitleAvoid);
 
         boxTop = new Box(BoxLayout.X_AXIS);
 
@@ -73,6 +80,7 @@ public class ProductRenderer extends Box implements TableCellRenderer {
         iconSend3 = new ImageIcon(Resources.getImagen("gui/img/icons/" + "right_red.png", Aplication.class, 20, 20));
         iconPlus = new ImageIcon(Resources.getImagen("gui/img/icons/" + "plus.png", Aplication.class, 20, 20));
         iconMinus = new ImageIcon(Resources.getImagen("gui/img/icons/" + "minus.png", Aplication.class, 20, 20));
+        iconCancel = new ImageIcon(Resources.getImagen("gui/img/icons/" + "cancel.png", Aplication.class, 20, 20));
 //        ImageIcon iconEntry = new ImageIcon(Resources.getImagen("gui/img/icons/" + "clock.png", Aplication.class, 15, 15));
         lbIconSended = new JLabel();
         lbIconSended.setIcon(null);
@@ -158,6 +166,8 @@ public class ProductRenderer extends Box implements TableCellRenderer {
             try {
                 prodPed = (ProductoPed) value;
 
+                labelName.setFont(fTitle);
+
                 int width = table.getColumnModel().getColumn(column).getWidth();
                 Presentation presentation = prodPed.getPresentation();
                 String stPres = "";
@@ -189,7 +199,9 @@ public class ProductRenderer extends Box implements TableCellRenderer {
                         lbIconSended.setIcon(iconMinus);
                         break;
                     case ProductoPed.ST_AVOIDED:
-                        lbIconSended.setIcon(iconSend3);
+                        lbIconSended.setIcon(iconCancel);
+                        labelName.setFont(fTitleAvoid);
+                        labelName.setForeground(Color.MAGENTA);
                         break;
                     default:
                         lbIconSended.setIcon(null);

@@ -1,14 +1,18 @@
 package com.bacon.gui;
 
 import com.bacon.Aplication;
+import com.bacon.GUIManager;
 import com.bacon.domain.AdditionalPed;
-import com.bacon.domain.Item;
 import com.bacon.domain.Order;
 import com.bacon.domain.ProductoPed;
+import com.bacon.domain.Waiter;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.KeyEventDispatcher;
+import java.awt.KeyboardFocusManager;
+import java.awt.event.KeyEvent;
 import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -26,6 +30,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingConstants;
 import javax.swing.SwingWorker;
 import javax.swing.border.Border;
 import javax.swing.event.ListSelectionEvent;
@@ -34,6 +39,7 @@ import javax.swing.table.TableCellRenderer;
 import org.dz.MyDefaultTableModel;
 import org.dz.Resources;
 import org.ocpsoft.prettytime.PrettyTime;
+import org.ocpsoft.prettytime.TimeUnit;
 
 /**
  *
@@ -45,6 +51,7 @@ public class PanelOrderList extends javax.swing.JPanel implements ListSelectionL
     private List<Order> orderslList;
     private MyDefaultTableModel model;
     private JLabel labelInfo;
+    private PrettyTime pt;
 
     /**
      * Creates new form PanelOrdersList
@@ -59,6 +66,19 @@ public class PanelOrderList extends javax.swing.JPanel implements ListSelectionL
 
     private void createComponents() {
 
+        KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new KeyEventDispatcher() {
+            @Override
+            public boolean dispatchKeyEvent(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_F5) {
+                    populateList();
+                }
+                return false;
+            }
+        });
+
+        pt = new PrettyTime(new Locale("es"));
+       
+
         String[] colNames = {"1", "2", "3", "4", "5", "6"};
         model = new MyDefaultTableModel(colNames, 0);
         tbOrders.setModel(model);
@@ -71,8 +91,7 @@ public class PanelOrderList extends javax.swing.JPanel implements ListSelectionL
         tbOrders.setSelectionModel(selectionModel);
         tbOrders.getTableHeader().setReorderingAllowed(false);
 
-        TimeCellRenderer timeRenderer = new TimeCellRenderer();
-
+//        TimeCellRenderer timeRenderer = new TimeCellRenderer();
         int[] colW = new int[]{50, 150, 80, 100, 50, 40};
         for (int i = 0; i < colW.length; i++) {
             tbOrders.getColumnModel().getColumn(i).setMinWidth(colW[i]);
@@ -80,8 +99,7 @@ public class PanelOrderList extends javax.swing.JPanel implements ListSelectionL
             tbOrders.getColumnModel().getColumn(i).setCellRenderer(new OrderCellRenderer());
         }
 
-        tbOrders.getColumnModel().getColumn(3).setCellRenderer(timeRenderer);
-
+//        tbOrders.getColumnModel().getColumn(3).setCellRenderer(timeRenderer);
         labelInfo = new JLabel();
 
         panelDetail.setLayout(new BorderLayout());
@@ -116,8 +134,10 @@ public class PanelOrderList extends javax.swing.JPanel implements ListSelectionL
 
     public void populateList() {
 
-        orderslList = app.getControl().getOrderslList("", "");
-
+        orderslList = app.getControl().getOrderslList("", "take_date DESC");
+        model.setRowCount(0);
+        PrettyTime pt = new PrettyTime(new Locale("es"));
+        app.getGuiManager().setWaitCursor();
         SwingWorker sw = new SwingWorker() {
             @Override
             protected Object doInBackground() throws Exception {
@@ -127,10 +147,13 @@ public class PanelOrderList extends javax.swing.JPanel implements ListSelectionL
                         order,
                         order.getValor(),
                         order.getFecha(),
+                        
+                        pt.formatDuration(pt.calculatePreciseDuration(order.getFecha())),
                         order.getStatus(),
                         true
                     });
                 }
+                app.getGuiManager().setDefaultCursor();
                 return true;
             }
         };
@@ -139,40 +162,71 @@ public class PanelOrderList extends javax.swing.JPanel implements ListSelectionL
     }
 
     public void showTable(Order order) {
-        List<ProductoPed> productos = order.getProducts();
-        StringBuilder str = new StringBuilder();
-        str.append("<html><table width=\"600\" cellspacing=\"0\" border=\"1\">");
-        str.append("<tr bgcolor=\"#A4C1FF\">");
-        str.append("<td>").append("Producto").append("</td>");
-//            str.append("<td>").append("Codigo").append("</td>");
-        str.append("<td>").append("Cant.").append("</td>");
-        str.append("<td>").append("V. Uni").append("</td>");
-        str.append("<td>").append("V. total").append("</td></tr>");
+        if (order != null) {
 
-        double total = 0;
+            String color = "#34cdaa";
+            Waiter waiter = app.getControl().getWaitressByID(order.getIdWaitress());
 
-        for (ProductoPed product : productos) {
-
-            int cantidad = product.getCantidad();
-            double price = product.getValueAdicionales() + product.getPrecio();
-            total += cantidad * price;
-            str.append("<tr><td bgcolor=\"#F6FFDB\">").append((product.getPresentation() != null
-                    ? (product.getProduct().getName() + " (" + product.getPresentation().getName() + ")") : product.getProduct().getName()).toUpperCase());
-            for (AdditionalPed adicional : product.getAdicionales()) {
-                str.append("<br><font color=blue size=2> +").append(adicional.getAdditional().getName())
-                        .append("(x").append(adicional.getCantidad()).append(")").append("</font>");
+            StringBuilder str = new StringBuilder();
+            str.append("<html><table width=\"600\" cellspacing=\"0\" border=\"1\">");
+            str.append("<tr>");
+            str.append("<td bgcolor=").append(color).append(">").append("ID").append("</td>");
+            str.append("<td>").append(order.getId()).append("</td></tr>");
+            str.append("<td bgcolor=").append(color).append(">").append("Consecutivo").append("</td>");
+            str.append("<td>").append(order.getConsecutive()).append("</td></tr>");
+            if (order.getDeliveryType() == PanelPedido.TIPO_LOCAL) {
+                str.append("<tr><td bgcolor=").append(color).append(">").append("Mesa").append("</td>");
+                str.append("<td>").append(order.getTable()).append("</td></tr>");
+                str.append("<tr><td bgcolor=").append(color).append(">").append("Mesero").append("</td>");
+                str.append("<td>").append(waiter.getName().toUpperCase()).append("</td></tr>");
+            } else {
+                str.append("<tr><td bgcolor=").append(color).append(">").append("Cliente").append("</td>");
+                str.append("<td>").append(order.getIdClient()).append("</td></tr>");
             }
+            str.append("<tr><td bgcolor=").append(color).append(">").append("Fecha").append("</td>");
+            str.append("<td>").append(app.DF_FULL3.format(order.getFecha())).append("</td></tr>");
+            str.append("<tr><td bgcolor=").append(color).append(">").append("Transcurrido").append("</td>");
+            str.append("<td>").append(pt.formatDuration(pt.calculatePreciseDuration(order.getFecha()))).append("</td></tr>");
+            str.append("</table>");
 
-            str.append("<br>").append(product.hasExcluisones() ? "Sin: " : "").append("<font color=red size=2>").append(product.getStExclusiones()).append("</font></td>");
+            str.append("<br><br><br>");
+
+            List<ProductoPed> productos = order.getProducts();
+//            StringBuilder str = new StringBuilder();
+            str.append("<table width=\"600\" cellspacing=\"0\" border=\"1\">");
+            str.append("<html><table width=\"600\" cellspacing=\"0\" border=\"1\">");
+            str.append("<tr bgcolor=\"#A4C1FF\">");
+            str.append("<td>").append("Producto").append("</td>");
+//            str.append("<td>").append("Codigo").append("</td>");
+            str.append("<td>").append("Cant.").append("</td>");
+            str.append("<td>").append("V. Uni").append("</td>");
+            str.append("<td>").append("V. total").append("</td></tr>");
+
+            double total = 0;
+
+            for (ProductoPed product : productos) {
+
+                int cantidad = product.getCantidad();
+                double price = product.getValueAdicionales() + product.getPrecio();
+                total += cantidad * price;
+                str.append("<tr><td bgcolor=\"#F6FFDB\">").append((product.getPresentation() != null
+                        ? (product.getProduct().getName() + " (" + product.getPresentation().getName() + ")") : product.getProduct().getName()).toUpperCase());
+                for (AdditionalPed adicional : product.getAdicionales()) {
+                    str.append("<br><font color=blue size=2> +").append(adicional.getAdditional().getName())
+                            .append("(x").append(adicional.getCantidad()).append(")").append("</font>");
+                }
+
+                str.append("<br>").append(product.hasExcluisones() ? "Sin: " : "").append("<font color=red size=2>").append(product.getStExclusiones()).append("</font></td>");
 //                str.append("<td bgcolor=\"#FFFFFF\">").append(product.getProduct().getCode()).append("</td>");
-            str.append("<td bgcolor=\"#FFFFFF\" align=\"right\">").append(app.DCFORM_P.format(cantidad)).append("</td>");
-            str.append("<td bgcolor=\"#FFFFFF\" align=\"right\">").append(app.DCFORM_P.format(price)).append("</td>");
-            str.append("<td bgcolor=\"#FFFFFF\" align=\"right\">").append(app.DCFORM_P.format(cantidad * price)).append("</td>");
-            str.append("</tr>");
-        }
-        str.append("</table></html>");
+                str.append("<td bgcolor=\"#FFFFFF\" align=\"right\">").append(app.DCFORM_P.format(cantidad)).append("</td>");
+                str.append("<td bgcolor=\"#FFFFFF\" align=\"right\">").append(app.DCFORM_P.format(price)).append("</td>");
+                str.append("<td bgcolor=\"#FFFFFF\" align=\"right\">").append(app.DCFORM_P.format(cantidad * price)).append("</td>");
+                str.append("</tr>");
+            }
+            str.append("</table></html>");
 
-        labelInfo.setText(str.toString());
+            labelInfo.setText(str.toString());
+        }
     }
 
     @Override
@@ -289,16 +343,17 @@ public class PanelOrderList extends javax.swing.JPanel implements ListSelectionL
             Border borde = BorderFactory.createLineBorder(Color.red);
 
             lbDate = new JLabel();
-            lbDate.setBorder(borde);
+//            lbDate.setBorder(borde);
             lbDate.setOpaque(true);
             lbDate.setPreferredSize(new Dimension(80, 30));
 
             lbTime = new JLabel();
             lbTime.setOpaque(true);
-            lbTime.setBorder(borde);
+//            lbTime.setBorder(borde);
             lbTime.setPreferredSize(new Dimension(80, 30));
 
             box.add(lbDate);
+            box.add(Box.createHorizontalStrut(10));
             box.add(Box.createHorizontalGlue());
             box.add(lbTime);
 
@@ -339,10 +394,12 @@ public class PanelOrderList extends javax.swing.JPanel implements ListSelectionL
     public class OrderCellRenderer implements TableCellRenderer {
 
         JLabel label;
+
         JButton btn;
 
         public OrderCellRenderer() {
             label = new JLabel();
+            label.setBorder(BorderFactory.createEmptyBorder(0, 3, 0, 3));
             label.setOpaque(true);
             btn = new JButton();
             btn.setPreferredSize(new Dimension(28, 28));
@@ -376,10 +433,21 @@ public class PanelOrderList extends javax.swing.JPanel implements ListSelectionL
                         if (value instanceof BigDecimal) {
                             format = app.DCFORM_P.format((BigDecimal) value);
                         }
+                        label.setHorizontalAlignment(SwingConstants.RIGHT);
                         label.setText(String.valueOf(format));
+
                         break;
                     case 3:
-
+                        String fecha = "0";
+                        if (value instanceof Date) {
+                            fecha = app.DF_FULL4.format(value);
+                        }
+                        label.setText(fecha);
+                        break;
+                    case 4:
+                        label.setText(String.valueOf(value));
+                        label.setToolTipText(String.valueOf(value));
+                        break;
                     default:
                         label.setText(String.valueOf(value));
                         break;
@@ -397,9 +465,6 @@ public class PanelOrderList extends javax.swing.JPanel implements ListSelectionL
                 return btn;
             }
             return label;
-
         }
-
     }
-
 }
