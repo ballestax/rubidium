@@ -69,6 +69,7 @@
                     |ADD_ORDER_PRODUCT|GET_ORDER_PRODUCT
                     |CREATE_STATIONS_TABLE|ADD_STATION|GET_STATIONS|CREATE_PRODUCT_STATION_TABLE|GET_PRODUCT_STATIONS
                     |GET_STATION_BY_ID
+                    |COUNT_UNINVOICED_PRODUCTS|GET_UNINVOICED_PRODUCTS
                     ) #REQUIRED
                     
 	>
@@ -2178,6 +2179,26 @@
                 SELECT * from stations WHERE id=?;
             </SQLFragment>   
         </SQLStatement>
+        
+        
+        
+        <SQLStatement method="COUNT_UNINVOICED_PRODUCTS">
+            <SQLFragment>
+                SELECT count(id) from invoice_product WHERE id_order=? AND id_invoice=0;
+            </SQLFragment>   
+        </SQLStatement>
+        
+        <SQLStatement method="GET_UNINVOICED_PRODUCTS">
+            <SQLFragment>
+                SELECT p.id, p.name, p.code, p.description, p.price, p.variable, p.image, p.category, ip.price, ip.cantidad, ip.id, ip.id_presentation,
+                ip.delivery,ip.term,ip.entry,ip.request,ip.status, GROUP_CONCAT(ps.station_id ORDER By ps.station_id ASC) AS stations
+                FROM products p, invoice_product ip, orders o, product_station ps
+                WHERE p.id = ip.id_product AND ip.id_order = o.id AND ps.product_id=p.id AND o.id=? AND ip.id_invoice>0 
+                GROUP BY ip.id
+            </SQLFragment>
+        </SQLStatement>
+        
+        
         
     </DAOStatements>
 </DAOConfiguration>

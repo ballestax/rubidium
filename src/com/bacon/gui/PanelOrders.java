@@ -132,7 +132,7 @@ public class PanelOrders extends PanelCapturaMod implements
 
         Font font = new Font("Arial", 1, 18);
 
-        String[] cols = {"Cant", "Producto", "Unidad", "V. Total", "LLevar"};
+        String[] cols = {"Cant", "Producto", "Unidad", "V. Total"};
         DCFORM_P = (DecimalFormat) NumberFormat.getInstance();
         DCFORM_P.applyPattern("$ ###,###,###");
         Color color = new Color(184, 25, 2);
@@ -169,7 +169,7 @@ public class PanelOrders extends PanelCapturaMod implements
         formatRenderer.setForeground(color);
         ProductRenderer prodRenderer = new ProductRenderer(BoxLayout.Y_AXIS);
 
-        int[] colW = new int[]{40, 220, 70, 80, 30};
+        int[] colW = new int[]{40, 220, 70, 80};
         for (int i = 0; i < colW.length; i++) {
             tbProducts.getColumnModel().getColumn(i).setMinWidth(colW[i]);
             tbProducts.getColumnModel().getColumn(i).setPreferredWidth(colW[i]);
@@ -181,8 +181,8 @@ public class PanelOrders extends PanelCapturaMod implements
         tbProducts.getColumnModel().getColumn(1).setCellRenderer(prodRenderer);
         tbProducts.getColumnModel().getColumn(2).setCellRenderer(formatRenderer);
         tbProducts.getColumnModel().getColumn(3).setCellRenderer(formatRenderer);
-        tbProducts.getColumnModel().getColumn(4).setCellRenderer(new CheckCellRenderer());
-        tbProducts.getColumnModel().getColumn(4).setCellEditor(tbProducts.getDefaultEditor(Boolean.class));
+//        tbProducts.getColumnModel().getColumn(4).setCellRenderer(new CheckCellRenderer());
+//        tbProducts.getColumnModel().getColumn(4).setCellEditor(tbProducts.getDefaultEditor(Boolean.class));
 
         ActionListener actionListener = new ActionListener() {
             @Override
@@ -360,7 +360,7 @@ public class PanelOrders extends PanelCapturaMod implements
             if (orderslList.size() > 0) {
                 Order order = orderslList.get(0);
                 for (ProductoPed product : order.getProducts()) {
-                    addProductPed(product, product.getCantidad(), product.getPrecio(), false);
+                    addProductPed(product, product.getCantidad(), product.getPrecio());
                 }
                 status = order.getStatus();
 
@@ -501,14 +501,14 @@ public class PanelOrders extends PanelCapturaMod implements
                     cantidad,
                     productPed,
                     totalProd,
-                    totalProd * cantidad,
-                    productPed.isDelivery()
+                    totalProd * cantidad
+//                    ,productPed.isDelivery()
                 });
 
                 int row = modelTable.getRowCount() - 1;
                 modelTable.setRowEditable(row, false);
                 modelTable.setCellEditable(row, 0, edit);
-                modelTable.setCellEditable(row, 4, edit);
+//                modelTable.setCellEditable(row, 4, edit);
                 tbProducts.getSelectionModel().addSelectionInterval(row, row);
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());
@@ -1199,10 +1199,11 @@ public class PanelOrders extends PanelCapturaMod implements
             int[] selectedRows = tbProducts.getSelectedRows();
             if (selectedRows.length == 1) {
                 int row = selectedRows[0];
-                boolean check = Boolean.parseBoolean(modelTable.getValueAt(row, 4).toString());
+//                boolean check = Boolean.parseBoolean(modelTable.getValueAt(row, 4).toString());
                 ProductoPed prod = (ProductoPed) modelTable.getValueAt(row, 1);
+                boolean check = prod.isDelivery();
                 prod.setDelivery(!check);
-                modelTable.setValueAt(!check, selectedRows[0], 4);
+//                modelTable.setValueAt(!check, selectedRows[0], 4);
             } else {
                 for (int row : selectedRows) {
                     boolean check = Boolean.parseBoolean(modelTable.getValueAt(row, 4).toString());
@@ -1391,12 +1392,13 @@ public class PanelOrders extends PanelCapturaMod implements
             if (row >= 0) {
                 try {
                     int quantity = Integer.parseInt(modelTable.getValueAt(row, 0).toString());
-                    boolean paraLlevar = Boolean.parseBoolean(modelTable.getValueAt(row, 4).toString());
+//                    boolean paraLlevar = Boolean.parseBoolean(modelTable.getValueAt(row, 4).toString());
                     lbQuantity.setText(String.valueOf(quantity));
                     product = (ProductoPed) modelTable.getValueAt(row, 1);
-                    tgDelivery.setSelected(paraLlevar);
+                    
                     if (product != null) {
-                        tgEntry.setSelected(product.isEntry());
+                        tgEntry.setSelected(product.isEntry());                        
+                        tgDelivery.setSelected(product.isDelivery());
                     }
                     int status = product.getStatus();
                     btCancelMods.setVisible(status == ProductoPed.ST_MOD_ADD_CANT || status == ProductoPed.ST_MOD_MIN_CANT);

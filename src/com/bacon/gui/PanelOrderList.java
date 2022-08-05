@@ -1,7 +1,7 @@
 package com.bacon.gui;
 
 import com.bacon.Aplication;
-import com.bacon.GUIManager;
+import com.bacon.controllers.InvoiceController;
 import com.bacon.domain.AdditionalPed;
 import com.bacon.domain.Order;
 import com.bacon.domain.ProductoPed;
@@ -12,7 +12,10 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.beans.PropertyChangeEvent;
 import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -25,6 +28,7 @@ import javax.swing.BoxLayout;
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -37,21 +41,25 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableCellRenderer;
 import org.dz.MyDefaultTableModel;
+import org.dz.PanelCapturaMod;
 import org.dz.Resources;
 import org.ocpsoft.prettytime.PrettyTime;
-import org.ocpsoft.prettytime.TimeUnit;
 
 /**
  *
  * @author lrod
  */
-public class PanelOrderList extends javax.swing.JPanel implements ListSelectionListener {
+public class PanelOrderList extends PanelCapturaMod implements ActionListener, ListSelectionListener {
 
     private final Aplication app;
     private List<Order> orderslList;
     private MyDefaultTableModel model;
     private JLabel labelInfo;
     private PrettyTime pt;
+    private JButton btFactura;
+    private final InvoiceController invoiceController;
+    private Order order;
+    private JButton btGenInvoice;
 
     /**
      * Creates new form PanelOrdersList
@@ -60,6 +68,7 @@ public class PanelOrderList extends javax.swing.JPanel implements ListSelectionL
      */
     public PanelOrderList(Aplication app) {
         this.app = app;
+        invoiceController = new InvoiceController(app);
         initComponents();
         createComponents();
     }
@@ -77,12 +86,16 @@ public class PanelOrderList extends javax.swing.JPanel implements ListSelectionL
         });
 
         pt = new PrettyTime(new Locale("es"));
-       
 
         String[] colNames = {"1", "2", "3", "4", "5", "6"};
         model = new MyDefaultTableModel(colNames, 0);
         tbOrders.setModel(model);
         tbOrders.setRowHeight(35);
+
+        ImageIcon iconPrint = new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "Printer-orange.png", 20, 20));
+        ImageIcon iconTickets = new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "tickets.png", 20, 20));
+        ImageIcon iconCancel = new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "cancel.png", 20, 20));
+        ImageIcon iconFacturar = new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "autoship.png", 20, 20));
 
         DefaultListSelectionModel selectionModel = new DefaultListSelectionModel();
         selectionModel.addListSelectionListener(this);
@@ -106,15 +119,32 @@ public class PanelOrderList extends javax.swing.JPanel implements ListSelectionL
 
         JPanel panelInfo = new JPanel(new BorderLayout());
         Box boxButtons = new Box(BoxLayout.X_AXIS);
-        JButton btGenInvoice = new JButton("Facturar");
+
+        btGenInvoice = new JButton("Facturar");
+        btGenInvoice.setIcon(iconFacturar);
+        btGenInvoice.setActionCommand(AC_FACTURAR);
+        btGenInvoice.addActionListener(this);
+
         JButton btCancelar = new JButton("Cancelar");
-        JButton btComandas = new JButton("Camandas");
+        btCancelar.setIcon(iconCancel);
         JButton btGuia = new JButton("Guia");
-        JButton btFactura = new JButton("Factura");
+        btGuia.setIcon(iconPrint);
+        btFactura = new JButton("Factura");
+        btFactura.setIcon(iconPrint);
+
+        JButton btComandas = new JButton("Comandas");
+        btComandas.setIcon(iconTickets);
+
+        JComboBox cbComandas = new JComboBox();
+
         boxButtons.add(btGenInvoice);
+        boxButtons.add(Box.createHorizontalStrut(5));
         boxButtons.add(btCancelar);
+        boxButtons.add(Box.createHorizontalStrut(5));
         boxButtons.add(btComandas);
+        boxButtons.add(Box.createHorizontalStrut(5));
         boxButtons.add(btGuia);
+        boxButtons.add(Box.createHorizontalStrut(5));
         boxButtons.add(btFactura);
 
         JScrollPane scroll = new JScrollPane();
@@ -131,6 +161,7 @@ public class PanelOrderList extends javax.swing.JPanel implements ListSelectionL
         populateList();
 
     }
+    public static final String AC_FACTURAR = "AC_FACTURAR";
 
     public void populateList() {
 
@@ -147,7 +178,6 @@ public class PanelOrderList extends javax.swing.JPanel implements ListSelectionL
                         order,
                         order.getValor(),
                         order.getFecha(),
-                        
                         pt.formatDuration(pt.calculatePreciseDuration(order.getFecha())),
                         order.getStatus(),
                         true
@@ -230,13 +260,25 @@ public class PanelOrderList extends javax.swing.JPanel implements ListSelectionL
     }
 
     @Override
+    public void actionPerformed(ActionEvent e) {
+        if (AC_FACTURAR.equals(e.getActionCommand())) {
+            if (order != null) {
+//                invoiceController.orderInvoice(order);
+                app.getGuiManager().showPanelInvoicedOrder(this, order);
+            }
+        }
+
+    }
+
+    @Override
     public void valueChanged(ListSelectionEvent e) {
         int row = tbOrders.getSelectedRow();
         if (row < 0) {
             showTable(null);
+            order = null;
         }
         try {
-            Order order = (Order) model.getValueAt(row, 1);
+            order = (Order) model.getValueAt(row, 1);
             showTable(order);
         } catch (Exception ex) {
         }
@@ -467,4 +509,10 @@ public class PanelOrderList extends javax.swing.JPanel implements ListSelectionL
             return label;
         }
     }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
 }

@@ -1552,4 +1552,14 @@ public class Control {
         }
     }
 
+    public int countUninvoicedProducts(long idOrder) {
+        try {
+            JDBCUtilDAO utilDao = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
+            return utilDao.countUninvoicedProducts(idOrder);
+        } catch (Exception e) {
+            logger.error("Error counting uninvoiced products.", e);
+            return -1;
+        }
+    }
+
 }

@@ -47,6 +47,9 @@ public class ProductRenderer extends Box implements TableCellRenderer {
     private ImageIcon iconPlus;
     private ImageIcon iconMinus;
     private ImageIcon iconCancel;
+    private boolean iconPainted = true;
+    private Color selectionBackgroundColor = null;
+    private boolean marked = false;
 
     /*
          *   Use the specified formatter to format the Object
@@ -126,6 +129,18 @@ public class ProductRenderer extends Box implements TableCellRenderer {
 
     }
 
+    public void setIconPainted(boolean iconPainted) {
+        this.iconPainted = iconPainted;
+    }
+
+    public void setSelectionBackgroundColor(Color selectionBacgroungColor) {
+        this.selectionBackgroundColor = selectionBacgroungColor;
+    }
+
+    public void setMarked(boolean marked) {
+        this.marked = marked;
+    }
+
     private void createTooltip() {
         if (prodPed != null) {
             StringBuilder stb = new StringBuilder();
@@ -186,6 +201,12 @@ public class ProductRenderer extends Box implements TableCellRenderer {
                     stEntry = " [" + "ENTRADA" + "]";
                 }
 
+                boolean delivery = prodPed.isDelivery();
+                String stDelivery = "";
+                if (delivery) {
+                    stDelivery = " [" + "LLEVAR" + "]";
+                }
+
                 switch (prodPed.getStatus()) {
                     case ProductoPed.ST_SENDED:
                     case ProductoPed.ST_SENDED_MOD:
@@ -207,6 +228,8 @@ public class ProductRenderer extends Box implements TableCellRenderer {
                         lbIconSended.setIcon(null);
                 }
 
+                lbIconSended.setVisible(iconPainted);
+
                 //                String stExclusion = prodPed.getStExclusiones();
                 String color = prodPed.getStatus() == ProductoPed.ST_MOD_ADD_CANT ? "#ff2345" : "#000";
                 if (prodPed.getStatus() == ProductoPed.ST_NEW_ADD) {
@@ -217,6 +240,7 @@ public class ProductRenderer extends Box implements TableCellRenderer {
                         + stPres
                         + stTerm
                         + "<font color=#fe3917>" + stEntry + "</font>"
+                        + "<font color=#feaa17>" + stDelivery + "</font>"
                         + "</font></html>").toUpperCase());
 
                 int height = 0;
@@ -275,6 +299,20 @@ public class ProductRenderer extends Box implements TableCellRenderer {
             setBackground(row % 2 == 0 ? table.getBackground() : UIManager.getColor("Table.alternateRowColor"));
 //            setForeground(Color.black);
             setBorder(UIManager.getBorder("Table.cellBorder"));
+        }
+
+        boolean mark = false;
+        try {
+            if (table.getValueAt(row, 0) instanceof Boolean) {
+                mark = Boolean.valueOf(table.getValueAt(row, 0).toString());
+            }
+        } catch (Exception e) {
+        }
+
+        if (marked && mark) {
+            if (selectionBackgroundColor != null) {
+                setBackground(selectionBackgroundColor);
+            }
         }
 
         return this;

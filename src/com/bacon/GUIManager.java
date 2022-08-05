@@ -10,6 +10,7 @@ import com.bacon.domain.ConfigDB;
 import com.bacon.domain.Cycle;
 import com.bacon.domain.Invoice;
 import com.bacon.domain.Item;
+import com.bacon.domain.Order;
 import com.bacon.domain.Permission;
 import com.bacon.domain.Presentation;
 import com.bacon.domain.Product;
@@ -44,6 +45,7 @@ import com.bacon.gui.PanelPedido;
 import com.bacon.gui.PanelDash;
 import com.bacon.gui.PanelDownItem;
 import com.bacon.gui.PanelInventory;
+import com.bacon.gui.PanelInvoicedOrder;
 import com.bacon.gui.PanelList;
 import com.bacon.gui.PanelNewConciliacion;
 import com.bacon.gui.PanelNewCycle;
@@ -160,6 +162,7 @@ public class GUIManager {
     private PanelBasic panelBasicOrdersList;
     private PanelOrderList panelOrderList;
     private PanelSelProducts panelSelProducts;
+    private PanelInvoicedOrder panelInvoicedOrder;
 
     private GUIManager() {
 
@@ -223,7 +226,7 @@ public class GUIManager {
 
 //        config = app.getControl().getConfig("cf.showmenubar");
 //        if (config != null && Boolean.getBoolean(config.getValor())) {
-            getFrame().add(getMenu(), BorderLayout.NORTH);
+        getFrame().add(getMenu(), BorderLayout.NORTH);
 //        }
         getFrame().add(getContenedor(), BorderLayout.CENTER);
         getFrame().addWindowListener(getwHandler());
@@ -247,8 +250,8 @@ public class GUIManager {
         getPanelPresentation().setVisible(true);
 //        ConfigDB config = app.getControl().getConfig("cf.showtoolbar");
 //        if (config != null && Boolean.getBoolean(config.getValor())) {
-            getToolbar().setVisible(true);
-            getContenedor().add(getToolbar(), BorderLayout.NORTH);
+        getToolbar().setVisible(true);
+        getContenedor().add(getToolbar(), BorderLayout.NORTH);
 //        }
         getContenedor().updateUI();
         getContPane().updateUI();
@@ -355,7 +358,7 @@ public class GUIManager {
         }
         return panelInventory;
     }
-    
+
     public PanelSelProducts getPaneSelProducts() {
         if (panelSelProducts == null) {
             panelSelProducts = new PanelSelProducts(app);
@@ -489,6 +492,13 @@ public class GUIManager {
             panelAddItem = new PanelAddItem(app);
         }
         return panelAddItem;
+    }
+
+    public PanelInvoicedOrder getPanelInvoicedOrder() {
+        if (panelInvoicedOrder == null) {
+            panelInvoicedOrder = new PanelInvoicedOrder(app);
+        }
+        return panelInvoicedOrder;
     }
 
     public PanelPayInvoice getPanelPayInvoice(Invoice inv) {
@@ -1309,6 +1319,33 @@ public class GUIManager {
         }
 //        dialog.setResizable(false);
         dialog.add(getPanelAddItem());
+        dialog.setTitle(title);
+        dialog.pack();
+        dialog.setLocationRelativeTo(getFrame());
+        setDefaultCursor();
+        dialog.setVisible(true);
+    }
+
+    public void showPanelInvoicedOrder(PropertyChangeListener listener, Order order) {
+        setWaitCursor();
+        JDialog dialog = new MyDialogEsc();
+        dialog.setModal(true);
+        int w = 800;
+        int h = 600;
+        dialog.setPreferredSize(new Dimension(w, h));
+
+        if (!getPanelInvoicedOrder().containsListener(listener)) {
+            getPanelInvoicedOrder().addPropertyChangeListener(listener);
+        }
+
+        getPanelInvoicedOrder().reset();
+        String title = "Facturar orden.";
+
+        if (order != null) {
+            getPanelInvoicedOrder().setOrder(order);
+        }
+//        dialog.setResizable(false);
+        dialog.add(getPanelInvoicedOrder());
         dialog.setTitle(title);
         dialog.pack();
         dialog.setLocationRelativeTo(getFrame());

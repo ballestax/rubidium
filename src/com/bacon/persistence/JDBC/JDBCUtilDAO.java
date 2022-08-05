@@ -2578,7 +2578,7 @@ public class JDBCUtilDAO implements UtilDAO {
         }
         return stations;
     }
-    
+
     public String getStation(long idStation) throws DAOException {
         String station = "";
         Connection conn = null;
@@ -2601,5 +2601,26 @@ public class JDBCUtilDAO implements UtilDAO {
         }
         return station;
     }
+
+    public int countUninvoicedProducts(long idOrder) {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        Object[] parameters = {idOrder};
+        int response = 0;
+        try {
+            conn = dataSource.getConnection();
+            ps = sqlStatements.buildSQLStatement(conn, COUNT_UNINVOICED_PRODUCTS_KEY, parameters);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                response = rs.getInt(1);
+            }
+        } catch (Exception e) {
+        }
+
+        return response;
+    }
+    public static final String GET_UNINVOICED_PRODUCTS_KEY = "GET_UNINVOICED_PRODUCTS";
+    public static final String COUNT_UNINVOICED_PRODUCTS_KEY = "COUNT_UNINVOICED_PRODUCTS";
 
 }
