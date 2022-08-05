@@ -84,6 +84,7 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
     private Object tagSelected;
     private JToggleButton btShowDisable;
     private String stFilterDisable;
+    private List<Item> localList;
 
     /**
      * Creates new form PanelReportSales
@@ -163,6 +164,13 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
         btSnapShot.addActionListener(this);
         btSnapShot.setToolTipText("Ver Snapshot");
 
+        JButton btPrintList = new JButton();
+        btPrintList.setFont(f);
+        btPrintList.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "Printer-orange.png", 22, 22)));
+        btPrintList.setActionCommand(AC_PRINT_LIST);
+        btPrintList.addActionListener(this);
+        btPrintList.setToolTipText("Imprimir");
+
         btShowDisable = new JToggleButton();
         btShowDisable.setFont(f);
         btShowDisable.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "camera-accept.png", 22, 22)));
@@ -225,6 +233,7 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
         panelButtons.add(btExport);
         panelButtons.add(btSnapShot);
         panelButtons.add(btShowDisable);
+        panelButtons.add(btPrintList);
 
         String[] colNames = new String[]{"N°", "Item", "Cantidad", "Medida", "Cost", "Price", "Min", "Cost. Total"};
 
@@ -423,6 +432,7 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
     public static final String AC_LOAD_ITEM = "AC_LOAD_ITEM";
     public static final String AC_SHOW_ADD_ITEM = "AC_SHOW_ADD_ITEM";
     public static final String AC_DOWNLOAD_ITEM = "AC_DOWNLOAD_ITEM";
+    public static final String AC_PRINT_LIST = "AC_PRINT_LIST";
 
     private void showPanelEditItem(String id) {
         Item item = app.getControl().getItemWhere("id=" + id);
@@ -574,10 +584,11 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
     private void populateTable(List<Item> itemList) {
 
         SwingWorker sw = new SwingWorker() {
+            
             @Override
             protected Object doInBackground() throws Exception {
                 model.setRowCount(0);
-                List<Item> localList = itemList;
+                localList = itemList;
                 if (filtered) {
                     localList = listFiltered;
                 }
@@ -767,6 +778,20 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
             config.setValor(String.valueOf(!btShowDisable.isSelected()));
             app.getControl().updateConfig(config);
             refreshItemsFiltered();
+        }
+
+        if (e.getActionCommand().equals(AC_PRINT_LIST)) {
+
+            ConfigDB config = app.getControl().getConfigLocal(Configuration.PRINTER_SELECTED);
+            String propPrinter = config != null ? config.getValor() : "";
+            if (propPrinter.isEmpty()) {
+                GUIManager.showErrorMessage(null, "No ha seleccionado una impresora valida para imprimir", "Impresora no encontrada");
+                return;
+            }
+            String printerName = propPrinter;
+            String tag = regTags.getText().substring(5);
+            
+            app.getPrinterService().imprimirInventario(localList,"", printerName);
         }
     }
 

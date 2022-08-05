@@ -5,6 +5,7 @@ import com.bacon.domain.Client;
 import com.bacon.domain.ConfigDB;
 import com.bacon.domain.Ingredient;
 import com.bacon.domain.Invoice;
+import com.bacon.domain.Item;
 import com.bacon.domain.Presentation;
 import com.bacon.domain.ProductoPed;
 import com.bacon.domain.Table;
@@ -23,11 +24,11 @@ import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import javax.print.PrintService;
 import org.dz.Imagenes;
-
 
 /**
  *
@@ -361,7 +362,7 @@ public class PrinterService {
             escpos.feed(1);
 
             config = app.getControl().getConfigLocal(Configuration.DOCUMENT_NAME);
-            String docName = config != null ? config.getValor() : "Ticket N°:";            
+            String docName = config != null ? config.getValor() : "Ticket N°:";
             escpos.writeLF(font3, String.format(docName + "  %1s", invoice.getFactura()));
             escpos.writeLF(font3, String.format("Fecha:       %1s", app.DF_FULL2.format(invoice.getFecha())));
 
@@ -437,7 +438,7 @@ public class PrinterService {
             java.util.logging.Logger.getLogger(PrintService.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
     public void sendBuzzerPin(String printerName) {
         PrintService printService = PrinterOutputStream.getPrintServiceByName(printerName);
         EscPos escpos;
@@ -447,6 +448,56 @@ public class PrinterService {
             escpos.close();
         } catch (IOException ex) {
             java.util.logging.Logger.getLogger(PrintService.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public void imprimirInventario(List<Item> list, String TAG, String printerName) {
+
+        PrintService printService = PrinterOutputStream.getPrintServiceByName(printerName);
+        EscPos escpos;
+        try {
+
+            Style font2 = new Style().setFontSize(Style.FontSize._1, Style.FontSize._1).setJustification(EscPosConst.Justification.Center);
+            Style font3 = new Style().setFontSize(Style.FontSize._2, Style.FontSize._2);
+            Style font4 = new Style().setFontSize(Style.FontSize._1, Style.FontSize._1).setJustification(EscPosConst.Justification.Right);
+            Style font5 = new Style().setFontSize(Style.FontSize._2, Style.FontSize._2).setJustification(EscPosConst.Justification.Right);
+
+            escpos = new EscPos(new PrinterOutputStream(printService));
+            escpos.feed(1);
+
+            Date fecha = new Date();
+
+            escpos.writeLF(font3, String.format("%1s", "Inventario:" + TAG));
+            escpos.write(font2, String.format("%20.20s", app.DF_SL.format(fecha)));
+            escpos.write(font3, String.format("%8.8s", app.DF_TIME.format(fecha)));
+            escpos.writeLF("");
+
+            escpos.feed(1);
+
+            String column1Format = "%1.1s";  // fixed size 3 characters, left aligned
+            String column2Format = "%-20.20s";  // fixed size 8 characters, left aligned
+            String column3Format = "%7.7s";   // fixed size 6 characters, right aligned
+            String column4Format = "%12.12s";   // fixed size 6 characters, right aligned
+            String formatInfo = column1Format + " " + column2Format + " " + column3Format + " " + column4Format;
+
+            escpos.writeLF(font2, "===============================================");
+            for (int i = 0; i < list.size(); i++) {
+                Item item = list.get(i);
+                escpos.writeLF(String.format(formatInfo, "", item.getName(),
+                        "", app.DCFORM_P.format(item.getQuantity())));
+
+            }
+
+            escpos.writeLF(font2, "================================================");
+
+            escpos.feed(2);
+
+            escpos.cut(EscPos.CutMode.FULL);
+
+            escpos.close();
+
+        } catch (IOException ex) {
+            java.util.logging.Logger.getLogger(PanelPedido.class.getName()).log(Level.ALL.SEVERE, null, ex);
         }
     }
 
