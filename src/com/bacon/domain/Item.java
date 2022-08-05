@@ -38,6 +38,8 @@ public class Item {
     private String user;
 
     private Set<String> tags;
+    
+    private boolean enabled;
 
     public Item() {
         this.presentations = new ArrayList<>();
@@ -257,6 +259,14 @@ public class Item {
         this.snapshot = snapshot;
     }
 
-   
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    
 
 }

@@ -680,6 +680,7 @@ public class PanelAddItem extends PanelCaptura implements ActionListener, Proper
             item.setAverage(BigDecimal.ZERO);
             item.setUser(app.getUser().getUsername().toLowerCase());
             item.setTags(regTags.getText().toLowerCase());
+            item.setEnabled(true);
             ArrayList<Object[]> selecteds = getSelecteds();
             for (int i = 0; i < selecteds.size(); i++) {
                 Object[] dat = selecteds.get(i);

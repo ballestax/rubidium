@@ -1,9 +1,12 @@
 package com.bacon.gui;
 
 import com.bacon.Aplication;
+import com.bacon.Configuration;
 import com.bacon.GUIManager;
 import com.bacon.ProgAction;
+import com.bacon.domain.ConfigDB;
 import com.bacon.domain.Item;
+import com.bacon.domain.Permission;
 import com.bacon.domain.Presentation;
 import com.bacon.domain.Product;
 import static com.bacon.gui.PanelSelItem.AC_ADD_ITEM_TO_TABLE;
@@ -49,6 +52,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.swing.BoxLayout;
+import javax.swing.JToggleButton;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import org.dz.MyDefaultTableModel;
@@ -78,6 +82,8 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
     private JMenuItem itemLinks;
     private Object filterSelected;
     private Object tagSelected;
+    private JToggleButton btShowDisable;
+    private String stFilterDisable;
 
     /**
      * Creates new form PanelReportSales
@@ -95,6 +101,16 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
         panelButtons.setLayout(new FlowLayout(FlowLayout.LEFT));
 
         Font f = new Font("Sans", 1, 11);
+
+        String userName = app.getUser().getUsername();
+        String userDevice = Aplication.getUserDevice();
+        if (!app.getControl().existConfig(Configuration.SHOW_DISABLE_ITEMS, userName, userDevice)) {
+            app.getControl().addConfig(new ConfigDB(Configuration.SHOW_DISABLE_ITEMS, ConfigDB.BOOLEAN, "true", userName, userDevice));
+        }
+
+        ConfigDB config = app.getControl().getConfig(Configuration.SHOW_DISABLE_ITEMS);
+        boolean showDisableItems = config != null ? Boolean.parseBoolean(config.getValor()) : false;
+        stFilterDisable = showDisableItems ? "" : "enabled=1";
 
         JButton btAdd = new JButton();
         btAdd.setName("Agregar");
@@ -146,6 +162,14 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
         btSnapShot.setActionCommand(AC_SHOW_SNAPSHOT);
         btSnapShot.addActionListener(this);
         btSnapShot.setToolTipText("Ver Snapshot");
+
+        btShowDisable = new JToggleButton();
+        btShowDisable.setFont(f);
+        btShowDisable.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "camera-accept.png", 22, 22)));
+        btShowDisable.setActionCommand(AC_SHOW_DISABLE);
+        btShowDisable.addActionListener(this);
+        btShowDisable.setToolTipText("Ver deshabilitados");
+        btShowDisable.setSelected(showDisableItems);
 
         ImageIcon searchIcon = new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "search.png", 16, 16));
         ImageIcon clearIcon = new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "cancel.png", 22, 22));
@@ -200,6 +224,7 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
         panelButtons.add(btConciliation);
         panelButtons.add(btExport);
         panelButtons.add(btSnapShot);
+        panelButtons.add(btShowDisable);
 
         String[] colNames = new String[]{"N°", "Item", "Cantidad", "Medida", "Cost", "Price", "Min", "Cost. Total"};
 
@@ -290,20 +315,24 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
         jPanel1.setLayout(new BorderLayout());
         jPanel1.add(pnDetail);
 
+        System.out.println("stFilert: " + stFilterDisable);
+        System.out.println("config: " + config);
         populateTable();
 
     }
 
     private JPopupMenu makePopup(int row) {
-        boolean on = false;
+        boolean onSnap = false;
+        boolean onEnab = false;
         if (row >= 0) {
             long idItem = Long.parseLong(tableItems.getValueAt(row, 0).toString());
             Item item = app.getControl().getItemWhere("id=" + idItem);
             if (item != null) {
-                on = item.isSnapshot();
+                onSnap = item.isSnapshot();
+                onEnab = item.isEnabled();
             }
         }
-        String html = "<html>Snapshot <font color=" + (!on ? "green" : "red") + ">[" + (!on ? "ON" : "OFF") + "]</font><html>";
+        String html = "<html>Snapshot <font color=" + (!onSnap ? "green" : "red") + ">[" + (!onSnap ? "ON" : "OFF") + "]</font><html>";
         JMenuItem itemSnapshot = new JMenuItem(html);
         itemSnapshot.addActionListener(new ActionListener() {
 
@@ -317,16 +346,39 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
             }
         });
 
+        String htmlEnab = "<html>Habilitado <font color=" + (!onEnab ? "green" : "red") + ">[" + (!onEnab ? "ON" : "OFF") + "]</font><html>";
+        JMenuItem itemEnabled = new JMenuItem(htmlEnab);
+        itemEnabled.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int r = tableItems.getSelectedRow();
+                String id = tableItems.getValueAt(r, 0).toString();
+                Item item = app.getControl().getItemWhere("id=" + id);
+                item.setEnabled(!item.isEnabled());
+                app.getControl().updateItem(item);
+            }
+        });
+
         JPopupMenu popupTable = new JPopupMenu();
+
+        Permission perm = app.getControl().getPermissionByName("download-items-inventary");
+        itemDescargar.setEnabled(app.getControl().hasPermission(app.getUser(), perm));
+
+        perm = app.getControl().getPermissionByName("load-items-inventary");
+        itemCargar.setEnabled(app.getControl().hasPermission(app.getUser(), perm));
 
         popupTable.add(itemVer);
         popupTable.addSeparator();
         popupTable.add(itemCargar);
+
         popupTable.add(itemDescargar);
         popupTable.addSeparator();
         popupTable.add(itemLinks);
         popupTable.addSeparator();
         popupTable.add(itemSnapshot);
+        popupTable.addSeparator();
+        popupTable.add(itemEnabled);
 
         return popupTable;
     }
@@ -365,6 +417,7 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
     private static final String AC_CHANGE_TAGS = "AC_CHANGE_TAGS";
     public static final String AC_EXPORT_TO = "AC_EXPORT_TO";
     public static final String AC_SHOW_SNAPSHOT = "AC_SHOW_SNAPSHOT";
+    public static final String AC_SHOW_DISABLE = "AC_SHOW_DISABLE";
     public static final String AC_ADD_CONCILIATION = "AC_ADD_CONCILIATION";
     public static final String AC_REFRESH_ITEMS = "AC_REFRESH_ITEMS";
     public static final String AC_LOAD_ITEM = "AC_LOAD_ITEM";
@@ -445,7 +498,7 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
             return;
         }
 
-        ArrayList<Item> listItems = app.getControl().getItemList("", "name");
+        ArrayList<Item> listItems = app.getControl().getItemList(stFilterDisable, "name");
 
         List<Item> listFiltered = listItems.stream()
                 .filter(item -> item.getName().toUpperCase().contains(text.toUpperCase()))
@@ -463,7 +516,7 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
         if (filtered) {
             listItems = listFiltered;
         } else {
-            listItems = app.getControl().getItemList("", "name");
+            listItems = app.getControl().getItemList(stFilterDisable, "name");
         }
         List listRes = new ArrayList();
         if (FILTER_ITEM_AGOTADOS.equals(filtro)) {
@@ -477,7 +530,7 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
             filtered = true;
         } else {
             filtered = false;
-            listFiltered = app.getControl().getItemList("", "name");
+            listFiltered = app.getControl().getItemList(stFilterDisable, "name");
         }
         populateTable(listFiltered);
     }
@@ -493,7 +546,7 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
         Predicate<Item> filterRegular = itm -> itm.getQuantity() > itm.getStockMin();
         Predicate<Item> filterTags = itm -> itm.getTagsSt().contains(tag.substring(5).toLowerCase());
 
-        ArrayList<Item> listItems = app.getControl().getItemList("", "name");
+        ArrayList<Item> listItems = app.getControl().getItemList(stFilterDisable, "name");
         Stream<Item> stream = listItems.stream();
 
         if (regFilters.getSelected() > 0) {
@@ -515,7 +568,7 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
     }
 
     private void populateTable() {
-        populateTable(app.getControl().getItemList("", "name"));
+        populateTable(app.getControl().getItemList(stFilterDisable, "name"));
     }
 
     private void populateTable(List<Item> itemList) {
@@ -655,13 +708,31 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
         } else if (AC_SHOW_SNAPSHOT.equals(e.getActionCommand())) {
             app.getGuiManager().showPanelSnapShot();
         } else if (AC_LOAD_ITEM.equals(e.getActionCommand())) {
-            app.getGuiManager().showPanelSelItem(this);
+            Permission perm = app.getControl().getPermissionByName("load-items-inventary");
+            if (app.getControl().hasPermission(app.getUser(), perm)) {
+                app.getGuiManager().showPanelSelItem(this);
+            } else {
+                GUIManager.showErrorMessage(this, "No tiene permisos para realizar esta accion", "Error de privilegios");
+            }
+
         } else if (AC_REFRESH_ITEMS.equals(e.getActionCommand())) {
             refreshItemsFiltered();
         } else if (AC_ADD_CONCILIATION.equals(e.getActionCommand())) {
-            app.getGuiManager().showPanelConciliacion(true);
+            Permission perm = app.getControl().getPermissionByName("conciliate-items-inventary");
+            if (app.getControl().hasPermission(app.getUser(), perm)) {
+                app.getGuiManager().showPanelConciliacion(true);
+            } else {
+                GUIManager.showErrorMessage(this, "No tiene permisos para realizar esta accion", "Error de privilegios");
+            }
+
         } else if (AC_DOWNLOAD_ITEM.equals(e.getActionCommand())) {
-            app.getGuiManager().showPanelDownItem(this);
+            Permission perm = app.getControl().getPermissionByName("download-items-inventary");
+            if (app.getControl().hasPermission(app.getUser(), perm)) {
+                app.getGuiManager().showPanelDownItem(this);
+            } else {
+                GUIManager.showErrorMessage(this, "No tiene permisos para realizar esta accion", "Error de privilegios");
+            }
+
         } else if (AC_CHANGE_ITEMS.equals(e.getActionCommand())) {
             filterSelected = regFilters.getSelectedItem();
             filtrarItems();
@@ -687,6 +758,15 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
                 }
             };
             tarea.execute();
+        }
+
+        if (e.getActionCommand().equals(AC_SHOW_DISABLE)) {
+
+            stFilterDisable = btShowDisable.isSelected() ? "" : "enabled=1";
+            ConfigDB config = app.getControl().getConfig(Configuration.SHOW_DISABLE_ITEMS);
+            config.setValor(String.valueOf(!btShowDisable.isSelected()));
+            app.getControl().updateConfig(config);
+            refreshItemsFiltered();
         }
     }
 

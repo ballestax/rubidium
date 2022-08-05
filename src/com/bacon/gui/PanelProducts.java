@@ -374,7 +374,7 @@ public class PanelProducts extends PanelCapturaMod implements ActionListener, Ca
     private void showProduct(Product prod) {
         if (prod != null) {
             editCampos(false);
-            regName.setText(prod.getName());       
+            regName.setText(prod.getName());
             regCat.setSelected(prod.getCategory().toUpperCase());
             regPrice.setText(app.DCFORM_W.format(prod.getPrice()));
             regDesc.setText(prod.getDescription());
@@ -417,7 +417,7 @@ public class PanelProducts extends PanelCapturaMod implements ActionListener, Ca
         for (Presentation presentation : presList) {
             PanelPressProduct panelPressProduct = new PanelPressProduct(app, presentation);
             panelPressProduct.addPropertyChangeListener(this);
-            panelContainPress.add(panelPressProduct);            
+            panelContainPress.add(panelPressProduct);
         }
         panelContainPress.updateUI();
     }
@@ -930,25 +930,27 @@ public class PanelProducts extends PanelCapturaMod implements ActionListener, Ca
             if (editingProduct != null) {
                 long id = editingProduct.getId();
                 Product product = parseProduct();
-                product.setId(id);
-                if (app.getControl().updateProduct(product)) {
-                    populateTable("");
-                    tbProducts.setEnabled(true);
-                    editCampos(false);
-                    resetPanelNewProduct();
-                    btSave.setVisible(false);
-                    btCancel.setVisible(false);
-                    editingProduct = null;
-                    regPrice.setBorder(bordeNormal);
-                    regPrice.setForeground(Color.black);
-                    regDesc.setBorder(bordeNormal);
-                    textArea.setForeground(Color.black);
-                    regName.setBorder(bordeNormal);
-                    regName.setForeground(Color.black);
-                    regCode.setBorder(bordeNormal);
-                    regCode.setForeground(Color.black);
-                    regCat.setBorder(bordeNormal);
-                    regCat.setForeground(Color.black);
+                if (product != null) {
+                    product.setId(id);
+                    if (app.getControl().updateProduct(product)) {
+                        populateTable("");
+                        tbProducts.setEnabled(true);
+                        editCampos(false);
+                        resetPanelNewProduct();
+                        btSave.setVisible(false);
+                        btCancel.setVisible(false);
+                        editingProduct = null;
+                        regPrice.setBorder(bordeNormal);
+                        regPrice.setForeground(Color.black);
+                        regDesc.setBorder(bordeNormal);
+                        textArea.setForeground(Color.black);
+                        regName.setBorder(bordeNormal);
+                        regName.setForeground(Color.black);
+                        regCode.setBorder(bordeNormal);
+                        regCode.setForeground(Color.black);
+                        regCat.setBorder(bordeNormal);
+                        regCat.setForeground(Color.black);
+                    }
                 }
             }
         } else if (AC_ADD_PRESS.equals(e.getActionCommand())) {
@@ -1041,7 +1043,7 @@ public class PanelProducts extends PanelCapturaMod implements ActionListener, Ca
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        
+
         if (PanelList.AC_SELECTED.equals(evt.getPropertyName())) {
             regCat.setText(evt.getNewValue().toString());
         } else if (PanelList.AC_ADD.equals(evt.getPropertyName())) {
@@ -1055,7 +1057,7 @@ public class PanelProducts extends PanelCapturaMod implements ActionListener, Ca
             updateCategoriesList();
         } else if (PanelPressProduct.AC_SAVE_PRESENTATION.equals(evt.getPropertyName())) {
             loadPresentations(currentProduct);
-        }else if (PanelPressProduct.AC_EDIT_PRESENTATION.equals(evt.getPropertyName())) {
+        } else if (PanelPressProduct.AC_EDIT_PRESENTATION.equals(evt.getPropertyName())) {
             loadPresentations(currentProduct);
         } else if (PanelPressProduct.AC_CHANGE_DEFAULT.equals(evt.getPropertyName())) {
             Component[] components = panelContainPress.getComponents();

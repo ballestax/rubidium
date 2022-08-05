@@ -135,7 +135,7 @@ public class JDBCConfigDAO implements ConfigDAO {
                 configDB.setValor(rs.getString("value"));
                 configDB.setTipo(rs.getString("type"));
                 configDB.setUser(rs.getString("user"));
-                configDB.setValor(rs.getString("device"));
+                configDB.setDevice(rs.getString("device"));
             }
         } catch (SQLException e) {
             throw new DAOException("Could not properly retrieve the ConfigDB: " + e);

@@ -1453,6 +1453,7 @@
                 onlyDelivery TINYINT(1),
                 snapshot TINYINT(1),
                 tags VARCHAR(255),
+                enabled TINYINT(1),
                 createdTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 lastUpdatedTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                 user VARCHAR(25) NOT NULL DEFAULT 'USER_DF',
@@ -1493,7 +1494,7 @@
         
         <SQLStatement method="ADD_ITEM">
             <SQLFragment>
-                INSERT INTO inventory (name,quantity,measure,cost,price,location,stock,stockmin,average,init,onlyDelivery,tags,snapshot,user) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?);                
+                INSERT INTO inventory (name,quantity,measure,cost,price,location,stock,stockmin,average,init,onlyDelivery,tags,snapshot,enabled,user) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);                
             </SQLFragment>            
         </SQLStatement>
         
@@ -1525,7 +1526,8 @@
                 stockMin=?,
                 onlyDelivery=?,                 
                 tags=?,
-                snapshot=?
+                snapshot=?,
+                enabled=? 
                 WHERE id = ?
             </SQLFragment>            
         </SQLStatement>

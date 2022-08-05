@@ -55,6 +55,7 @@ public class Configuration {
     public static final String PROD_ORDER = "cf.order";
     public static final String NUM_COLUMNS_VIEW1 = "cf.numcolumnsv1";
     public static final String NUM_COLUMNS_VIEW2 = "cf.numcolumnsv2";
+    public static final String SHOW_DISABLE_ITEMS = "cf.showdisableditems";
     
 
     public static final String BS_ID = "cf.tck.id";
