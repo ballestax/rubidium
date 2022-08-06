@@ -791,7 +791,7 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
             String printerName = propPrinter;
             String tag = regTags.getText().substring(5);
             
-            app.getPrinterService().imprimirInventario(localList,"", printerName);
+            app.getPrinterService().imprimirInventario(localList,tag.toUpperCase(), printerName);
         }
     }
 

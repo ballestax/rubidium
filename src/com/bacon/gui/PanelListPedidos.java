@@ -2,6 +2,7 @@ package com.bacon.gui;
 
 import com.bacon.Aplication;
 import com.bacon.Configuration;
+import com.bacon.GUIManager;
 import com.bacon.MyConstants;
 import com.bacon.ProgAction;
 import com.bacon.domain.Cycle;
@@ -198,11 +199,15 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener,
                 msg.append("</html>");
                 int opt = JOptionPane.showConfirmDialog(null, msg, "Advertencia", JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
                 if (opt == JOptionPane.OK_OPTION) {
-                    inv.setStatus(Invoice.ST_ANULADA);
-                    app.getControl().updateInvoice(inv);
-                    List<ProductoPed> list = inv.getProducts();
-                    app.getControl().restoreInventory(list);
-                    loadPedidos();
+                    if (inv.getStatus() != Invoice.ST_ANULADA) {
+                        inv.setStatus(Invoice.ST_ANULADA);
+                        app.getControl().updateInvoice(inv);
+                        List<ProductoPed> list = inv.getProducts();
+                        app.getControl().restoreInventory(list);
+                        loadPedidos();
+                    } else {
+                        GUIManager.showErrorMessage(PanelListPedidos.this, "La factura ya ha sido anulada", "Factura anulada");
+                    }
                 }
 
             }
@@ -285,7 +290,7 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener,
         lbPeriodo1.setBackground(COLOR_BACKG);
         lbPeriodo1.setBorder(BorderFactory.createLineBorder(Color.BLACK));
         lbPeriodo1.setVisible(false);
-        
+
         btFilters.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "view-filter.png", 18, 18)));
         btFilters.setActionCommand(ACTION_ACTIVATE_FILTER);
         btFilters.addActionListener(this);

@@ -805,11 +805,14 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
             msg.append("</html>");
             int opt = JOptionPane.showConfirmDialog(null, msg, "Advertencia", JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
             if (opt == JOptionPane.OK_OPTION) {
+                if(inv.getStatus()!=Invoice.ST_ANULADA){
                 inv.setStatus(Invoice.ST_ANULADA);
                 app.getControl().updateInvoice(inv);
                 List<ProductoPed> list = inv.getProducts();
                 app.getControl().restoreInventory(list, inv.getTipoEntrega());
-
+                }else{
+                    GUIManager.showErrorMessage(this, "La factura ya fue anulada, se cargara una nueva con los mismos datos", "Factura anulada");
+                }
                 lbFactura.setText(calculateProximoRegistro());
 
                 enablePedido(true);
@@ -825,6 +828,7 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
 
                 btPrint.setVisible(false);
                 btPrint1.setVisible(false);
+                
 
             }
 

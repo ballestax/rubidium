@@ -62,6 +62,7 @@ public class PanelQuickSearch extends PanelCapturaMod implements ActionListener 
         Invoice invoice = app.getControl().getInvoiceByCode(codigo);
         if (invoice != null) {
             PanelConfirmPedido confirmPedido = new PanelConfirmPedido(app, invoice);
+            confirmPedido.addPropertyChangeListener(app.getGuiManager().getPanelPedido());
             pnContain.removeAll();
             pnContain.add(confirmPedido);
         } else {

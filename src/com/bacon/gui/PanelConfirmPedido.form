@@ -24,7 +24,9 @@
                           <Component id="lbOthers" max="32767" attributes="0"/>
                           <Group type="102" attributes="0">
                               <Component id="btAdd" min="-2" pref="50" max="-2" attributes="0"/>
-                              <EmptySpace pref="249" max="32767" attributes="0"/>
+                              <EmptySpace pref="181" max="32767" attributes="0"/>
+                              <Component id="btLoad" min="-2" pref="62" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
                               <Component id="btAnulate" min="-2" pref="62" max="-2" attributes="0"/>
                           </Group>
                       </Group>
@@ -84,6 +86,7 @@
                   <Component id="btPrint" linkSize="1" alignment="2" max="32767" attributes="0"/>
                   <Component id="btConfirm" linkSize="1" alignment="2" pref="39" max="32767" attributes="0"/>
                   <Component id="btAdd" alignment="2" max="32767" attributes="0"/>
+                  <Component id="btLoad" alignment="2" max="32767" attributes="0"/>
               </Group>
               <EmptySpace min="-2" max="-2" attributes="0"/>
           </Group>
@@ -172,6 +175,8 @@
     <Component class="javax.swing.JButton" name="btAnulate">
     </Component>
     <Component class="javax.swing.JButton" name="btPrint2">
+    </Component>
+    <Component class="javax.swing.JButton" name="btLoad">
     </Component>
   </SubComponents>
 </Form>

@@ -483,14 +483,14 @@ public class PrinterService {
             escpos.writeLF(font2, "===============================================");
             for (int i = 0; i < list.size(); i++) {
                 Item item = list.get(i);
-                escpos.writeLF(String.format(formatInfo, "", item.getName(),
-                        "", app.DCFORM_P.format(item.getQuantity())));
+                escpos.writeLF(String.format(formatInfo, "", item.getName().toUpperCase(),
+                        " . . . . ", app.DCFORM_P.format(item.getQuantity())));
 
             }
 
             escpos.writeLF(font2, "================================================");
 
-            escpos.feed(2);
+            escpos.feed(4);
 
             escpos.cut(EscPos.CutMode.FULL);
 

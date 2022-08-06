@@ -6,9 +6,11 @@ import com.bacon.GUIManager;
 import com.bacon.domain.Client;
 import com.bacon.domain.ConfigDB;
 import com.bacon.domain.Invoice;
+import com.bacon.domain.Permission;
 import com.bacon.domain.ProductoPed;
 import com.bacon.domain.Table;
 import com.bacon.domain.Waiter;
+import static com.bacon.gui.PanelListPedidos.AC_SHOW_INVOICE;
 import static com.bacon.gui.PanelPedido.TIPO_DOMICILIO;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
@@ -19,12 +21,13 @@ import java.math.BigDecimal;
 import java.util.List;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
+import org.dz.PanelCapturaMod;
 
 /**
  *
  * @author lrod
  */
-public class PanelConfirmPedido extends javax.swing.JPanel implements ActionListener, PropertyChangeListener {
+public class PanelConfirmPedido extends PanelCapturaMod implements ActionListener, PropertyChangeListener {
 
     private final Aplication app;
     private Invoice invoice;
@@ -82,6 +85,13 @@ public class PanelConfirmPedido extends javax.swing.JPanel implements ActionList
         btAnulate.addActionListener(this);
         btAnulate.setEnabled(invoice.getStatus() != Invoice.ST_ANULADA);
 
+        btLoad.setToolTipText("Cargar");
+        btLoad.setMargin(new Insets(2, 2, 2, 2));
+        btLoad.setFocusPainted(false);
+        btLoad.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "edit.png", 32, 32)));
+        btLoad.setActionCommand(AC_LOAD_BILL);
+        btLoad.addActionListener(this);
+
 //        jScrollPane1.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
     }
     public static final String AC_PRINT_GUIDE = "AC_PRINT_GUIDE";
@@ -89,6 +99,7 @@ public class PanelConfirmPedido extends javax.swing.JPanel implements ActionList
     public static final String AC_SAVE_BILL = "AC_SAVE_BILL";
     public static final String AC_PRINT_BILL = "AC_PRINT_BILL";
     public static final String AC_ADD_PRODUCT = "AC_ADD_PRODUCT";
+    public static final String AC_LOAD_BILL = "AC_LOAD_BILL";
 
     public void setupInvoice() {
         if (invoice != null) {
@@ -195,9 +206,12 @@ public class PanelConfirmPedido extends javax.swing.JPanel implements ActionList
         } else if (AC_ANULATE_BILL.equals(e.getActionCommand())) {
             anularFactura();
 
+        } else if (AC_LOAD_BILL.equals(e.getActionCommand())) {
+            cargarFactura();
+
         } else if (AC_PRINT_GUIDE.equals(e.getActionCommand())) {
             ConfigDB config = app.getControl().getConfigLocal(Configuration.PRINTER_SELECTED);
-            String propPrinter = config != null ? config.getValor() : "";            
+            String propPrinter = config != null ? config.getValor() : "";
             if (propPrinter.isEmpty()) {
                 GUIManager.showErrorMessage(null, "No ha seleccionado una impresora valida para imprimir", "Impresora no encontrada");
                 return;
@@ -220,12 +234,26 @@ public class PanelConfirmPedido extends javax.swing.JPanel implements ActionList
         msg.append("</html>");
         int opt = JOptionPane.showConfirmDialog(null, msg, "Advertencia", JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
         if (opt == JOptionPane.OK_OPTION) {
-            invoice.setStatus(Invoice.ST_ANULADA);
-            app.getControl().updateInvoice(invoice);
-            updateInvoice();
-            List<ProductoPed> list = invoice.getProducts();
-            app.getControl().restoreInventory(list);
+            if (invoice.getStatus() != Invoice.ST_ANULADA) {
+                invoice.setStatus(Invoice.ST_ANULADA);
+                app.getControl().updateInvoice(invoice);
+                updateInvoice();
+                List<ProductoPed> list = invoice.getProducts();
+                app.getControl().restoreInventory(list);
+            } else {
+                GUIManager.showErrorMessage(this, "La factura ya ha sido anulada", "Factura anulada");
+            }
         }
+    }
+
+    private void cargarFactura() {
+        String fact = invoice.getFactura();
+//        Invoice inv = app.getControl().getInvoiceByCode(fact);
+
+        pcs.firePropertyChange(AC_SHOW_INVOICE, invoice, null);
+
+        Permission perm = app.getControl().getPermissionByName("show-pedidos-module");
+        app.getGuiManager().showBasicPanel(app.getGuiManager().getPanelBasicPedidos(), perm);
     }
 
     /**
@@ -250,6 +278,7 @@ public class PanelConfirmPedido extends javax.swing.JPanel implements ActionList
         lbStatus = new javax.swing.JLabel();
         btAnulate = new javax.swing.JButton();
         btPrint2 = new javax.swing.JButton();
+        btLoad = new javax.swing.JButton();
 
         lbTitle.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
@@ -281,7 +310,9 @@ public class PanelConfirmPedido extends javax.swing.JPanel implements ActionList
                             .addComponent(lbOthers, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(btAdd, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 249, Short.MAX_VALUE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 181, Short.MAX_VALUE)
+                                .addComponent(btLoad, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(btAnulate, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -326,7 +357,8 @@ public class PanelConfirmPedido extends javax.swing.JPanel implements ActionList
                     .addComponent(btPrint2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(btPrint, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(btConfirm, javax.swing.GroupLayout.DEFAULT_SIZE, 39, Short.MAX_VALUE)
-                    .addComponent(btAdd, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(btAdd, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btLoad, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
 
@@ -339,6 +371,7 @@ public class PanelConfirmPedido extends javax.swing.JPanel implements ActionList
     private javax.swing.JButton btAdd;
     private javax.swing.JButton btAnulate;
     private javax.swing.JButton btConfirm;
+    private javax.swing.JButton btLoad;
     private javax.swing.JButton btPrint;
     private javax.swing.JButton btPrint2;
     private javax.swing.JScrollPane jScrollPane1;
@@ -353,8 +386,7 @@ public class PanelConfirmPedido extends javax.swing.JPanel implements ActionList
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+
     }
 
-    
 }
