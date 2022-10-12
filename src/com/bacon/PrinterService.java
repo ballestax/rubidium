@@ -95,6 +95,9 @@ public class PrinterService {
 
             config = app.getControl().getConfigLocal(com.bacon.Configuration.BS_CUSTOM_BOTTON);
             String BS_CUSTOM2 = config != null ? config.getValor() : app.getConfiguration().getProperty(Configuration.BS_CUSTOM_BOTTON);
+            
+            config = app.getControl().getConfigLocal(com.bacon.Configuration.BS_CUSTOM_SERVICE);
+            String BS_CUSTOM3 = config != null ? config.getValor() : app.getConfiguration().getProperty(Configuration.BS_CUSTOM_SERVICE);
 
             config = app.getControl().getConfigLocal(com.bacon.Configuration.BS_CUSTOM_QUALITY_MSG);
             String BS_QUALITY_MESSAGE = config != null ? config.getValor() : app.getConfiguration().getProperty(Configuration.BS_CUSTOM_QUALITY_MSG);
@@ -109,6 +112,7 @@ public class PrinterService {
             BitImageWrapper imageWrapper = new BitImageWrapper();
 
             Style font2 = new Style().setFontSize(Style.FontSize._1, Style.FontSize._1).setJustification(EscPosConst.Justification.Center);
+            Style font2Bold = new Style().setFontSize(Style.FontSize._1, Style.FontSize._1).setJustification(EscPosConst.Justification.Center).setBold(true);
             Style font3 = new Style().setFontSize(Style.FontSize._1, Style.FontSize._1);
             Style font4 = new Style().setFontSize(Style.FontSize._1, Style.FontSize._1).setJustification(EscPosConst.Justification.Right);
             Style font5 = new Style().setFontSize(Style.FontSize._1, Style.FontSize._2).setJustification(EscPosConst.Justification.Center);
@@ -186,7 +190,7 @@ public class PrinterService {
             } else if (invoice.getTipoEntrega() == PanelPedido.TIPO_LOCAL) {
                 escpos.writeLF(font2, "________________________________________________");
                 if (invoice.getPorcService() > 0) {
-                    escpos.writeLF(String.format(formatInfo, "", "Servicio voluntario", invoice.getPorcService() + "%", app.DCFORM_P.format(invoice.getValueService())));
+                    escpos.writeLF(font2Bold, String.format(formatInfo, "", "Servicio voluntario", invoice.getPorcService() + "%", app.DCFORM_P.format(invoice.getValueService())));
                 } else {
                     escpos.writeLF("No incluye servicio voluntario");
                 }
@@ -198,6 +202,23 @@ public class PrinterService {
             escpos.writeLF(String.format(formatInfo, "", "", "Total:", app.DCFORM_P.format(total)));
 
             escpos.writeLF(font2, "================================================");
+            escpos.feed(1);
+
+            if (invoice.getTipoEntrega() == PanelPedido.TIPO_LOCAL) {
+                if (invoice.getPorcService() > 0) {
+                    escpos.writeLF(font2Bold, "***ADVERTENCIA DE SERVICIO VOLUNTARIO***");                    
+                    escpos.writeLF(font2, BS_CUSTOM3);
+//                    escpos.writeLF(font2, "Segun lo establecido en la Ley 1935 del 3/ago/2018"
+//                            + "(Art. 1,2, parágrafo 1, art. 3, par. 1, art 4)");
+//                    escpos.writeLF(font2, "Se informa a los consumidores que este"
+//                     +"   establecimiento de comercio sugiere a sus consumidores "
+//                     +"una propina correspondiente al 8% del valor de su cuenta,"
+//                     +" el cual podrá ser rechazado o modificado por usted "
+//                     +"de acuerdo a su valoración del servicio prestado. ");
+//                    escpos.writeLF(font2, "Indíquele a la persona que lo atiende si quiere pagar el valor del servicio voluntario en la factura."
+//                            + " En caso de inconveniente comuníquese con nuestras líneas de atención.");
+                }
+            }
 
             if (invoice.getTipoEntrega() == PanelPedido.TIPO_LOCAL && Boolean.parseBoolean(BS_QUALITY_ENABLED)) {
                 escpos.feed(2);
