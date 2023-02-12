@@ -163,19 +163,19 @@ public class PanelPressProduct extends PanelCapturaMod implements ActionListener
             valido = false;
         } else {
             if (status == STATUS_EDITING) {
-                int existClave = app.getControl().existClaveMult("presentation_product", "name", "name='" + name + "' AND product_id=" + presentation.getIDProd());
-
-                if (existClave > 0) {
-                    GUIManager.showErrorMessage(this, "<html><p>Ya exixte una presentacion registrada con este nombre:"
-                            + "<p color=red size=+1>" + name.toUpperCase() + "</html>", "ADVERTENCIA");
-                    regName.setForeground(Color.red);
-                    valido = false;
-                }
+//                int existClave = app.getControl().existClaveMult("presentation_product", "name", "name='" + name + "' AND product_id=" + presentation.getIDProd());
+//
+//                if (existClave > 0) {
+//                    GUIManager.showErrorMessage(this, "<html><p>Ya existe una presentacion registrada con este nombre:"
+//                            + "<p color=red size=+1>" + name.toUpperCase() + "</html>", "ADVERTENCIA");
+//                    regName.setForeground(Color.red);
+//                    valido = false;
+//                }
             } else {
                 int existClave = app.getControl().existClaveMult("presentation_product", "name", "name='" + name + "' AND product_id=" + prod.getId());
 
                 if (existClave > 0) {
-                    GUIManager.showErrorMessage(this, "<html><p>Ya exixte una presentacion registrada con este nombre:"
+                    GUIManager.showErrorMessage(this, "<html><p>Ya existe una presentacion registrada con este nombre:"
                             + "<p color=red size=+1>" + name.toUpperCase() + "</html>", "ADVERTENCIA");
                     regName.setForeground(Color.red);
                     valido = false;
@@ -346,7 +346,7 @@ public class PanelPressProduct extends PanelCapturaMod implements ActionListener
                 }
             }
         } else if (e.getSource().equals(regPrice.getComponent())) {
-            if (editingPres != null) {
+            if (editingPres != null && !regPrice.getText().isEmpty()) {
                 double value = Double.parseDouble(regPrice.getText());
                 try {
                     if (editingPres.getPrice() != value) {

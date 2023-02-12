@@ -79,7 +79,7 @@ public class PanelDownItem extends PanelCaptura implements ActionListener, Caret
         tabla.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tabla.setFont(new Font("Tahoma", 0, 15));
         
-        tfCantidad.setDocument(TextFormatter.getIntegerLimiter());
+        tfCantidad.setDocument(TextFormatter.getDoubleLimiter());
         tfCantidad.addCaretListener(new Caret());
         tfCantidad.addCaretListener(this);
 
@@ -197,15 +197,15 @@ public class PanelDownItem extends PanelCaptura implements ActionListener, Caret
             valido = false;
         }
         if (tfCantidad.getText().trim().isEmpty()
-                || Integer.parseInt(tfCantidad.getText()) < 1
-                || Integer.parseInt(tfCantidad.getText()) > item.getQuantity()) {
+                || Double.parseDouble(tfCantidad.getText()) <= 0
+                || Double.parseDouble(tfCantidad.getText()) > item.getQuantity()) {
             tfCantidad.setBorder(bordeError);
             valido = false;
         }
         if (valido) {
 
             try {
-                item.setQuantity(Integer.parseInt(tfCantidad.getText()));
+                item.setQuantity(Double.parseDouble(tfCantidad.getText()));
 //                item.setPrice(new BigDecimal(tfValorUnit.getText()));
                 nota = tfNota.getText();
             } catch (NumberFormatException e) {
@@ -219,14 +219,14 @@ public class PanelDownItem extends PanelCaptura implements ActionListener, Caret
         boolean valido = true;
         Item localItem = selectedItem;
         if (tfCantidad.getText().trim().isEmpty()
-                || Integer.parseInt(tfCantidad.getText()) < 1
-                || Integer.parseInt(tfCantidad.getText()) > selectedItem.getQuantity()) {
+                || Double.parseDouble(tfCantidad.getText()) <=0
+                || Double.parseDouble(tfCantidad.getText()) > selectedItem.getQuantity()) {
             tfCantidad.setBorder(bordeError);
             valido = false;
         }
         if (valido && selectedItem != null) {
             try {
-                localItem.setQuantity(Integer.parseInt(tfCantidad.getText()));
+                localItem.setQuantity(Double.parseDouble(tfCantidad.getText()));
             } catch (Exception e) {
             }
             return localItem;

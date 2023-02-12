@@ -249,7 +249,8 @@ public class JDBCProductDAO implements ProductDAO {
                 producto.getImage(),
                 producto.getCategory(),
                 producto.isVariablePrice(),
-                producto.isEnabled()
+                producto.isEnabled(),
+                producto.getId()
             };
             update = sqlStatements.buildSQLStatement(conn, UPDATE_PRODUCT_KEY, parameters);
             update.executeUpdate();

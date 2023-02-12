@@ -539,14 +539,28 @@ public class PanelProducts extends PanelCapturaMod implements ActionListener, Ca
         if (name.trim().isEmpty()) {
             regName.setBorder(bordeError);
             valido = false;
-        } else if (currentProduct != null && status != STATUS_EDITING) {
-            int existClave = app.getControl().existClave("products", "name", "'" + name + "'");
+        } else {
+            if (status == STATUS_EDITING && currentProduct != null) {
+                if (!currentProduct.getName().equals(name)) {
+                    int existClave = app.getControl().existClave("products", "name", "'" + name + "'");
 
-            if (existClave > 0) {
-                GUIManager.showErrorMessage(this, "<html><p>Ya exixte un producto registrado con este nombre:"
-                        + "<p color=red size=+1>" + name.toUpperCase() + "</html>", "ADVERTENCIA");
-                regName.setForeground(Color.red);
-                valido = false;
+                    if (existClave > 0) {
+                        GUIManager.showErrorMessage(this, "<html><p>Ya exixte un producto registrado con este nombre:"
+                                + "<p color=red size=+1>" + name.toUpperCase() + "</html>", "ADVERTENCIA");
+                        regName.setForeground(Color.red);
+                        valido = false;
+                    }
+                }
+
+            } else {
+                int existClave = app.getControl().existClave("products", "name", "'" + name + "'");
+
+                if (existClave > 0) {
+                    GUIManager.showErrorMessage(this, "<html><p>Ya exixte un producto registrado con este nombre:"
+                            + "<p color=red size=+1>" + name.toUpperCase() + "</html>", "ADVERTENCIA");
+                    regName.setForeground(Color.red);
+                    valido = false;
+                }
             }
         }
         String code = regCode.getText().trim();
@@ -559,7 +573,7 @@ public class PanelProducts extends PanelCapturaMod implements ActionListener, Ca
                 if (!currentProduct.getCode().equals(code)) {
                     int existClave = app.getControl().existClave("products", "code", "'" + code + "'");
                     if (existClave > 0) {
-                        GUIManager.showErrorMessage(this, "<html><p>Ya exixte un producto registrado con este codigo:"
+                        GUIManager.showErrorMessage(this, "<html><p>Ya existe un producto registrado con este codigo:"
                                 + "<p color=red size=+1>" + code + "</html>", "ADVERTENCIA");
                         regCode.setForeground(Color.red);
                         valido = false;
@@ -568,7 +582,7 @@ public class PanelProducts extends PanelCapturaMod implements ActionListener, Ca
             } else {
                 int existClave = app.getControl().existClave("products", "code", "'" + code + "'");
                 if (existClave > 0) {
-                    GUIManager.showErrorMessage(this, "<html><p>Ya exixte un producto registrado con este codigo:"
+                    GUIManager.showErrorMessage(this, "<html><p>Ya existe un producto registrado con este codigo:"
                             + "<p color=red size=+1>" + code + "</html>", "ADVERTENCIA");
                     regCode.setForeground(Color.red);
                     valido = false;
@@ -585,6 +599,7 @@ public class PanelProducts extends PanelCapturaMod implements ActionListener, Ca
             valido = false;
         }
 
+        System.out.println(regDesc.getText());
         if (regDesc.getText().trim().isEmpty()) {
             regDesc.setBorder(bordeError);
             valido = false;

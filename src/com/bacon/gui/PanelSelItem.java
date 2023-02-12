@@ -207,7 +207,7 @@ public class PanelSelItem extends PanelCaptura implements ActionListener, CaretL
     public Item getSelectedItem() {
         boolean valido = true;
         if (tfCantidad.getText().trim().isEmpty()
-                || Integer.parseInt(tfCantidad.getText()) < 1) {
+                || Double.parseDouble(tfCantidad.getText()) <= 0) {
             tfCantidad.setBorder(bordeError);
             valido = false;
         }
@@ -221,8 +221,8 @@ public class PanelSelItem extends PanelCaptura implements ActionListener, CaretL
         }
         if (valido && selectedItem != null) {
             try {
-                selectedItem.setQuantity(Integer.parseInt(tfCantidad.getText()));
-            } catch (Exception e) {
+                selectedItem.setQuantity(Double.parseDouble(tfCantidad.getText()));
+            } catch (NumberFormatException e) {
             }
             return selectedItem;
         }
@@ -237,7 +237,7 @@ public class PanelSelItem extends PanelCaptura implements ActionListener, CaretL
             valido = false;
         }
         if (tfCantidad.getText().trim().isEmpty()
-                || Integer.parseInt(tfCantidad.getText()) < 1) {
+                || Double.parseDouble(tfCantidad.getText()) <= 0) {
             tfCantidad.setBorder(bordeError);
             valido = false;
         }
@@ -253,7 +253,7 @@ public class PanelSelItem extends PanelCaptura implements ActionListener, CaretL
         if (valido) {
             item = app.getControl().getItemWhere("id=" + modelo.getValueAt(row, 0));
             try {
-                item.setQuantity(Integer.parseInt(tfCantidad.getText()));
+                item.setQuantity(Double.parseDouble(tfCantidad.getText()));
 //                item.setPrice(new BigDecimal(tfValorUnit.getText()));
             } catch (NumberFormatException e) {
             }
