@@ -70,7 +70,7 @@ public final class Aplication implements ActionListener, PropertyChangeListener,
     public static final String CONFIG_LASTUPDATE = "lastUpdate";
 
     public static final String PREFERENCES = "";
-    public static final String DATABASE = "baconapp";
+    public static final String DATABASE = "bacon2";
     public static final String WORK_FOLDER = "baconapp";
     public static final String DB_USER = "root";
     public static boolean INSTALL_DB = false;

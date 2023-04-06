@@ -2,6 +2,7 @@ package com.bacon.gui;
 
 import com.bacon.Aplication;
 import com.bacon.Configuration;
+import static com.bacon.Control.logger;
 import com.bacon.GUIManager;
 import com.bacon.domain.Client;
 import com.bacon.domain.ConfigDB;
@@ -235,6 +236,7 @@ public class PanelConfirmPedido extends PanelCapturaMod implements ActionListene
         int opt = JOptionPane.showConfirmDialog(null, msg, "Advertencia", JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
         if (opt == JOptionPane.OK_OPTION) {
             if (invoice.getStatus() != Invoice.ST_ANULADA) {
+                logger.warn("Anulate invoice::"+invoice.getFactura());
                 invoice.setStatus(Invoice.ST_ANULADA);
                 app.getControl().updateInvoice(invoice);
                 updateInvoice();

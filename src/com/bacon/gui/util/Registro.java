@@ -1024,6 +1024,7 @@ public class Registro extends JComponent implements Reseteable, CaretListener {
 
     public void setDocument(Document docLim) {
         this.docLim = docLim;
+        if(campo instanceof JTextField)
         ((JTextField) campo).setDocument(this.docLim);
     }
 

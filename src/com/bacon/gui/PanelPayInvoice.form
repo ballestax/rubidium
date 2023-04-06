@@ -16,43 +16,43 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Group type="102" alignment="0" attributes="0">
+          <Group type="102" attributes="0">
+              <EmptySpace min="-2" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" attributes="0">
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Component id="lbInvoice" min="-2" pref="158" max="-2" attributes="0"/>
-                      <EmptySpace min="0" pref="0" max="-2" attributes="0"/>
-                      <Component id="lbTitle" min="-2" pref="158" max="-2" attributes="0"/>
-                      <EmptySpace max="32767" attributes="0"/>
+                  <Group type="102" alignment="0" attributes="0">
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Group type="102" attributes="0">
+                              <Component id="btPendiente" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="32767" attributes="0"/>
+                              <Component id="btPagar" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <Component id="regEfect" alignment="0" max="32767" attributes="0"/>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="lbInvoice" pref="158" max="32767" attributes="0"/>
+                              <EmptySpace min="-2" pref="0" max="-2" attributes="0"/>
+                              <Component id="lbTitle" pref="158" max="32767" attributes="0"/>
+                          </Group>
+                          <Component id="regTransfer" alignment="0" max="32767" attributes="0"/>
+                          <Component id="regBank" alignment="0" max="32767" attributes="0"/>
+                      </Group>
+                      <EmptySpace type="unrelated" min="-2" max="-2" attributes="0"/>
+                      <Component id="registro2" min="-2" pref="2" max="-2" attributes="0"/>
                   </Group>
-                  <Group type="102" alignment="1" attributes="0">
-                      <EmptySpace max="32767" attributes="0"/>
-                      <Component id="btPagar" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                  </Group>
-              </Group>
-              <Component id="registro2" min="-2" pref="2" max="-2" attributes="0"/>
-          </Group>
-          <Group type="102" alignment="0" attributes="0">
-              <EmptySpace max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="1" attributes="0">
-                  <Component id="regTransfer" alignment="1" min="-2" pref="318" max="-2" attributes="0"/>
-                  <Component id="regEfect" alignment="1" min="-2" pref="318" max="-2" attributes="0"/>
-                  <Group type="102" attributes="0">
-                      <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                  <Group type="102" alignment="0" attributes="0">
+                      <Group type="103" groupAlignment="0" attributes="0">
                           <Component id="lbTotal" alignment="1" max="32767" attributes="0"/>
                           <Component id="lbVar" alignment="1" max="32767" attributes="0"/>
-                          <Component id="lbSubt" alignment="1" min="-2" pref="150" max="-2" attributes="0"/>
+                          <Component id="lbSubt" alignment="1" pref="150" max="32767" attributes="0"/>
                       </Group>
-                      <EmptySpace type="separate" max="-2" attributes="0"/>
+                      <EmptySpace type="separate" min="-2" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="lbValVar" min="-2" pref="150" max="-2" attributes="0"/>
-                          <Component id="lbValSubt" min="-2" pref="150" max="-2" attributes="0"/>
-                          <Component id="lbValTot" alignment="0" min="-2" pref="150" max="-2" attributes="0"/>
+                          <Component id="lbValVar" pref="150" max="32767" attributes="0"/>
+                          <Component id="lbValSubt" pref="150" max="32767" attributes="0"/>
+                          <Component id="lbValTot" alignment="0" pref="150" max="32767" attributes="0"/>
                       </Group>
+                      <EmptySpace min="-2" pref="12" max="-2" attributes="0"/>
                   </Group>
               </Group>
-              <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -85,15 +85,20 @@
                       <Component id="regEfect" min="-2" pref="31" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="regTransfer" min="-2" pref="31" max="-2" attributes="0"/>
-                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                      <Component id="btPagar" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="32767" attributes="0"/>
+                      <Component id="regBank" min="-2" pref="31" max="-2" attributes="0"/>
+                      <EmptySpace type="separate" min="-2" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="btPagar" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="btPendiente" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
                   </Group>
                   <Group type="102" attributes="0">
                       <EmptySpace min="243" pref="243" max="-2" attributes="0"/>
                       <Component id="registro2" min="-2" max="-2" attributes="0"/>
                   </Group>
               </Group>
-              <EmptySpace max="32767" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -111,7 +116,7 @@
     </Component>
     <Component class="com.bacon.gui.util.Registro" name="regEfect">
       <AuxValues>
-        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.bacon.gui.util.Registro(0, &quot;&quot;,&quot;0&quot;,140,140, acEfecty)"/>
+        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.bacon.gui.util.Registro(0, &quot;&quot;,&quot;0&quot;,140,140)"/>
       </AuxValues>
     </Component>
     <Component class="com.bacon.gui.util.Registro" name="registro2">
@@ -191,6 +196,16 @@
         <Property name="text" type="java.lang.String" value="jLabel1"/>
         <Property name="opaque" type="boolean" value="true"/>
       </Properties>
+    </Component>
+    <Component class="javax.swing.JButton" name="btPendiente">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="jButton1"/>
+      </Properties>
+    </Component>
+    <Component class="com.bacon.gui.util.Registro" name="regBank">
+      <AuxValues>
+        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.bacon.gui.util.Registro(0,&quot;&quot;, new String[1] ,140)"/>
+      </AuxValues>
     </Component>
   </SubComponents>
 </Form>

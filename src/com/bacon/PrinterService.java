@@ -511,7 +511,7 @@ public class PrinterService {
 
             escpos.writeLF(font2, "================================================");
 
-            escpos.feed(4);
+            escpos.feed(5);
 
             escpos.cut(EscPos.CutMode.FULL);
 

@@ -572,8 +572,8 @@ public class GUIManager {
 
     public ArrayList<Image> getListIconos() {
         ArrayList list = new ArrayList<>();
-        list.add(app.getImgManager().getImagen(app.getFolderIcons() + "logo.png", 32, 32));
-        list.add(app.getImgManager().getImagen(app.getFolderIcons() + "logo.png", 64, 64));
+        list.add(app.getImgManager().getImagen(app.getFolderIcons() + "logo-2.png", 32, 32));
+        list.add(app.getImgManager().getImagen(app.getFolderIcons() + "logo-2.png", 64, 64));
         return list;
     }
 
@@ -726,7 +726,7 @@ public class GUIManager {
             archivo.add(new JPopupMenu.Separator());
             archivo.add(app.getAction(Aplication.ACTION_EXIT_APP));
 
-            ver.add(app.getAction(Aplication.ACTION_SHOW_ADMIN));
+           // ver.add(app.getAction(Aplication.ACTION_SHOW_ADMIN));
 
             salir.addActionListener(new ActionListener() {
                 @Override
@@ -744,7 +744,7 @@ public class GUIManager {
 
 //            archivo.add(salir);
             menubar.add(archivo);
-            menubar.add(ver);
+            //menubar.add(ver);
 
             ayuda.add(acerca);
             menubar.add(ayuda);

@@ -6,6 +6,7 @@ import com.bacon.domain.Invoice;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import javax.swing.ImageIcon;
 import javax.swing.SwingConstants;
@@ -18,7 +19,7 @@ import org.dz.TextFormatter;
  *
  * @author lrod
  */
-public class PanelPayInvoice extends PanelCapturaMod {
+public class PanelPayInvoice extends PanelCapturaMod implements ActionListener{
 
     private final Aplication app;
     private final Invoice invoice;
@@ -37,9 +38,10 @@ public class PanelPayInvoice extends PanelCapturaMod {
         acEfecty = new ProgAction("Efectivo",
                 new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "cash.png", 24, 24)), "Efectivo", 'e') {
             public void actionPerformed(ActionEvent e) {
-//                        salir(0);
+//                invoice.getValor()
             }
         };
+               
         
         initComponents();
         createComponents();
@@ -48,9 +50,7 @@ public class PanelPayInvoice extends PanelCapturaMod {
     private void createComponents() {
 
         Font f = new Font("Sans serif", 1, 16);
-        Font f2 = new Font("Tahoma", 1, 16);
-
-        
+        Font f2 = new Font("Tahoma", 1, 16);        
 
         lbTitle.setText(invoice.getFactura());
         lbInvoice.setText("Factura");
@@ -67,30 +67,40 @@ public class PanelPayInvoice extends PanelCapturaMod {
         lbValTot.setText(app.getDCFORM_P().format(invoice.getValor().add(invoice.getValorDelivery()).doubleValue() + invoice.getValueService()));
         lbValTot.setFont(f2);
 
-//        lbValSubt.setFont(new Font("Sans", 1, 16));
-//        lbValSubt.setText(app.getDCFORM_P().format(invoice.getValor().doubleValue()));
-
-        regEfect.addActionListener(acEfecty);
+        regEfect.addActionListener(this);
+        regEfect.setActionCommand("AC_EFECTIVO");
         regEfect.setLabelText("Efectivo");
-        regEfect.setFontCampo(f);
-        
+        regEfect.setFontCampo(f);        
         regEfect.setTextAligment(SwingConstants.RIGHT);
         regEfect.setDocument(TextFormatter.getDoubleLimiter());
         regEfect.setText(app.getDCFORM_W().format(invoice.getValorTotal().doubleValue()));
+        
         regTransfer.setLabelText("Tranferencias");
         regTransfer.setFontCampo(f);
         regTransfer.setTextAligment(SwingConstants.RIGHT);
         regTransfer.setDocument(TextFormatter.getDoubleLimiter());
         regTransfer.setText("0");
+        regTransfer.addActionListener(this);
+        regTransfer.setActionCommand("AC_TRANSFERENCIA");              
+        
+        regBank.setLabelText("Banco");
+        regBank.setFontCampo(f);        
+        regBank.setTextAligment(SwingConstants.RIGHT);
+        regBank.setDocument(TextFormatter.getDoubleLimiter());
+        regBank.setText(new Object[]{"Nequi","Bancolombia","Davivienda","BBVA","Datafono","Otro"});
+        
+//        btSwitch.setActionCommand("AC_SWITCH");
+//        btSwitch.addActionListener(this);
 
         btPagar.setText("Pagar");
+        
+        btPendiente.setText("Pendiente");
 
         regEfect.addCaretListener(new CaretListener() {
             @Override
             public void caretUpdate(CaretEvent e) {
                 calcularValores(1);
             }
-
         });
 
         regTransfer.addCaretListener(new CaretListener() {
@@ -98,8 +108,8 @@ public class PanelPayInvoice extends PanelCapturaMod {
             public void caretUpdate(CaretEvent e) {
                 calcularValores(2);
             }
-
         });
+        
     }
 
     private void calcularValores(int reg) {
@@ -135,7 +145,7 @@ public class PanelPayInvoice extends PanelCapturaMod {
     private void initComponents() {
 
         lbTitle = new javax.swing.JLabel();
-        regEfect = new com.bacon.gui.util.Registro(0, "","0",140,140, acEfecty);
+        regEfect = new com.bacon.gui.util.Registro(0, "","0",140,140);
         registro2 = new com.bacon.gui.util.Registro();
         regTransfer = new com.bacon.gui.util.Registro(0, "","0",140);
         btPagar = new javax.swing.JButton();
@@ -146,6 +156,8 @@ public class PanelPayInvoice extends PanelCapturaMod {
         lbVar = new javax.swing.JLabel();
         lbValTot = new javax.swing.JLabel();
         lbTotal = new javax.swing.JLabel();
+        btPendiente = new javax.swing.JButton();
+        regBank = new com.bacon.gui.util.Registro(0,"", new String[1] ,140);
 
         lbTitle.setBackground(new java.awt.Color(195, 195, 195));
         lbTitle.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
@@ -185,39 +197,41 @@ public class PanelPayInvoice extends PanelCapturaMod {
         lbTotal.setText("jLabel1");
         lbTotal.setOpaque(true);
 
+        btPendiente.setText("jButton1");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(lbInvoice, javax.swing.GroupLayout.PREFERRED_SIZE, 158, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, 0)
-                        .addComponent(lbTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 158, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(btPagar)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)))
-                .addComponent(registro2, javax.swing.GroupLayout.PREFERRED_SIZE, 2, javax.swing.GroupLayout.PREFERRED_SIZE))
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(regTransfer, javax.swing.GroupLayout.PREFERRED_SIZE, 318, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(regEfect, javax.swing.GroupLayout.PREFERRED_SIZE, 318, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(btPendiente)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(btPagar))
+                            .addComponent(regEfect, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(lbInvoice, javax.swing.GroupLayout.DEFAULT_SIZE, 158, Short.MAX_VALUE)
+                                .addGap(0, 0, 0)
+                                .addComponent(lbTitle, javax.swing.GroupLayout.DEFAULT_SIZE, 158, Short.MAX_VALUE))
+                            .addComponent(regTransfer, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(regBank, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(registro2, javax.swing.GroupLayout.PREFERRED_SIZE, 2, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(lbTotal, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(lbVar, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(lbSubt, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(lbSubt, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 150, Short.MAX_VALUE))
                         .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(lbValVar, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(lbValSubt, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(lbValTot, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addGap(6, 6, 6))
+                            .addComponent(lbValVar, javax.swing.GroupLayout.DEFAULT_SIZE, 150, Short.MAX_VALUE)
+                            .addComponent(lbValSubt, javax.swing.GroupLayout.DEFAULT_SIZE, 150, Short.MAX_VALUE)
+                            .addComponent(lbValTot, javax.swing.GroupLayout.DEFAULT_SIZE, 150, Short.MAX_VALUE))
+                        .addGap(12, 12, 12))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -244,12 +258,16 @@ public class PanelPayInvoice extends PanelCapturaMod {
                         .addComponent(regEfect, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(regTransfer, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(btPagar))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(regBank, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(btPagar)
+                            .addComponent(btPendiente)))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(243, 243, 243)
                         .addComponent(registro2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
         layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {lbInvoice, lbTitle});
@@ -259,6 +277,7 @@ public class PanelPayInvoice extends PanelCapturaMod {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btPagar;
+    private javax.swing.JButton btPendiente;
     private javax.swing.JLabel lbInvoice;
     private javax.swing.JLabel lbSubt;
     private javax.swing.JLabel lbTitle;
@@ -267,6 +286,7 @@ public class PanelPayInvoice extends PanelCapturaMod {
     private javax.swing.JLabel lbValTot;
     private javax.swing.JLabel lbValVar;
     private javax.swing.JLabel lbVar;
+    private com.bacon.gui.util.Registro regBank;
     private com.bacon.gui.util.Registro regEfect;
     private com.bacon.gui.util.Registro regTransfer;
     private com.bacon.gui.util.Registro registro2;
@@ -275,5 +295,20 @@ public class PanelPayInvoice extends PanelCapturaMod {
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
 
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent ae) {
+        System.out.println(ae.getActionCommand());
+       if("AC_EFECTIVO".equals(ae.getActionCommand())){
+           regEfect.setText(app.DCFORM_P.format(invoice.getValorTotal()));
+       }else  if("AC_TRANSFERENCIA".equals(ae.getActionCommand())){
+           regTransfer.setText(app.DCFORM_P.format(invoice.getValorTotal()));           
+       }else if("AC_SWITCH".equals(ae.getActionCommand())){
+            String temp = regEfect.getText();
+            regEfect.setText(regTransfer.getText());
+            regTransfer.setText(temp);
+            
+       }      
     }
 }

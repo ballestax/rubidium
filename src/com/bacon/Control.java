@@ -1236,7 +1236,7 @@ public class Control {
                 int id = Integer.parseInt(data.get("id").toString());
                 double quantity = Double.parseDouble(data.get("quantity").toString());
                 app.getControl().addItemToInventory(id, quantity * pPed.getCantidad());
-                logger.debug("Update inventory: " + pPed.getProduct().getName() + ":: " + data.get("name") + "-> idItem:" + id + "[" + quantity + "]");
+                logger.warn("Update inventory: " + pPed.getProduct().getName() + ":: " + data.get("name") + "-> idItem:" + id + "[" + quantity + "]");
             }
 
         }

@@ -208,10 +208,10 @@ public class PanelSnapShot extends PanelCapturaMod implements ActionListener {
 
     private void loadSnapshotItems(Cycle cycle) {
 //        SwingWorker sw;
-//        if(sw !=null && !sw.isDone()){
-//            sw.cancel(true);
-//            model.setRowCount(0);
-//        }
+        if(sw !=null && !sw.isDone()){
+            sw.cancel(true);
+            model.setRowCount(0);
+        }
 
         sw = new SwingWorker() {
 
