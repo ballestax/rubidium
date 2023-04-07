@@ -214,6 +214,7 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
         regFilters.setText(filters.toArray());
         regFilters.setActionCommand(AC_CHANGE_ITEMS);
         regFilters.addActionListener(this);
+        filterSelected = regFilters.getText();
 
         Set tags = loadTags();
         regTags = new Registro(BoxLayout.X_AXIS, "Tags", new String[1], 50);
@@ -221,6 +222,7 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
         regTags.setText(tags.toArray());
         regTags.setActionCommand(AC_CHANGE_TAGS);
         regTags.addActionListener(this);
+        tagSelected = regTags.getText();
 
         panelButtons.add(regSearch);
         panelButtons.add(regFilters);
@@ -323,9 +325,7 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
 
         jPanel1.setLayout(new BorderLayout());
         jPanel1.add(pnDetail);
-
-        System.out.println("stFilert: " + stFilterDisable);
-        System.out.println("config: " + config);
+       
         populateTable();
 
     }
