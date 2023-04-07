@@ -132,8 +132,10 @@ public class PanelSelCategory extends PanelCapturaMod implements ActionListener 
             if(lastButtonSel != null){
                 lastButtonSel.setForeground(Color.black);
             }
+            if(e.getSource() instanceof JButton){
             lastButtonSel = (JButton) e.getSource();
             lastButtonSel.setForeground(Color.red);
+            }
             
             lastCategorySel = e.getActionCommand().substring(8);
             System.out.println(lastCategorySel);

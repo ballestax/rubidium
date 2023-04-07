@@ -173,7 +173,7 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
 
         btShowDisable = new JToggleButton();
         btShowDisable.setFont(f);
-        btShowDisable.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "camera-accept.png", 22, 22)));
+        btShowDisable.setIcon(new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "file-warning.png", 22, 22)));
         btShowDisable.setActionCommand(AC_SHOW_DISABLE);
         btShowDisable.addActionListener(this);
         btShowDisable.setToolTipText("Ver deshabilitados");
@@ -226,13 +226,13 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
         panelButtons.add(regFilters);
         panelButtons.add(regTags);
         panelButtons.add(btRefresh);
+        panelButtons.add(btShowDisable);
         panelButtons.add(btAdd);
         panelButtons.add(btLoad);
         panelButtons.add(btDesc);
         panelButtons.add(btConciliation);
         panelButtons.add(btExport);
-        panelButtons.add(btSnapShot);
-        panelButtons.add(btShowDisable);
+        panelButtons.add(btSnapShot);        
         panelButtons.add(btPrintList);
 
         String[] colNames = new String[]{"N°", "Item", "Cantidad", "Medida", "Cost", "Price", "Min", "Cost. Total"};
@@ -715,9 +715,19 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
     @Override
     public void actionPerformed(ActionEvent e) {
         if (AC_SHOW_ADD_ITEM.equals(e.getActionCommand())) {
-            app.getGuiManager().showPanelAddItem(this, null);
+            Permission perm = app.getControl().getPermissionByName("add-items-inventary");
+            if (app.getControl().hasPermission(app.getUser(), perm)) {
+                app.getGuiManager().showPanelAddItem(this, null);
+            } else {
+                GUIManager.showErrorMessage(this, "No tiene permisos para realizar esta accion", "Error de privilegios");
+            }
         } else if (AC_SHOW_SNAPSHOT.equals(e.getActionCommand())) {
-            app.getGuiManager().showPanelSnapShot();
+            Permission perm = app.getControl().getPermissionByName("show-snapshot-inventary");
+            if (app.getControl().hasPermission(app.getUser(), perm)) {
+                app.getGuiManager().showPanelSnapShot();
+            } else {
+                GUIManager.showErrorMessage(this, "No tiene permisos para realizar esta accion", "Error de privilegios");
+            }
         } else if (AC_LOAD_ITEM.equals(e.getActionCommand())) {
             Permission perm = app.getControl().getPermissionByName("load-items-inventary");
             if (app.getControl().hasPermission(app.getUser(), perm)) {
@@ -753,22 +763,12 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
         }
 
         if (e.getActionCommand().equals(AC_EXPORT_TO)) {
-            LOGGER.debug("Exportando...");
-            SwingWorker tarea = new SwingWorker() {
-                @Override
-                protected Object doInBackground() throws Exception {
-                    try {
-                        String tipo = "Inventario";
-                        String file = app.getDirDocuments() + File.separator + "Reporte_" + tipo + "_" + app.getFormatoFecha().format(new Date()) + ".xlsx";
-                        app.getXlsManager().exportarTabla(model, "Reporte " + tipo, file, PanelInventory.this);
-                        Desktop.getDesktop().open(new File(file));
-                    } catch (Exception ex) {
-                        GUIManager.showErrorMessage(null, "Error intentando abrir el archivo.\n" + ex.getMessage(), "Error");
-                    }
-                    return true;
-                }
-            };
-            tarea.execute();
+            Permission perm = app.getControl().getPermissionByName("export-items-inventary");
+            if (app.getControl().hasPermission(app.getUser(), perm)) {
+                exportToXLS();
+            }else {
+                GUIManager.showErrorMessage(this, "No tiene permisos para realizar esta accion", "Error de privilegios");
+            }
         }
 
         if (e.getActionCommand().equals(AC_SHOW_DISABLE)) {
@@ -781,18 +781,45 @@ public class PanelInventory extends PanelCapturaMod implements ActionListener, L
         }
 
         if (e.getActionCommand().equals(AC_PRINT_LIST)) {
-
-            ConfigDB config = app.getControl().getConfigLocal(Configuration.PRINTER_SELECTED);
-            String propPrinter = config != null ? config.getValor() : "";
-            if (propPrinter.isEmpty()) {
-                GUIManager.showErrorMessage(null, "No ha seleccionado una impresora valida para imprimir", "Impresora no encontrada");
-                return;
+            Permission perm = app.getControl().getPermissionByName("print-items-inventary");
+            if (app.getControl().hasPermission(app.getUser(), perm)) {    
+                printList();
+            }else {
+                GUIManager.showErrorMessage(this, "No tiene permisos para realizar esta accion", "Error de privilegios");
             }
-            String printerName = propPrinter;
-            String tag = regTags.getText().substring(5);
-            
-            app.getPrinterService().imprimirInventario(localList,tag.toUpperCase(), printerName);
         }
+    }
+
+    private void printList() {
+        ConfigDB config = app.getControl().getConfigLocal(Configuration.PRINTER_SELECTED);
+        String propPrinter = config != null ? config.getValor() : "";
+        if (propPrinter.isEmpty()) {
+            GUIManager.showErrorMessage(null, "No ha seleccionado una impresora valida para imprimir", "Impresora no encontrada");
+            return;
+        }
+        String printerName = propPrinter;
+        String tag = regTags.getText().substring(5);
+        app.getPrinterService().imprimirInventario(localList,tag.toUpperCase(), printerName);      
+    }
+
+    private void exportToXLS() {
+         LOGGER.debug("Exportando...");
+    
+        SwingWorker tarea = new SwingWorker() {
+            @Override
+            protected Object doInBackground() throws Exception {
+                try {
+                    String tipo = "Inventario";
+                    String file = app.getDirDocuments() + File.separator + "Reporte_" + tipo + "_" + app.getFormatoFecha().format(new Date()) + ".xlsx";
+                    app.getXlsManager().exportarTabla(model, "Reporte " + tipo, file, PanelInventory.this);
+                    Desktop.getDesktop().open(new File(file));
+                } catch (Exception ex) {
+                    GUIManager.showErrorMessage(null, "Error intentando abrir el archivo.\n" + ex.getMessage(), "Error");
+                }
+                return true;
+            }
+        };
+        tarea.execute();
     }
 
     private void refreshItemsFiltered() {

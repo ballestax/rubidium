@@ -56,6 +56,13 @@ public class MyConstants {
         new Permission("show-tab-users", "Ver el modulo administrador"),
         new Permission("show-inventory-module", "Ver el modulo inventario"),
         new Permission("show-products-module", "Ver el modulo productos"),
+        new Permission("add-items-inventary", "Agregar items al inventario"),
+        new Permission("load-items-inventary", "Cargar items al inventario"),
+        new Permission("download-items-inventary", "Descargar items al inventario"),
+        new Permission("conciliate-items-inventary", "Coniciliar items al inventario"),
+        new Permission("print-items-inventary", "Inprimir items del inventario"),
+        new Permission("export-items-inventary", "Exportar items del inventario"),
+        
     };
 
     public static final SimpleDateFormat FORMAT_DATE = new SimpleDateFormat("dd-MM-yyyy");
