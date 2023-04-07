@@ -184,6 +184,9 @@ public class PanelModPedidos extends PanelCapturaMod
             }
             panelCategory.setProducts(list);
             panelLeft.updateUI();
+        }else if(evt.getPropertyName().equals(PanelTopSearch.AC_REFRESH_PRODUCTS)){
+            System.out.println("Refrescando productos");
+            loadAllProducts();
         }
         
     }

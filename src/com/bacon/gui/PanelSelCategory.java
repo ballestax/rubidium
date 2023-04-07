@@ -5,6 +5,7 @@ import com.bacon.Configuration;
 import com.bacon.domain.Category;
 import com.bacon.domain.ConfigDB;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -32,6 +33,8 @@ public class PanelSelCategory extends PanelCapturaMod implements ActionListener 
     private Box boxContainer;
     private JPopupMenu popupExtraCategories;
     private JButton btExtras;
+    private JButton lastButtonSel;
+    private String lastCategorySel;
 
     public PanelSelCategory(Aplication app, ArrayList<Category> categories) {
         this.app = app;
@@ -60,24 +63,33 @@ public class PanelSelCategory extends PanelCapturaMod implements ActionListener 
         ConfigDB config = app.getControl().getConfigLocal(Configuration.MAX_CATEGORIES_LIST);        
         int MAX = config != null ? (int) config.castValor() : 6;
 
+        Border marginBorder = BorderFactory.createEmptyBorder(7, 5, 7, 5);
         if (categories != null) {
             for (int i = 0; i < categories.size() && i <= MAX; i++) {
-                JButton btCategory = new JButton();
+                JButton btCategory = new JButton();                
+                btCategory.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createEtchedBorder(EtchedBorder.LOWERED), marginBorder));
+                
                 btCategory.setBackground(categories.get(i).getColor());
+                btCategory.setForeground(Color.black);
                 btCategory.setMargin(new Insets(1, 1, 1, 1));
                 String name = categories.get(i).getName().toUpperCase();
                 btCategory.setText(name);
                 btCategory.setActionCommand(SEL_CAT_ + name);
                 btCategory.addActionListener(this);
                 boxContainer.add(btCategory);
-                boxContainer.add(Box.createHorizontalStrut(2));
+                boxContainer.add(Box.createHorizontalStrut(4));
             }
             if (categories.size() - 1 > MAX) {
                 btExtras = new JButton();
                 btExtras.setBackground(Utiles.colorAleatorio(125, 255));
                 btExtras.setMargin(new Insets(1, 1, 1, 1));
+                
+                btExtras.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createEtchedBorder(EtchedBorder.LOWERED), marginBorder));
                 String name = "...";
                 btExtras.setText(name);
+                btExtras.setForeground(Color.black);
                 btExtras.setActionCommand(SHOW_EXTRA_CATEGORIES);
                 btExtras.addActionListener(this);
                 boxContainer.add(Box.createHorizontalGlue());
@@ -117,6 +129,15 @@ public class PanelSelCategory extends PanelCapturaMod implements ActionListener 
             popupExtraCategories.show(btExtras, -popupExtraCategories.getWidth() + btExtras.getWidth(), btExtras.getHeight());
         } else {
             pcs.firePropertyChange(e.getActionCommand(), null, null);
+            if(lastButtonSel != null){
+                lastButtonSel.setForeground(Color.black);
+            }
+            lastButtonSel = (JButton) e.getSource();
+            lastButtonSel.setForeground(Color.red);
+            
+            lastCategorySel = e.getActionCommand().substring(8);
+            System.out.println(lastCategorySel);
+            
         }
     }
 
