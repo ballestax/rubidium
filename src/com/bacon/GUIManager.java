@@ -557,7 +557,7 @@ public class GUIManager {
                 @Override
                 public boolean dispatchKeyEvent(KeyEvent e) {
                     if (e.getKeyCode() == KeyEvent.VK_F3) {
-                        if (!showingInfo) {
+                        if (!showingInfo && app.getUser()!=null) {
                             showingInfo = true;
                             showPanelInfo();
                         }
@@ -940,7 +940,7 @@ public class GUIManager {
     private void showPanelControlAccess() {
         user = app.getUser();
         setWaitCursor();
-        final JDialog dialog = new MyDialogEsc();
+        final JDialog dialog = new JDialog();
         dialog.setModalityType(Dialog.ModalityType.TOOLKIT_MODAL);
         int w = 350;
         int h = 220;

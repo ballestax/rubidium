@@ -325,7 +325,9 @@ public final class Aplication implements ActionListener, PropertyChangeListener,
     }
 
     public void setUser(User user) {
-        user.setPassword("");
+        if(user!=null){
+            user.setPassword("");
+        }
         this.user = user;
         getGuiManager().reloadToolbar();
     }
@@ -468,6 +470,7 @@ public final class Aplication implements ActionListener, PropertyChangeListener,
         acCerrarSesion = new ProgAction("Cerrar sesion",
                 null, "Cerrar la sesion del usuario actual", 'x') {
             public void actionPerformed(ActionEvent e) {
+                setUser(null);
                 getGuiManager().closeSesion();
             }
         };
