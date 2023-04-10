@@ -663,6 +663,7 @@ public class JDBCInvoiceDAO implements InvoiceDAO {
                 ProductoPed product = products.get(i);
                 Object[] parameters1 = {
                     idInvoice,
+                    0,
                     product.getProduct().getId(),
                     product.hasPresentation() ? product.getPresentation().getId() : 0,
                     product.getPrecio(),

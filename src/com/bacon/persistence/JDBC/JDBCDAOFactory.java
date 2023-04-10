@@ -19,6 +19,7 @@ import com.bacon.persistence.dao.IngredientDAO;
 import com.bacon.persistence.dao.InvoiceDAO;
 import com.bacon.persistence.dao.ItemDAO;
 import com.bacon.persistence.dao.LocationDAO;
+import com.bacon.persistence.dao.OrderDAO;
 import com.bacon.persistence.dao.ProductDAO;
 import com.bacon.persistence.dao.UserDAO;
 import com.bacon.persistence.dao.UtilDAO;
@@ -318,6 +319,13 @@ public class JDBCDAOFactory extends DAOFactory {
     @Override
     public LocationDAO getLocationDAO() throws DAOException {
         return new JDBCLocationDAO(dataSource, sqlStatements);
-    }       
+    }
+
+    @Override
+    public OrderDAO getOrderDAO() throws DAOException {
+        return new JDBCOrderDAO(getDataSource(), sqlStatements);
+    }
+    
+    
 
 }

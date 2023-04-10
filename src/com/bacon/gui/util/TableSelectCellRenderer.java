@@ -14,7 +14,6 @@ import javax.swing.JTable;
 import javax.swing.UIManager;
 import javax.swing.table.TableCellRenderer;
 
-
 /**
  *
  * @author ballestax
@@ -23,11 +22,10 @@ public class TableSelectCellRenderer extends JLabel implements TableCellRenderer
 
     boolean isBordered = true;
     JTable table;
-    private final Color COLOR_CHECK;
+    private static Color COLOR_CHECK = new Color(100, 220, 159);
 
     public TableSelectCellRenderer(boolean isBordered) {
-        this.isBordered = isBordered;
-        COLOR_CHECK = new Color(100,220,159);
+        this.isBordered = isBordered;        
         setOpaque(true);
     }
 
@@ -52,7 +50,8 @@ public class TableSelectCellRenderer extends JLabel implements TableCellRenderer
                         setBorder(BorderFactory.createLineBorder(Color.lightGray));
                     }
                 } else {
-                    setBackground(table.getBackground());
+//                    setBackground(table.getBackground());
+                    setBackground(row % 2 == 0 ? table.getBackground() : UIManager.getColor("Table.alternateRowColor"));
 //                        setForeground(EST_COLOR[estados[row]]);
                     setBorder(UIManager.getBorder("Table.cellBorder"));
                 }
@@ -84,7 +83,7 @@ public class TableSelectCellRenderer extends JLabel implements TableCellRenderer
                         component.setBorder(BorderFactory.createLineBorder(Color.lightGray));
                     }
                 } else {
-                    component.setBackground(table.getBackground());
+                    component.setBackground(row % 2 == 0 ? table.getBackground() : UIManager.getColor("Table.alternateRowColor"));
                     component.setForeground(table.getForeground());
                     component.setBorder(UIManager.getBorder("Table.cellBorder"));
                 }
@@ -102,4 +101,9 @@ public class TableSelectCellRenderer extends JLabel implements TableCellRenderer
 
         }
     }
+
+    public static Color getCOLOR_CHECK() {
+        return COLOR_CHECK;
+    }
+
 }

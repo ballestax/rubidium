@@ -1,7 +1,6 @@
 package com.bacon.gui;
 
 import com.bacon.Aplication;
-import com.bacon.domain.Additional;
 import com.bacon.domain.Presentation;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -22,6 +21,7 @@ public class PanelPresentation extends PanelCaptura implements ActionListener {
 
     private final Aplication app;
     private final Presentation presentation;
+    private Color colorBg;
 
     /**
      * Creates new form PanelAddition
@@ -37,6 +37,8 @@ public class PanelPresentation extends PanelCaptura implements ActionListener {
     }
 
     private void createComponents() {
+        
+        colorBg = getBackground();
         
         MouseAdapter mouseClick = new MouseAdapter() {
             @Override
@@ -152,12 +154,11 @@ public class PanelPresentation extends PanelCaptura implements ActionListener {
     
     public void setSelected(boolean sel) {
         rbSel.setSelected(sel);
-//        if(!sel){
-//            
-//        }else{
-//            setBackground(Color.red);
+//        setBackground(colorBg);
+//        if(sel){
+//            setBackground(Color.CYAN);
 //        }
-    }
+      }
 
     @Override
     public void setBackground(Color bg) {
@@ -166,9 +167,6 @@ public class PanelPresentation extends PanelCaptura implements ActionListener {
         rbSel.setBackground(bg);
     }
     
-    
-    
-
     public boolean isSelected() {
         return rbSel.isSelected();
     }

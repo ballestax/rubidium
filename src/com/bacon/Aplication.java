@@ -59,10 +59,12 @@ public final class Aplication implements ActionListener, PropertyChangeListener,
     public static final String ACTION_SHOW_ADMIN = "acShowAdmin";
     public static final String ACTION_SHOW_ORDER = "acShowOrder";
     public static final String ACTION_SHOW_ORDER_LIST = "acShowOrderList";
+    public static final String ACTION_SHOW_SALES_LIST = "acShowSalesList";
     public static final String ACTION_SHOW_CASH = "acShowCash";
     public static final String ACTION_SHOW_REPORTS = "acShowReports";
     public static final String ACTION_SHOW_INVENTORY = "acShowInventory";
     public static final String ACTION_SHOW_PRODUCTS = "acShowProducts";
+    public static final String ACTION_SHOW_POS = "acShowPOS";
 
     public static final String ACTION_RETURN_TO_MENU = "acReturnToMenu";
     public static final String ACTION_CLOSE_SESION = "acCLoseSesion";
@@ -84,10 +86,12 @@ public final class Aplication implements ActionListener, PropertyChangeListener,
     public DateFormat DF_FULL = new SimpleDateFormat("dd MMMM yyyy hh:mm");
     public DateFormat DF_FULL2 = new SimpleDateFormat("dd-MM-yyyy HH:mm");
     public DateFormat DF_FULL3 = new SimpleDateFormat("dd-MMM-yyyy HH:mm");
+    public DateFormat DF_FULL4 = new SimpleDateFormat("dd/MM/yy HH:mm");
     public DateFormat DF_SL = new SimpleDateFormat("dd MMMM yyyy");
     public DateFormat DF_SQL = new SimpleDateFormat("yyyy-MM-dd");
     public static final DateFormat DF_SQL_TS = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     public DateFormat DF_TIME = new SimpleDateFormat("HH:mm");
+    public DateFormat DF_TIME_FULL = new SimpleDateFormat("HH:mm:ss");
 
     private boolean tserver;
     private final Configuration configuration;
@@ -117,6 +121,8 @@ public final class Aplication implements ActionListener, PropertyChangeListener,
     private ProgAction acShowReports;
     private ProgAction acShowInventory;
     private ProgAction acShowProducts;
+    private ProgAction acShowPOS;
+    private ProgAction acShowSalesList;
 
     public Aplication() {
         Properties properties = new Properties();
@@ -410,22 +416,42 @@ public final class Aplication implements ActionListener, PropertyChangeListener,
         acShowOrders = new ProgAction("Pedidos",
                 null, "Ver modulo de pedidos", 'a') {
             public void actionPerformed(ActionEvent e) {
-                Permission perm = getControl().getPermissionByName("show-pedidos-module");
-                getGuiManager().showBasicPanel(getGuiManager().getPanelBasicPedidos(), perm);
+                Permission perm = getControl().getPermissionByName("show-orders-module");
+                getGuiManager().showBasicPanel(getGuiManager().getPanelBasicOrders(), perm);
             }
         };
         acShowOrders.setSmallIcon(new ImageIcon(imgManager.getImagen(getFolderIcons() + "shop.png", 25, 25)));
         acShowOrders.setLargeIcon(new ImageIcon(imgManager.getImagen(getFolderIcons() + "shop.png", 32, 32)));
 
+        acShowPOS = new ProgAction("POS",
+                null, "Ver modulo POS", 'a') {
+            public void actionPerformed(ActionEvent e) {
+                Permission perm = getControl().getPermissionByName("show-pos-module");
+                getGuiManager().showBasicPanel(getGuiManager().getPanelBasicPOS(), perm);
+            }
+        };
+        acShowPOS.setSmallIcon(new ImageIcon(imgManager.getImagen(getFolderIcons() + "monitor.png", 25, 25)));
+        acShowPOS.setLargeIcon(new ImageIcon(imgManager.getImagen(getFolderIcons() + "monitor.png", 32, 32)));
+
         acShowOrderList = new ProgAction("Lista de pedidos",
                 null, "Ver Lista de pedidos", 'a') {
             public void actionPerformed(ActionEvent e) {
                 Permission perm = getControl().getPermissionByName("show-orderlist-module");
-                getGuiManager().showBasicPanel(getGuiManager().getPanelBasicListPedidos(), perm);
+                getGuiManager().showBasicPanel(getGuiManager().getPanelBasicOrdersList(), perm);
             }
         };
         acShowOrderList.setSmallIcon(new ImageIcon(imgManager.getImagen(getFolderIcons() + "ordering.png", 25, 25)));
         acShowOrderList.setLargeIcon(new ImageIcon(imgManager.getImagen(getFolderIcons() + "ordering.png", 32, 32)));
+
+        acShowSalesList = new ProgAction("Ventas",
+                null, "Ver Lista de ventas", 'a') {
+            public void actionPerformed(ActionEvent e) {
+                Permission perm = getControl().getPermissionByName("show-saleslist-module");
+                getGuiManager().showBasicPanel(getGuiManager().getPanelBasicSalesList(), perm);
+            }
+        };
+        acShowSalesList.setSmallIcon(new ImageIcon(imgManager.getImagen(getFolderIcons() + "sales-report.png", 25, 25)));
+        acShowSalesList.setLargeIcon(new ImageIcon(imgManager.getImagen(getFolderIcons() + "sales-report.png", 32, 32)));
 
         acShowCash = new ProgAction("Caja",
                 null, "Ver modulo caja", 'c') {
@@ -497,8 +523,14 @@ public final class Aplication implements ActionListener, PropertyChangeListener,
             case ACTION_SHOW_ORDER:
                 return acShowOrders;
 
+            case ACTION_SHOW_POS:
+                return acShowPOS;
+
             case ACTION_SHOW_ORDER_LIST:
                 return acShowOrderList;
+
+            case ACTION_SHOW_SALES_LIST:
+                return acShowSalesList;
 
             case ACTION_SHOW_CASH:
                 return acShowCash;

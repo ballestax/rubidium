@@ -170,10 +170,12 @@
                       <Group type="103" groupAlignment="0" max="-2" attributes="0">
                           <Group type="102" attributes="0">
                               <Component id="btConfirm" min="-2" pref="90" max="-2" attributes="0"/>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Component id="btPrint" min="-2" pref="82" max="-2" attributes="0"/>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Component id="btPrint1" min="-2" pref="82" max="-2" attributes="0"/>
+                              <EmptySpace min="-2" pref="3" max="-2" attributes="0"/>
+                              <Component id="btOrder" min="-2" pref="32" max="-2" attributes="0"/>
+                              <EmptySpace min="-2" pref="3" max="-2" attributes="0"/>
+                              <Component id="btPrint" linkSize="8" min="-2" pref="51" max="-2" attributes="0"/>
+                              <EmptySpace min="-2" pref="3" max="-2" attributes="0"/>
+                              <Component id="btPrint1" linkSize="8" min="-2" pref="82" max="-2" attributes="0"/>
                           </Group>
                           <Component id="containerPanels" max="32767" attributes="0"/>
                       </Group>
@@ -241,6 +243,7 @@
                   <Component id="regTotal" linkSize="3" alignment="2" pref="30" max="32767" attributes="0"/>
                   <Component id="btPrint" linkSize="3" alignment="2" min="-2" pref="33" max="-2" attributes="0"/>
                   <Component id="btConfirm" linkSize="3" alignment="2" min="-2" pref="33" max="-2" attributes="0"/>
+                  <Component id="btOrder" alignment="2" min="-2" pref="33" max="-2" attributes="0"/>
               </Group>
               <EmptySpace min="-2" pref="3" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="2" attributes="0">
@@ -466,5 +469,7 @@
         </DimensionLayout>
       </Layout>
     </Container>
+    <Component class="javax.swing.JButton" name="btOrder">
+    </Component>
   </SubComponents>
 </Form>

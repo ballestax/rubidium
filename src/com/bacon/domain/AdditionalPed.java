@@ -33,6 +33,14 @@ public class AdditionalPed {
     }
 
     @Override
+    public String toString() {
+        StringBuilder stb = new StringBuilder();
+        return stb.append("+").append(additional.getName())
+                .append("(x").append(cantidad).append(")")
+                .toString();
+    }
+    
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;

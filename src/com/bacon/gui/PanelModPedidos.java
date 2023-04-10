@@ -15,6 +15,7 @@ import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -26,14 +27,13 @@ import javax.swing.JScrollPane;
 import org.dz.PanelCapturaMod;
 import org.dz.Utiles;
 
-
 /**
  *
  * @author lrod
  */
 public class PanelModPedidos extends PanelCapturaMod
         implements ActionListener {
-    
+
     private final Aplication app;
     private JPanel pnCont;
     private Box panelLeft;
@@ -46,6 +46,8 @@ public class PanelModPedidos extends PanelCapturaMod
     private PanelSelCategory panelSelCategory;
     private Comparator<Product> compAlpha;
     private Comparator<Product> compPrice;
+    private PanelOrders pnOrders;
+    int cont = 0;
 
     /**
      * Creates new form PanelPedidos
@@ -57,28 +59,28 @@ public class PanelModPedidos extends PanelCapturaMod
         initComponents();
         createComponents();
     }
-    
+
     private void createComponents() {
-        
+
         categorys = new ArrayList<>();
         categorys.add(new Category("Productos"));
         pnCont = new JPanel(new BorderLayout());
-        
+
         compAlpha = Comparator.comparing(product -> product.getName().toLowerCase());
         compPrice = Comparator.comparing(Product::getPrice)
                 .thenComparing(product -> product.getName().toLowerCase());
-        
+
         panelTop = new Box(BoxLayout.Y_AXIS);
-        
+
         panelTopSearch = new PanelTopSearch(app);
         panelTopSearch.addPropertyChangeListener(this);
-        
+
         panelTop.add(panelTopSearch);
-        
-        panelSelCategory = app.getGuiManager().getPanelSelCategory();
+
+        panelSelCategory = new PanelSelCategory(app, null);
         panelSelCategory.addPropertyChangeListener(this);
         panelTopSearch.addPropertyChangeListener(panelSelCategory);
-        
+
         categorys = app.getControl().getCategoriesList();
         categorys.stream().forEach(category -> category.setColor(Utiles.colorAleatorio(200, 250)));
         ConfigDB config = app.getControl().getConfigLocal(Configuration.MAX_CATEGORIES_LIST);
@@ -89,34 +91,43 @@ public class PanelModPedidos extends PanelCapturaMod
         Category CAT_TODOS = new Category("TODOS");
         CAT_TODOS.setColor(Color.LIGHT_GRAY.brighter());
         categorys.add(0, CAT_TODOS);
-        
+
         panelSelCategory.setCategories(categorys);
-        
+
         panelTop.add(panelSelCategory);
-        
+
         pnCont.add(panelTop, BorderLayout.NORTH);
-        
+
         panelLeft = new Box(BoxLayout.Y_AXIS);
         JScrollPane scp = new JScrollPane(panelLeft);
         scp.getVerticalScrollBar().setUnitIncrement(30);
         pnCont.add(scp, BorderLayout.CENTER);
         splitPane.setLeftComponent(pnCont);
-        
+
         pnPedido = app.getGuiManager().getPanelPedido();
-        
+
         splitPane.setRightComponent(pnPedido);
         splitPane.setOneTouchExpandable(true);
-        
+
         productsList = new ArrayList<>();
         loadAllProducts();
-        
-        panelCategory = new PanelCategory(categorys, productsList, app);
-        panelCategory.addPropertyChangeListener(pnPedido);
+
+        panelCategory = new PanelCategory(categorys, productsList, app, pnPedido, PanelCategory.CARD_VIEW_3);
+        panelCategory.addPropertyChangeListener(pnPedido);        
         panelTopSearch.addPropertyChangeListener(panelCategory);
         
         panelLeft.add(panelCategory);
     }
-    
+
+    public void switchPanel() {
+        cont++;
+        if (cont % 2 == 0) {
+            splitPane.setRightComponent(pnOrders);
+        } else {
+            splitPane.setRightComponent(pnPedido);
+        }
+    }
+
     private void loadAllProducts() {
         String order = app.getConfiguration().getProperty(Configuration.PROD_ORDER, "----");
         String orderBy = "";
@@ -125,7 +136,6 @@ public class PanelModPedidos extends PanelCapturaMod
         } else if (PanelCategory.ORDEN_PRICE.equalsIgnoreCase(order)) {
             orderBy = "price, name";
         }
-        
         productsList = app.getControl().getProductsList("enabled=1", orderBy);
     }
 
@@ -145,15 +155,15 @@ public class PanelModPedidos extends PanelCapturaMod
     }// </editor-fold>//GEN-END:initComponents
 
     @Override
-    
+
     public void actionPerformed(ActionEvent e) {
     }
-    
+
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         if (PanelTopSearch.AC_FILTER_PRODUCTS.equals(evt.getPropertyName())) {
             ArrayList<Product> productsList = (ArrayList<Product>) evt.getNewValue();
-            
+
             if (productsList == null) {
 //                panelLeft.removeAll();
                 productsList = this.productsList;
@@ -167,16 +177,16 @@ public class PanelModPedidos extends PanelCapturaMod
             this.updateUI();
         } else if (evt.getPropertyName().startsWith(PanelSelCategory.SEL_CAT_)) {
             String cat = evt.getPropertyName().substring(8).toLowerCase();
-            
+
             Comparator<Product> comparator = Comparator.<Product>naturalOrder();
             if (PanelCategory.ORDEN_ALPHA.equalsIgnoreCase(panelCategory.getSelectedSort())) {
                 comparator = compAlpha;
             } else if (PanelCategory.ORDEN_PRICE.equalsIgnoreCase(panelCategory.getSelectedSort())) {
                 comparator = compPrice;
             }
-            
+
             List<Product> list = this.productsList;
-            
+
             if (!"TODOS".equalsIgnoreCase(cat) && !"...".equalsIgnoreCase(cat)) {
                 list = productsList.stream().filter(p -> p.getCategory().equalsIgnoreCase(cat)).sorted(comparator).collect(Collectors.toList());
             } else {
@@ -188,7 +198,7 @@ public class PanelModPedidos extends PanelCapturaMod
             System.out.println("Refrescando productos");
             loadAllProducts();
         }
-        
+
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

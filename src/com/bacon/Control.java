@@ -17,6 +17,7 @@ import com.bacon.domain.InventoryEvent;
 import com.bacon.domain.Invoice;
 import com.bacon.domain.Item;
 import com.bacon.domain.Location;
+import com.bacon.domain.Order;
 import com.bacon.domain.Permission;
 import com.bacon.domain.Presentation;
 import com.bacon.domain.Product;
@@ -35,6 +36,7 @@ import com.bacon.persistence.JDBC.JDBCIngredientDAO;
 import com.bacon.persistence.JDBC.JDBCInvoiceDAO;
 import com.bacon.persistence.JDBC.JDBCItemDAO;
 import com.bacon.persistence.JDBC.JDBCLocationDAO;
+import com.bacon.persistence.JDBC.JDBCOrderDAO;
 import com.bacon.persistence.JDBC.JDBCProductDAO;
 import com.bacon.persistence.JDBC.JDBCUserDAO;
 import com.bacon.persistence.JDBC.JDBCUtilDAO;
@@ -105,6 +107,9 @@ public class Control {
 
             JDBCLocationDAO locationDAO = (JDBCLocationDAO) DAOFactory.getInstance().getLocationDAO();
             locationDAO.init();
+
+            JDBCOrderDAO orderDAO = (JDBCOrderDAO) DAOFactory.getInstance().getOrderDAO();
+            orderDAO.init();
 
             JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
             utilDAO.init();
@@ -1495,6 +1500,78 @@ public class Control {
         data.put("real", real);
 
         return data;
+    }
+
+    public long addOrder(Order order) {
+        try {
+            JDBCOrderDAO orderDAO = (JDBCOrderDAO) DAOFactory.getInstance().getOrderDAO();
+            return orderDAO.addOrder(order);
+        } catch (DAOException ex) {
+            logger.error("Error adding order.", ex);
+            GUIManager.showErrorMessage(null, "Error agregando orden", "Error");
+        }
+        return 0;
+    }
+
+    public long addProductOrder(long idOrder, List<ProductoPed> products) {
+        try {
+            JDBCOrderDAO orderDAO = (JDBCOrderDAO) DAOFactory.getInstance().getOrderDAO();
+            return orderDAO.addProductsOrder(idOrder, products);
+        } catch (DAOException ex) {
+            logger.error("Error adding products order.", ex);
+            GUIManager.showErrorMessage(null, "Error agregando products orden", "Error");
+        }
+        return 0;
+    }
+
+    public List<Order> getOrderslList(String where, String order) {
+        try {
+            JDBCOrderDAO orderList = (JDBCOrderDAO) DAOFactory.getInstance().getOrderDAO();
+            return orderList.getOrderList(where, order);
+        } catch (DAOException ex) {
+            logger.error("Error getting Order list.", ex);
+            return null;
+        }
+    }
+
+    public List<ProductoPed> getOrderProducts(long id) {
+        try {
+            JDBCOrderDAO orderList = (JDBCOrderDAO) DAOFactory.getInstance().getOrderDAO();
+            return orderList.getOrderProducts(id);
+        } catch (DAOException ex) {
+            logger.error("Error getting Order products.", ex);
+            return null;
+        }
+    }
+
+    public String getProductStations(long idProduct) {
+        try {
+            JDBCUtilDAO utilList = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
+            return utilList.getProductStations(idProduct);
+        } catch (DAOException ex) {
+            logger.error("Error getting stations by product.", ex);
+            return null;
+        }
+    }
+
+    public String getStation(int idStation) {
+        try {
+            JDBCUtilDAO utilList = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
+            return utilList.getStation(idStation);
+        } catch (DAOException ex) {
+            logger.error("Error getting stations by product.", ex);
+            return null;
+        }
+    }
+
+    public int countUninvoicedProducts(long idOrder) {
+        try {
+            JDBCUtilDAO utilDao = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
+            return utilDao.countUninvoicedProducts(idOrder);
+        } catch (Exception e) {
+            logger.error("Error counting uninvoiced products.", e);
+            return -1;
+        }
     }
 
 }

@@ -23,7 +23,6 @@ import com.bacon.domain.Waiter;
 import com.bacon.gui.util.MyPopupListener;
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Font;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
@@ -51,7 +50,6 @@ import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
@@ -133,6 +131,7 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
     private ImageIcon iconTLGreen;
     private ImageIcon iconTLRed;
     private Client lastClient;
+    private JMenuItem itemModify;
 
     /**
      * Creates new form PanelPedido
@@ -155,9 +154,9 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
         Font font = new Font("Arial", 1, 18);
         Font font2 = new Font("Serif", 1, 15);
 
-        colorDelivery = Utiles.colorAleatorio(100,200).darker();
+        colorDelivery = Utiles.colorAleatorio(100, 200).darker();
 //        colorLocal = new Color(180,30,154);
-        colorLocal = Utiles.colorAleatorio(100,200).darker();
+        colorLocal = Utiles.colorAleatorio(100, 200).darker();
 
         DCFORM_P = (DecimalFormat) NumberFormat.getInstance();
         DCFORM_P.applyPattern("$ ###,###,###");
@@ -301,11 +300,20 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
         btConfirm.setText("CONFIRMAR");
 
         ImageIcon iconPrint = new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "Printer-orange.png", 18, 18));
+        ImageIcon iconOrder = new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "ordering.png", 18, 18));
+
+        btOrder.setBackground(new Color(253, 153, 205));
+        btOrder.setMargin(new Insets(1, 1, 1, 1));
+        btOrder.setFont(new Font("Arial", 1, 10));
+        btOrder.setActionCommand(AC_PRINT_ORDER);
+        btOrder.addActionListener(this);
+        btOrder.setIcon(iconOrder);
+        btOrder.setToolTipText("Imprimir orden");
 
         btPrint.setBackground(new Color(153, 253, 255));
         btPrint.setMargin(new Insets(1, 1, 1, 1));
         btPrint.setFont(new Font("Arial", 1, 10));
-        btPrint.setActionCommand(AC_PRINT_ORDER);
+        btPrint.setActionCommand(AC_PRINT_GUIDE);
         btPrint.addActionListener(this);
         btPrint.setIcon(iconPrint);
         btPrint.setText("Pedido");
@@ -389,6 +397,19 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
         });
         popupTabla.add(itemDelete);
 
+        itemModify = new JMenuItem("Modificar");
+        itemModify.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int r = tbListado.getSelectedRow();
+                ProductoPed pp = (ProductoPed) tbListado.getValueAt(r, 1);
+                if (pp != null) {
+                    app.getGuiManager().showCustomPedido(pp, PanelPedido.this);
+                }
+            }
+        });
+        popupTabla.add(itemModify);
+
         tbListado.addMouseListener(popupListenerTabla);
 
         tbListado.addMouseListener(new MouseAdapter() {
@@ -459,7 +480,7 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
         waiters.add(0, new Waiter("-----", 0));
         regMesera.setText(waiters.toArray());
         regMesera.setFontCampo(new Font("Sans", 1, 16));
-        ((JComboBox) regMesera.getComponent()).setRenderer(new WaiterListCellRender());
+        ((JComboBox) regMesera.getComponent()).setRenderer(new WaiterListCellRenderer());
         regMesera.setActionCommand(AC_CHANGE_SELECTED);
         regMesera.addActionListener(this);
 
@@ -467,7 +488,6 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
         lbIndicator.setOpaque(true);
         lbIndicator.setVisible(false);
 
-        
         regCelular.setDocument(TextFormatter.getIntegerLimiter());
         regCelular.setActionCommand(AC_SEARCH_CLIENT);
         regCelular.addActionListener(this);
@@ -478,7 +498,7 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
 //        regService.setEnabled(true);
         config = app.getControl().getConfigLocal(Configuration.PRINT_PREV_DELIVERY);
         btPrint.setVisible(config != null ? (Boolean.valueOf(config.getValor())) : false);
-//        btPrint.setVisible(false);
+        btPrint.setVisible(false);
         btPrint1.setVisible(false);
 
         showLabelDescuento();
@@ -520,6 +540,7 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
 
     public static final String AC_PRINT_ORDER = "AC_PRINT_ORDER";
     public static final String AC_PRINT_BILL = "AC_PRINT_BILL";
+    public static final String AC_PRINT_GUIDE = "AC_PRINT_GUIDE";
     public static final String AC_SEARCH_CLIENT = "AC_SEARCH_CLIENT";
     public static final String AC_CLEAR_CLIENT = "AC_CLEAR_CLIENT";
     public static final String AC_LAST_DELIVERY = "AC_LAST_DELIVERY";
@@ -547,7 +568,6 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
             Date init = lastCycle.getInit();
             List<Duration> presDur = pt.calculatePreciseDuration(init);
             String formatDuration = pt.formatDuration(presDur);
-
         }
     }
 
@@ -620,7 +640,7 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
 
             ConfigDB config = app.getControl().getConfigLocal(Configuration.PRINT_PREV_DELIVERY);
             if (config != null ? Boolean.valueOf(config.getValor()) : false) {
-                btPrint.setVisible(true);
+                btOrder.setVisible(true);
             }
             config = app.getControl().getConfigLocal(Configuration.DOCUMENT_NAME);
             String docName = config != null && !config.getValor().isEmpty() ? config.getValor() : "Ticket";
@@ -639,17 +659,23 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
                 String propPrinter = config != null ? config.getValor() : "";
                 app.getPrinterService().imprimirFactura(invoice, propPrinter);
             }
+        } else if (AC_PRINT_GUIDE.equals(e.getActionCommand())) {
+            ConfigDB config = app.getControl().getConfig(Configuration.PRINTER_SELECTED);
+            String propPrinter = config != null ? config.getValor() : "";
+            if (invoice != null) {
+                app.getPrinterService().imprimirGuide(invoice, propPrinter);
+            }
         } else if (AC_PRINT_ORDER.equals(e.getActionCommand())) {
             ConfigDB config = app.getControl().getConfigLocal(Configuration.PRINTER_SELECTED);
             String propPrinter = config != null ? config.getValor() : "";
             if (invoice != null) {
-                app.getPrinterService().imprimirGuide(invoice, propPrinter);
+                app.getPrinterService().imprimirPedido(invoice, propPrinter);
             } else {
                 if (products.isEmpty()) {
                     GUIManager.showErrorMessage(null, "No hay productos en el pedido", "Advertencia");
                 } else {
                     Invoice invoicePrev = getInvoice();
-                    app.getPrinterService().imprimirGuide(invoicePrev, propPrinter);
+                    app.getPrinterService().imprimirPedido(invoicePrev, propPrinter);
                 }
             }
         } else if (AC_SEARCH_CLIENT.equals(e.getActionCommand())) {
@@ -1950,6 +1976,7 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
         btLastDelivery = new javax.swing.JButton();
         lbIndicator = new javax.swing.JLabel();
         containerPanels = new javax.swing.JPanel();
+        btOrder = new javax.swing.JButton();
 
         lbEntregas.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(233, 235, 4)));
         lbEntregas.setMinimumSize(new java.awt.Dimension(80, 31));
@@ -2117,9 +2144,11 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(btConfirm, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btPrint, javax.swing.GroupLayout.PREFERRED_SIZE, 82, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGap(3, 3, 3)
+                                .addComponent(btOrder, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(3, 3, 3)
+                                .addComponent(btPrint, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(3, 3, 3)
                                 .addComponent(btPrint1, javax.swing.GroupLayout.PREFERRED_SIZE, 82, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addComponent(containerPanels, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -2133,6 +2162,8 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
         );
 
         layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {btDelete, btInventoryInfo});
+
+        layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {btPrint, btPrint1});
 
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -2175,7 +2206,8 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
                     .addComponent(btPrint1, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(regTotal, javax.swing.GroupLayout.PREFERRED_SIZE, 30, Short.MAX_VALUE)
                     .addComponent(btPrint, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btConfirm, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(btConfirm, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btOrder, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(3, 3, 3)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
                     .addComponent(regDescuento, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE)
@@ -2195,6 +2227,7 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
     private javax.swing.JButton btDelete;
     private javax.swing.JButton btInventoryInfo;
     private javax.swing.JButton btLastDelivery;
+    private javax.swing.JButton btOrder;
     private javax.swing.JButton btPrint;
     private javax.swing.JButton btPrint1;
     private javax.swing.JButton btSearch;
@@ -2251,38 +2284,6 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
                 String text = Jsoup.parse(fact).text();
                 regCelular.setText(text);
             }
-        }
-    }
-
-    public class WaiterListCellRender extends JLabel implements javax.swing.ListCellRenderer<Object> {
-
-        public WaiterListCellRender() {
-            setOpaque(true);
-            setForeground(Utiles.colorAleatorio(0,255));
-            setBorder(BorderFactory.createEmptyBorder(3, 2, 3, 2));
-            setFont(new Font("Sans", 1, 16));
-        }
-
-        @Override
-        public Component getListCellRendererComponent(JList<? extends Object> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-            if (value != null && value instanceof Waiter) {
-                Waiter waiter = (Waiter) value;
-
-                setText(waiter.getName().toUpperCase());
-                Color color = Color.BLACK;
-                try {
-                    color = Color.decode(waiter.getColor());
-                } catch (Exception e) {
-                }
-
-                setForeground(color);
-                if (isSelected) {
-                    setBackground(list.getSelectionBackground());
-                } else {
-                    setBackground(list.getBackground());
-                }
-            }
-            return this;
         }
     }
 
