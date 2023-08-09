@@ -13,6 +13,7 @@ public class InventoryEvent {
 
     protected long id;
     protected long idItem;
+    protected long idUser;
     protected int event;
     protected double quantity;
     protected Date lastUpdate;
@@ -32,10 +33,18 @@ public class InventoryEvent {
         return idItem;
     }
 
+    public void setIdUser(long idUser) {
+        this.idUser= idUser;
+    }
+
+    public long getIdUser() {
+        return idUser;
+    }
+
     public void setIdItem(long idItem) {
         this.idItem = idItem;
     }
-
+    
     public int getEvent() {
         return event;
     }
