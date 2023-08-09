@@ -1825,7 +1825,8 @@
                 idItem INTEGER,
                 event INT,
                 quantity DECIMAL(12,2),    
-                lastUpdatedTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,          
+                lastUpdatedTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,    
+		userId INTEGER, 
                 PRIMARY KEY (id)
                 )ENGINE=InnoDB DEFAULT CHARSET=latin1;
             </SQLFragment>
@@ -1833,7 +1834,7 @@
         
         <SQLStatement method="ADD_INVENTORY_EVENT">
             <SQLFragment>
-                INSERT INTO inventory_register (idItem,event, quantity) VALUES (?,?,?);
+                INSERT INTO inventory_register (idItem,event, quantity, userId) VALUES (?,?,?,?);
             </SQLFragment>
         </SQLStatement>
         
