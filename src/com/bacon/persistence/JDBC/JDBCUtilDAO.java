@@ -1864,7 +1864,7 @@ public class JDBCUtilDAO implements UtilDAO {
         }
     }
 
-    public void addInventoryRegister(Item item, int EVENT, double quantity) throws DAOException {
+    public void addInventoryRegister(Item item, int EVENT, double quantity, int idUser) throws DAOException {
         Connection conn = null;
         PreparedStatement ps = null;
         try {
@@ -1873,7 +1873,8 @@ public class JDBCUtilDAO implements UtilDAO {
             Object[] parameters = {
                 item.getId(),
                 EVENT,
-                quantity
+                quantity,
+                idUser
             };
             ps = sqlStatements.buildSQLStatement(conn, ADD_INVENTORY_EVENT_KEY, parameters);
             ps.executeUpdate();
@@ -1920,6 +1921,7 @@ public class JDBCUtilDAO implements UtilDAO {
                 event.setEvent(rs.getInt("event"));
                 event.setQuantity(rs.getDouble("quantity"));
                 event.setLastUpdate(rs.getTimestamp("lastUpdatedTime"));
+                event.setIdUser(rs.getLong("idUser"));
                 events.add(event);
             }
         } catch (SQLException e) {
