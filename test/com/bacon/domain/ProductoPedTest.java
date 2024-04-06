@@ -1,4 +1,4 @@
-package com.bacon.domain;
+package com.rb.domain;
 
 import org.junit.Before;
 import org.junit.Test;

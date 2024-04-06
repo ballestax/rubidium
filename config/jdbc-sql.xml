@@ -39,7 +39,7 @@
                     |CREATE_CLIENTS_TABLE|GET_CLIENT|ADD_CLIENT|DELETE_CLIENT|UPDATE_CLIENT
                     |CREATE_PRESENTATION_PRODUCT_TABLE|GET_PRESENTATIONS_BY_PRODUCT|GET_PRESENTATION_BY_DEFAULT|GET_PRESENTATION
                     |GET_ALL_PRESENTATIONS_BY_PRODUCT
-                    |CREATE_CYCLES_TABLE|GET_CYCLE|ADD_CYCLE|DELETE_CYCLE|UPDATE_CYCLE
+                    |CREATE_CYCLES_TABLE|GET_CYCLE|ADD_CYCLE|DELETE_CYCLE|UPDATE_CYCLE|GET_LAST_CYCLE
                     |CREATE_OTHER_PRODUCTS_TABLE|GET_OTHER_PRODUCT|ADD_OTHER_PRODUCT|DELETE_OTHER_PRODUCT
                     |CREATE_INVOICE_OTHER_PRODUCT_TABLE|ADD_INVOICE_OTHER_PRODUCT
                     |GET_CATEGORIES_SORTED|GET_ALL_CATEGORIES|GET_CATEGORY
@@ -1325,6 +1325,24 @@
             </SQLFragment>
             <SQLFragment excludeIfNamedParamEmpty="TRUE">
                 ORDER BY {orderby}
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="GET_LAST_CYCLE">
+            <SQLFragment>
+                SELECT
+            </SQLFragment>
+            <SQLFragment>
+                * FROM cycles
+            </SQLFragment>
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                WHERE {where}
+            </SQLFragment>
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                ORDER BY {orderby}
+            </SQLFragment>
+            <SQLFragment>
+                LIMIT 1
             </SQLFragment>
         </SQLStatement>
         
