@@ -24,7 +24,9 @@ import javax.swing.BoxLayout;
  */
 public class PanelConfigPrint extends javax.swing.JPanel implements ActionListener {
 
-    public static final String ACTION_APPLY = "ACTION_SAVE";
+    public static final String AC_APPLY_CHANGES = "AC_APPLY_CHANGES";
+    public static final String AC_REFRESH_PRINTERS = "AC_REFRESH_PRINTERS";
+    public static final String AC_SEL_PRINTER = "AC_SEL_PRINTER";
 
     private final Aplication app;
     private String selectedPrinter;
@@ -51,21 +53,24 @@ public class PanelConfigPrint extends javax.swing.JPanel implements ActionListen
         printerName = config != null ? config.getValor() : app.getConfiguration().getProperty(com.rb.Configuration.PRINTER_SELECTED, "");
         lbPrinter.setText("<html>Impresora seleccionada: <font color=blue>" + printerName + "</font></html>");
 
-//        exportDIR = property;
-        PrintService[] listPrinters = listPrinters();
-        regPrinter.setText(listPrinters);
+        refreshPrinters();
         regPrinter.setActionCommand(AC_SEL_PRINTER);
         regPrinter.addActionListener(this);
 
         btApply.setText("Aplicar");
-        btApply.setActionCommand(ACTION_APPLY);
+        btApply.setActionCommand(AC_APPLY_CHANGES);
         btApply.addActionListener(this);
     }
-    public static final String AC_SEL_PRINTER = "AC_SEL_PRINTER";
+    
 
     private PrintService[] listPrinters() {
-        PrintService[] printServices = PrintServiceLookup.lookupPrintServices(null, null);
-        return printServices;
+        return PrintServiceLookup.lookupPrintServices(null, null);
+    }
+
+    private void refreshPrinters() {
+        PrintService[] listPrinters = listPrinters();
+        regPrinter.setText(listPrinters);
+        regPrinter.setActionCommand(AC_SEL_PRINTER);
     }
 
     /**
@@ -140,7 +145,7 @@ public class PanelConfigPrint extends javax.swing.JPanel implements ActionListen
     public void actionPerformed(ActionEvent e) {
         String userName = app.getUser().getUsername();
         String userDevice = Aplication.getUserDevice();
-        if (ACTION_APPLY.equals(e.getActionCommand())) {
+        if (AC_APPLY_CHANGES.equals(e.getActionCommand())) {
             String value = printerName;
             app.getControl().addConfig(new ConfigDB(Configuration.PRINTER_SELECTED, ConfigDB.STRING, value, userName, userDevice));
         } else if (AC_SEL_PRINTER.equals(e.getActionCommand())) {
@@ -148,6 +153,9 @@ public class PanelConfigPrint extends javax.swing.JPanel implements ActionListen
             lbPrinter.setText("<html>Impresora seleccionada: <font color=blue>" + printer.getName() + "</font></html>");
             String value = printer.getName();
             app.getControl().addConfig(new ConfigDB(Configuration.PRINTER_SELECTED, ConfigDB.STRING, value, userName, userDevice));
+            selectedPrinter = value;
+        } else if (AC_REFRESH_PRINTERS.equals(e.getActionCommand())) {
+            refreshPrinters();
         }
     }
 }
