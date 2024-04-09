@@ -169,6 +169,8 @@ public class GUIManager {
     private PanelOrderList panelOrderList;
     private PanelSelProducts panelSelProducts;
     private PanelInvoicedOrder panelInvoicedOrder;
+    private PanelAdminTables pnAdminWaiters;
+    private PanelAdminTables pnAdminTables;
 
     private boolean showingInfo = false;
     private PanelQuickSearch panelQSearch;
@@ -195,6 +197,7 @@ public class GUIManager {
     private JStatusbar statusbar;
     private JPanel container;
     private PanelDash panelPresentation;
+    
 
     public void configurar() {
 
@@ -481,6 +484,20 @@ public class GUIManager {
             pnAdminUsers = new PanelAdminUsers(app);
         }
         return pnAdminUsers;
+    }
+
+    public PanelAdminTables getPanelAdminWaiters() {
+        if (pnAdminWaiters == null) {
+            pnAdminWaiters = new PanelAdminTables(app);
+        }
+        return pnAdminWaiters;
+    }
+
+    public PanelAdminTables getPanelAdminTables() {
+        if (pnAdminTables == null) {
+            pnAdminTables = new PanelAdminTables(app);
+        }
+        return pnAdminTables;
     }
 
     public GuiPanelSelProduct getPanelSelProduct() {

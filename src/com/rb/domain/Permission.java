@@ -11,7 +11,7 @@ package com.rb.domain;
  */
 public class Permission {
     
-   private int id;
+    private int id;
     private String name;
     private String displayName;
     private String description;

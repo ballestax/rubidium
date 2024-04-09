@@ -45,15 +45,21 @@ public class MyConstants {
     public static final String[] FILTROS_NUMERO = {"=", ">", ">=", "<", "<=", "<>"};
     public static final String[] FILTROS_BOOLEANOS = {"=", "<>"};
 
+    public static final String PERM_SHOW_TAB_WAITERS = "show-tab-waiters";
+    public static final String PERM_SHOW_TAB_TABLES = "show-tab-tables";
+    public static final String PERM_SHOW_TAB_BACKUP = "show-tab-backup";
+    public static final String PERM_SHOW_TAB_CONFIG = "show-tab-config";
+    public static final String PERM_SHOW_TAB_USERS = "show-tab-users";
+
     public static final Permission[] PERMISSIONS = {
         new Permission("show-admin-module", "Ver el modulo administrador"),
         new Permission("show-orders-module", "Ver el modulo pedidos"),
         new Permission("show-cash-module", "Ver el modulo caja"),
         new Permission("show-reports-module", "Ver el modulo reportes"),
         new Permission("show-orderlist-module", "Ver el modulo lista de pedidos"),
-        new Permission("show-tab-backup", "Ver pestaña copia de seguridad"),        
-        new Permission("show-tab-config", "Ver pestaña configuracion"),
-        new Permission("show-tab-users", "Ver el modulo administrador"),
+        new Permission(PERM_SHOW_TAB_BACKUP, "Ver pestaña copia de seguridad"),        
+        new Permission(PERM_SHOW_TAB_CONFIG, "Ver pestaña configuracion"),
+        new Permission(PERM_SHOW_TAB_USERS, "Ver el modulo usuarios"),
         new Permission("show-inventory-module", "Ver el modulo inventario"),
         new Permission("show-products-module", "Ver el modulo productos"),
         new Permission("add-items-inventary", "Agregar items al inventario"),
@@ -66,6 +72,12 @@ public class MyConstants {
         new Permission("show-pos-module", "Ver el modulo POS"),
         new Permission("allow-cancel-product-order", "Cancelar producto en una orden"),
         new Permission("allow-modify-product-order", "Modificar producto en una orden"),
+
+
+        new Permission(PERM_SHOW_TAB_WAITERS, "Ver pestaña meseros"),
+        new Permission(PERM_SHOW_TAB_TABLES, "Ver pestaña mesas"),
+        new Permission("allow-modify-waiters", "Modificar meseros"),
+        new Permission("allow-modify-tables", "Modificar mesas"),
         
     };
 

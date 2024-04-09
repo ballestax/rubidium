@@ -6,8 +6,15 @@
 package com.rb.gui;
 
 import com.rb.Aplication;
+import com.rb.MyConstants;
+import com.rb.domain.Permission;
+import com.rb.domain.User;
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JTabbedPane;
@@ -21,6 +28,7 @@ public class PanelModAdmin extends javax.swing.JPanel {
 
     private Aplication app;
     private JTabbedPane tabPane;
+    private Map<Integer,Permission> mapPermissions;
 
     /**
      * Creates new form PanelAdminModule
@@ -28,6 +36,7 @@ public class PanelModAdmin extends javax.swing.JPanel {
     public PanelModAdmin(Aplication app) {
 
         this.app = app;
+        mapPermissions = new HashMap<>();
         initComponents();
         customInit();
     }
@@ -38,22 +47,58 @@ public class PanelModAdmin extends javax.swing.JPanel {
         tabPane = new JTabbedPane();
         tabPane.setTabPlacement(JTabbedPane.LEFT);
 
-        addTab("Copia de seguridad", app.getGuiManager().getPanelAdminBackup());
-        addTab("Configurar", app.getGuiManager().getPanelAdminConfig());
-        addTab("Usuarios", app.getGuiManager().getPanelAdminUsers());
+        tabPane.addChangeListener(ev -> {
+            int selectedIndex = tabPane.getSelectedIndex();
+            if(!app.getControl().hasPermission(app.getUser(), mapPermissions.get(selectedIndex))){
+                int previousIndex = (selectedIndex - 1) >= 0 ? selectedIndex - 1 : 0;
+                tabPane.setSelectedIndex(previousIndex);
+            }
+        });
+
+        reloadTabsWhitPermisions();
 
     }
 
-    public void addTab(String tab, JComponent comp) {
+    public void addTab(String tab, JComponent comp, Permission perm) {
         JLabel titleTab;
         titleTab = new JLabel();
         titleTab.setHorizontalAlignment(SwingConstants.LEFT);
         titleTab.setPreferredSize(new Dimension(200, 30));
         tabPane.addTab(tab, comp);
+        mapPermissions.put(tabPane.getTabCount()-1, perm);
         titleTab.setText("<html><p align=left><font size=+1>" + tab + "</p></html>");
         tabPane.setTabComponentAt(tabPane.getTabCount() - 1, titleTab);
         add(tabPane, SwingConstants.CENTER);
     }
+
+    public void reloadTabsWhitPermisions() {
+        if (tabPane != null) {
+
+            User user = app.getUser();
+
+            tabPane.removeAll();
+            tabPane.updateUI();
+
+            Permission perm = app.getControl().getPermissionByName(MyConstants.PERM_SHOW_TAB_BACKUP);
+            if (user != null && app.getControl().hasPermission(user, perm)) {
+                addTab("Copia de seguridad", app.getGuiManager().getPanelAdminBackup(), perm);
+            }
+            perm = app.getControl().getPermissionByName(MyConstants.PERM_SHOW_TAB_CONFIG);
+            if (user != null && app.getControl().hasPermission(user, perm)) {
+                addTab("Configurar", app.getGuiManager().getPanelAdminConfig(), perm);
+            }
+            perm = app.getControl().getPermissionByName(MyConstants.PERM_SHOW_TAB_USERS);
+            if (user != null && app.getControl().hasPermission(user, perm)) {
+                addTab("Usuarios", app.getGuiManager().getPanelAdminUsers(),perm);
+            }
+            perm = app.getControl().getPermissionByName(MyConstants.PERM_SHOW_TAB_WAITERS);
+            if (user != null && app.getControl().hasPermission(user, perm)) {
+                addTab("Meseros", app.getGuiManager().getPanelAdminWaiters(),perm);
+            }
+            perm = app.getControl().getPermissionByName(MyConstants.PERM_SHOW_TAB_TABLES);
+            if (user != null && app.getControl().hasPermission(user, perm)) {
+                addTab("Mesas", app.getGuiManager().getPanelAdminTables(),perm);
+            }
 
     /**
      * This method is called from within the constructor to initialize the form.
