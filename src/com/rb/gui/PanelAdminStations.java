@@ -9,7 +9,7 @@ import com.rb.gui.util.MyPopupListener;
 import com.rb.Aplication;
 import com.rb.GUIManager;
 import com.rb.domain.Permission;
-import com.rb.domain.Waiter;
+import com.rb.domain.Station;
 import com.rb.persistence.JDBC.JDBCDAOFactory;
 import com.rb.persistence.JDBC.JDBCUtilDAO;
 import com.rb.persistence.dao.DAOException;
@@ -47,14 +47,14 @@ import org.dz.MyTableCellRenderer;
  *
  * @author ballestax
  */
-public class PanelAdminWaiters extends javax.swing.JPanel implements ActionListener, PropertyChangeListener {
+public class PanelAdminStations extends javax.swing.JPanel implements ActionListener, PropertyChangeListener {
 
     private final Aplication app;
     private MyDefaultTableModel model;
     private JPopupMenu popupTable;
     private MyPopupListener popupListenerTabla;
 
-    public static final String AC_MOD_WAITER = "AC_MOD_WAITER";
+    public static final String AC_MOD_STATION = "AC_MOD_STATION";
  
 
     /**
@@ -62,7 +62,7 @@ public class PanelAdminWaiters extends javax.swing.JPanel implements ActionListe
      *
      * @param app
      */
-    public PanelAdminWaiters(Aplication app) {
+    public PanelAdminStations(Aplication app) {
         this.app = app;
         initComponents();
         createComponents();
@@ -73,17 +73,17 @@ public class PanelAdminWaiters extends javax.swing.JPanel implements ActionListe
                
         String[] colNames = {"N°", "Nombre", "Rol", "Modificar"};
         model = new MyDefaultTableModel(colNames, 0);
-        tableWaiters.setModel(model);
-        tableWaiters.setRowHeight(25);
+        tableStations.setModel(model);
+        tableStations.setRowHeight(25);
 
         int[] colW = {20, 100, 70, 50};
         for (int i = 0; i < colW.length; i++) {
-            tableWaiters.getColumnModel().getColumn(i).setMinWidth(colW[i]);
-            tableWaiters.getColumnModel().getColumn(i).setPreferredWidth(colW[i]);
-            tableWaiters.getColumnModel().getColumn(i).setCellRenderer(new MyTableCellRenderer(true));
+            tableStations.getColumnModel().getColumn(i).setMinWidth(colW[i]);
+            tableStations.getColumnModel().getColumn(i).setPreferredWidth(colW[i]);
+            tableStations.getColumnModel().getColumn(i).setCellRenderer(new MyTableCellRenderer(true));
         }
-        tableWaiters.getColumnModel().getColumn(model.getColumnCount() - 1).setCellEditor(new BotonEditor(tableWaiters, this, AC_MOD_WAITER));
-        tableWaiters.getColumnModel().getColumn(model.getColumnCount() - 1).setCellRenderer(new ButtonCellRenderer("Modificar"));
+        tableStations.getColumnModel().getColumn(model.getColumnCount() - 1).setCellEditor(new BotonEditor(tableStations, this, AC_MOD_STATION));
+        tableStations.getColumnModel().getColumn(model.getColumnCount() - 1).setCellRenderer(new ButtonCellRenderer("Modificar"));
 
         popupTable = new JPopupMenu();
         popupListenerTabla = new MyPopupListener(popupTable, true);
@@ -92,9 +92,9 @@ public class PanelAdminWaiters extends javax.swing.JPanel implements ActionListe
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                int r = tableWaiters.getSelectedRow();
+                int r = tableStations.getSelectedRow();
                 try {
-                    String username = tableWaiters.getValueAt(r, 1).toString();
+                    String username = tableStations.getValueAt(r, 1).toString();
                    
                 } catch (Exception ex) {
                     GUIManager.showErrorMessage(null, "Error al intentar borrar el usuario", "Eliminar usuario");
@@ -103,24 +103,24 @@ public class PanelAdminWaiters extends javax.swing.JPanel implements ActionListe
             }
         });
         popupTable.add(item1);
-        tableWaiters.addMouseListener(popupListenerTabla);
+        tableStations.addMouseListener(popupListenerTabla);
 
-        loadWaiters();
+        loadStations();
 
     }
 
-    private void loadWaiters() {
+    private void loadStations() {
         try {
-            ArrayList<Waiter> waiters = ((JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO()).getWaitersList("", "");
+            ArrayList<Station> Stations = ((JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO()).getStationsList("", "");
 
             model.setRowCount(0);
-            for (int i = 0; i < waiters.size(); i++) {
-                Waiter waiter = waiters.get(i);
+            for (int i = 0; i < Stations.size(); i++) {
+                Station station = Stations.get(i);
                 model.addRow(new Object[]{
-                    waiter.getId(),
-                    waiter.getName(),
-                    waiter.getStatus(),
-                    waiter.getColor(),
+                    station.getId(),
+                    station.getName(),
+                    station.getStatus(),
+                    station.getColor(),
                     true
                 });
                 model.setRowEditable(model.getRowCount() - 1, false);
@@ -143,11 +143,11 @@ public class PanelAdminWaiters extends javax.swing.JPanel implements ActionListe
 
         toolbar = new javax.swing.JToolBar();
         jScrollPane1 = new javax.swing.JScrollPane();
-        tableWaiters = new javax.swing.JTable();
+        tableStations = new javax.swing.JTable();
 
         toolbar.setRollover(true);
 
-        tableWaiters.setModel(new javax.swing.table.DefaultTableModel(
+        tableStations.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
             },
@@ -155,7 +155,7 @@ public class PanelAdminWaiters extends javax.swing.JPanel implements ActionListe
 
             }
         ));
-        jScrollPane1.setViewportView(tableWaiters);
+        jScrollPane1.setViewportView(tableStations);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -180,20 +180,20 @@ public class PanelAdminWaiters extends javax.swing.JPanel implements ActionListe
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable tableWaiters;
+    private javax.swing.JTable tableStations;
     private javax.swing.JToolBar toolbar;
     // End of variables declaration//GEN-END:variables
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (ACTION_NEW_WAITER.equals(e.getActionCommand())) {
-            //TODO New Waiter
-        } else if (ACTION_UPDATE_WAITER.equals(e.getActionCommand())) {
-            loadWaiters();
+        if (ACTION_NEW_STATION.equals(e.getActionCommand())) {
+            //TODO New Station
+        } else if (ACTION_UPDATE_STATION.equals(e.getActionCommand())) {
+            loadStations();
         }
     }
-    public static final String ACTION_UPDATE_WAITER = "ACTION_UPDATE_WAITER";
-    public static final String ACTION_NEW_WAITER = "ACTION_NEW_WAITER";
+    public static final String ACTION_UPDATE_STATION = "ACTION_UPDATE_STATION";
+    public static final String ACTION_NEW_STATION = "ACTION_NEW_STATION";
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {

@@ -17,6 +17,7 @@ import com.rb.domain.OtherProduct;
 import com.rb.domain.Permission;
 import com.rb.domain.Presentation;
 import com.rb.domain.Rol;
+import com.rb.domain.Station;
 import com.rb.domain.Table;
 import com.rb.domain.User;
 import com.rb.domain.Waiter;
@@ -177,6 +178,7 @@ public class JDBCUtilDAO implements UtilDAO {
     public static final String CREATE_PRODUCT_STATION_TABLE_KEY = "CREATE_PRODUCT_STATION_TABLE";
     public static final String GET_PRODUCT_STATIONS_KEY = "GET_PRODUCT_STATIONS";
     public static final String GET_STATION_KEY = "GET_STATION_BY_ID";
+    public static final String GET_STATIONS_LIST_KEY = "GET_STATIONS";
 
     private static final Logger logger = Logger.getLogger(JDBCUtilDAO.class.getCanonicalName());
 
@@ -2627,7 +2629,7 @@ public class JDBCUtilDAO implements UtilDAO {
         return stations;
     }
 
-    public String getStation(long idStation) throws DAOException {
+    public String getStationByID(long idStation) throws DAOException {
         String station = "";
         Connection conn = null;
         PreparedStatement retrieve = null;
@@ -2648,6 +2650,48 @@ public class JDBCUtilDAO implements UtilDAO {
             DBManager.closeConnection(conn);
         }
         return station;
+    }
+
+    public List<Station> getStationsList(String where, String orderBy) throws DAOException {
+        String sql;
+        ArrayList<Station> stations = new ArrayList<>();
+        try {
+            SQLExtractor sqlExtractorWhere = new SQLExtractor(where, SQLExtractor.Type.WHERE);
+            SQLExtractor sqlExtractorOrderBy = new SQLExtractor(orderBy, SQLExtractor.Type.ORDER_BY);
+            Map<String, String> namedParams = new HashMap<>();
+            namedParams.put(NAMED_PARAM_WHERE, sqlExtractorWhere.extractWhere());
+            namedParams.put(NAMED_PARAM_ORDER_BY, sqlExtractorOrderBy.extractOrderBy());
+            sql = sqlStatements.getSQLString(GET_STATIONS_LIST_KEY, namedParams);
+
+        } catch (SQLException e) {
+            throw new DAOException("Could not properly retrieve the Station List", e);
+        } catch (IOException e) {
+            throw new DAOException("Could not properly retrieve the Station List", e);
+        }
+
+        Connection conn = null;
+        PreparedStatement retrieve = null;
+        ResultSet rs = null;
+        Station station = null;
+        try {
+            conn = dataSource.getConnection();
+            retrieve = conn.prepareStatement(sql);
+            rs = retrieve.executeQuery();
+
+            while (rs.next()) {
+                station = new Station();
+                station.setName(rs.getString("name"));
+
+                stations.add(station);
+            }
+        } catch (SQLException e) {
+            throw new DAOException("Could not proper retrieve the Station: " + e);
+        } finally {
+            DBManager.closeResultSet(rs);
+            DBManager.closeStatement(retrieve);
+            DBManager.closeConnection(conn);
+        }
+        return stations;
     }
 
     public int countUninvoicedProducts(long idOrder) {

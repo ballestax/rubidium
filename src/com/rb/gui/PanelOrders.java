@@ -1355,7 +1355,7 @@ public class PanelOrders extends PanelCapturaMod implements
                     String propPrinter = config != null ? config.getValor() : "";
                     classify.keySet().forEach(station -> {
                         List<ProductoPed> list = (List<ProductoPed>) classify.get(station);
-                        String nameStation = app.getControl().getStation(Integer.valueOf(station.toString()));
+                        String nameStation = app.getControl().getStationByID(Integer.valueOf(station.toString()));
                         app.getPrinterService().imprimirPedidoStations(order, list, nameStation, propPrinter, false);
                     });
                 } else {
@@ -1371,7 +1371,7 @@ public class PanelOrders extends PanelCapturaMod implements
                 String propPrinter = config != null ? config.getValor() : "";
                 classify.keySet().forEach(station -> {
                     List<ProductoPed> list = (List<ProductoPed>) classify.get(station);
-                    String nameStation = app.getControl().getStation(Integer.valueOf(station.toString()));
+                    String nameStation = app.getControl().getStationByID(Integer.valueOf(station.toString()));
                     app.getPrinterService().imprimirPedidoStations(order, list, nameStation, propPrinter, true);
                 });
             }

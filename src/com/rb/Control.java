@@ -1557,9 +1557,19 @@ public class Control {
     public String getStation(int idStation) {
         try {
             JDBCUtilDAO utilList = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
-            return utilList.getStation(idStation);
+            return utilList.getStationByID(idStation);
         } catch (DAOException ex) {
             logger.error("Error getting stations by product.", ex);
+            return null;
+        }
+    }
+
+    public List<Station> getStationsList() {
+        try {
+            JDBCUtilDAO utilList = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
+            return utilList.getStationsList("","");
+        } catch (DAOException ex) {
+            logger.error("Error getting stations list.", ex);
             return null;
         }
     }
