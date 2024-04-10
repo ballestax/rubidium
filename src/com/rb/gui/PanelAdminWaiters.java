@@ -72,7 +72,7 @@ public class PanelAdminWaiters extends javax.swing.JPanel implements ActionListe
 
     private void createComponents() {
         toolbar.setFloatable(false);
-        toolbar2.setFloatable(false);
+       
 
         
         String[] colNames = {"N°", "Nombre", "Rol", "Modificar"};
@@ -82,12 +82,12 @@ public class PanelAdminWaiters extends javax.swing.JPanel implements ActionListe
 
         int[] colW = {20, 100, 70, 50};
         for (int i = 0; i < colW.length; i++) {
-            tableUsers.getColumnModel().getColumn(i).setMinWidth(colW[i]);
-            tableUsers.getColumnModel().getColumn(i).setPreferredWidth(colW[i]);
-            tableUsers.getColumnModel().getColumn(i).setCellRenderer(new MyTableCellRenderer(true));
+            tableWaiters.getColumnModel().getColumn(i).setMinWidth(colW[i]);
+            tableWaiters.getColumnModel().getColumn(i).setPreferredWidth(colW[i]);
+            tableWaiters.getColumnModel().getColumn(i).setCellRenderer(new MyTableCellRenderer(true));
         }
-        tableUsers.getColumnModel().getColumn(model.getColumnCount() - 1).setCellEditor(new BotonEditor(tableUsers, this, AC_MOD_WAITER));
-        tableUsers.getColumnModel().getColumn(model.getColumnCount() - 1).setCellRenderer(new ButtonCellRenderer("Modificar"));
+        tableWaiters.getColumnModel().getColumn(model.getColumnCount() - 1).setCellEditor(new BotonEditor(tableWaiters, this, AC_MOD_WAITER));
+        tableWaiters.getColumnModel().getColumn(model.getColumnCount() - 1).setCellRenderer(new ButtonCellRenderer("Modificar"));
 
         popupTable = new JPopupMenu();
         popupListenerTabla = new MyPopupListener(popupTable, true);
@@ -96,22 +96,10 @@ public class PanelAdminWaiters extends javax.swing.JPanel implements ActionListe
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                int r = tableUsers.getSelectedRow();
+                int r = tableWaiters.getSelectedRow();
                 try {
-                    String username = tableUsers.getValueAt(r, 1).toString();
-                    RemoteUserResultsInterface user = ((JDBCUserDAO) JDBCDAOFactory.getInstance().getUserDAO()).retrieveUsers("username='" + username + "'", "");
-                    User get = user.getItems(0, 1).get(0);
-                    if (!get.getAccessLevel().equals(User.AccessLevel.ADMIN)) {
-                        String msg = "Se va a eliminar el usuario: " + get.getUsername() + "\n"
-                                + "Desea continuar?";
-                        int opc = JOptionPane.showConfirmDialog(null, msg, "Advertencia", JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
-                        if (opc == JOptionPane.OK_OPTION) {
-                            ((JDBCUserDAO) JDBCDAOFactory.getInstance().getUserDAO()).deleteUser(username);
-                            loadUsers();
-                        }
-                    } else {
-                        GUIManager.showErrorMessage(null, "No se puede eliminar el usuario administrador", "Error");
-                    }
+                    String username = tableWaiters.getValueAt(r, 1).toString();
+                   
                 } catch (Exception ex) {
                     GUIManager.showErrorMessage(null, "Error al intentar borrar el usuario", "Eliminar usuario");
                 }
@@ -119,7 +107,7 @@ public class PanelAdminWaiters extends javax.swing.JPanel implements ActionListe
             }
         });
         popupTable.add(item1);
-        tableUsers.addMouseListener(popupListenerTabla);
+        tableWaiters.addMouseListener(popupListenerTabla);
 
         loadWaiters();
 
@@ -159,14 +147,11 @@ public class PanelAdminWaiters extends javax.swing.JPanel implements ActionListe
 
         toolbar = new javax.swing.JToolBar();
         jScrollPane1 = new javax.swing.JScrollPane();
-        tableUsers = new javax.swing.JTable();
-        toolbar2 = new javax.swing.JToolBar();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        tableRoles = new javax.swing.JTable();
+        tableWaiters = new javax.swing.JTable();
 
         toolbar.setRollover(true);
 
-        tableUsers.setModel(new javax.swing.table.DefaultTableModel(
+        tableWaiters.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
             },
@@ -174,58 +159,33 @@ public class PanelAdminWaiters extends javax.swing.JPanel implements ActionListe
 
             }
         ));
-        jScrollPane1.setViewportView(tableUsers);
-
-        toolbar2.setRollover(true);
-
-        tableRoles.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-
-            },
-            new String [] {
-
-            }
-        ));
-        jScrollPane2.setViewportView(tableRoles);
+        jScrollPane1.setViewportView(tableWaiters);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(toolbar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(toolbar2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jScrollPane2)
-                        .addContainerGap())
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 531, Short.MAX_VALUE)
-                        .addGap(13, 13, 13))))
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 531, Short.MAX_VALUE)
+                .addGap(13, 13, 13))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(toolbar, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 250, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(toolbar2, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 171, Short.MAX_VALUE)
-                .addContainerGap())
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(14, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JTable tableRoles;
-    private javax.swing.JTable tableUsers;
+    private javax.swing.JTable tableWaiters;
     private javax.swing.JToolBar toolbar;
-    private javax.swing.JToolBar toolbar2;
     // End of variables declaration//GEN-END:variables
 
     @Override
@@ -242,20 +202,7 @@ public class PanelAdminWaiters extends javax.swing.JPanel implements ActionListe
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         if (evt.getPropertyName().equals(PanelNewUser.AC_NEW_USER)) {
-            String username = ((Object[]) evt.getOldValue())[0].toString();
-            char[] pass = (char[]) ((Object[]) evt.getOldValue())[1];
-            Rol rol = (Rol) evt.getNewValue();
-            try {
-                ((JDBCUserDAO) DAOFactory.getInstance().getUserDAO()).addUser(username, String.valueOf(pass));
-                User user = app.getControl().getUser(username);
-                if (user != null && rol != null) {
-                    ((JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO()).assignRoleToUser(user, rol);
-                }
-                loadWaiters();
-
-            } catch (DAOException e) {
-                GUIManager.showErrorMessage(null, "Error al intentar crear el usuario", "Error");
-            }
+            
         
         }
     }
