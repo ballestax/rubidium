@@ -177,21 +177,21 @@ public class JDBCUserDAO implements UserDAO {
 
             int updated = 0;
             if (username != null) {
-                logger.fine("Updating user (" + userId + ") username");
+                logger.debug("Updating user (" + userId + ") username");
                 updated--;
                 Object[] parameters = {username.trim().toLowerCase(), userId};
                 ps = sqlStatements.buildSQLStatement(conn, UPDATE_USER_USERNAME_KEY, parameters);
                 updated += ps.executeUpdate();
             }
             if (passwordHash != null) {
-                logger.fine("Updating user (" + userId + ") password");
+                logger.debug("Updating user (" + userId + ") password");
                 updated--;
                 Object[] parameters = {passwordHash, userId};
                 ps = sqlStatements.buildSQLStatement(conn, UPDATE_USER_PASS_KEY, parameters);
                 updated += ps.executeUpdate();
             }
             if (accessLevel != null) {
-                logger.fine("Updating user (" + userId + ") access level");
+                logger.debug("Updating user (" + userId + ") access level");
                 updated--;
                 Object[] parameters = {accessLevel.toString(), userId};
                 ps = sqlStatements.buildSQLStatement(conn, UPDATE_USER_ACCESS_KEY, parameters);
@@ -332,7 +332,7 @@ public class JDBCUserDAO implements UserDAO {
     }
 
     public RemoteUserResultsInterface retrieveUsers() throws DAOException, RemoteException {
-        logger.fine("Getting all users");
+        logger.debug("Getting all users");
         return retrieveUsers(null, null);
     }
 

@@ -30,10 +30,10 @@ import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.table.TableCellRenderer;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.bx.gui.MyDefaultTableModel;
+import org.dz.MyDefaultTableModel;
+import org.dz.MyListModel;
 import org.dz.PanelCapturaMod;
 
 import com.rb.Aplication;

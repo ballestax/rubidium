@@ -26,8 +26,10 @@ import com.rb.gui.PanelAddItem;
 import com.rb.gui.PanelAddProduct;
 import com.rb.gui.PanelAdminBackup;
 import com.rb.gui.PanelAdminConfig;
+import com.rb.gui.PanelAdminTables;
 import com.rb.gui.PanelModAdmin;
 import com.rb.gui.PanelAdminUsers;
+import com.rb.gui.PanelAdminWaiters;
 import com.rb.gui.PanelCash;
 import com.rb.gui.util.PanelBasic;
 import com.rb.gui.PanelChangePassword;
@@ -169,7 +171,7 @@ public class GUIManager {
     private PanelOrderList panelOrderList;
     private PanelSelProducts panelSelProducts;
     private PanelInvoicedOrder panelInvoicedOrder;
-    private PanelAdminTables pnAdminWaiters;
+    private PanelAdminWaiters pnAdminWaiters;
     private PanelAdminTables pnAdminTables;
 
     private boolean showingInfo = false;
@@ -486,9 +488,9 @@ public class GUIManager {
         return pnAdminUsers;
     }
 
-    public PanelAdminTables getPanelAdminWaiters() {
+    public PanelAdminWaiters getPanelAdminWaiters() {
         if (pnAdminWaiters == null) {
-            pnAdminWaiters = new PanelAdminTables(app);
+            pnAdminWaiters = new PanelAdminWaiters(app);
         }
         return pnAdminWaiters;
     }

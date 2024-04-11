@@ -111,7 +111,7 @@ public class PanelAdminStations extends javax.swing.JPanel implements ActionList
 
     private void loadStations() {
         try {
-            ArrayList<Station> Stations = ((JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO()).getStationsList("", "");
+            List<Station> Stations = ((JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO()).getStationsList("", "");
 
             model.setRowCount(0);
             for (int i = 0; i < Stations.size(); i++) {

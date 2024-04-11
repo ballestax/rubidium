@@ -99,6 +99,8 @@ public class PanelModAdmin extends javax.swing.JPanel {
             if (user != null && app.getControl().hasPermission(user, perm)) {
                 addTab("Mesas", app.getGuiManager().getPanelAdminTables(),perm);
             }
+        }
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.

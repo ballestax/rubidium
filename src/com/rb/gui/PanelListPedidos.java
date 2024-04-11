@@ -51,7 +51,7 @@ import org.apache.logging.log4j.Logger;
 import org.bx.gui.MyDefaultTableModel;
 import org.dz.PanelCapturaMod;
 import org.dz.Utiles;
-import org.jfree.util.PaintUtilities;
+import org.jfree.chart.util.PaintUtils;
 
 import com.rb.Aplication;
 import com.rb.Configuration;
@@ -131,7 +131,7 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener,
 
         datePick1.addPropertyChangeListener(this);
 
-        colSelection = PaintUtilities.colorToString(tableList.getSelectionBackground().darker());
+        colSelection = PaintUtils.colorToString(tableList.getSelectionBackground().darker());
 
         regDate.setActionCommand(AC_CHANGE_DATE);
         regDate.addActionListener(this);

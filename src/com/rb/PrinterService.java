@@ -19,6 +19,8 @@ import com.github.anastaciocintra.escpos.Style;
 import com.github.anastaciocintra.escpos.image.BitImageWrapper;
 import com.github.anastaciocintra.escpos.image.Bitonal;
 import com.github.anastaciocintra.escpos.image.BitonalThreshold;
+import com.github.anastaciocintra.escpos.image.CoffeeImage;
+import com.github.anastaciocintra.escpos.image.CoffeeImageImpl;
 import com.github.anastaciocintra.escpos.image.EscPosImage;
 import com.github.anastaciocintra.output.PrinterOutputStream;
 import java.awt.Image;
@@ -78,7 +80,8 @@ public class PrinterService {
 //            BufferedImage imagen = ImageIO.read(githubURL);
             Image imagen = app.getImgManager().getImagen("gui/img/" + "logo-2.png", 150, 150);
             BufferedImage buffImagen = Imagenes.toBuffereredImage(imagen);
-            EscPosImage escposImage = new EscPosImage(buffImagen, algorithm);
+            CoffeeImage cfImage = new CoffeeImageImpl(buffImagen);
+            EscPosImage escposImage = new EscPosImage(cfImage, algorithm);
 
             //DATOS PARA LA FACTURA
             ConfigDB config = app.getControl().getConfigLocal(com.rb.Configuration.BS_NAME);

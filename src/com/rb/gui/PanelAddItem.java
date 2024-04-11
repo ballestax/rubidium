@@ -27,11 +27,11 @@ import javax.swing.SwingWorker;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.dz.ListSelection;
 import org.dz.MyDefaultTableModel;
 import org.dz.PanelCaptura;
 import org.dz.TextFormatter;
-import org.xhtmlrenderer.util.Util;
 
 /**
  *
@@ -280,7 +280,7 @@ public class PanelAddItem extends PanelCaptura implements ActionListener, Proper
                 }
             } else {
                 for (int j = 0; j < model.getRowCount(); j++) {
-                    if (Util.isNumber(model.getValueAt(j, 3).toString())) {
+                    if (NumberUtils.isCreatable(model.getValueAt(j, 3).toString())) {
                         int rPres = Integer.parseInt(model.getValueAt(j, 3).toString());
                         if (rPres == idPres) {
                             model.setValueAt(true, j, 0);

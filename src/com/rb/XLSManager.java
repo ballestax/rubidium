@@ -17,15 +17,20 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+
 import javax.swing.table.DefaultTableModel;
+
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.BorderStyle;
+import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.DataFormat;
-import org.apache.poi.xssf.usermodel.XSSFBorderFormatting;
+import org.apache.poi.ss.usermodel.FillPatternType;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import org.apache.poi.ss.usermodel.VerticalAlignment;
+import org.apache.poi.xssf.usermodel.DefaultIndexedColorMap;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFColor;
@@ -33,6 +38,8 @@ import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+
 
 /**
  *
@@ -76,9 +83,9 @@ public class XLSManager {
                     for (i = 0; i < 5; i++) {
                         HSSFCell cell = row.getCell(i);
                         String cellValue = "";
-                        if (cell.getCellType() == HSSFCell.CELL_TYPE_STRING) {
+                        if (cell.getCellType() == CellType.STRING) {
                             cellValue = cell.getStringCellValue();
-                        } else if (cell.getCellType() == HSSFCell.CELL_TYPE_NUMERIC) {
+                        } else if (cell.getCellType() == CellType.NUMERIC) {
                             cellValue = format.format(cell.getNumericCellValue());
                         }
                         System.out.print(cellValue + "\t");
@@ -114,21 +121,20 @@ public class XLSManager {
             Insets top = new Insets(1, 1, 0, 1);
             Insets botton = new Insets(0, 1, 1, 1);
             Insets all = new Insets(1, 1, 1, 1);
-            XSSFColor CF_DIAS = new XSSFColor(Color.lightGray);
-            XSSFColor CL_DIAS = new XSSFColor(new Color(10, 5, 5));
-            XSSFColor CF_HORAS = new XSSFColor(Color.lightGray);
-            XSSFColor CL_HORAS = new XSSFColor(new Color(25, 2, 3));
-            XSSFColor BLANCO = new XSSFColor(Color.white);
-            XSSFColor NEGRO = new XSSFColor(Color.black);
-            XSSFColor AZUL = new XSSFColor(new Color(0, 0, 160));
-            XSSFColor VERDE = new XSSFColor(new Color(13, 73, 15));
-//            XSSFColor CF_CELDA = new XSSFColor(new Color(249, 255, 203));
-            XSSFColor CF_CELDA = new XSSFColor(Color.white);
-            final short CENTER = XSSFCellStyle.ALIGN_CENTER;
-            final short LEFT = XSSFCellStyle.ALIGN_LEFT;
-            final short RIGHT = XSSFCellStyle.ALIGN_RIGHT;
-            XSSFCellStyle stiloRight = getStilox(book, CF_CELDA, NEGRO, BLANCO, (short) 10, RIGHT, CENTER, all, format1);
-            XSSFCellStyle stiloLeft = getStilox(book, CF_CELDA, NEGRO, BLANCO, (short) 10, LEFT, CENTER, all, format1);
+
+            //DefaultIndexedColorMap defIndexedColorMap = new DefaultIndexedColorMap();
+
+            XSSFColor CF_CELDA = new XSSFColor(new byte[]{2,3,4});            
+            XSSFColor BLANCO = new XSSFColor(new byte[]{(byte)255,(byte)255,(byte)255});
+            XSSFColor NEGRO = new XSSFColor(new byte[]{(byte)0,(byte)0,(byte)0});
+            XSSFColor VERDE = new XSSFColor(new byte[]{(byte)0,(byte)255,(byte)0});
+
+            final VerticalAlignment CENTER_V = VerticalAlignment.CENTER;
+            final HorizontalAlignment CENTER_H = HorizontalAlignment.CENTER;
+            final HorizontalAlignment LEFT = HorizontalAlignment.LEFT;
+            final  HorizontalAlignment RIGHT = HorizontalAlignment.RIGHT;
+            XSSFCellStyle stiloRight = getStilox(book, CF_CELDA, NEGRO, BLANCO, (short) 10, CENTER_V, RIGHT, all, format1);
+            XSSFCellStyle stiloLeft = getStilox(book, CF_CELDA, NEGRO, BLANCO, (short) 10, CENTER_V, LEFT, all, format1);
 
             int fil = 0;
 
@@ -137,7 +143,7 @@ public class XLSManager {
             row = sheet.createRow(fil);
             cell = row.createCell(0);
             cell.setCellValue(title);
-            cell.setCellStyle(getStilox(book, BLANCO, VERDE, VERDE, (short) 12, LEFT, CENTER, all));
+            cell.setCellStyle(getStilox(book, BLANCO, VERDE, VERDE, (short) 12,CENTER_V, LEFT, all));
             fil++;
             if (values != null) {
                 row = sheet.createRow(fil);
@@ -163,7 +169,7 @@ public class XLSManager {
             for (int c = 0; c < NCOL; c++) {
                 cell = row.createCell(c);
                 cell.setCellValue(modelo.getColumnName(c));
-                cell.setCellStyle(getStilox(book, CF_DIAS, NEGRO, CL_DIAS, (short) 11, CENTER, CENTER, all));
+                cell.setCellStyle(getStilox(book, CF_CELDA, NEGRO, CF_CELDA, (short) 11, CENTER_V, CENTER_H, all));
                 sheet.setColumnWidth(c, 20 * 256);
             }
             sheet.setColumnWidth(0, 20 * 256);
@@ -178,18 +184,18 @@ public class XLSManager {
                         boolean end = modelo.getRowCount() - 1 == j;
                         if (obj instanceof Integer) {
                             cell.setCellValue(Integer.parseInt(obj.toString()));
-                            cell.setCellType(Cell.CELL_TYPE_NUMERIC);
+                            cell.setCellType(CellType.NUMERIC);
                             cell.setCellStyle(stiloRight);
                         } else if (obj instanceof Double || obj instanceof BigDecimal) {                            
                             cell.setCellValue(Double.parseDouble(obj.toString()));
-                            cell.setCellType(Cell.CELL_TYPE_NUMERIC);
+                            cell.setCellType(CellType.NUMERIC);
                             cell.setCellStyle(stiloRight);
                         } else if (obj instanceof Long) {
                             cell.setCellValue(Long.parseLong(obj.toString()));
-                            cell.setCellType(Cell.CELL_TYPE_NUMERIC);
+                            cell.setCellType(CellType.NUMERIC);
                             cell.setCellStyle(stiloRight);
                         } else {
-                            cell.setCellType(Cell.CELL_TYPE_STRING);
+                            cell.setCellType(CellType.NUMERIC);
                             cell.setCellValue(obj.toString());
                             cell.setCellStyle(stiloLeft);
                         }
@@ -223,17 +229,19 @@ public class XLSManager {
             Insets top = new Insets(1, 1, 0, 1);
             Insets botton = new Insets(0, 1, 1, 1);
             Insets all = new Insets(1, 1, 1, 1);
-            XSSFColor CF_DIAS = new XSSFColor(Color.lightGray);
-            XSSFColor CL_DIAS = new XSSFColor(new Color(10, 5, 5));
-            XSSFColor BLANCO = new XSSFColor(Color.white);
-            XSSFColor NEGRO = new XSSFColor(Color.black);
-            XSSFColor VERDE = new XSSFColor(new Color(13, 73, 15));
-            XSSFColor CF_CELDA = new XSSFColor(Color.white);
-            final short CENTER = XSSFCellStyle.ALIGN_CENTER;
-            final short LEFT = XSSFCellStyle.ALIGN_LEFT;
-            final short RIGHT = XSSFCellStyle.ALIGN_RIGHT;
-            XSSFCellStyle stiloRight = getStilox(book, CF_CELDA, NEGRO, BLANCO, (short) 10, RIGHT, CENTER, all, format1);
-            XSSFCellStyle stiloLeft = getStilox(book, CF_CELDA, NEGRO, BLANCO, (short) 10, LEFT, CENTER, all, format1);
+
+            DefaultIndexedColorMap defIndexedColorMap = new DefaultIndexedColorMap();
+            XSSFColor CF_CELDA = new XSSFColor(new byte[]{2,3,4});            
+            XSSFColor BLANCO = new XSSFColor(new byte[]{(byte)255,(byte)255,(byte)255});
+            XSSFColor NEGRO = new XSSFColor(new byte[]{(byte)0,(byte)0,(byte)0});
+            XSSFColor VERDE = new XSSFColor(new byte[]{(byte)0,(byte)255,(byte)0});
+
+            final VerticalAlignment CENTER_V = VerticalAlignment.CENTER;
+            final HorizontalAlignment CENTER_H = HorizontalAlignment.CENTER;
+            final HorizontalAlignment LEFT = HorizontalAlignment.LEFT;
+            final  HorizontalAlignment RIGHT = HorizontalAlignment.RIGHT;
+            XSSFCellStyle stiloRight = getStilox(book, CF_CELDA, NEGRO, BLANCO, (short) 10, CENTER_V, RIGHT, all, format1);
+            XSSFCellStyle stiloLeft = getStilox(book, CF_CELDA, NEGRO, BLANCO, (short) 10, CENTER_V, LEFT, all, format1);
 
             if (modelos != null && !modelos.isEmpty()) {
                 boolean init = false;
@@ -257,7 +265,7 @@ public class XLSManager {
                     row = sheet.createRow(fil);
                     cell = row.createCell(0);
                     cell.setCellValue(title);
-                    cell.setCellStyle(getStilox(book, BLANCO, VERDE, VERDE, (short) 12, LEFT, CENTER, all));
+                    cell.setCellStyle(getStilox(book, BLANCO, VERDE, VERDE, (short) 12, CENTER_V, LEFT, all));
                     fil++;
                     if (values != null) {
                         row = sheet.createRow(fil);
@@ -285,7 +293,7 @@ public class XLSManager {
                     for (int c = 0; c < NCOL; c++) {
                         cell = row.createCell(c);
                         cell.setCellValue(modelo.getColumnName(c));
-                        cell.setCellStyle(getStilox(book, CF_DIAS, NEGRO, CL_DIAS, (short) 11, CENTER, CENTER, all));
+                        cell.setCellStyle(getStilox(book, CF_CELDA, NEGRO, CF_CELDA, (short) 11, CENTER_V, CENTER_H, all));
                         sheet.setColumnWidth(c, 20 * 256);
                     }
                     sheet.setColumnWidth(0, 20 * 256);
@@ -300,18 +308,18 @@ public class XLSManager {
                                 boolean end = modelo.getRowCount() - 1 == j;
                                 if (obj instanceof Integer) {
                                     cell.setCellValue(Integer.parseInt(obj.toString()));
-                                    cell.setCellType(Cell.CELL_TYPE_NUMERIC);
+                                    cell.setCellType(CellType.NUMERIC);
                                     cell.setCellStyle(stiloRight);
                                 } else if (obj instanceof Double) {                                    
                                     cell.setCellValue(Double.parseDouble(obj.toString()));
-                                    cell.setCellType(Cell.CELL_TYPE_NUMERIC);
+                                    cell.setCellType(CellType.NUMERIC);
                                     cell.setCellStyle(stiloRight);
                                 } else if (obj instanceof Long) {
                                     cell.setCellValue(Long.parseLong(obj.toString()));
-                                    cell.setCellType(Cell.CELL_TYPE_NUMERIC);
+                                    cell.setCellType(CellType.NUMERIC);
                                     cell.setCellStyle(stiloRight);
                                 } else {
-                                    cell.setCellType(Cell.CELL_TYPE_STRING);
+                                    cell.setCellType(CellType.NUMERIC);
                                     cell.setCellValue(obj.toString());
                                     cell.setCellStyle(stiloLeft);
                                 }
@@ -346,10 +354,10 @@ public class XLSManager {
             XSSFColor BdColor,
             XSSFColor FontColor,
             short FontTam,
-            short hAlignment,
-            short vAlignment,
+            VerticalAlignment vAlignment,
+            HorizontalAlignment hAlignment,
             Insets bordes) {
-        return getStilox(book, FgColor, BdColor, FontColor, FontTam, hAlignment, vAlignment, bordes, (short) 0);
+        return getStilox(book, FgColor, BdColor, FontColor, FontTam, vAlignment, hAlignment, bordes, (short) 0);
     }
 
     private XSSFCellStyle getStilox(
@@ -358,8 +366,8 @@ public class XLSManager {
             XSSFColor BdColor,
             XSSFColor FontColor,
             short FontTam,
-            short hAlignment,
-            short vAlignment,
+            VerticalAlignment vAlignment,
+            HorizontalAlignment hAlignment,
             Insets bordes,
             short format) {
         XSSFCellStyle style = book.createCellStyle();
@@ -371,28 +379,29 @@ public class XLSManager {
         style.setFont(font);
         if (bordes != null) {
             if (bordes.top > 0) {
-                style.setBorderTop(XSSFBorderFormatting.BORDER_THIN);
+                style.setBorderTop(BorderStyle.THIN);
                 style.setTopBorderColor(BdColor);
             }
             if (bordes.bottom > 0) {
-                style.setBorderBottom(XSSFBorderFormatting.BORDER_THIN);
+                style.setBorderBottom(BorderStyle.THIN);
                 style.setBottomBorderColor(BdColor);
             }
             if (bordes.left > 0) {
-                style.setBorderLeft(XSSFBorderFormatting.BORDER_THIN);
+                style.setBorderLeft(BorderStyle.THIN);
                 style.setLeftBorderColor(BdColor);
             }
             if (bordes.right > 0) {
-                style.setBorderRight(XSSFBorderFormatting.BORDER_THIN);
+                style.setBorderRight(BorderStyle.THIN); 
                 style.setRightBorderColor(BdColor);
             }
         }
+        
         style.setVerticalAlignment(vAlignment);
         style.setAlignment(hAlignment);
         style.setDataFormat(format);
 //        style.setFillBackgroundColor(new XSSFColor(Color.orange).getIndexed());
         style.setFillForegroundColor(FgColor);
-        style.setFillPattern(CellStyle.SOLID_FOREGROUND);
+        style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
         return style;
     }
 

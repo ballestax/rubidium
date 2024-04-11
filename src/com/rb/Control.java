@@ -1557,7 +1557,7 @@ public class Control {
         }
     }
 
-    public String getStation(int idStation) {
+    public String getStationByID(int idStation) {
         try {
             JDBCUtilDAO utilList = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
             return utilList.getStationByID(idStation);
