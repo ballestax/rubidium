@@ -20,7 +20,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Logger;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import javax.sql.DataSource;
 
 /**
@@ -32,7 +34,7 @@ public class JDBCAdditionalDAO implements AdditionalDAO {
     public static final String TABLE_NAME = "additionals";
     public static final String NAMED_PARAM_WHERE = "{where}";
     public static final String NAMED_PARAM_ORDER_BY = "{orderby}";
-    private static final Logger logger = Logger.getLogger(JDBCAdditionalDAO.class.getCanonicalName());
+    private static final Logger logger = LogManager.getLogger(JDBCAdditionalDAO.class.getCanonicalName());
     private final DataSource dataSource;
     private final SQLLoader sqlStatements;
     protected static final String CREATE_ADDITIONALS_TABLE_KEY = "CREATE_ADDITIONALS_TABLE";

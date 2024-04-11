@@ -5,6 +5,26 @@
  */
 package com.rb.persistence.JDBC;
 
+import static com.rb.persistence.JDBC.JDBCUtilDAO.GET_MAX_ID_KEY;
+
+import java.io.IOException;
+import java.rmi.RemoteException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.sql.DataSource;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.rb.DBManager;
 import com.rb.domain.Additional;
 import com.rb.domain.AdditionalPed;
@@ -14,26 +34,10 @@ import com.rb.domain.Presentation;
 import com.rb.domain.Product;
 import com.rb.domain.ProductoPed;
 import com.rb.gui.PanelPedido;
-import static com.rb.persistence.JDBC.JDBCUtilDAO.GET_MAX_ID_KEY;
 import com.rb.persistence.SQLExtractor;
 import com.rb.persistence.SQLLoader;
 import com.rb.persistence.dao.DAOException;
 import com.rb.persistence.dao.OrderDAO;
-import java.io.IOException;
-import java.rmi.RemoteException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.logging.Logger;
-import javax.sql.DataSource;
 
 /**
  *
@@ -47,7 +51,7 @@ public class JDBCOrderDAO implements OrderDAO {
     public static final String NAMED_PARAM_START = "{start}";
     public static final String NAMED_PARAM_END = "{end}";
     public static final String NAMED_PARAM_NUM = "{num}";
-    private static final Logger logger = Logger.getLogger(JDBCOrderDAO.class.getCanonicalName());
+    private static final Logger logger = LogManager.getLogger(JDBCOrderDAO.class.getCanonicalName());
     private final DataSource dataSource;
     private final SQLLoader sqlStatements;
     protected static final String CREATE_ORDERS_TABLE_KEY = "CREATE_ORDERS_TABLE";

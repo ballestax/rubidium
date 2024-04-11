@@ -41,7 +41,8 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dz.Imagenes;
 
 /**
@@ -109,7 +110,7 @@ public final class Aplication implements ActionListener, PropertyChangeListener,
     public static final int WC = 80;
     private final SimpleDateFormat formatoFecha;
     private User user;
-    private static final Logger logger = Logger.getLogger(Aplication.class.getCanonicalName());
+    private static final Logger logger = LogManager.getLogger(Aplication.class.getCanonicalName());
     private ScheduledExecutorService ses;
     private SimpleDateFormat sdfExport;
     private PropertyChangeSupport pcs;
@@ -129,8 +130,24 @@ public final class Aplication implements ActionListener, PropertyChangeListener,
         try {
             String logFile = Aplication.getDirTrabajo() + File.separator + "logging.log";
             properties.load(new FileInputStream("config/logging.properties"));
-            properties.put("log4j.appender.file.File", logFile);
-            org.apache.log4j.PropertyConfigurator.configure(properties);
+            properties.put("appender.file.fileName", logFile);
+           
+            // final LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
+            // final org.apache.logging.log4j.core.config.Configuration config = ctx.getConfiguration();
+            // final Layout layout = PatternLayout.createDefaultLayout(config);
+            // Appender appender = FileAppender.createAppender("target/test.log", "false", "false", "File", "true",
+            //     "false", "false", "4000", layout, null, "false", null, config);
+            // appender.start();
+            // config.addAppender(appender);
+            // AppenderRef ref = AppenderRef.createAppenderRef("File", null, null);
+            // AppenderRef[] refs = new AppenderRef[] {ref};
+            // LoggerConfig loggerConfig = LoggerConfig.createLogger("false", "info", "org.apache.logging.log4j",
+            //     "true", refs, null, config, null );
+            // loggerConfig.addAppender(appender, null, null);
+            // config.addLogger("org.apache.logging.log4j", loggerConfig);
+            // ctx.updateLoggers();
+            
+
         } catch (IOException ex) {
             System.err.println("No se encuentra el archivo de configuracion");
         }

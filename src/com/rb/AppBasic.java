@@ -29,7 +29,6 @@ public class AppBasic {
                 try {
                     Install inst = new Install();
 
-//                    inst.writeHash();
                     if (inst.test()) {
                         Aplication app = new Aplication();
                         app.init();

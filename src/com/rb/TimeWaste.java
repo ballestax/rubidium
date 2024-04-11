@@ -9,16 +9,19 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Date;
-import org.apache.commons.net.ntp.NTPUDPClient;
-import org.apache.commons.net.ntp.TimeInfo;
 import java.util.Properties;
+
 import javax.mail.Message;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-import org.apache.log4j.Logger;
+
+import org.apache.commons.net.ntp.NTPUDPClient;
+import org.apache.commons.net.ntp.TimeInfo;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
@@ -26,7 +29,7 @@ import org.apache.log4j.Logger;
  */
 public final class TimeWaste {
 
-    private static final Logger logger = Logger.getLogger(TimeWaste.class.getCanonicalName());
+    private static final Logger logger = LogManager.getLogger(TimeWaste.class.getCanonicalName());
 
     private Date getTime() throws UnknownHostException, IOException {
 

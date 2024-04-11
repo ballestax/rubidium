@@ -1,19 +1,7 @@
 package com.rb.gui;
 
-import com.rb.Aplication;
-import com.rb.Configuration;
-import com.rb.GUIManager;
-import com.rb.MyConstants;
-import com.rb.ProgAction;
-import com.rb.domain.Cycle;
-import com.rb.domain.Invoice;
-import com.rb.domain.Permission;
-import com.rb.domain.Product;
-import com.rb.domain.ProductoPed;
-import com.rb.domain.Table;
-import com.rb.domain.Waiter;
-import com.rb.gui.util.MyDatePickerImp;
-import com.rb.gui.util.MyPopupListener;
+import static javax.swing.BorderFactory.createLineBorder;
+
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
@@ -32,10 +20,9 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.EventObject;
 import java.util.List;
-import java.util.logging.Level;
+
 import javax.swing.AbstractCellEditor;
 import javax.swing.BorderFactory;
-import static javax.swing.BorderFactory.createLineBorder;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.ImageIcon;
@@ -57,11 +44,29 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableRowSorter;
-import org.apache.log4j.Logger;
-import org.dz.MyDefaultTableModel;
+
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.bx.gui.MyDefaultTableModel;
 import org.dz.PanelCapturaMod;
 import org.dz.Utiles;
 import org.jfree.util.PaintUtilities;
+
+import com.rb.Aplication;
+import com.rb.Configuration;
+import com.rb.GUIManager;
+import com.rb.MyConstants;
+import com.rb.ProgAction;
+import com.rb.domain.Cycle;
+import com.rb.domain.Invoice;
+import com.rb.domain.Permission;
+import com.rb.domain.Product;
+import com.rb.domain.ProductoPed;
+import com.rb.domain.Table;
+import com.rb.domain.Waiter;
+import com.rb.gui.util.MyDatePickerImp;
+import com.rb.gui.util.MyPopupListener;
 
 /**
  *
@@ -76,7 +81,7 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener,
     private String queryDate;
     private Color COLOR_BACKG;
 
-    private final Logger log = Logger.getLogger(PanelListPedidos.class.getCanonicalName());
+    private final Logger log = LogManager.getLogger(PanelListPedidos.class.getCanonicalName());
 
     public static final String TODOS = " - TODOS - ";
     public static final String PERIODO_MES = "MES";
@@ -730,7 +735,7 @@ public class PanelListPedidos extends PanelCapturaMod implements ActionListener,
         try {
             date = MyDatePickerImp.formatDate.parse(fecha);
         } catch (ParseException ex) {
-            java.util.logging.Logger.getLogger(PanelListPedidos.class.getName()).log(Level.SEVERE, null, ex);
+            LogManager.getLogger(PanelListPedidos.class.getName()).log(Level.ERROR, ex.getMessage(), ex);
         }
         cal.setTime(date);
 

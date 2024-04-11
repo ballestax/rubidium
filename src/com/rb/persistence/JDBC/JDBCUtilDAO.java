@@ -5,6 +5,24 @@
  */
 package com.rb.persistence.JDBC;
 
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.sql.DataSource;
+
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.rb.Aplication;
 import com.rb.DBManager;
 import com.rb.domain.CashMov;
@@ -25,20 +43,6 @@ import com.rb.persistence.SQLExtractor;
 import com.rb.persistence.SQLLoader;
 import com.rb.persistence.dao.DAOException;
 import com.rb.persistence.dao.UtilDAO;
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import javax.sql.DataSource;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 
 /**
  *
@@ -180,7 +184,7 @@ public class JDBCUtilDAO implements UtilDAO {
     public static final String GET_STATION_KEY = "GET_STATION_BY_ID";
     public static final String GET_STATIONS_LIST_KEY = "GET_STATIONS";
 
-    private static final Logger logger = Logger.getLogger(JDBCUtilDAO.class.getCanonicalName());
+    private static final Logger logger = LogManager.getLogger(JDBCUtilDAO.class.getCanonicalName());
 
     public static final String NAMED_PARAM_KEY = "{key}";
     public static final String GET_MAX_ID_KEY = "GET_MAX_ID";

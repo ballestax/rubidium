@@ -5,15 +5,6 @@
  */
 package com.rb.gui;
 
-import com.rb.Aplication;
-import com.rb.GUIManager;
-import com.rb.Utiles;
-import com.rb.domain.Conciliacion;
-import com.rb.domain.Item;
-import com.rb.domain.Location;
-import com.rb.gui.util.DatePickerImp;
-import com.rb.gui.util.MyDatePickerImp;
-import com.rb.persistence.JDBC.JDBCDAOFactory;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -24,16 +15,29 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
-import org.apache.log4j.Logger;
-import org.dz.MyDefaultTableModel;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.bx.gui.MyDefaultTableModel;
 import org.dz.PanelCapturaMod;
 import org.dz.TextFormatter;
+
+import com.rb.Aplication;
+import com.rb.GUIManager;
+import com.rb.Utiles;
+import com.rb.domain.Conciliacion;
+import com.rb.domain.Item;
+import com.rb.domain.Location;
+import com.rb.gui.util.DatePickerImp;
+import com.rb.gui.util.MyDatePickerImp;
+import com.rb.persistence.JDBC.JDBCDAOFactory;
 
 /**
  *
@@ -49,7 +53,7 @@ public class PanelNewConciliacion extends PanelCapturaMod implements ActionListe
     private String codigo;
     private MyDatePickerImp datePick1;
 
-    private Logger logger = Logger.getLogger(PanelNewConciliacion.class.getCanonicalName());
+    private Logger logger = LogManager.getLogger(PanelNewConciliacion.class.getCanonicalName());
 
     /**
      * Creates new form PnNewConciliacion

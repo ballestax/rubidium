@@ -16,9 +16,10 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.commons.dbcp2.BasicDataSource;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
@@ -30,7 +31,7 @@ public class DBManager {
     private static String DROP_TABLE_KEY = "DROP_TABLE";
     private static String TRUNCATE_TABLE_KEY = "TRUNCATE_TABLE";
     private BasicDataSource bds;
-    private static final Logger logger = Logger.getLogger(DBManager.class.getCanonicalName());
+    private static final Logger logger = LogManager.getLogger(DBManager.class.getCanonicalName());
 
     private DBManager() {
     }
@@ -70,7 +71,7 @@ public class DBManager {
             Connection con = getDatasource().getConnection();
             con.prepareStatement("select 1").executeQuery();
         } catch (SQLException ex) {
-            Logger.getLogger(DBManager.class.getName()).log(Level.SEVERE, null, ex);            
+            LogManager.getLogger(DBManager.class.getName()).log(Level.ERROR, ex.getMessage(), ex);  
             return false;
         }
         return true;
@@ -82,7 +83,7 @@ public class DBManager {
                 conn.rollback();
             }
         } catch (SQLException e) {
-            logger.severe("Could not rollback connection: " + e.getMessage());
+            logger.error("Could not rollback connection: " + e.getMessage());
         }
     }
 
@@ -92,7 +93,7 @@ public class DBManager {
                 conn.close();
             }
         } catch (SQLException e) {
-            logger.severe("Could not close connection: " + e.getMessage());
+            logger.error("Could not close connection: " + e.getMessage());
         }
     }
 
@@ -102,7 +103,7 @@ public class DBManager {
                 st.close();
             }
         } catch (SQLException e) {
-            logger.severe("Could not close statement: " + e.getMessage());
+            logger.error("Could not close statement: " + e.getMessage());
         }
     }
 
@@ -112,7 +113,7 @@ public class DBManager {
                 rs.close();
             }
         } catch (SQLException e) {
-            logger.severe("Could not close result set: " + e.getMessage());
+            logger.error("Could not close result set: " + e.getMessage());
         }
     }
 

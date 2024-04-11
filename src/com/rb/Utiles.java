@@ -29,14 +29,16 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
 import javax.imageio.ImageIO;
+
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
 import org.apache.xmlbeans.impl.common.Levenshtein;
 import org.dz.Mat;
 import org.jasypt.encryption.pbe.StandardPBEStringEncryptor;
@@ -211,7 +213,7 @@ public class Utiles {
             baos.close();
             return imagenByte;
         } catch (IOException ex) {
-            Logger.getLogger(Utiles.class.getName()).log(Level.SEVERE, null, ex);
+            LogManager.getLogger(Utiles.class.getName()).log(Level.ERROR, ex.getMessage(), ex);
             return null;
         }
     }
@@ -397,7 +399,7 @@ public class Utiles {
         try {
             write = ImageIO.write(image, format, file);
         } catch (IOException ex) {
-            Logger.getLogger(Utiles.class.getName()).log(Level.SEVERE, null, ex);
+            LogManager.getLogger(Utiles.class.getName()).log(Level.ERROR, ex.getMessage(), ex);
         }
         return write;
     }

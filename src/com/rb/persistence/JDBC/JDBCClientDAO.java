@@ -5,12 +5,6 @@
  */
 package com.rb.persistence.JDBC;
 
-import com.rb.DBManager;
-import com.rb.domain.Client;
-import com.rb.persistence.SQLExtractor;
-import com.rb.persistence.SQLLoader;
-import com.rb.persistence.dao.ClientDAO;
-import com.rb.persistence.dao.DAOException;
 import java.io.IOException;
 import java.rmi.RemoteException;
 import java.sql.Connection;
@@ -20,8 +14,18 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Logger;
+
 import javax.sql.DataSource;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import com.rb.DBManager;
+import com.rb.domain.Client;
+import com.rb.persistence.SQLExtractor;
+import com.rb.persistence.SQLLoader;
+import com.rb.persistence.dao.ClientDAO;
+import com.rb.persistence.dao.DAOException;
 
 /**
  *
@@ -32,7 +36,7 @@ public class JDBCClientDAO implements ClientDAO {
     public static final String TABLE_NAME = "clients";
     public static final String NAMED_PARAM_WHERE = "{where}";
     public static final String NAMED_PARAM_ORDER_BY = "{orderby}";
-    private static final Logger logger = Logger.getLogger(JDBCClientDAO.class.getCanonicalName());
+    private static final Logger logger = LogManager.getLogger(JDBCClientDAO.class.getCanonicalName());
     private final DataSource dataSource;
     private final SQLLoader sqlStatements;
     protected static final String CREATE_CLIENTS_TABLE_KEY = "CREATE_CLIENTS_TABLE";

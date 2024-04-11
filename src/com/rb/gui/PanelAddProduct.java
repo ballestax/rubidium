@@ -1,14 +1,11 @@
 package com.rb.gui;
 
-import com.rb.Aplication;
-import com.rb.MyConstants;
 import static com.rb.MyConstants.FILTER_NUM_INT_DIFFERENT;
 import static com.rb.MyConstants.FILTER_NUM_INT_GREATER_EQUAL;
 import static com.rb.MyConstants.FILTER_NUM_INT_LESS;
 import static com.rb.MyConstants.FILTER_NUM_INT_LESS_EQUAL;
-import com.rb.domain.Presentation;
-import com.rb.domain.Product;
-import com.rb.domain.ProductoPed;
+import static javax.swing.BorderFactory.createLineBorder;
+
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
@@ -20,9 +17,9 @@ import java.beans.PropertyChangeListener;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.EventObject;
+
 import javax.swing.AbstractCellEditor;
 import javax.swing.BorderFactory;
-import static javax.swing.BorderFactory.createLineBorder;
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -43,9 +40,17 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableRowSorter;
-import org.apache.log4j.Logger;
-import org.dz.MyDefaultTableModel;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.bx.gui.MyDefaultTableModel;
 import org.dz.PanelCapturaMod;
+
+import com.rb.Aplication;
+import com.rb.MyConstants;
+import com.rb.domain.Presentation;
+import com.rb.domain.Product;
+import com.rb.domain.ProductoPed;
 
 
 /**
@@ -62,7 +67,7 @@ public class PanelAddProduct extends PanelCapturaMod implements ActionListener, 
 
     private ArrayList<ProductoPed> productos;
 
-    private static final Logger log = Logger.getLogger(PanelAddProduct.class.getCanonicalName());
+    private static final Logger log = LogManager.getLogger(PanelAddProduct.class.getCanonicalName());
 
     /**
      * Creates new form PanelAddProduct

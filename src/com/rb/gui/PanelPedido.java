@@ -68,7 +68,8 @@ import org.apache.commons.collections4.MultiValuedMap;
 import org.apache.commons.collections4.keyvalue.MultiKey;
 import org.apache.commons.collections4.multimap.ArrayListValuedHashMap;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dz.MyDefaultTableModel;
 
 import org.dz.MyDialogEsc;
@@ -101,7 +102,7 @@ public class PanelPedido extends PanelCapturaMod implements ActionListener, Chan
     private HashMap<Long, Object[]> checkInventory;
     private MultiValuedMap mapInventory;
 
-    public static final Logger logger = Logger.getLogger(PanelPedido.class.getCanonicalName());
+    public static final Logger logger = LogManager.getLogger(PanelPedido.class.getCanonicalName());
     private JPopupMenu popupTabla;
     private MyPopupListener popupListenerTabla;
     private Color colorDelivery;

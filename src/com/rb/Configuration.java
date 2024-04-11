@@ -11,7 +11,9 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 import java.util.prefs.Preferences;
-import org.apache.log4j.Logger;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jasypt.encryption.pbe.StandardPBEStringEncryptor;
 import org.jasypt.properties.EncryptableProperties;
 
@@ -78,7 +80,7 @@ public class Configuration {
 
     private StandardPBEStringEncryptor encryptor;
 
-    private static final Logger logger = Logger.getLogger(Configuration.class.getCanonicalName());
+    private static final Logger logger = LogManager.getLogger(Configuration.class.getCanonicalName());
 
     private Configuration() {
         try {

@@ -22,7 +22,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.SwingWorker;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.jasypt.encryption.pbe.StandardPBEStringEncryptor;
 
 /**
@@ -32,7 +33,7 @@ import org.jasypt.encryption.pbe.StandardPBEStringEncryptor;
 public class BackupsCtrl {
 
     private final Aplication app;
-    private static final Logger logger = Logger.getLogger(BackupsCtrl.class.getCanonicalName());
+    private static final Logger logger = LogManager.getLogger(BackupsCtrl.class.getCanonicalName());
 
     public BackupsCtrl(Aplication app) {
         this.app = app;

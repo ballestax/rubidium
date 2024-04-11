@@ -27,7 +27,9 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Level;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+
 import javax.print.PrintService;
 import org.dz.Imagenes;
 
@@ -242,7 +244,7 @@ public class PrinterService {
             escpos.close();
 
         } catch (IOException ex) {
-            java.util.logging.Logger.getLogger(PanelPedido.class.getName()).log(Level.ALL.SEVERE, null, ex);
+            LogManager.getLogger(PanelPedido.class.getName()).log(Level.ERROR, ex.getMessage(), ex);
         }
     }
 
@@ -351,7 +353,7 @@ public class PrinterService {
             escpos.close();
 
         } catch (IOException ex) {
-            java.util.logging.Logger.getLogger(PanelPedido.class.getName()).log(Level.ALL.SEVERE, null, ex);
+            LogManager.getLogger(PanelPedido.class.getName()).log(Level.ERROR, ex.getMessage(), ex);
         }
     }
 
@@ -440,7 +442,7 @@ public class PrinterService {
             escpos.close();
 
         } catch (IOException ex) {
-            java.util.logging.Logger.getLogger(PanelPedido.class.getName()).log(Level.ALL.SEVERE, null, ex);
+            LogManager.getLogger(PanelPedido.class.getName()).log(Level.ERROR, ex.getMessage(), ex);
         }
     }
 
@@ -453,7 +455,7 @@ public class PrinterService {
             escpos.write(27).write(112).write(0).write(25).write(250);
             escpos.close();
         } catch (IOException ex) {
-            java.util.logging.Logger.getLogger(PrintService.class.getName()).log(Level.SEVERE, null, ex);
+            LogManager.getLogger(PrintService.class.getName()).log(Level.ERROR, ex.getMessage(), ex);
         }
     }
 
@@ -467,7 +469,7 @@ public class PrinterService {
             }
             escpos.close();
         } catch (IOException ex) {
-            java.util.logging.Logger.getLogger(PrintService.class.getName()).log(Level.SEVERE, null, ex);
+            LogManager.getLogger(PrintService.class.getName()).log(Level.ERROR, ex.getMessage(), ex);
         }
     }
 
@@ -480,7 +482,7 @@ public class PrinterService {
             escpos.write(27).write(42).write(0).write(25).write(250);
             escpos.close();
         } catch (IOException ex) {
-            java.util.logging.Logger.getLogger(PrintService.class.getName()).log(Level.SEVERE, null, ex);
+            LogManager.getLogger(PrintService.class.getName()).log(Level.ERROR, ex.getMessage(), ex);
         }
     }
 
@@ -530,7 +532,7 @@ public class PrinterService {
             escpos.close();
 
         } catch (IOException ex) {
-            java.util.logging.Logger.getLogger(PanelPedido.class.getName()).log(Level.ALL.SEVERE, null, ex);
+            LogManager.getLogger(PanelPedido.class.getName()).log(Level.ERROR, ex.getMessage(), ex);
         }
     }
 
@@ -638,7 +640,7 @@ public class PrinterService {
             escpos.close();
 
         } catch (IOException ex) {
-            java.util.logging.Logger.getLogger(PanelPedido.class.getName()).log(Level.ALL.SEVERE, null, ex);
+            LogManager.getLogger(PanelPedido.class.getName()).log(Level.ERROR, ex.getMessage(), ex);
         }
     }
 
@@ -758,7 +760,7 @@ public class PrinterService {
             escpos.close();
 
         } catch (IOException ex) {
-            java.util.logging.Logger.getLogger(PanelPedido.class.getName()).log(Level.ALL.SEVERE, null, ex);
+            LogManager.getLogger(PanelPedido.class.getName()).log(Level.ERROR, ex.getMessage(), ex);
         }
     }
 

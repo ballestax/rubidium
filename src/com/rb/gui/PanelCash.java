@@ -49,7 +49,9 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
-import org.apache.log4j.Logger;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dz.MyDefaultTableModel;
 import org.dz.PanelCapturaMod;
 
@@ -62,7 +64,7 @@ public class PanelCash extends PanelCapturaMod implements ActionListener, ListSe
     private final Aplication app;
     private Cycle cycle;
     private BigDecimal total;
-    public static final Logger logger = Logger.getLogger(PanelCash.class.getCanonicalName());
+    public static final Logger logger = LogManager.getLogger(PanelCash.class.getCanonicalName());
     private MyDefaultTableModel model;
     private DecimalFormat decimalFormat;
     private MyDefaultTableModel modelExt;

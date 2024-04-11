@@ -14,8 +14,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.commons.dbcp2.BasicDataSource;
 
 /**
@@ -181,12 +182,12 @@ public class SQLManager {
                 Connection con = DriverManager.getConnection(prefijo + ":" + url);
                 con.prepareStatement("select 1").executeQuery();
             } catch (SQLException ex) {
-                Logger.getLogger(SQLManager.class.getName()).log(Level.SEVERE, null, ex);
+                LogManager.getLogger(SQLManager.class.getName()).log(Level.ERROR, ex.getMessage(), ex);
                 System.out.println("ex = " + ex);
                 return false;
             } catch (ClassNotFoundException ex) {
                 System.out.println("ex = " + ex);
-                Logger.getLogger(SQLManager.class.getName()).log(Level.SEVERE, null, ex);
+                LogManager.getLogger(SQLManager.class.getName()).log(Level.ERROR, ex.getMessage(), ex);
                 return false;
             }
             return true;
@@ -202,12 +203,12 @@ public class SQLManager {
             Connection con = DriverManager.getConnection(prefijo + url, user, new String(password));
             con.prepareStatement("select 1").executeQuery();
         } catch (SQLException ex) {
-            Logger.getLogger(SQLManager.class.getName()).log(Level.SEVERE, null, ex);
+            LogManager.getLogger(SQLManager.class.getName()).log(Level.ERROR, ex.getMessage(), ex);
             System.out.println("ex = " + ex);
             return false;
         } catch (ClassNotFoundException ex) {
             System.out.println("ex = " + ex);
-            Logger.getLogger(SQLManager.class.getName()).log(Level.SEVERE, null, ex);
+            LogManager.getLogger(SQLManager.class.getName()).log(Level.ERROR, ex.getMessage(), ex);
             return false;
         }
         return true;

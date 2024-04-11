@@ -5,15 +5,12 @@
  */
 package com.rb.gui;
 
-import com.rb.Aplication;
-import com.rb.GUIManager;
-import com.rb.MyConstants;
 import static com.rb.MyConstants.FILTER_NUM_INT_DIFFERENT;
 import static com.rb.MyConstants.FILTER_NUM_INT_GREATER_EQUAL;
 import static com.rb.MyConstants.FILTER_NUM_INT_LESS;
 import static com.rb.MyConstants.FILTER_NUM_INT_LESS_EQUAL;
-import com.rb.domain.Product;
-import com.rb.gui.util.MultiSpanCellTable;
+import static javax.swing.BorderFactory.createLineBorder;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -24,16 +21,16 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeListener;
-import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
+
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListSelectionModel;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -45,6 +42,7 @@ import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.RowFilter;
 import javax.swing.SwingConstants;
+import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
@@ -55,14 +53,18 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableRowSorter;
 
-import javax.swing.ImageIcon;
-import javax.swing.SwingWorker;
-import org.apache.log4j.Logger;
-import static javax.swing.BorderFactory.createLineBorder;
-import org.dz.MyDefaultTableModel;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.bx.gui.MyDefaultTableModel;
 import org.dz.PanelCaptura;
 import org.dz.Registro;
 import org.dz.TextFormatter;
+
+import com.rb.Aplication;
+import com.rb.GUIManager;
+import com.rb.MyConstants;
+import com.rb.domain.Product;
+import com.rb.gui.util.MultiSpanCellTable;
 
 
 /**
@@ -90,7 +92,7 @@ public class GuiPanelSelProduct extends PanelCaptura implements ListSelectionLis
     private boolean mostrarAgotados;
     private JCheckBox chAgotados;
     private JButton btnTransferencia;
-    private static final Logger log = Logger.getLogger(GuiPanelSelProduct.class.getCanonicalName());
+    private static final Logger log = LogManager.getLogger(GuiPanelSelProduct.class.getCanonicalName());
     private JButton btnUpdate;
     private JButton btnConciliacion;
     private JButton btAddQuick;

@@ -21,13 +21,14 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.rmi.RemoteException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPasswordField;
+
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
 import org.dz.PanelCaptura;
 import org.dz.Registro;
 
@@ -130,9 +131,9 @@ public class GuiPanelNewUser extends PanelCaptura{
                     getRootPane().getParent().setVisible(false);
                 }
             } catch (DAOException ex) {
-                Logger.getLogger(GuiPanelNewUser.class.getName()).log(Level.SEVERE, null, ex);
+                LogManager.getLogger(GuiPanelNewUser.class.getName()).log(Level.ERROR, ex.getMessage(), ex);
             } catch (RemoteException ex) {
-                Logger.getLogger(GuiPanelNewUser.class.getName()).log(Level.SEVERE, null, ex);
+                LogManager.getLogger(GuiPanelNewUser.class.getName()).log(Level.ERROR, ex.getMessage(), ex);
             }
 
         }

@@ -23,6 +23,7 @@ import com.rb.domain.Presentation;
 import com.rb.domain.Product;
 import com.rb.domain.ProductoPed;
 import com.rb.domain.Rol;
+import com.rb.domain.Station;
 import com.rb.domain.Table;
 import com.rb.domain.User;
 import com.rb.domain.Waiter;
@@ -50,8 +51,10 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import org.apache.log4j.Logger;
+
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
@@ -60,7 +63,7 @@ import org.apache.log4j.Logger;
 public class Control {
 
     private Aplication app;
-    public static final Logger logger = Logger.getLogger(Control.class.getCanonicalName());
+    public static final Logger logger = LogManager.getLogger(Control.class.getCanonicalName());
 
     public Control(Aplication app) {
         this.app = app;
@@ -334,9 +337,9 @@ public class Control {
             logger.error("Error getting user.", ex);
             return null;
         } catch (RemoteException ex) {
-            java.util.logging.Logger.getLogger(Control.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error("Error getting User.", ex);
         } catch (UserRetrieveException ex) {
-            java.util.logging.Logger.getLogger(Control.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error("Error getting User.", ex);
         }
         return null;
     }

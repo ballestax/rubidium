@@ -5,12 +5,8 @@
  */
 package com.rb.gui;
 
-import com.rb.Aplication;
-import com.rb.Configuration;
-import com.rb.domain.Presentation;
-import com.rb.domain.Product;
-import com.rb.domain.ProductoPed;
 import static com.rb.gui.PanelCustomPedido.AC_CUSTOM_ADD;
+
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Insets;
@@ -24,14 +20,23 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
+
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dz.PanelCapturaMod;
+
+import com.rb.Aplication;
+import com.rb.Configuration;
+import com.rb.domain.Presentation;
+import com.rb.domain.Product;
+import com.rb.domain.ProductoPed;
 
 /**
  *
@@ -41,7 +46,7 @@ public class PanelProduct2 extends PanelCapturaMod implements ActionListener {
 
     private Product product;
     private final Aplication app;
-    public static final Logger logger = Logger.getLogger(PanelProduct2.class.getCanonicalName());
+    public static final Logger logger = LogManager.getLogger(PanelProduct2.class.getCanonicalName());
     private JPopupMenu popPres;
 
     /**

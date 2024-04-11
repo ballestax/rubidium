@@ -11,14 +11,14 @@ import java.util.prefs.Preferences;
 
 /**
  *
- * @author CHECHE
+ * @author LRod
  */
 public final class Install {
 
     private Preferences registro;
-    private final transient String REG = "baconapp";
+    private final transient String REG = "rubidium";
     private static final String CLAVE = "ahbabcbgcd";
-    private final transient String REG1 = "/baconapp/inst";
+    private final transient String REG1 = "/rubidium/inst";
     private static final String CLAVE1 = "vinst";
     private Date TWST;
 
@@ -32,7 +32,7 @@ public final class Install {
 
         TWST = cld.getTime();
         
-       // writeHash();
+        writeHash();
     }
 
     public Date getTWST() {
@@ -84,12 +84,12 @@ public final class Install {
         }
     }
 
-//    protected final void writeHash() {
-//        registro.node(REG).put(CLAVE, "1821232734");
-//        try {
-//            registro.flush();
-//        } catch (Exception e) {
-//            System.err.println("(Exc)guardarPreferencias(): " + e);
-//        }
-//    }
+   protected final void writeHash() {
+       registro.node(REG).put(CLAVE, "1821232734");
+       try {
+           registro.flush();
+       } catch (Exception e) {
+           System.err.println("(Exc)guardarPreferencias(): " + e);
+       }
+   }
 }

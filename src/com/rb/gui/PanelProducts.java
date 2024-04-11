@@ -1,13 +1,8 @@
 package com.rb.gui;
 
-import com.rb.Aplication;
-import com.rb.GUIManager;
-import com.rb.MyConstants;
-import com.rb.Utiles;
-import com.rb.domain.Presentation;
-import com.rb.domain.Product;
 import static com.rb.gui.PanelTopSearch.AC_CLEAR_FIELD;
-import com.rb.persistence.JDBC.JDBCProductDAO;
+import static javax.swing.BorderFactory.createLineBorder;
+
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.FlowLayout;
@@ -24,9 +19,9 @@ import java.util.ArrayList;
 import java.util.EventObject;
 import java.util.List;
 import java.util.stream.Collectors;
+
 import javax.swing.AbstractCellEditor;
 import javax.swing.BorderFactory;
-import static javax.swing.BorderFactory.createLineBorder;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.ImageIcon;
@@ -53,11 +48,21 @@ import javax.swing.event.TableModelListener;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableRowSorter;
-import org.apache.log4j.Logger;
-import org.dz.MyDefaultTableModel;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.bx.gui.MyDefaultTableModel;
 import org.dz.PanelCapturaMod;
-import org.dz.ProgAction;
 import org.dz.TextFormatter;
+
+import com.rb.Aplication;
+import com.rb.GUIManager;
+import com.rb.MyConstants;
+import com.rb.ProgAction;
+import com.rb.Utiles;
+import com.rb.domain.Presentation;
+import com.rb.domain.Product;
+import com.rb.persistence.JDBC.JDBCProductDAO;
 
 /**
  *
@@ -72,7 +77,7 @@ public class PanelProducts extends PanelCapturaMod implements ActionListener, Ca
     private TableRowSorter<MyDefaultTableModel> lastSorter;
     private final JTextArea textArea;
     private ProgAction acNewCategory;
-    public static final Logger LOGGER = Logger.getLogger(PanelProducts.class.getCanonicalName());
+    public static final Logger LOGGER = LogManager.getLogger(PanelProducts.class.getCanonicalName());
     private Product currentProduct;
     private JMenuItem itemEdit;
     private Product editingProduct;

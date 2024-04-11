@@ -4,15 +4,6 @@
  */
 package com.rb.persistence.JDBC;
 
-import com.rb.DBManager;
-import com.rb.persistence.dao.DAOException;
-import com.rb.domain.User;
-import com.rb.domain.User.AccessLevel;
-import com.rb.persistence.SQLExtractor;
-import com.rb.persistence.SQLLoader;
-import com.rb.persistence.dao.RemoteUserResultsInterface;
-import com.rb.persistence.dao.UserDAO;
-import com.rb.persistence.dao.UserRetrieveException;
 import java.io.IOException;
 import java.rmi.RemoteException;
 import java.sql.Connection;
@@ -23,10 +14,23 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
 import javax.sql.DataSource;
+
 import org.apache.commons.dbcp2.BasicDataSource;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import com.rb.DBManager;
+import com.rb.domain.User;
+import com.rb.domain.User.AccessLevel;
+import com.rb.persistence.SQLExtractor;
+import com.rb.persistence.SQLLoader;
+import com.rb.persistence.dao.DAOException;
+import com.rb.persistence.dao.RemoteUserResultsInterface;
+import com.rb.persistence.dao.UserDAO;
+import com.rb.persistence.dao.UserRetrieveException;
 
 /**
  *
@@ -36,7 +40,7 @@ public class JDBCUserDAO implements UserDAO {
 
     public static final String TABLE_NAME = "users";
     private String NAMED_PARAM_WHERE;
-    private static final Logger logger = Logger.getLogger(JDBCUserDAO.class.getCanonicalName());
+    private static final Logger logger = LogManager.getLogger(JDBCUserDAO.class.getCanonicalName());
     private final DataSource dataSource;
     private final SQLLoader sqlStatements;
     protected static final String CREATE_USERS_TABLE_KEY = "CREATE_USERS_TABLE";
@@ -292,9 +296,9 @@ public class JDBCUserDAO implements UserDAO {
             }
             return check;
         } catch (IOException ex) {
-            Logger.getLogger(JDBCUserDAO.class.getName()).log(Level.SEVERE, null, ex);
+            LogManager.getLogger(JDBCUserDAO.class.getName()).log(Level.ERROR, ex.getMessage(), ex);
         } catch (SQLException ex) {
-            Logger.getLogger(JDBCUserDAO.class.getName()).log(Level.SEVERE, null, ex);
+            LogManager.getLogger(JDBCUserDAO.class.getName()).log(Level.ERROR, ex.getMessage(), ex);
         }
         return false;
     }

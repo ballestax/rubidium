@@ -5,11 +5,6 @@
  */
 package com.rb.gui;
 
-import com.rb.domain.Category;
-import com.rb.Aplication;
-import com.rb.Configuration;
-import com.rb.domain.ConfigDB;
-import com.rb.domain.Product;
 import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -25,12 +20,21 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
+
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.SwingWorker;
-import org.apache.log4j.Logger;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dz.PanelCapturaMod;
 import org.dz.Utiles;
+
+import com.rb.Aplication;
+import com.rb.Configuration;
+import com.rb.domain.Category;
+import com.rb.domain.ConfigDB;
+import com.rb.domain.Product;
 
 /**
  *
@@ -41,7 +45,7 @@ public class PanelCategory extends PanelCapturaMod implements PropertyChangeList
     private final Aplication app;
     private Category category;
     private List<Product> products;
-    public static final Logger logger = Logger.getLogger(PanelCategory.class.getCanonicalName());
+    public static final Logger logger = LogManager.getLogger(PanelCategory.class.getCanonicalName());
     private int oldSize;
     private int view;
     private String selectedSort;

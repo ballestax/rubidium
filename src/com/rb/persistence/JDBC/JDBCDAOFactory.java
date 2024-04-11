@@ -4,25 +4,6 @@
  */
 package com.rb.persistence.JDBC;
 
-import com.rb.Aplication;
-import com.rb.DBManager;
-import com.rb.GUIManager;
-import com.rb.TimeWaste;
-import com.rb.persistence.dao.DAOException;
-import com.rb.persistence.SQLLoader;
-import com.rb.persistence.dao.AdditionalDAO;
-import com.rb.persistence.dao.ClientDAO;
-import com.rb.persistence.dao.ConciliacionDAO;
-import com.rb.persistence.dao.ConfigDAO;
-import com.rb.persistence.dao.DAOFactory;
-import com.rb.persistence.dao.IngredientDAO;
-import com.rb.persistence.dao.InvoiceDAO;
-import com.rb.persistence.dao.ItemDAO;
-import com.rb.persistence.dao.LocationDAO;
-import com.rb.persistence.dao.OrderDAO;
-import com.rb.persistence.dao.ProductDAO;
-import com.rb.persistence.dao.UserDAO;
-import com.rb.persistence.dao.UtilDAO;
 import java.beans.PropertyVetoException;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -38,10 +19,32 @@ import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPasswordField;
+
 import org.apache.commons.dbcp2.BasicDataSource;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jasypt.encryption.pbe.StandardPBEStringEncryptor;
 import org.jasypt.properties.EncryptableProperties;
+
+import com.rb.Aplication;
+import com.rb.DBManager;
+import com.rb.GUIManager;
+import com.rb.TimeWaste;
+import com.rb.persistence.SQLLoader;
+import com.rb.persistence.dao.AdditionalDAO;
+import com.rb.persistence.dao.ClientDAO;
+import com.rb.persistence.dao.ConciliacionDAO;
+import com.rb.persistence.dao.ConfigDAO;
+import com.rb.persistence.dao.DAOException;
+import com.rb.persistence.dao.DAOFactory;
+import com.rb.persistence.dao.IngredientDAO;
+import com.rb.persistence.dao.InvoiceDAO;
+import com.rb.persistence.dao.ItemDAO;
+import com.rb.persistence.dao.LocationDAO;
+import com.rb.persistence.dao.OrderDAO;
+import com.rb.persistence.dao.ProductDAO;
+import com.rb.persistence.dao.UserDAO;
+import com.rb.persistence.dao.UtilDAO;
 
 /**
  *
@@ -67,7 +70,7 @@ public class JDBCDAOFactory extends DAOFactory {
     public static final String TRUNCATE_TABLE_KEY = "TRUNCATE_TABLE";
     public static final String NAMED_PARAM_TABLE = "{table}";
 
-    private static final Logger logger = Logger.getLogger(JDBCDAOFactory.class.getCanonicalName());
+    private static final Logger logger = LogManager.getLogger(JDBCDAOFactory.class.getCanonicalName());
 
     private BasicDataSource dataSource;
     private SQLLoader sqlStatements;

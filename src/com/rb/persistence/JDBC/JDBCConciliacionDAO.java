@@ -6,12 +6,6 @@
  */
 package com.rb.persistence.JDBC;
 
-import com.rb.DBManager;
-import com.rb.domain.Conciliacion;
-import com.rb.persistence.SQLExtractor;
-import com.rb.persistence.SQLLoader;
-import com.rb.persistence.dao.ConciliacionDAO;
-import com.rb.persistence.dao.DAOException;
 import java.io.IOException;
 import java.rmi.RemoteException;
 import java.sql.Connection;
@@ -21,9 +15,19 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+
 import javax.sql.DataSource;
+
 import org.apache.commons.dbcp2.BasicDataSource;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import com.rb.DBManager;
+import com.rb.domain.Conciliacion;
+import com.rb.persistence.SQLExtractor;
+import com.rb.persistence.SQLLoader;
+import com.rb.persistence.dao.ConciliacionDAO;
+import com.rb.persistence.dao.DAOException;
 
 /**
  *
@@ -34,7 +38,7 @@ public class JDBCConciliacionDAO implements ConciliacionDAO {
     public static final String TABLE_NAME = "conciliaciones";
     public static final String NAMED_PARAM_WHERE = "{where}";
     public static final String NAMED_PARAM_ORDER_BY = "{orderby}";
-    private static final Logger logger = Logger.getLogger(JDBCConciliacionDAO.class.getCanonicalName());
+    private static final Logger logger = LogManager.getLogger(JDBCConciliacionDAO.class.getCanonicalName());
     private final DataSource dataSource;
     private final SQLLoader sqlStatements;
     protected static final String CREATE_CONCILIACIONES_TABLE_KEY = "CREATE_CONCILIACIONES_TABLE";

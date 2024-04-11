@@ -5,14 +5,8 @@
  */
 package com.rb.gui;
 
-import com.rb.Aplication;
-import com.rb.GUIManager;
-import com.rb.PDFGenerator;
-import com.rb.Utiles;
-import com.rb.domain.Conciliacion;
-import com.rb.domain.InventoryEvent;
-import com.rb.domain.Item;
-import com.rb.domain.Location;
+import static javax.swing.BorderFactory.createLineBorder;
+
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Desktop;
@@ -29,18 +23,27 @@ import java.util.Date;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
+
 import javax.swing.BorderFactory;
-import static javax.swing.BorderFactory.createLineBorder;
 import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.table.TableCellRenderer;
 
-import org.apache.log4j.Logger;
-import org.dz.MyDefaultTableModel;
-import org.dz.MyListModel;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.bx.gui.MyDefaultTableModel;
 import org.dz.PanelCapturaMod;
+
+import com.rb.Aplication;
+import com.rb.GUIManager;
+import com.rb.PDFGenerator;
+import com.rb.Utiles;
+import com.rb.domain.Conciliacion;
+import com.rb.domain.InventoryEvent;
+import com.rb.domain.Item;
+import com.rb.domain.Location;
 
 
 /**
@@ -49,7 +52,7 @@ import org.dz.PanelCapturaMod;
  */
 public class PanelReportProductDetail extends PanelCapturaMod implements ActionListener {
 
-    private static final Logger logger = Logger.getLogger(PanelReportProductDetail.class.getCanonicalName());
+    private static final Logger logger = LogManager.getLogger(PanelReportProductDetail.class.getCanonicalName());
 
     private final Aplication app;
     private MyDefaultTableModel modeloTabla;

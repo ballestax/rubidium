@@ -20,8 +20,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -134,7 +135,7 @@ public class DatePickerImp extends JComponent implements ActionListener, CaretLi
         try {
             date = formatDate.parse(text);
         } catch (ParseException ex) {
-            Logger.getLogger(DatePickerImp.class.getName()).log(Level.SEVERE, null, ex);
+            LogManager.getLogger(DatePickerImp.class.getName()).log(Level.ERROR, ex.getMessage(), ex);
         }
     }
 

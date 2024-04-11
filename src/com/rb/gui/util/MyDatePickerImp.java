@@ -17,14 +17,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JTextField;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
+
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
 import org.dz.DatePicker;
 import org.dz.MyDialogEsc;
 
@@ -130,7 +132,7 @@ public class MyDatePickerImp extends JComponent implements ActionListener, Caret
         try {
             date = formatDate.parse(text);
         } catch (ParseException ex) {
-            Logger.getLogger(MyDatePickerImp.class.getName()).log(Level.SEVERE, null, ex);
+            LogManager.getLogger(MyDatePickerImp.class.getName()).log(Level.ERROR, ex.getMessage(), ex);
         }
     }
 
