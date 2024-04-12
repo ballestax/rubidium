@@ -259,7 +259,7 @@ public class JDBCDAOFactory extends DAOFactory {
                 logger.debug(e);
             }
             logger.debug("Creating database:" + Aplication.DATABASE);
-            con = DriverManager.getConnection("jdbc:mysql://localhost:3306/?user=" + Aplication.DB_USER + "&password=" + String.copyValueOf(pass));
+            con = DriverManager.getConnection("jdbc:postgresql://dpg-coc8jtol6cac73eroou0-a.oregon-postgres.render.com:5432/?user=" + Aplication.DB_USER + "&password=" + String.copyValueOf(pass));
             Statement statement = con.createStatement();
             statement.executeUpdate("CREATE DATABASE IF NOT EXISTS " + Aplication.DATABASE + " CHARACTER SET utf8 COLLATE utf8_general_ci");
         } catch (ClassNotFoundException | SQLException e) {

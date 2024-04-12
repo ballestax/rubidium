@@ -32,6 +32,7 @@
         "c:\\Dev\\lib\\itextpdf-5.5.13.3.jar",
         "c:\\Dev\\lib\\xmlworker-5.5.13.3.jar",
         "c:\\Dev\\lib\\commons-net-3.10.0.jar",
-        "c:\\Dev\\lib\\jsoup-1.17.2.jar"
+        "c:\\Dev\\lib\\jsoup-1.17.2.jar",
+        "c:\\Dev\\lib\\postgresql-42.7.3.jar"
     ]
 }

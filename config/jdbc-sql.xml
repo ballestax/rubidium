@@ -69,7 +69,7 @@
                     |ADD_ORDER_PRODUCT|GET_ORDER_PRODUCT
                     |CREATE_STATIONS_TABLE|ADD_STATION|GET_STATIONS|CREATE_PRODUCT_STATION_TABLE|GET_PRODUCT_STATIONS
                     |GET_STATION_BY_ID
-                    |COUNT_UNINVOICED_PRODUCTS|GET_UNINVOICED_PRODUCTS
+                    |COUNT_UNINVOICED_PRODUCTS|GET_UNINVOICED_PRODUCTS                    
                     ) #REQUIRED
                     
 	>
@@ -2225,4 +2225,2121 @@
         
         
     </DAOStatements>
+
+    <DAOStatements database="postgresql">
+        <SQLStatement method="COUNT_TABLE">
+            <SQLFragment>
+                SELECT count(*) FROM ({query}) AS counted
+            </SQLFragment>
+        </SQLStatement>
+
+        <SQLStatement method="CHECK_TABLE">
+            <SQLFragment>
+                SELECT count(*) FROM {table}
+            </SQLFragment>
+        </SQLStatement>
+		
+        <SQLStatement method="CREATE_USERS_TABLE">
+            <SQLFragment>
+                CREATE TABLE users (
+                id INTEGER NOT NULL AUTO_INCREMENT,
+                username VARCHAR(100),
+                password VARCHAR(100),
+                access_level VARCHAR(100),
+                createdTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                UNIQUE (username),
+                PRIMARY KEY (id)
+                );
+            </SQLFragment>
+        </SQLStatement>
+		
+        <SQLStatement method="INSERT_USER">
+            <SQLFragment>
+                INSERT INTO users (username,password,access_level) VALUES (?, ?, ?);
+            </SQLFragment>
+        </SQLStatement>
+		
+        <SQLStatement method="INSERT_USER_FULL">
+            <SQLFragment>
+                INSERT INTO users VALUES (?, ?, ?, ?);
+            </SQLFragment>
+        </SQLStatement>
+		
+        <SQLStatement method="UPDATE_USER_USERNAME">
+            <SQLFragment>
+                UPDATE users SET username = ? WHERE id = ?;
+            </SQLFragment>
+        </SQLStatement>
+		
+        <SQLStatement method="UPDATE_USER_ACCESS">
+            <SQLFragment>
+                UPDATE users SET access_level = ? WHERE id = ?;
+            </SQLFragment>
+        </SQLStatement>
+		
+        <SQLStatement method="UPDATE_USER_PASSWORD">
+            <SQLFragment>
+                UPDATE users SET password = ? WHERE id = ?;
+            </SQLFragment>
+        </SQLStatement>
+		
+        <SQLStatement method="DELETE_USER">
+            <SQLFragment>
+                DELETE FROM users WHERE username = ?;
+            </SQLFragment>
+        </SQLStatement>
+		
+        <SQLStatement method="GET_USER_LIMIT">
+            <SQLFragment>
+                SELECT
+            </SQLFragment>
+            <SQLFragment>
+                id, username, access_level
+                FROM users
+            </SQLFragment>
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                WHERE {where}
+            </SQLFragment>
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                ORDER BY {orderby}
+            </SQLFragment>
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                LIMIT ?, ?
+            </SQLFragment>
+        </SQLStatement>
+		
+        <SQLStatement method="GET_USER">
+            <SQLFragment>
+                SELECT
+            </SQLFragment>
+            <SQLFragment>
+                id, username, access_level
+                FROM users
+            </SQLFragment>
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                WHERE {where}
+            </SQLFragment>
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                ORDER BY {orderby}
+            </SQLFragment>
+        </SQLStatement>
+		
+        <SQLStatement method="CHECK_USER_PASSWORD">
+            <SQLFragment>
+                SELECT password, id, access_level FROM users WHERE username = ? AND STRCMP(BINARY password, ?) = 0;
+            </SQLFragment>
+        </SQLStatement>		
+        
+        <SQLStatement method="CREATE_ROLES_TABLE">
+            <SQLFragment>
+                CREATE TABLE roles (
+                id SERIAL PRIMARY KEY,
+                name VARCHAR(100) UNIQUE,
+                display_name VARCHAR(255),
+                description VARCHAR(255),
+                createdTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+                );
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="GET_ROLES_LIST">
+            <SQLFragment>
+                SELECT
+            </SQLFragment>
+            <SQLFragment>
+                *
+                FROM roles
+            </SQLFragment>
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                WHERE {where}
+            </SQLFragment>    
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                ORDER BY {orderby} 
+            </SQLFragment>
+            
+        </SQLStatement>
+        
+        <SQLStatement method="GET_ROLE">
+            <SQLFragment>
+                SELECT
+            </SQLFragment>
+            <SQLFragment>
+                id, name
+                FROM roles
+            </SQLFragment>
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                WHERE {where}
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="INSERT_ROL">
+            <SQLFragment>
+                INSERT INTO roles (name,display_name,description ) VALUES (?, ?, ?);
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="UPDATE_ROL">
+            <SQLFragment>
+                UPDATE roles SET 
+                name= ?,
+                display_name= ?,
+                description= ?
+                WHERE id = ?;
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="DELETE_ROL">
+            <SQLFragment>
+                DELETE FROM roles WHERE name = ?;
+            </SQLFragment>
+        </SQLStatement>
+        
+        
+        <SQLStatement method="CREATE_PERMISSIONS_TABLE">
+            <SQLFragment>
+                CREATE TABLE permissions (
+                id SERIAL PRIMARY KEY,
+                name VARCHAR(100) UNIQUE,
+                display_name VARCHAR(255),
+                description VARCHAR(255)
+                );
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="INSERT_PERMISSION">
+            <SQLFragment>
+                INSERT INTO permissions (name,display_name,description) VALUES (?, ?, ?);
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="UPDATE_PERMISSION">
+            <SQLFragment>
+                UPDATE permissions SET 
+                name= ?,
+                display_name= ?,
+                description= ?
+                WHERE id = ?;
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="DELETE_PERMISSION">
+            <SQLFragment>
+                DELETE FROM permissions WHERE id = ?;
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="GET_PERMISSIONS_LIST">
+            <SQLFragment>
+                SELECT
+            </SQLFragment>
+            <SQLFragment>
+                *
+                FROM permissions
+            </SQLFragment>            
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                WHERE {where}
+            </SQLFragment>    
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                ORDER BY {orderby} 
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="CREATE_PERMISSION_ROLE_TABLE">
+            <SQLFragment>
+                CREATE TABLE permission_role (
+                permission_id INTEGER NOT NULL,
+                role_id INTEGER NOT NULL,
+                FOREIGN KEY (permission_id) REFERENCES permissions(id) ON DELETE CASCADE ON UPDATE CASCADE,
+                FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE CASCADE ON UPDATE CASCADE
+                );
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="INSERT_PERMISSION_ROLE">
+            <SQLFragment>
+                INSERT INTO permission_role VALUES (?, ?);
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="GET_PERMISSION_ROLE_LIST">
+            <SQLFragment>
+                SELECT
+            </SQLFragment>
+            <SQLFragment>
+                *
+                FROM permission_role
+            </SQLFragment>            
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                WHERE {where}
+            </SQLFragment>    
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                ORDER BY {orderby} 
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="GET_PERMISSION_BY_ROLE_LIST">
+            <SQLFragment>
+                SELECT
+            </SQLFragment>
+            <SQLFragment>
+                p.id, 
+                p.name,
+                p.display_name,
+                p.description
+                FROM permissions p, roles r, permission_role pr
+            </SQLFragment>            
+            <SQLFragment>
+                WHERE pr.permission_id=p.id and r.id=pr.role_id and r.id=?
+            </SQLFragment>    
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                ORDER BY {orderby} 
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="DELETE_PERMISSION_ROLE">
+            <SQLFragment>
+                DELETE FROM permission_role WHERE role_id = ?;
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="CREATE_ROLE_USER_TABLE">
+            <SQLFragment>
+                CREATE TABLE role_user (
+                user_id INTEGER NOT NULL,
+                role_id INTEGER NOT NULL,
+                UNIQUE(user_id),
+                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
+                FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE CASCADE ON UPDATE CASCADE
+                );
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="INSERT_ROLE_USER">
+            <SQLFragment>
+                INSERT INTO role_user VALUES (?, ?);
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="GET_ROLE_USER_LIST">
+            <SQLFragment>
+                SELECT
+            </SQLFragment>
+            <SQLFragment>
+                *
+                FROM role_user
+            </SQLFragment>            
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                WHERE {where}
+            </SQLFragment>    
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                ORDER BY {orderby} 
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="DELETE_ROLE_USER">
+            <SQLFragment>
+                DELETE FROM role_user WHERE user_id = ?;
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="HAS_PERMISSION">
+            <SQLFragment>
+                SELECT count(*) 
+                FROM permission_role pr, role_user ru
+                WHERE pr.role_id = ru.role_id AND ru.user_id=? AND pr.permission_id=?
+            </SQLFragment>
+        </SQLStatement>
+        
+        
+        <SQLStatement method="GET_USER_ROLE">
+            <SQLFragment>
+                SELECT r.name 
+                FROM role_user ru, roles r, users u 
+                WHERE ru.role_id = r.id AND u.id=ru.user_id AND u.id=?
+            </SQLFragment>
+        </SQLStatement>
+        
+          
+                	
+        <SQLStatement method="CREATE_PERSONS_TABLE">
+            <SQLFragment>
+                CREATE TABLE persons (
+                id SERIAL PRIMARY KEY,
+                identification INTEGER NOT NULL UNIQUE,
+                firstName1 VARCHAR(255),
+                firstName2 VARCHAR(255),
+                lastName1 VARCHAR(255),
+                lastName2 VARCHAR(255),
+                lider INTEGER,					
+                cellphone VARCHAR(15),
+                profession VARCHAR(255),
+                address VARCHAR(255),
+                place1 VARCHAR(255),
+                typePlace VARCHAR(255),
+                neighborhood VARCHAR(255),                
+                birthday DATE,
+                email VARCHAR(255),
+                votingPlace VARCHAR(255),
+                votingTable INTEGER,
+                witness BOOLEAN DEFAULT '0',
+                jury BOOLEAN DEFAULT '0',
+                volunteer BOOLEAN DEFAULT '0',
+                hardvote BOOLEAN DEFAULT '0',
+                giveVehicle BOOLEAN DEFAULT '0',
+                typeVehicle VARCHAR(255),
+                compromise VARCHAR(255),
+                photo BLOB DEFAULT NULL,
+                createdTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                lastUpdatedTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                PRIMARY KEY (id));
+            </SQLFragment>
+        </SQLStatement>		
+        
+        <SQLStatement method="GET_PERSON">
+            <SQLFragment>
+                SELECT
+            </SQLFragment>
+            <SQLFragment>
+                *
+                FROM persons
+            </SQLFragment>
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                WHERE {where}
+            </SQLFragment>    
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                ORDER BY {orderby} 
+            </SQLFragment>
+            
+        </SQLStatement>
+        
+        <SQLStatement method="GET_ID_PERSON">
+            <SQLFragment>
+                SELECT
+            </SQLFragment>
+            <SQLFragment>
+                identification
+                FROM persons
+            </SQLFragment>
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                WHERE {where}
+            </SQLFragment>    
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                ORDER BY {orderby} 
+            </SQLFragment>
+            
+        </SQLStatement>
+        
+        <SQLStatement method="GET_PERSON_LIMIT">
+            <SQLFragment>
+                SELECT
+            </SQLFragment>
+            <SQLFragment>
+                *
+                FROM persons
+            </SQLFragment>
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                WHERE {where}
+            </SQLFragment>    
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                ORDER BY {orderby} 
+            </SQLFragment>
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                LIMIT {start}, {num}
+            </SQLFragment>
+        </SQLStatement>
+        
+        
+        <SQLStatement method="UPDATE_PERSON">
+            <SQLFragment>
+                UPDATE persons SET 
+                firstName1=?,
+                firstName2=?,
+                lastName1=?,
+                lastName2=?,
+                lider=?,
+                cellphone=?,
+                profession=?,
+                address=?,
+                place1=?,
+                typePlace=?,
+                neighborhood=?,                
+                birthday=?,
+                email=?,
+                votingPlace=?,
+                votingTable=?,
+                witness=?,
+                jury=?,
+                volunteer=?,
+                hardvote=?,
+                giveVehicle=?,
+                typeVehicle=?,
+                compromise=?,
+                photo=? 
+                WHERE identification = ?
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="INSERT_PERSON">
+            <SQLFragment>
+                INSERT INTO persons (identification,firstName1,firstName2,
+                lastName1,lastName2,lider,cellphone,profession,
+                address,place1,typePlace,neighborhood,birthday,email,votingPlace,
+                votingTable,witness,jury,volunteer,hardvote,giveVehicle,typeVehicle,
+                compromise,photo) 
+                VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);
+            </SQLFragment>
+        </SQLStatement>	
+                
+        <SQLStatement method="DELETE_PERSON">
+            <SQLFragment>
+                DELETE FROM persons WHERE identification = ?;
+            </SQLFragment>
+        </SQLStatement>		
+        
+        <SQLStatement method="DELETE_PERSON_WHERE">
+            <SQLFragment>
+                DELETE FROM persons
+            </SQLFragment>
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                WHERE {where}
+            </SQLFragment>
+        </SQLStatement>		
+                       
+        <SQLStatement method="DROP_TABLE">
+            <SQLFragment>
+                DROP TABLE {table};
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="TRUNCATE_TABLE">
+            <SQLFragment>
+                TRUNCATE TABLE {table};
+            </SQLFragment>
+        </SQLStatement>
+       
+        <SQLStatement method="CHECK_TABLE_USERS">
+            <SQLFragment>
+                SELECT count(*) FROM users WHERE 1=1
+            </SQLFragment>
+        </SQLStatement> 
+        
+        <SQLStatement method="COUNT_TABLE2">
+            <SQLFragment>
+                SELECT count(*) FROM ? WHERE 1=1;
+            </SQLFragment>
+        </SQLStatement>  
+        
+        <SQLStatement method="CREATE_CONFIG_TABLE">
+            <SQLFragment>
+                CREATE TABLE config (
+                id SERIAL PRIMARY KEY,
+                code VARCHAR(100) NOT NULL,
+                value VARCHAR(255),
+                type VARCHAR(255),
+                user VARCHAR(100) NOT NULL,
+                device VARCHAR(100) NOT NULL,
+                
+                UNIQUE KEY unique_id(code,user,device));
+            </SQLFragment>
+        </SQLStatement>	
+        
+        <SQLStatement method="GET_CONFIG">
+            <SQLFragment>
+                SELECT
+            </SQLFragment>
+            <SQLFragment>
+                *
+                FROM config
+            </SQLFragment>
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                WHERE {where}
+            </SQLFragment>            
+        </SQLStatement>
+        
+        <SQLStatement method="ADD_CONFIG">
+            <SQLFragment>
+                INSERT INTO config (code,value, type, user, device) VALUES (?,?,?,?,?)
+            </SQLFragment>
+            <SQLFragment>
+                ON DUPLICATE KEY UPDATE value= VALUES(value), type=VALUES(type)
+            </SQLFragment>
+        </SQLStatement>        
+        
+        <SQLStatement method="DELETE_CONFIG">
+            <SQLFragment>
+                DELETE FROM config WHERE code  = ?;
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="UPDATE_CONFIG">
+            <SQLFragment>
+                UPDATE config SET 
+                value=?,
+                type=? 
+                WHERE code = ? AND user = ? AND device = ?
+            </SQLFragment>
+        </SQLStatement>    
+        
+        <SQLStatement method="EXIST_CONFIG">
+            <SQLFragment>
+                SELECT count(code) FROM config WHERE code=? AND user=? AND device=?;
+            </SQLFragment>
+        </SQLStatement>    
+        
+        <SQLStatement method="EXIST_CLAVE">
+            <SQLFragment>
+                SELECT count({query}) FROM {table} WHERE {query}={key};
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="EXIST_CLAVE_MULT">
+            <SQLFragment>
+                SELECT count({query}) FROM {table} WHERE {key};
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="GET_MAX_ID">
+            <SQLFragment>
+                SELECT max(id) FROM {table};
+            </SQLFragment>
+        </SQLStatement>
+        
+        
+        
+        <SQLStatement method="CREATE_PRODUCTS_TABLE">
+            <SQLFragment>
+                CREATE TABLE products(
+                id SERIAL PRIMARY KEY,
+                name VARCHAR(255) NOT NULL UNIQUE,
+                code VARCHAR(255) NOT NULL UNIQUE,      
+                description VARCHAR(500),
+                price DECIMAL(20,2),
+                variable BOOLEAN,
+                image VARCHAR(255),
+                category VARCHAR(25),
+                enabled BOOLEAN DEFAULT 1, 
+                PRIMARY KEY (id)
+                );
+            </SQLFragment>
+        </SQLStatement>	
+        
+        <SQLStatement method="ADD_PRODUCT">
+            <SQLFragment>
+                INSERT INTO products (name,code, description, price, image, category, variable, enabled) VALUES (?,?,?,?,?,?,?,?);
+            </SQLFragment>
+        </SQLStatement>        
+        
+        <SQLStatement method="GET_PRODUCT">
+            <SQLFragment>
+                SELECT
+            </SQLFragment>
+            <SQLFragment>
+                * FROM products
+            </SQLFragment>
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                WHERE {where}
+            </SQLFragment>    
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                ORDER BY {orderby}
+            </SQLFragment>        
+        </SQLStatement>
+        
+        <SQLStatement method="DELETE_PRODUCT">
+            <SQLFragment>
+                DELETE FROM products WHERE code = ?;
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="UPDATE_PRODUCT">
+            <SQLFragment>
+                UPDATE products SET 
+                name=?,                
+                code=?,                
+                description=?,
+                price=?,
+                image=?,
+                category=?,
+                variable=?,
+                enabled=? 
+                WHERE id = ?
+            </SQLFragment>
+        </SQLStatement> 
+        
+        <SQLStatement method="GET_PRODUCT_BY_PRESS_ID">
+            <SQLFragment>
+                SELECT
+                p.id,p.name,p.code,p.description,p.price,p.variable,p.image,p.category,p.enabled
+            </SQLFragment>
+            <SQLFragment>
+                FROM products p, presentation_product pp
+            </SQLFragment>
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                WHERE p.id=pp.product_id AND {where}
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="CREATE_INGREDIENTS_TABLE">
+            <SQLFragment>
+                CREATE TABLE ingredients(
+                id SERIAL PRIMARY KEY,
+                name VARCHAR(255) NOT NULL UNIQUE,
+                code VARCHAR(255) NOT NULL UNIQUE,      
+                medida VARCHAR(25),                
+                PRIMARY KEY (id)
+                );
+            </SQLFragment>
+        </SQLStatement>	
+        
+        <SQLStatement method="ADD_INGREDIENT">
+            <SQLFragment>
+                INSERT INTO ingredients (name,code,medida) VALUES (?,?,?);
+            </SQLFragment>
+        </SQLStatement>        
+        
+        <SQLStatement method="GET_INGREDIENT">
+            <SQLFragment>
+                SELECT
+            </SQLFragment>
+            <SQLFragment>
+                * FROM ingredients
+            </SQLFragment>
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                WHERE {where}
+            </SQLFragment>    
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                ORDER BY {orderby}
+            </SQLFragment>        
+        </SQLStatement>
+        
+        <SQLStatement method="DELETE_INGREDIENT">
+            <SQLFragment>
+                DELETE FROM ingredients WHERE code = ?;
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="UPDATE_INGREDIENT">
+            <SQLFragment>
+                UPDATE ingredients SET 
+                name=?,                
+                medida=? 
+                WHERE code = ?
+            </SQLFragment>
+        </SQLStatement> 
+        
+        
+        
+        <SQLStatement method="CREATE_PRODUCT_INGREDIENT_TABLE">
+            <SQLFragment>
+                CREATE TABLE product_ingredient (
+                product_id INTEGER NOT NULL,
+                ingredient_id INTEGER NOT NULL,
+                cantidad INTEGER,
+                opcional BOOLEAN DEFAULT '0',
+                FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE ON UPDATE CASCADE,
+                FOREIGN KEY (ingredient_id) REFERENCES ingredients(id) ON DELETE CASCADE ON UPDATE CASCADE
+                );
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="GET_INGREDIENTS_BY_PRODUCT">
+            <SQLFragment>
+                SELECT i.id, i.code,i.name,i.medida, pi.cantidad, pi.opcional 
+                FROM product_ingredient pi, ingredients i, products p  
+                WHERE 
+                pi.ingredient_id=i.id 
+                and pi.product_id=p.id 
+                and p.code = ?
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="CREATE_ADDITIONALS_TABLE">
+            <SQLFragment>
+                CREATE TABLE additionals(
+                id SERIAL PRIMARY KEY,
+                ingredient_id INTEGER NOT NULL,
+                precio DECIMAL(20,2)
+                );
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="ADD_ADDITIONAL">
+            <SQLFragment>
+                INSERT INTO additionals (producto_id,precio) VALUES (?,?);
+            </SQLFragment>
+        </SQLStatement>        
+        
+        <SQLStatement method="GET_ADDITIONAL">
+            <SQLFragment>
+                SELECT
+            </SQLFragment>
+            <SQLFragment>                
+                a.id, i.name,i.code,i.medida,a.precio
+            </SQLFragment>
+            <SQLFragment>
+                FROM ingredients i, additionals a                
+            </SQLFragment>
+            <SQLFragment>
+                where i.id=a.ingredient_id
+            </SQLFragment>
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                ORDER BY {orderby}
+            </SQLFragment>    
+            
+        </SQLStatement>
+        
+        <SQLStatement method="DELETE_ADDITIONAL">
+            <SQLFragment>
+                DELETE FROM additionals WHERE id = ?;
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="UPDATE_ADDITIONAL">
+            <SQLFragment>
+                UPDATE additionals SET                 
+                precio=?
+                WHERE id = ?
+            </SQLFragment>
+        </SQLStatement> 
+        
+        
+        
+        <SQLStatement method="CREATE_INVOICES_TABLE">
+            <SQLFragment>
+                CREATE TABLE invoices(
+                id SERIAL PRIMARY KEY,
+                code VARCHAR(255) NOT NULL UNIQUE,                
+                sale_date TIMESTAMP,                
+                deliveryType INTEGER, 
+                value DECIMAL(20,2),
+                numDeliverys INTEGER,
+                valueDelivery DECIMAL(20,2),
+                discount DECIMAL,                               
+                idClient VARCHAR(11),
+                idMesero INTEGER,
+                mesa INTEGER,
+                ciclo INTEGER,
+                notes VARCHAR(500),
+                isservice BOOLEAN NOT NULL DEFAULT '0',
+                service_porc DECIMAL(3,1) NOT NULL DEFAULT '0',
+                status BOOLEAN NOT NULL DEFAULT '0',
+                lastUpdatedTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+                );
+            </SQLFragment>
+        </SQLStatement>	
+        
+        <SQLStatement method="ADD_INVOICE">
+            <SQLFragment>
+                INSERT INTO invoices (code,sale_date,deliveryType,value,numDeliverys,valueDelivery,discount,idClient,idMesero,mesa,ciclo,notes, isservice, service_porc, status) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);
+            </SQLFragment>
+        </SQLStatement>        
+        
+        <SQLStatement method="GET_INVOICE">
+            <SQLFragment>
+                SELECT
+            </SQLFragment>
+            <SQLFragment>
+                * FROM invoices
+            </SQLFragment>
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                WHERE {where}
+            </SQLFragment>    
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                ORDER BY {orderby}
+            </SQLFragment>
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                LIMIT {start}, {num}
+            </SQLFragment>        
+        </SQLStatement>
+        
+        <SQLStatement method="DELETE_INVOICE">
+            <SQLFragment>
+                DELETE FROM invoices WHERE code = ?;
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="UPDATE_INVOICE">
+            <SQLFragment>
+                UPDATE invoices SET                          
+                deliveryType=?,
+                value=?,
+                numDeliverys=?,
+                valueDelivery=?,
+                discount=?,
+                idClient=?,
+                idMesero=?,
+                mesa=?,
+                ciclo=?,
+                isservice=?,
+                service_porc=?,
+                status=?
+                WHERE code = ?
+            </SQLFragment>
+        </SQLStatement> 
+        
+        <SQLStatement method="GET_INVOICE_BY_PRODUCT">
+            <SQLFragment>
+                SELECT
+            </SQLFragment>
+            <SQLFragment>
+                * FROM invoice_product LEFT JOIN invoices ON invoices.id=invoice_product.id_invoice
+            </SQLFragment>
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                WHERE {where}
+            </SQLFragment>    
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                ORDER BY {orderby}
+            </SQLFragment>        
+        </SQLStatement>
+        
+        <SQLStatement method="CREATE_ORDERS_TABLE">
+            <SQLFragment>
+                CREATE TABLE orders(
+                id SERIAL PRIMARY KEY,                 
+                take_date TIMESTAMP,
+                deliveryType INTEGER,
+                consecutive VARCHAR(11),
+                value DECIMAL(20,2),
+                idClient VARCHAR(11),
+                idWaiter INTEGER,
+                idTable INTEGER,
+                idCycle INTEGER,
+                notes VARCHAR(500),
+                status BOOLEAN NOT NULL DEFAULT '0',
+                lastUpdatedTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+                );
+            </SQLFragment>
+        </SQLStatement>	
+        
+        <SQLStatement method="ADD_ORDER">
+            <SQLFragment>
+                INSERT INTO orders (take_date,deliveryType,consecutive,value,idClient,idWaiter,idTable,idCycle,notes,status) VALUES (?,?,?,?,?,?,?,?,?,?);
+            </SQLFragment>
+        </SQLStatement>        
+        
+        <SQLStatement method="GET_ORDER">
+            <SQLFragment>
+                SELECT
+            </SQLFragment>
+            <SQLFragment>
+                * FROM orders
+            </SQLFragment>
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                WHERE {where}
+            </SQLFragment>    
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                ORDER BY {orderby}
+            </SQLFragment>
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                LIMIT {start}, {num}
+            </SQLFragment>        
+        </SQLStatement>
+        
+        <SQLStatement method="DELETE_ORDER">
+            <SQLFragment>
+                DELETE FROM orders WHERE id = ?;
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="UPDATE_ORDER">
+            <SQLFragment>
+                UPDATE orders SET          
+                deliveryType=?,
+                value=?,                
+                idClient=?,
+                idWaiter=?,
+                idTable=?,
+                idCycle=?,
+                notes=?,
+                status=?
+                WHERE id = ?
+            </SQLFragment>
+        </SQLStatement>
+        
+                        
+        <SQLStatement method="CREATE_WAITERS_TABLE">
+            <SQLFragment>
+                CREATE TABLE waiters(
+                id SERIAL PRIMARY KEY,
+                name VARCHAR(255),
+                status INTEGER,
+                color VARCHAR(15)
+                );
+            </SQLFragment>
+        </SQLStatement>	
+        
+        <SQLStatement method="GET_WAITERS">
+            <SQLFragment>
+                SELECT
+            </SQLFragment>
+            <SQLFragment>
+                * FROM waiters
+            </SQLFragment>
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                WHERE {where}
+            </SQLFragment>    
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                ORDER BY {orderby}
+            </SQLFragment>        
+        </SQLStatement>
+        
+        <SQLStatement method="CREATE_TABLES_TABLE">
+            <SQLFragment>
+                CREATE TABLE tables(
+                id SERIAL PRIMARY KEY,
+                name VARCHAR(255),
+                status INTEGER
+                );
+            </SQLFragment>
+        </SQLStatement>	
+        
+        <SQLStatement method="GET_TABLES">
+            <SQLFragment>
+                SELECT
+            </SQLFragment>
+            <SQLFragment>
+                * FROM tables
+            </SQLFragment>
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                WHERE {where}
+            </SQLFragment>    
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                ORDER BY {orderby}
+            </SQLFragment>        
+        </SQLStatement>
+        
+        <SQLStatement method="CREATE_INVOICE_PRODUCT_TABLE">
+            <SQLFragment>
+                CREATE TABLE invoice_product(
+                id SERIAL PRIMARY KEY,
+                id_invoice INTEGER NOT NULL,
+                id_order INTEGER,
+                id_product INTEGER NOT NULL,
+                id_presentation INTEGER NOT NULL,
+                price DECIMAL(20,2),
+                cantidad INTEGER,
+                delivery BOOLEAN,
+                term VARCHAR(30),
+                entry BOOLEAN,
+                request VARCHAR(200),
+                status INT NOT NULL DEFAULT 0   
+                );
+            </SQLFragment>
+        </SQLStatement>	
+        
+        <SQLStatement method="ADD_INVOICE_PRODUCT">
+            <SQLFragment>
+                INSERT INTO invoice_product (id_invoice, id_order, id_product, id_presentation, price, cantidad, delivery, term, entry, request, status) VALUES (?,?,?,?,?,?,?,?,?,?,?);
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="GET_INVOICE_PRODUCT">
+            <SQLFragment>
+                SELECT p.id, p.name, p.code, p.description, p.price, p.variable, p.image, p.category, ip.price, ip.cantidad, ip.id, ip.id_presentation
+                FROM products p, invoice_product ip, invoices i 
+                WHERE p.id = ip.id_product AND ip.id_invoice = i.id  AND i.code=?
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="GET_ORDER_PRODUCT">
+            <SQLFragment>
+                SELECT p.id, p.name, p.code, p.description, p.price, p.variable, p.image, p.category, ip.price, ip.cantidad, ip.id, ip.id_presentation,
+                ip.delivery,ip.term,ip.entry,ip.request,ip.status, GROUP_CONCAT(ps.station_id ORDER By ps.station_id ASC) AS stations
+                FROM products p, invoice_product ip, orders o, product_station ps
+                WHERE p.id = ip.id_product AND ip.id_order = o.id AND ps.product_id=p.id AND o.id=?
+                GROUP BY ip.id
+            </SQLFragment>
+        </SQLStatement>
+        
+        
+        <SQLStatement method="GET_PRODUCT_STATIONS">
+            <SQLFragment>
+                SELECT GROUP_CONCAT(ps.station_id) AS stations
+                FROM product_station ps
+                WHERE ps.product_id=?
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="CREATE_ADDITIONAL_PRODUCT_TABLE">
+            <SQLFragment>
+                CREATE TABLE additional_product(
+                id SERIAL PRIMARY KEY,
+                id_product INTEGER NOT NULL,
+                id_additional INTEGER NOT NULL,                
+                price DECIMAL(20,2),
+                cantidad INTEGER         
+                );
+            </SQLFragment>
+        </SQLStatement>	
+        
+        <SQLStatement method="ADD_ADDITIONAL_PRODUCT">
+            <SQLFragment>
+                INSERT INTO additional_product (id_product, id_additional, price, cantidad) VALUES (?,?,?,?);
+            </SQLFragment>
+        </SQLStatement>
+     
+        <SQLStatement method="GET_ADDITIONAL_PRODUCT">
+            <SQLFragment>
+                SELECT a.id, i.name, i.code, i.medida, a.precio, ap.cantidad
+                FROM ingredients i, additionals a, additional_product ap
+                WHERE ap.id_additional=a.id AND a.ingredient_id=i.id AND ap.id_product=?
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="CREATE_EXCLUSION_PRODUCT_TABLE">
+            <SQLFragment>
+                CREATE TABLE exclusion_product(
+                id SERIAL PRIMARY KEY,
+                id_product INTEGER NOT NULL,
+                id_ingredient INTEGER NOT NULL
+                );
+            </SQLFragment>
+        </SQLStatement>	
+        
+        <SQLStatement method="ADD_EXCLUSION_PRODUCT">
+            <SQLFragment>
+                INSERT INTO exclusion_product (id_product, id_ingredient) VALUES (?,?);
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="GET_EXCLUSION_PRODUCT">
+            <SQLFragment>
+                SELECT i.id, i.name, i.code, i.medida
+                FROM ingredients i, exclusion_product ep
+                WHERE i.id= ep.id_ingredient AND ep.id_product=?
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="GET_FIRST_REGISTRO">
+            <SQLFragment>
+                SELECT min({query}) FROM {table} ORDER BY {query};
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="GET_LAST_REGISTRO">
+            <SQLFragment>
+                SELECT max({query}) FROM {table} ORDER BY {query};
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="CREATE_CLIENTS_TABLE">
+            <SQLFragment>
+                CREATE TABLE clients (
+                id SERIAL PRIMARY KEY,
+                cellphone VARCHAR(15) UNIQUE,                
+                names VARCHAR(255),
+                lastname VARCHAR(255),
+                address VARCHAR(255),
+                lastUpdatedTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+                );
+            </SQLFragment>
+        </SQLStatement>		
+        
+        <SQLStatement method="GET_CLIENT">
+            <SQLFragment>
+                SELECT
+            </SQLFragment>
+            <SQLFragment>
+                * FROM clients
+            </SQLFragment>
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                WHERE {where}
+            </SQLFragment>
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                ORDER BY {orderby}
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="ADD_CLIENT">
+            <SQLFragment>
+                INSERT INTO clients (cellphone,names,lastname, address) 
+                VALUES (?,?,?,?) ON DUPLICATE KEY UPDATE cellphone=cellphone;
+            </SQLFragment>
+        </SQLStatement>	
+        
+        <SQLStatement method="DELETE_CLIENT">
+            <SQLFragment>
+                DELETE FROM clients WHERE cellphone = ?;
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="UPDATE_CLIENT">
+            <SQLFragment>
+                UPDATE clients SET         
+                names=?,        
+                lastname=?,
+                address=?
+                WHERE cellphone = ?
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="CREATE_PRESENTATION_PRODUCT_TABLE">
+            <SQLFragment>
+                CREATE TABLE presentation_product (
+                id SERIAL PRIMARY KEY,
+                product_id INTEGER NOT NULL,
+                serie INTEGER NOT NULL,
+                name VARCHAR(100),
+                price DECIMAL(20,2),
+                isdefault BOOLEAN DEFAULT '0',
+                isenabled BOOLEAN DEFAULT '1',                
+                FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE ON UPDATE CASCADE                
+                );
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="GET_PRESENTATIONS_BY_PRODUCT">
+            <SQLFragment>
+                SELECT ps.id, ps.product_id, ps.serie,ps.name,ps.price,ps.isdefault,ps.isenabled
+                FROM presentation_product ps
+                WHERE 
+                ps.product_id = ? AND ps.isenabled=1
+                ORDER BY
+                ps.price, ps.name
+            </SQLFragment>
+        </SQLStatement>
+                
+        <SQLStatement method="GET_ALL_PRESENTATIONS_BY_PRODUCT">
+            <SQLFragment>
+                SELECT ps.id, ps.product_id, ps.serie,ps.name,ps.price,ps.isdefault,ps.isenabled
+                FROM presentation_product ps
+                WHERE 
+                ps.product_id = ?
+                ORDER BY
+                ps.price, ps.name
+            </SQLFragment>
+        </SQLStatement>
+                
+        <SQLStatement method="GET_PRESENTATION_BY_DEFAULT">
+            <SQLFragment>
+                SELECT ps.id, ps.product_id, ps.serie,ps.name,ps.price,ps.isdefault,ps.isenabled
+                FROM presentation_product ps
+                WHERE 
+                ps.product_id = ? AND isdefault = ?
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="GET_PRESENTATION">
+            <SQLFragment>
+                SELECT ps.id, ps.product_id, ps.serie,ps.name,ps.price,ps.isdefault,ps.isenabled
+                FROM presentation_product ps
+                WHERE ps.id = ?
+            </SQLFragment>
+        </SQLStatement>
+        
+        
+        <SQLStatement method="CREATE_CYCLES_TABLE">
+            <SQLFragment>
+                CREATE TABLE cycles (
+                id SERIAL PRIMARY KEY,
+                init TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                ended TIMESTAMP,
+                saldo DECIMAL(20,2),
+                status BOOLEAN DEFAULT TRUE,                                
+                lastUpdatedTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+                );
+            </SQLFragment>
+        </SQLStatement>		
+        
+        <SQLStatement method="GET_CYCLE">
+            <SQLFragment>
+                SELECT
+            </SQLFragment>
+            <SQLFragment>
+                * FROM cycles
+            </SQLFragment>
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                WHERE {where}
+            </SQLFragment>
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                ORDER BY {orderby}
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="GET_LAST_CYCLE">
+            <SQLFragment>
+                SELECT
+            </SQLFragment>
+            <SQLFragment>
+                * FROM cycles
+            </SQLFragment>
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                WHERE {where}
+            </SQLFragment>
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                ORDER BY {orderby}
+            </SQLFragment>
+            <SQLFragment>
+                LIMIT 1
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="ADD_CYCLE">
+            <SQLFragment>
+                INSERT INTO cycles (saldo) 
+                VALUES (?)
+            </SQLFragment>
+        </SQLStatement>	
+        
+        <SQLStatement method="DELETE_CYCLE">
+            <SQLFragment>
+                DELETE FROM cycles WHERE id = ?;
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="UPDATE_CYCLE">
+            <SQLFragment>
+                UPDATE cycles SET         
+                ended=?,
+                status=?
+                WHERE id = ?
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="CREATE_OTHER_PRODUCTS_TABLE">
+            <SQLFragment>
+                CREATE TABLE other_products(
+                id SERIAL PRIMARY KEY,
+                name VARCHAR(255) NOT NULL UNIQUE,                
+                description VARCHAR(500),
+                price DECIMAL(20,2)
+                );
+            </SQLFragment>
+        </SQLStatement>	
+        
+        <SQLStatement method="ADD_OTHER_PRODUCT">
+            <SQLFragment>
+                INSERT INTO other_products (name, description, price) VALUES (?,?,?)
+            </SQLFragment>
+            <SQLFragment>
+                ON DUPLICATE KEY UPDATE description=VALUES(description), price=VALUES(price)                
+            </SQLFragment>
+        </SQLStatement>        
+        
+        <SQLStatement method="GET_OTHER_PRODUCT">
+            <SQLFragment>
+                SELECT
+            </SQLFragment>
+            <SQLFragment>
+                * FROM other_products
+            </SQLFragment>
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                WHERE {where}
+            </SQLFragment>    
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                ORDER BY {orderby}
+            </SQLFragment>        
+        </SQLStatement>
+        
+        <SQLStatement method="DELETE_OTHER_PRODUCT">
+            <SQLFragment>
+                DELETE FROM other_products WHERE id = ?;
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="CREATE_INVOICE_OTHER_PRODUCT_TABLE">
+            <SQLFragment>
+                CREATE TABLE invoice_otherproduct(
+                id SERIAL PRIMARY KEY,
+                id_invoice INTEGER NOT NULL,
+                id_otherproduct INTEGER NOT NULL,
+                cantidad INTEGER,
+                price DECIMAL(20,2)            
+                );
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="ADD_INVOICE_OTHER_PRODUCT">
+            <SQLFragment>
+                INSERT INTO invoice_otherproduct (id_invoice, id_otherproduct, cantidad, price) VALUES (?,?,?,?);
+            </SQLFragment>
+        </SQLStatement>
+                
+        <SQLStatement method="GET_CATEGORIES_SORTED">
+            <SQLFragment>
+                SELECT p.category, sum(ip.cantidad) as cantidad
+                FROM invoice_product ip, products p
+                WHERE ip.id_product = p.id
+                GROUP BY p.category
+                ORDER BY cantidad DESC                
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="GET_ALL_CATEGORIES">
+            <SQLFragment>
+                SELECT p.category
+                FROM products p
+                GROUP BY p.category
+                ORDER BY p.category DESC                
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="GET_CATEGORY">
+            <SQLFragment>
+                SELECT p.category
+                FROM products p
+            </SQLFragment>
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                WHERE {where}
+            </SQLFragment>    
+            <SQLFragment>
+                GROUP BY p.category
+                ORDER BY p.category DESC
+            </SQLFragment>
+                            
+            
+        </SQLStatement>
+
+
+        <SQLStatement method="CREATE_EXPENSES_INCOMES_TABLE">            
+            <SQLFragment>
+                CREATE TABLE expenses_incomes(
+                id SERIAL PRIMARY KEY,
+                type INTEGER NOT NULL,
+                description VARCHAR(100),
+                value DECIMAL(20,2),
+                note VARCHAR(255),
+                cycle_id INTEGER NOT NULL,
+                category_id INTEGER NOT NULL,                      
+                FOREIGN KEY (cycle_id) REFERENCES cycles(id) ON DELETE CASCADE ON UPDATE CASCADE,                       
+                FOREIGN KEY (category_id) REFERENCES expenses_categories(id) ON DELETE CASCADE ON UPDATE CASCADE                       
+                );
+            </SQLFragment>
+        </SQLStatement>   
+        
+        <SQLStatement method="ADD_EXPENSE_INCOME">
+            <SQLFragment>
+                INSERT INTO expenses_incomes (type,description,value,note,cycle_id,category_id) 
+                VALUES (?,?,?,?,?,?)
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="GET_EXPENSE_INCOME">
+            <SQLFragment>
+                SELECT
+            </SQLFragment>
+            <SQLFragment>
+                * FROM expenses_incomes
+            </SQLFragment>
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                WHERE {where}
+            </SQLFragment>    
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                ORDER BY {orderby}
+            </SQLFragment>        
+        </SQLStatement>	     
+        
+        <SQLStatement method="CREATE_EXPENSES_CATEGORIES_TABLE">            
+            <SQLFragment>
+                CREATE TABLE expenses_categories(
+                id SERIAL PRIMARY KEY,
+                category VARCHAR(30) NOT NULL UNIQUE
+                );
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="ADD_EXPENSES_CATEGORY">
+            <SQLFragment>
+                INSERT INTO expenses_categories (category) VALUES (?);
+            </SQLFragment>
+        </SQLStatement>        
+        
+        <SQLStatement method="GET_EXPENSES_CATEGORY">
+            <SQLFragment>
+                SELECT
+            </SQLFragment>
+            <SQLFragment>
+                * FROM expenses_categories
+            </SQLFragment>
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                WHERE {where}
+            </SQLFragment>    
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                ORDER BY {orderby}
+            </SQLFragment>        
+        </SQLStatement>
+        
+        <SQLStatement method="UPDATE_EXPENSES_CATEGORY">
+            <SQLFragment>
+                UPDATE expenses_categories SET 
+                category=?
+                WHERE category = ?;
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="DELETE_EXPENSES_CATEGORY">
+            <SQLFragment>
+                DELETE FROM expenses_categories WHERE category = ?;
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="CREATE_INVENTORY_TABLE">            
+            <SQLFragment>
+                CREATE TABLE inventory (
+                    id SERIAL PRIMARY KEY,
+                    name VARCHAR(255),
+                    quantity DECIMAL(12,2),
+                    measure VARCHAR(100),
+                    cost DECIMAL(20,2),
+                    price DECIMAL(20,2),
+                    location INTEGER,
+                    stock DECIMAL(12,2),
+                    stockMin DECIMAL(12,2),
+                    average DECIMAL(20,2),
+                    init DECIMAL(12,2),
+                    onlyDelivery BOOLEAN,
+                    snapshot BOOLEAN,
+                    tags VARCHAR(255),
+                    enabled BOOLEAN,
+                    createdTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    lastUpdatedTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    id_user VARCHAR(25) NOT NULL DEFAULT 'USER_DF'
+                );
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="CREATE_INVENTORY_PRODUCT_TABLE">            
+            <SQLFragment>
+                CREATE TABLE inventory_product(
+                id SERIAL PRIMARY KEY,
+                item_id INTEGER NOT NULL,                
+                presentation_id INTEGER NOT NULL,
+                product_id INTEGER,
+                quantity DECIMAL(12,2),
+                
+                FOREIGN KEY (item_id) REFERENCES inventory(id) ON DELETE CASCADE ON UPDATE CASCADE,                
+                FOREIGN KEY (presentation_id) REFERENCES presentation_product(id) ON DELETE CASCADE ON UPDATE CASCADE
+                );
+            </SQLFragment>
+        </SQLStatement>   
+        
+        <SQLStatement method="GET_ITEM">
+            <SQLFragment>
+                SELECT
+            </SQLFragment>
+            <SQLFragment>
+                * FROM inventory
+            </SQLFragment>
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                WHERE {where}
+            </SQLFragment>    
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                ORDER BY {orderby}
+            </SQLFragment>        
+        </SQLStatement>
+        
+        <SQLStatement method="ADD_ITEM">
+            <SQLFragment>
+                INSERT INTO inventory (name,quantity,measure,cost,price,location,stock,stockmin,average,init,onlyDelivery,tags,snapshot,enabled,id_user) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);                
+            </SQLFragment>            
+        </SQLStatement>
+        
+        <SQLStatement method="ADD_INVENTORY_PRESENTATION">
+            <SQLFragment>
+                INSERT INTO inventory_product (item_id, product_id, presentation_id, quantity) VALUES (?,?,?,?);
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="ADD_INVENTORY_PRODUCT">
+            <SQLFragment>
+                INSERT INTO inventory_product (item_id, product_id, quantity) VALUES (?,?,?);
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="DELETE_ITEM_PRES">
+            <SQLFragment>
+                DELETE FROM inventory_product WHERE item_id = ?;                
+            </SQLFragment>  
+        </SQLStatement>
+        
+        <SQLStatement method="UPDATE_ITEM">
+            <SQLFragment>
+                UPDATE inventory SET
+                name=?,                 
+                cost=?,
+                price=?,
+                stock=?,
+                stockMin=?,
+                onlyDelivery=?,                 
+                tags=?,
+                snapshot=?,
+                enabled=? 
+                WHERE id = ?
+            </SQLFragment>            
+        </SQLStatement>
+        
+        <SQLStatement method="DELETE_ITEM">
+            <SQLFragment>
+                DELETE FROM inventory WHERE id = ?;
+            </SQLFragment>  
+        </SQLStatement>
+        
+        <SQLStatement method="CREATE_UNITS_TABLE">
+            <SQLFragment>
+                CREATE TABLE units(
+                id SERIAL PRIMARY KEY,
+                name VARCHAR(255) NOT NULL UNIQUE
+                );
+            </SQLFragment>
+        </SQLStatement>	
+        
+        <SQLStatement method="ADD_UNIT">
+            <SQLFragment>
+                INSERT INTO units (name) VALUES (?);
+            </SQLFragment>
+        </SQLStatement>        
+        
+        <SQLStatement method="GET_UNIT">
+            <SQLFragment>
+                SELECT
+            </SQLFragment>
+            <SQLFragment>
+                * FROM units
+            </SQLFragment>
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                WHERE {where}
+            </SQLFragment>    
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                ORDER BY {orderby}
+            </SQLFragment>        
+        </SQLStatement>
+        
+        <SQLStatement method="DELETE_UNIT">
+            <SQLFragment>
+                DELETE FROM units WHERE name = ?;
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="UPDATE_UNIT">
+            <SQLFragment>
+                UPDATE units SET 
+                name=?
+                WHERE name = ?;
+            </SQLFragment>
+        </SQLStatement> 
+        
+        <SQLStatement method="CHECK_INVENTORY">
+            <SQLFragment>
+                SELECT i.id, i.name, pp.name as pres, i.measure, i.quantity as exist, ip.presentation_id as idPres, ip.quantity, i.onlyDelivery 
+                FROM inventory i, inventory_product ip, presentation_product pp 
+                WHERE i.id=ip.item_id AND pp.id=ip.presentation_id AND ip.presentation_id=?
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="CHECK_INVENTORY_PRODUCT">
+            <SQLFragment>
+                SELECT i.id, i.name, p.name as pres, i.measure, i.quantity as exist, ip.presentation_id as idPres, ip.quantity, i.onlyDelivery 
+                FROM inventory i, products p, inventory_product ip 
+                WHERE i.id=ip.item_id AND p.id=ip.product_id AND ip.product_id=?
+            </SQLFragment>
+        </SQLStatement>
+                
+        <SQLStatement method="UPDATE_INVENTORY_QUANTITY">
+            <SQLFragment>
+                UPDATE inventory SET quantity = ?
+                WHERE id = ? 
+            </SQLFragment>
+        </SQLStatement> 
+        
+        <SQLStatement method="ADD_INVENTORY_QUANTITY">
+            <SQLFragment>
+                UPDATE inventory SET quantity = quantity + ?
+                WHERE id = ? 
+            </SQLFragment>
+        </SQLStatement> 
+        
+        
+        <SQLStatement method="CREATE_CONCILIACIONES_TABLE">
+            <SQLFragment>
+                CREATE TABLE conciliaciones ( 
+                id SERIAL PRIMARY KEY,
+                codigo VARCHAR(10) NOT NULL UNIQUE,                
+                fecha DATE,
+                idItem INTEGER,	
+                existencias DECIMAL(12,2),
+                conciliacion DECIMAL(12,2),
+                locacion INTEGER,
+                nota VARCHAR(500),
+                lastUpdatedTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                user_id VARCHAR(25)
+                );
+            </SQLFragment>
+        </SQLStatement>	
+		
+        <SQLStatement method="GET_CONCILIACION">
+            <SQLFragment>
+                SELECT
+            </SQLFragment>
+            <SQLFragment>
+                * FROM conciliaciones
+            </SQLFragment>
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                WHERE {where}
+            </SQLFragment>
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                ORDER BY {orderby}
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="ADD_CONCILIACION">
+            <SQLFragment>
+                INSERT INTO conciliaciones (codigo,fecha,idItem,existencias,conciliacion,locacion,nota,user_id) VALUES (?,?,?,?,?,?,?,?);
+            </SQLFragment>
+        </SQLStatement>	
+        
+        <SQLStatement method="DELETE_CONCILIACION">
+            <SQLFragment>
+                DELETE FROM conciliaciones WHERE id = ?;
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="UPDATE_CONCILIACION">
+            <SQLFragment>
+                UPDATE conciliaciones SET                 
+                codigo=?,
+                fecha=?,
+                idItem=?,
+                existencias=?,
+                conciliacion=?,
+                locacion=?,
+                nota=?,
+                user_id=?
+                WHERE id = ?
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="CREATE_LOCATIONS_TABLE">
+            <SQLFragment>
+                CREATE TABLE locations(
+                id SERIAL PRIMARY KEY,
+                name VARCHAR(255) NOT NULL UNIQUE,
+                address VARCHAR(255),
+                salePoint BOOLEAN
+                );
+            </SQLFragment>
+        </SQLStatement>	
+        
+        <SQLStatement method="ADD_LOCATION">
+            <SQLFragment>
+                INSERT INTO locations (name, address, salePoint) VALUES (?,?,?);
+            </SQLFragment>
+        </SQLStatement>        
+        
+        <SQLStatement method="GET_LOCATION">
+            <SQLFragment>
+                SELECT
+            </SQLFragment>
+            <SQLFragment>
+                * FROM locations
+            </SQLFragment>
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                WHERE {where}
+            </SQLFragment>    
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                ORDER BY {orderby}
+            </SQLFragment>        
+        </SQLStatement>
+        
+        <SQLStatement method="DELETE_LOCATION">
+            <SQLFragment>
+                DELETE FROM locations WHERE id = ?;
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="UPDATE_LOCATION">
+            <SQLFragment>
+                UPDATE locations SET 
+                name=?,
+                address=?,
+                salePoint=?
+                WHERE id = ?
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="CREATE_INVENTORY_REGISTER_TABLE">
+            <SQLFragment>
+                CREATE TABLE inventory_register(
+                id SERIAL PRIMARY KEY,
+                idItem INTEGER,
+                event INT,
+                quantity DECIMAL(12,2),    
+                lastUpdatedTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,    
+		        idUser INTEGER
+                );
+            </SQLFragment>
+        </SQLStatement> 
+        
+        <SQLStatement method="ADD_INVENTORY_EVENT">
+            <SQLFragment>
+                INSERT INTO inventory_register (idItem,event, quantity, idUser) VALUES (?,?,?,?);
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="GET_INVENTORY_EVENT_LIST">
+            <SQLFragment>
+                SELECT
+            </SQLFragment>
+            <SQLFragment>
+                * FROM inventory_register
+            </SQLFragment>
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                WHERE {where}
+            </SQLFragment>    
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                ORDER BY {orderby}
+            </SQLFragment>        
+        </SQLStatement>
+        
+        <SQLStatement method="GET_PRODUCTS_OUT_INVENTORY">
+            <SQLFragment>
+                SELECT p.id as id, p.name as name, sum(ip.cantidad*ivp.quantity) as quantity, i.deliveryType as deliveryType
+                FROM  invoices i, invoice_product ip, products p
+                LEFT JOIN inventory_product ivp ON
+                p.id = ivp.product_id 
+                WHERE i.id=ip.id_invoice AND ip.id_product=p.id and i.status=0 AND ip.id_product=? AND ivp.item_id=? 
+                AND (i.sale_date BETWEEN ? AND ?)
+                GROUP BY p.id
+            </SQLFragment>            
+        </SQLStatement>
+                
+        <SQLStatement method="GET_PRESENTATIONS_OUT_INVENTORY">
+            <SQLFragment>                
+                SELECT
+                p.name,
+                pp.name AS pres,
+                sum(ip.cantidad * ivp.quantity) AS quantity,
+                ip.id_presentation,
+                p.id AS prod_id,
+                ivp.item_id,
+                i.sale_date,
+                i.deliveryType AS deliveryType
+                FROM
+                invoice_product ip
+                LEFT JOIN inventory_product ivp ON
+                ip.id_presentation = ivp.presentation_id,
+                presentation_product pp,
+                products p,
+                invoices i
+                WHERE
+                ip.id_presentation = ? AND ivp.item_id = ? 
+                AND ip.id_presentation = pp.id AND pp.product_id = p.id
+                AND ip.id_invoice = i.id
+                AND (i.sale_date BETWEEN ? AND ?)
+                AND i.status=0                
+            </SQLFragment>            
+        </SQLStatement>
+        
+        <SQLStatement method="GET_ITEM_PRESENTATIONS">
+            <SQLFragment>
+                SELECT * FROM inventory_product ip WHERE ip.item_id=?
+            </SQLFragment>
+        </SQLStatement>
+        
+        
+        <SQLStatement method="GET_PRODUCTS_SALES">
+            <SQLFragment>
+                SELECT
+                ivp.id_product as idProd, ivp.id_presentation as idPres, p.category as cat, p.name as name,
+                pp.name as pres, sum(ivp.cantidad) as quantity, sum(ivp.price*ivp.cantidad) as total
+                FROM 
+                invoice_product ivp
+                LEFT JOIN presentation_product pp ON ivp.id_presentation=pp.id
+                LEFT JOIN invoices i on ivp.id_invoice=i.id,
+                products p
+                WHERE
+                ivp.id_product=p.id AND i.status=0
+                AND (i.sale_date BETWEEN ? AND ?)
+                GROUP BY
+                p.category, ivp.id_product, ivp.id_presentation
+                ORDER BY p.category, p.name
+            </SQLFragment>
+            
+        </SQLStatement>
+        
+        <SQLStatement method="GET_LAST_INVOICE_BY_CLIENT">
+            <SQLFragment>
+                SELECT * from invoices where idClient=? ORDER BY code DESC LIMIT 1
+            </SQLFragment>            
+        </SQLStatement>
+        
+        
+        <SQLStatement method="CREATE_PAYMENTS_TABLE">
+            <SQLFragment>
+                CREATE TABLE payments(
+                id SERIAL PRIMARY KEY,
+                name VARCHAR(255) NOT NULL UNIQUE,
+                zorder INTEGER
+                );
+            </SQLFragment>
+        </SQLStatement>	
+        
+        <SQLStatement method="ADD_PAYMENT">
+            <SQLFragment>
+                INSERT INTO payments (name,zorder) VALUES (?,?);
+            </SQLFragment>
+        </SQLStatement>        
+        
+        <SQLStatement method="GET_PAYMENT">
+            <SQLFragment>
+                SELECT
+            </SQLFragment>
+            <SQLFragment>
+                * FROM payments
+            </SQLFragment>
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                WHERE {where}
+            </SQLFragment>    
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                ORDER BY {orderby}
+            </SQLFragment>        
+        </SQLStatement>
+        
+        <SQLStatement method="DELETE_PAYMENT">
+            <SQLFragment>
+                DELETE FROM payments WHERE name = ?;
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="UPDATE_PAYMENT">
+            <SQLFragment>
+                UPDATE payments SET 
+                name=?,
+                zorder=?
+                WHERE name = ?;
+            </SQLFragment>
+        </SQLStatement> 
+        
+        <SQLStatement method="CREATE_INVENTORY_SNAPSHOT_TABLE">            
+            <SQLFragment>
+                CREATE TABLE inventory_snapshot(
+                id SERIAL PRIMARY KEY,
+                item_id INTEGER NOT NULL,                
+                cycle_id INTEGER NOT NULL,
+                quantity DECIMAL(12,2),
+                ins DECIMAL(12,2),
+                outs DECIMAL(12,2),
+                conciliations DECIMAL(12,2),
+                sales DECIMAL(12,2),
+                final DECIMAL(12,2),
+                isOnlyDelivery BOOLEAN,
+                lastUpdatedTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,                
+                FOREIGN KEY (item_id) REFERENCES inventory(id) ON DELETE CASCADE ON UPDATE CASCADE,                
+                FOREIGN KEY (cycle_id) REFERENCES cycles(id) ON DELETE CASCADE ON UPDATE CASCADE
+                );
+            </SQLFragment>
+        </SQLStatement>
+                
+        <SQLStatement method="ADD_INVENTORY_SNAPSHOT_ITEM">
+            <SQLFragment>
+                INSERT INTO inventory_snapshot (item_id, cycle_id,quantity,ins,outs,conciliations,sales,final,isOnlyDelivery) 
+                VALUES (?,?,?,?,?,?,?,?,?);
+            </SQLFragment>            
+        </SQLStatement>
+        
+        <SQLStatement method="UPDATE_INVENTORY_SNAPSHOT_ITEM">
+            <SQLFragment>
+                UPDATE inventory_snapshot SET
+                ins =?,
+                outs=?,
+                conciliations=?,
+                sales=?,
+                final=?
+                WHERE id = ?;
+            </SQLFragment>            
+        </SQLStatement>
+        
+        <SQLStatement method="GET_INVENTORY_SNAPSHOT_ITEM">
+            <SQLFragment>
+                SELECT s.id, s.item_id, s.cycle_id, s.quantity, i.name, s.ins, s.outs,s.conciliations,s.sales,s.final,i.quantity,s.isOnlyDelivery 
+                FROM inventory_snapshot s, inventory i
+            </SQLFragment>            
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                WHERE i.id= s.item_id AND {where} 
+            </SQLFragment>
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                ORDER BY {orderby}
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="COUNT_ITEM_SNAP_EVENT">
+            <SQLFragment>
+                SELECT sum(ir.quantity) as sum FROM inventory_register ir WHERE ir.idItem=? AND ir.event=? AND (lastUpdatedTime BETWEEN ? AND ?)
+            </SQLFragment>            
+        </SQLStatement>
+        
+        <SQLStatement method="COUNT_ITEM_CONCILIATION_EVENT">
+            <SQLFragment>
+                SELECT sum(c.conciliacion-c.existencias) as sum FROM conciliaciones c WHERE c.idItem=? AND (c.lastUpdatedTime BETWEEN ? AND ?)
+            </SQLFragment>            
+        </SQLStatement>
+             
+        
+        <SQLStatement method="GET_TAGS_INVENTORY_LIST">
+            <SQLFragment>
+                SELECT tags FROM inventory
+            </SQLFragment>
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                WHERE {where}
+            </SQLFragment>
+            <SQLFragment>
+                GROUP BY tags
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="GET_PRODUCTS_BY_VARPRICE_RANK_LIST">
+            <SQLFragment>
+                SELECT id,id_product,price, count(id) as rank FROM invoice_product            
+                WHERE id_product=?
+                GROUP BY price
+                ORDER BY rank DESC
+                LIMIT ?
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="CREATE_CATEGORIES_TABLE">
+            <SQLFragment>
+                CREATE TABLE categories(
+                id SERIAL PRIMARY KEY,
+                name VARCHAR(255) NOT NULL UNIQUE,
+                zorder INTEGER
+                );
+            </SQLFragment>
+        </SQLStatement>	
+        
+        <SQLStatement method="ADD_CATEGORY">
+            <SQLFragment>
+                INSERT INTO categories (name,zorder) VALUES (?,?);
+            </SQLFragment>
+        </SQLStatement>        
+        
+        <SQLStatement method="GET_CATEGORY_PROD">
+            <SQLFragment>
+                SELECT
+            </SQLFragment>
+            <SQLFragment>
+                * FROM categories
+            </SQLFragment>
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                WHERE {where}
+            </SQLFragment>    
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                ORDER BY {orderby}
+            </SQLFragment>        
+        </SQLStatement>
+        
+        <SQLStatement method="UPDATE_CATEGORY">
+            <SQLFragment>
+                UPDATE categories SET 
+                name=?
+                WHERE name = ?;
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="ADD_PRESENTATION">
+            <SQLFragment>
+                INSERT INTO presentation_product (name,price,serie,isdefault,isenabled,product_id) VALUES (?,?,?,?,?,?);
+            </SQLFragment>
+        </SQLStatement> 
+        
+        <SQLStatement method="UPDATE_PRESENTATION">
+            <SQLFragment>
+                UPDATE  presentation_product SET
+                name =?,
+                price=?,
+                serie=?,
+                isdefault=?,
+                isenabled=?
+                WHERE id = ?
+            </SQLFragment>
+        </SQLStatement> 
+        
+        <SQLStatement method="UPDATE_PRESENTATION_TO_DEFAULT">
+            <SQLFragment>
+                UPDATE presentation_product SET                
+                isdefault=? 
+                WHERE product_id = ?;
+            </SQLFragment>            
+        </SQLStatement> 
+        
+        <SQLStatement method="UPDATE_PRESENTATION_TO_DEFAULT_BY_ID">
+            <SQLFragment>
+                UPDATE presentation_product SET                
+                isdefault=? 
+                WHERE product_id = ? AND id =?;
+            </SQLFragment>
+            
+        </SQLStatement> 
+        
+        <SQLStatement method="CREATE_STATIONS_TABLE">
+            <SQLFragment>
+                CREATE TABLE stations(
+                id SERIAL PRIMARY KEY,
+                name VARCHAR(255) NOT NULL UNIQUE,
+                printer VARCHAR(100)
+                );
+            </SQLFragment>
+        </SQLStatement>	
+        
+        <SQLStatement method="ADD_STATION">
+            <SQLFragment>
+                INSERT INTO stations (name, printer) VALUES (?,?);
+            </SQLFragment>
+        </SQLStatement>        
+        
+        <SQLStatement method="GET_STATIONS">
+            <SQLFragment>
+                SELECT
+            </SQLFragment>
+            <SQLFragment>
+                * FROM stations
+            </SQLFragment>
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                WHERE {where}
+            </SQLFragment>    
+            <SQLFragment excludeIfNamedParamEmpty="TRUE">
+                ORDER BY {orderby}
+            </SQLFragment>        
+        </SQLStatement>
+        
+        <SQLStatement method="CREATE_PRODUCT_STATION_TABLE">
+            <SQLFragment>
+                        CREATE TABLE product_station(
+                            id SERIAL PRIMARY KEY,
+                         product_id INTEGER NOT NULL,
+                         station_id INTEGER NOT NULL,
+                FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE ON UPDATE CASCADE,
+                FOREIGN KEY (station_id) REFERENCES stations(id) ON DELETE CASCADE ON UPDATE CASCADE
+                                      );
+                                </SQLFragment>
+                               </SQLStatement>
+
+                  <SQLStatement method="GET_STATION_BY_ID">
+                                <SQLFragment>
+                      SELECT * from stations WHERE id=?;
+                                </SQLFragment>
+                               </SQLStatement>
+
+
+
+              <SQLStatement method="COUNT_UNINVOICED_PRODUCTS">
+                                <SQLFragment>
+   SELECT count(id) from invoice_product WHERE id_order=? AND id_invoice=0;
+                                </SQLFragment>
+                               </SQLStatement>
+
+               <SQLStatement method="GET_UNINVOICED_PRODUCTS">
+                                <SQLFragment>
+                SELECT p.id, p.name, p.code, p.description, p.price, p.variable, p.image, p.category, ip.price, ip.cantidad, ip.id, ip.id_presentation,
+                ip.delivery,ip.term,ip.entry,ip.request,ip.status, GROUP_CONCAT(ps.station_id ORDER By ps.station_id ASC) AS stations
+      FROM products p, invoice_product ip, orders o, product_station ps
+                WHERE p.id = ip.id_product AND ip.id_order = o.id AND ps.product_id=p.id AND o.id=? AND ip.id_invoice>0
+                                GROUP BY ip.id
+                                </SQLFragment>
+                               </SQLStatement>
+
+
+
+                               </DAOStatements>
+
+
+    
 </DAOConfiguration>
