@@ -285,7 +285,7 @@ public class Control {
     public ArrayList<Permission> getPermissionList() {
         try {
             JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
-            return utilDAO.getPermissionList("TRUE");
+            return utilDAO.getPermissionList("");
         } catch (DAOException ex) {
             logger.error("Error getting permissions.", ex);
             return null;

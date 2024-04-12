@@ -138,7 +138,7 @@ public class JDBCConfigDAO implements ConfigDAO {
                 configDB.setClave(rs.getString("code"));
                 configDB.setValor(rs.getString("value"));
                 configDB.setTipo(rs.getString("type"));
-                configDB.setUser(rs.getString("user"));
+                configDB.setUser(rs.getString("username"));
                 configDB.setDevice(rs.getString("device"));
             }
         } catch (SQLException e) {
@@ -157,7 +157,7 @@ public class JDBCConfigDAO implements ConfigDAO {
             throw new IllegalArgumentException("Null clave");
         }
         try {
-            String where = "code='" + code + "' AND user='" + user + "' AND device='" + device + "'";
+            String where = "code='" + code + "' AND username='" + user + "' AND device='" + device + "'";
             SQLExtractor sqlExtractorWhere = new SQLExtractor(where, SQLExtractor.Type.WHERE);
             Map<String, String> namedParams = new HashMap<String, String>();
             namedParams.put(NAMED_PARAM_WHERE, sqlExtractorWhere.extractWhere());
@@ -183,7 +183,7 @@ public class JDBCConfigDAO implements ConfigDAO {
                 configDB.setClave(rs.getString("code"));
                 configDB.setValor(rs.getString("value"));
                 configDB.setTipo(rs.getString("type"));
-                configDB.setUser(rs.getString("user"));
+                configDB.setUser(rs.getString("username"));
                 configDB.setDevice(rs.getString("device"));
             }
         } catch (SQLException e) {

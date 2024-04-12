@@ -2242,13 +2242,11 @@
         <SQLStatement method="CREATE_USERS_TABLE">
             <SQLFragment>
                 CREATE TABLE users (
-                id INTEGER NOT NULL AUTO_INCREMENT,
-                username VARCHAR(100),
+                id SERIAL PRIMARY KEY,
+                username VARCHAR(100) UNIQUE,
                 password VARCHAR(100),
                 access_level VARCHAR(100),
-                createdTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                UNIQUE (username),
-                PRIMARY KEY (id)
+                createdTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP               
                 );
             </SQLFragment>
         </SQLStatement>
@@ -2326,7 +2324,7 @@
 		
         <SQLStatement method="CHECK_USER_PASSWORD">
             <SQLFragment>
-                SELECT password, id, access_level FROM users WHERE username = ? AND STRCMP(BINARY password, ?) = 0;
+                SELECT password, id, access_level FROM users WHERE username = ? AND CASE WHEN password = ? THEN 0 ELSE 1 END = 0;
             </SQLFragment>
         </SQLStatement>		
         
@@ -2581,11 +2579,11 @@
                 email VARCHAR(255),
                 votingPlace VARCHAR(255),
                 votingTable INTEGER,
-                witness BOOLEAN DEFAULT '0',
-                jury BOOLEAN DEFAULT '0',
-                volunteer BOOLEAN DEFAULT '0',
-                hardvote BOOLEAN DEFAULT '0',
-                giveVehicle BOOLEAN DEFAULT '0',
+                witness INTEGER DEFAULT 0,
+                jury INTEGER DEFAULT 0,
+                volunteer INTEGER DEFAULT 0,
+                hardvote INTEGER DEFAULT 0,
+                giveVehicle INTEGER DEFAULT 0,
                 typeVehicle VARCHAR(255),
                 compromise VARCHAR(255),
                 photo BLOB DEFAULT NULL,
@@ -2736,10 +2734,10 @@
                 code VARCHAR(100) NOT NULL,
                 value VARCHAR(255),
                 type VARCHAR(255),
-                user VARCHAR(100) NOT NULL,
-                device VARCHAR(100) NOT NULL,
-                
-                UNIQUE KEY unique_id(code,user,device));
+                username VARCHAR(100) NOT NULL,
+                device VARCHAR(100) NOT NULL,                
+                CONSTRAINT unique_id UNIQUE (code, username, device)
+                );
             </SQLFragment>
         </SQLStatement>	
         
@@ -2758,10 +2756,11 @@
         
         <SQLStatement method="ADD_CONFIG">
             <SQLFragment>
-                INSERT INTO config (code,value, type, user, device) VALUES (?,?,?,?,?)
+                INSERT INTO config (code,value, type, username, device) VALUES (?,?,?,?,?)
             </SQLFragment>
             <SQLFragment>
-                ON DUPLICATE KEY UPDATE value= VALUES(value), type=VALUES(type)
+                ON CONFLICT (code, username, device) 
+                DO UPDATE SET value = EXCLUDED.value, type = EXCLUDED.type;
             </SQLFragment>
         </SQLStatement>        
         
@@ -2776,13 +2775,13 @@
                 UPDATE config SET 
                 value=?,
                 type=? 
-                WHERE code = ? AND user = ? AND device = ?
+                WHERE code = ? AND username = ? AND device = ?
             </SQLFragment>
         </SQLStatement>    
         
         <SQLStatement method="EXIST_CONFIG">
             <SQLFragment>
-                SELECT count(code) FROM config WHERE code=? AND user=? AND device=?;
+                SELECT count(code) FROM config WHERE code=? AND username=? AND device=?;
             </SQLFragment>
         </SQLStatement>    
         
@@ -2814,11 +2813,10 @@
                 code VARCHAR(255) NOT NULL UNIQUE,      
                 description VARCHAR(500),
                 price DECIMAL(20,2),
-                variable BOOLEAN,
+                variable INTEGER,
                 image VARCHAR(255),
                 category VARCHAR(25),
-                enabled BOOLEAN DEFAULT 1, 
-                PRIMARY KEY (id)
+                enabled INTEGER DEFAULT 1
                 );
             </SQLFragment>
         </SQLStatement>	
@@ -2884,8 +2882,7 @@
                 id SERIAL PRIMARY KEY,
                 name VARCHAR(255) NOT NULL UNIQUE,
                 code VARCHAR(255) NOT NULL UNIQUE,      
-                medida VARCHAR(25),                
-                PRIMARY KEY (id)
+                medida VARCHAR(25)
                 );
             </SQLFragment>
         </SQLStatement>	
@@ -2934,7 +2931,7 @@
                 product_id INTEGER NOT NULL,
                 ingredient_id INTEGER NOT NULL,
                 cantidad INTEGER,
-                opcional BOOLEAN DEFAULT '0',
+                opcional INTEGER DEFAULT 0,
                 FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE ON UPDATE CASCADE,
                 FOREIGN KEY (ingredient_id) REFERENCES ingredients(id) ON DELETE CASCADE ON UPDATE CASCADE
                 );
@@ -3019,9 +3016,9 @@
                 mesa INTEGER,
                 ciclo INTEGER,
                 notes VARCHAR(500),
-                isservice BOOLEAN NOT NULL DEFAULT '0',
-                service_porc DECIMAL(3,1) NOT NULL DEFAULT '0',
-                status BOOLEAN NOT NULL DEFAULT '0',
+                isservice INTEGER NOT NULL DEFAULT 0,
+                service_porc DECIMAL(3,1) NOT NULL DEFAULT 0,
+                status INTEGER NOT NULL DEFAULT 0,
                 lastUpdatedTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
                 );
             </SQLFragment>
@@ -3104,7 +3101,7 @@
                 idTable INTEGER,
                 idCycle INTEGER,
                 notes VARCHAR(500),
-                status BOOLEAN NOT NULL DEFAULT '0',
+                status INTEGER NOT NULL DEFAULT 0,
                 lastUpdatedTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
                 );
             </SQLFragment>
@@ -3217,9 +3214,9 @@
                 id_presentation INTEGER NOT NULL,
                 price DECIMAL(20,2),
                 cantidad INTEGER,
-                delivery BOOLEAN,
+                delivery INTEGER,
                 term VARCHAR(30),
-                entry BOOLEAN,
+                entry INTEGER,
                 request VARCHAR(200),
                 status INT NOT NULL DEFAULT 0   
                 );
@@ -3311,13 +3308,13 @@
         
         <SQLStatement method="GET_FIRST_REGISTRO">
             <SQLFragment>
-                SELECT min({query}) FROM {table} ORDER BY {query};
+                SELECT min({query}) FROM {table} GROUP BY {query} ORDER BY {query};
             </SQLFragment>
         </SQLStatement>
         
         <SQLStatement method="GET_LAST_REGISTRO">
             <SQLFragment>
-                SELECT max({query}) FROM {table} ORDER BY {query};
+                SELECT max({query}) FROM {table}  GROUP BY {query} ORDER BY {query};
             </SQLFragment>
         </SQLStatement>
         
@@ -3352,7 +3349,8 @@
         <SQLStatement method="ADD_CLIENT">
             <SQLFragment>
                 INSERT INTO clients (cellphone,names,lastname, address) 
-                VALUES (?,?,?,?) ON DUPLICATE KEY UPDATE cellphone=cellphone;
+                VALUES (?,?,?,?) 
+                ON CONFLICT (cellphone) DO UPDATE SET cellphone = EXCLUDED.cellphone;
             </SQLFragment>
         </SQLStatement>	
         
@@ -3380,8 +3378,8 @@
                 serie INTEGER NOT NULL,
                 name VARCHAR(100),
                 price DECIMAL(20,2),
-                isdefault BOOLEAN DEFAULT '0',
-                isenabled BOOLEAN DEFAULT '1',                
+                isdefault INTEGER DEFAULT 0,
+                isenabled INTEGER DEFAULT 1,                
                 FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE ON UPDATE CASCADE                
                 );
             </SQLFragment>
@@ -3434,7 +3432,7 @@
                 init TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 ended TIMESTAMP,
                 saldo DECIMAL(20,2),
-                status BOOLEAN DEFAULT TRUE,                                
+                status INTEGER DEFAULT 1,                                
                 lastUpdatedTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
                 );
             </SQLFragment>
@@ -3511,7 +3509,7 @@
                 INSERT INTO other_products (name, description, price) VALUES (?,?,?)
             </SQLFragment>
             <SQLFragment>
-                ON DUPLICATE KEY UPDATE description=VALUES(description), price=VALUES(price)                
+                ON CONFLICT (name) DO UPDATE SET description = EXCLUDED.description, price = EXCLUDED.price;           
             </SQLFragment>
         </SQLStatement>        
         
@@ -3686,10 +3684,10 @@
                     stockMin DECIMAL(12,2),
                     average DECIMAL(20,2),
                     init DECIMAL(12,2),
-                    onlyDelivery BOOLEAN,
-                    snapshot BOOLEAN,
+                    onlyDelivery INTEGER,
+                    snapshot INTEGER,
                     tags VARCHAR(255),
-                    enabled BOOLEAN,
+                    enabled INTEGER,
                     createdTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
                     lastUpdatedTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
                     id_user VARCHAR(25) NOT NULL DEFAULT 'USER_DF'
@@ -3913,7 +3911,7 @@
                 id SERIAL PRIMARY KEY,
                 name VARCHAR(255) NOT NULL UNIQUE,
                 address VARCHAR(255),
-                salePoint BOOLEAN
+                salePoint INTEGER
                 );
             </SQLFragment>
         </SQLStatement>	
@@ -4120,7 +4118,7 @@
                 conciliations DECIMAL(12,2),
                 sales DECIMAL(12,2),
                 final DECIMAL(12,2),
-                isOnlyDelivery BOOLEAN,
+                isOnlyDelivery INTEGER,
                 lastUpdatedTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,                
                 FOREIGN KEY (item_id) REFERENCES inventory(id) ON DELETE CASCADE ON UPDATE CASCADE,                
                 FOREIGN KEY (cycle_id) REFERENCES cycles(id) ON DELETE CASCADE ON UPDATE CASCADE
