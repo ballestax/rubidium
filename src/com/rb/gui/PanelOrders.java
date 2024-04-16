@@ -133,7 +133,7 @@ public class PanelOrders extends PanelCapturaMod implements
 
         Font font = new Font("Arial", 1, 18);
 
-        String[] cols = {"Cant", "Producto", "Unidad", "V. Total"};
+        String[] cols = { "Cant", "Producto", "Unidad", "V. Total" };
         DCFORM_P = (DecimalFormat) NumberFormat.getInstance();
         DCFORM_P.applyPattern("$ ###,###,###");
         Color color = new Color(184, 25, 2);
@@ -144,7 +144,7 @@ public class PanelOrders extends PanelCapturaMod implements
 
         tbProducts.getTableHeader().setReorderingAllowed(false);
 
-        int height = 35; // + (showExclusions ? 15 : 0);        
+        int height = 35; // + (showExclusions ? 15 : 0);
         tbProducts.setRowHeight(height);
         tbProducts.setFont(new Font("Tahoma", 0, 14));
         modelTable.addTableModelListener(this);
@@ -158,7 +158,7 @@ public class PanelOrders extends PanelCapturaMod implements
                 int r = tbProducts.getSelectedRow();
                 ProductoPed pp = (ProductoPed) tbProducts.getValueAt(r, 1);
                 modelTable.removeRow(r);
-//                boolean del = products.remove(pp);
+                // boolean del = products.remove(pp);
             }
         });
         popupTable.add(itemDelete);
@@ -170,7 +170,7 @@ public class PanelOrders extends PanelCapturaMod implements
         formatRenderer.setForeground(color);
         ProductRenderer prodRenderer = new ProductRenderer(BoxLayout.Y_AXIS);
 
-        int[] colW = new int[]{40, 220, 70, 80};
+        int[] colW = new int[] { 40, 220, 70, 80 };
         for (int i = 0; i < colW.length; i++) {
             tbProducts.getColumnModel().getColumn(i).setMinWidth(colW[i]);
             tbProducts.getColumnModel().getColumn(i).setPreferredWidth(colW[i]);
@@ -182,8 +182,9 @@ public class PanelOrders extends PanelCapturaMod implements
         tbProducts.getColumnModel().getColumn(1).setCellRenderer(prodRenderer);
         tbProducts.getColumnModel().getColumn(2).setCellRenderer(formatRenderer);
         tbProducts.getColumnModel().getColumn(3).setCellRenderer(formatRenderer);
-//        tbProducts.getColumnModel().getColumn(4).setCellRenderer(new CheckCellRenderer());
-//        tbProducts.getColumnModel().getColumn(4).setCellEditor(tbProducts.getDefaultEditor(Boolean.class));
+        // tbProducts.getColumnModel().getColumn(4).setCellRenderer(new
+        // CheckCellRenderer());
+        // tbProducts.getColumnModel().getColumn(4).setCellEditor(tbProducts.getDefaultEditor(Boolean.class));
 
         ActionListener actionListener = new ActionListener() {
             @Override
@@ -276,7 +277,7 @@ public class PanelOrders extends PanelCapturaMod implements
 
         btCancelMods.setIcon(iconCancel);
         btCancelMods.setMargin(new Insets(0, 0, 0, 0));
-//        btCancelMods.setText("Cancelar");
+        // btCancelMods.setText("Cancelar");
         btCancelMods.setActionCommand(AC_CANCEL_MODS);
         btCancelMods.addActionListener(this);
         btCancelMods.setVisible(false);
@@ -294,9 +295,13 @@ public class PanelOrders extends PanelCapturaMod implements
         regSubtotal.setLabelText("Subtotal");
         regSubtotal.setText(DCFORM_P.format(0));
 
-//        iconOk = new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "package-accept.png", 18, 18));
-//        iconWarning = new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "package-warning.png", 18, 18));
-        ImageIcon iconDefault = new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + "package-info.png", 18, 18));
+        // iconOk = new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() +
+        // "package-accept.png", 18, 18));
+        // iconWarning = new
+        // ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() +
+        // "package-warning.png", 18, 18));
+        ImageIcon iconDefault = new ImageIcon(
+                app.getImgManager().getImagen(app.getFolderIcons() + "package-info.png", 18, 18));
 
         btShowInventary.setIcon(iconDefault);
         btShowInventary.setActionCommand(AC_SHOW_INVENTORY);
@@ -320,6 +325,7 @@ public class PanelOrders extends PanelCapturaMod implements
         loadDatas();
 
     }
+
     public static final String AC_SEND_AND_HOLD_ORDER = "AC_SEND_AND_HOLD_ORDER";
     public Font font;
 
@@ -355,7 +361,8 @@ public class PanelOrders extends PanelCapturaMod implements
         int status = 0;
         if (table.getIdOrder() > 0) {
 
-            lbInfo.setText("<html><font color=blue>Orden: </font><font color=blue size=+1>#" + table.getIdOrder() + "</font></html>");
+            lbInfo.setText("<html><font color=blue>Orden: </font><font color=blue size=+1>#" + table.getIdOrder()
+                    + "</font></html>");
 
             List<Order> orderslList = app.getControl().getOrderslList("id=" + table.getIdOrder(), "");
             if (orderslList.size() > 0) {
@@ -432,50 +439,59 @@ public class PanelOrders extends PanelCapturaMod implements
 
     public void addProductPed(ProductoPed productPed, int cantidad, double price, int rowSelected, boolean edit) {
         if (block & !edit) {
-            GUIManager.showErrorMessage(null, "El pedido esta cerrado no se puede agregar más productos", "Pedido cerrado");
+            GUIManager.showErrorMessage(null, "El pedido esta cerrado no se puede agregar más productos",
+                    "Pedido cerrado");
             return;
         }
 
         Product producto = productPed.getProduct();
+        HashMap<Integer, HashMap> mapData;
 
         if (productPed.hasPresentation()) {
-            HashMap<Integer, HashMap> mapData = app.getControl().checkInventory(productPed.getPresentation().getId());
-            productPed.setData(mapData);
-            if (mapData != null && !mapData.isEmpty()) {
-                Set<Integer> keys = mapData.keySet();
-                for (Integer key : keys) {
-                    HashMap data = mapData.get(key);
-                    double res = Double.valueOf(data.get("quantity").toString()) * cantidad;
-                    MultiKey mKey = new MultiKey(data.get("id"), productPed.hashCode());
-                    mapInventory.put(mKey, res);
-                }
-            }
-            checkInventory();
+            mapData = app.getControl().checkInventory(productPed.getPresentation().getId());
         } else {
-            HashMap<Integer, HashMap> mapData = app.getControl().checkInventoryProduct(productPed.getProduct().getId());
-            productPed.setData(mapData);
-            if (mapData != null && !mapData.isEmpty()) {
-                Set<Integer> keys = mapData.keySet();
-                for (Integer key : keys) {
-                    HashMap data = mapData.get(key);
-                    double res = Double.valueOf(data.get("quantity").toString()) * cantidad;
-                    MultiKey mKey = new MultiKey(data.get("id"), productPed.hashCode());
-                    mapInventory.put(mKey, res);
-                }
-            }
-            checkInventory();
+            mapData = app.getControl().checkInventoryProduct(productPed.getProduct().getId());
         }
+        productPed.setData(mapData);
+        if (mapData != null && !mapData.isEmpty()) {
+            Set<Integer> keys = mapData.keySet();
+            for (Integer key : keys) {
+                HashMap data = mapData.get(key);
+                double res = Double.valueOf(data.get("quantity").toString()) * cantidad;
+                MultiKey mKey = new MultiKey(data.get("id"), productPed.hashCode());
+                mapInventory.put(mKey, res);
+            }
+        }
+        checkInventory();
 
         tbProducts.getSelectionModel().clearSelection();
         System.out.println("block = " + block);
 
-        //si el pedido esta bloqueado contar como una adicion posterior
+        // si el pedido esta bloqueado contar como una adicion posterior
         if (block) {
             productPed.setStatus(ProductoPed.ST_MOD_ADD_CANT);
             mod = true;
             btSend.setEnabled(true);
             btHold.setEnabled(true);
         }
+
+        /*
+         * boolean containsProduct = products.contains(productPed);
+         * boolean priceMatches = price == productPed.getPrecio();
+         * 
+         * if (containsProduct && priceMatches) {
+         * if (!edit && !productPed.equals(getProductSelected())) {
+         * int confirm = JOptionPane.showConfirmDialog(null, "Confirm dialog");
+         * if (confirm == JOptionPane.YES_OPTION) {
+         * handleProductEdit(rowSelected, cantidad, price, productPed);
+         * }
+         * } else {
+         * handleProductEdit(rowSelected, cantidad, price, productPed);
+         * }
+         * } else {
+         * handleNewProduct(cantidad, price, productPed);
+         * }
+         */
 
         if (products.contains(productPed) && price == productPed.getPrecio()) {
             if (!edit) {
@@ -512,7 +528,10 @@ public class PanelOrders extends PanelCapturaMod implements
                         int row = products.indexOf(productPed);
                         modelTable.setValueAt(cantidad, row, 0);
                         modelTable.setValueAt(productPed, row, 1);
-                        double totalProd = (producto.isVariablePrice() || productPed.hasPresentation() ? price : producto.getPrice()) + productPed.getValueAdicionales();
+                        double totalProd = (producto.isVariablePrice() ||
+                                productPed.hasPresentation() ? price
+                                        : producto.getPrice())
+                                + productPed.getValueAdicionales();
                         modelTable.setValueAt(price, row, 2);
                         modelTable.setValueAt(price * cantidad, row, 3);
                     }
@@ -525,19 +544,22 @@ public class PanelOrders extends PanelCapturaMod implements
                 }
                 productPed.setCantidad(cantidad);
                 products.add(productPed);
-                double totalProd = (producto.isVariablePrice() || productPed.hasPresentation() ? price : producto.getPrice()) + productPed.getValueAdicionales();
-                modelTable.addRow(new Object[]{
-                    cantidad,
-                    productPed,
-                    totalProd,
-                    totalProd * cantidad
-//                    ,productPed.isDelivery()
+                double totalProd = (producto.isVariablePrice() ||
+                        productPed.hasPresentation() ? price
+                                : producto.getPrice())
+                        + productPed.getValueAdicionales();
+                modelTable.addRow(new Object[] {
+                        cantidad,
+                        productPed,
+                        totalProd,
+                        totalProd * cantidad
+                        // ,productPed.isDelivery()
                 });
 
                 int row = modelTable.getRowCount() - 1;
                 modelTable.setRowEditable(row, false);
                 modelTable.setCellEditable(row, 0, edit);
-//                modelTable.setCellEditable(row, 4, edit);
+                // modelTable.setCellEditable(row, 4, edit);
                 tbProducts.getSelectionModel().addSelectionInterval(row, row);
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());
@@ -549,7 +571,47 @@ public class PanelOrders extends PanelCapturaMod implements
             }
         }
 
-//        checkAllInventory();
+        // checkAllInventory();
+    }
+
+    private void handleNewProduct(int cantidad, double price, ProductoPed productPed) {
+        try {
+            Product producto = productPed.getProduct();
+            productPed.setCantidad(cantidad);
+            products.add(productPed);
+            double totalProd = (producto.isVariablePrice() || productPed.hasPresentation())
+                    ? price + productPed.getValueAdicionales()
+                    : productPed.getProduct().getPrice() + productPed.getValueAdicionales();
+            modelTable.addRow(new Object[] { cantidad, productPed, totalProd, totalProd * cantidad });
+            int row = modelTable.getRowCount() - 1;
+            modelTable.setRowEditable(row, false);
+            modelTable.setCellEditable(row, 0, false); // edit false
+            tbProducts.getSelectionModel().addSelectionInterval(row, row);
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+        }
+        if (block) {
+            productPed.setStatus(ProductoPed.ST_NEW_ADD);
+            btCancelMods.setVisible(false);
+            btDelete.setEnabled(true);
+        }
+    }
+
+    private void handleProductEdit(int rowSelected, int cantidad, double price, ProductoPed productPed) {
+        try {
+            if (rowSelected != -1) {
+                modelTable.removeRow(rowSelected);
+            }
+            int row = products.indexOf(productPed);
+            int cant = Integer.parseInt(modelTable.getValueAt(row, 0).toString());
+            modelTable.setValueAt(cant + cantidad, row, 0);
+            productPed.setCantidad(cantidad);
+            products.set(row, productPed);
+            tbProducts.setValueAt(productPed, row, 1);
+            tbProducts.getSelectionModel().addSelectionInterval(row, row);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     public static void updateRowHeights(int column, int width, JTable table) {
@@ -573,7 +635,7 @@ public class PanelOrders extends PanelCapturaMod implements
         } catch (Exception e) {
         }
 
-        //checkCiclo
+        // checkCiclo
         Cycle lastCycle = app.getControl().getLastCycle();
         if (lastCycle.getStatus() == Cycle.CLOSED) {
             GUIManager.showErrorMessage(null, "El ciclo: " + lastCycle.getId() + " esta cerrado\n"
@@ -591,7 +653,8 @@ public class PanelOrders extends PanelCapturaMod implements
             String property = config != null ? config.getValor() : "false";
             boolean permit = Boolean.valueOf(property);
             GUIManager.showErrorMessage(null, "Los productos exceden las existencias en inventario.\n"
-                    + "Esta " + (permit ? "habilitado" : "deshabilitado") + " facturar sin existencias", "Producto agotado");
+                    + "Esta " + (permit ? "habilitado" : "deshabilitado") + " facturar sin existencias",
+                    "Producto agotado");
             if (!permit) {
                 return false;
             }
@@ -632,7 +695,7 @@ public class PanelOrders extends PanelCapturaMod implements
         }
 
         order.setIdClient(1L);
-//        }
+        // }
 
         String tipoEntrega = PanelPedido.ENTREGA_LOCAL;
 
@@ -688,11 +751,11 @@ public class PanelOrders extends PanelCapturaMod implements
         boolean validate = true;
 
         if (!validate) {
-//            return false;
+            // return false;
         }
 
-//        celular = regCelular.getText();
-//        direccion = regDireccion.getText();
+        // celular = regCelular.getText();
+        // direccion = regDireccion.getText();
         verifyQuantitys();
 
         Order order = new Order();
@@ -709,22 +772,23 @@ public class PanelOrders extends PanelCapturaMod implements
             order.setTable(table.getId());
         }
 
-//        if (!celular.isEmpty()) {
-//            Client client = new Client(celular);
-//            client.addAddress(direccion);
-//
-//            int existClave = app.getControl().existClave("clients", "cellphone", celular);
-//
-//            if (existClave > 0) {
-//                app.getControl().updateClient(client);
-//            } else {
-//                app.getControl().addClient(client);
-//            }
-//
-//            invoice.setIdCliente(Long.parseLong(celular));
-//        } else {
+        // if (!celular.isEmpty()) {
+        // Client client = new Client(celular);
+        // client.addAddress(direccion);
+        //
+        // int existClave = app.getControl().existClave("clients", "cellphone",
+        // celular);
+        //
+        // if (existClave > 0) {
+        // app.getControl().updateClient(client);
+        // } else {
+        // app.getControl().addClient(client);
+        // }
+        //
+        // invoice.setIdCliente(Long.parseLong(celular));
+        // } else {
         order.setIdClient(1L);
-//        }
+        // }
 
         String tipoEntrega = PanelPedido.ENTREGA_LOCAL;
 
@@ -787,8 +851,7 @@ public class PanelOrders extends PanelCapturaMod implements
                 check.setBorderPainted(true);
                 check.setBorder(BorderFactory.createCompoundBorder(
                         BorderFactory.createEtchedBorder(),
-                        BorderFactory.createEmptyBorder(5, 10, 5, 10)
-                ));
+                        BorderFactory.createEmptyBorder(5, 10, 5, 10)));
                 pnIngredients.add(check);
             }
         }
@@ -797,7 +860,7 @@ public class PanelOrders extends PanelCapturaMod implements
     private void loadCooking() {
         List<String> cookingList = Collections.EMPTY_LIST;
         if (product != null) {
-            String[] cooking = {"1/2", "3/4", "BA"};
+            String[] cooking = { "1/2", "3/4", "BA" };
             cookingList = Arrays.asList(cooking);
         }
         pnCooking.removeAll();
@@ -805,12 +868,11 @@ public class PanelOrders extends PanelCapturaMod implements
         for (int i = 0; i < cookingList.size(); i++) {
             String cook = cookingList.get(i);
             JRadioButton rbCook = new JRadioButton(cook);
-//                check.setActionCommand(cook);
+            // check.setActionCommand(cook);
             rbCook.setBorderPainted(true);
             rbCook.setBorder(BorderFactory.createCompoundBorder(
                     BorderFactory.createEtchedBorder(),
-                    BorderFactory.createEmptyBorder(5, 10, 5, 10)
-            ));
+                    BorderFactory.createEmptyBorder(5, 10, 5, 10)));
             btgCooks.add(rbCook);
             pnCooking.add(rbCook);
 
@@ -874,9 +936,11 @@ public class PanelOrders extends PanelCapturaMod implements
         for (Integer next : keys) {
             Item item = app.getControl().getItemWhere("id=" + next);
             Double cant = (item.isOnlyDelivery() && tipo == TIPO_LOCAL) ? 0 : simpInv.get(next);
-            String color = (item.isOnlyDelivery() && tipo == TIPO_LOCAL) ? "#ff30a5" : (item.getQuantity() >= cant) ? "#00ff32" : "#ff4400";
+            String color = (item.isOnlyDelivery() && tipo == TIPO_LOCAL) ? "#ff30a5"
+                    : (item.getQuantity() >= cant) ? "#00ff32" : "#ff4400";
             stb.append("<tr>")
-                    .append("<td><font size=+1 color=").append(color).append(">").append(item.getName().toUpperCase()).append("</font></td>")
+                    .append("<td><font size=+1 color=").append(color).append(">").append(item.getName().toUpperCase())
+                    .append("</font></td>")
                     .append("<td><font size=+1> ").append(item.getQuantity()).append("</font></td>")
                     .append("<td><font size=+1 color=blue>").append(cant).append("</font></td>")
                     .append("</tr>");
@@ -897,7 +961,8 @@ public class PanelOrders extends PanelCapturaMod implements
      * regenerated by the Form Editor.
      */
     @SuppressWarnings("unchecked")
-    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    // <editor-fold defaultstate="collapsed" desc="Generated
+    // Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
         pnContenTab = new javax.swing.JPanel();
@@ -917,7 +982,7 @@ public class PanelOrders extends PanelCapturaMod implements
         btHold = new javax.swing.JButton();
         btStay = new javax.swing.JButton();
         pnTotals = new javax.swing.JPanel();
-        regSubtotal = new com.rb.gui.util.Registro(BoxLayout.X_AXIS, "","",60);
+        regSubtotal = new com.rb.gui.util.Registro(BoxLayout.X_AXIS, "", "", 60);
         lbStatus = new javax.swing.JLabel();
         regTable = new org.dz.Registro(BoxLayout.X_AXIS, "Mesa", new String[1], 60);
         pnCardContain = new javax.swing.JPanel();
@@ -931,55 +996,70 @@ public class PanelOrders extends PanelCapturaMod implements
         javax.swing.GroupLayout pnContenTabLayout = new javax.swing.GroupLayout(pnContenTab);
         pnContenTab.setLayout(pnContenTabLayout);
         pnContenTabLayout.setHorizontalGroup(
-            pnContenTabLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnContenTabLayout.createSequentialGroup()
-                .addGap(6, 6, 6)
-                .addComponent(btMinus, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(2, 2, 2)
-                .addComponent(lbQuantity, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(2, 2, 2)
-                .addComponent(btAdd, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btCancelMods, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 26, Short.MAX_VALUE)
-                .addComponent(tgDelivery, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(tgEntry, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btModify, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btDelete, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
-        );
+                pnContenTabLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(pnContenTabLayout.createSequentialGroup()
+                                .addGap(6, 6, 6)
+                                .addComponent(btMinus, javax.swing.GroupLayout.PREFERRED_SIZE, 40,
+                                        javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(2, 2, 2)
+                                .addComponent(lbQuantity, javax.swing.GroupLayout.PREFERRED_SIZE, 35,
+                                        javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(2, 2, 2)
+                                .addComponent(btAdd, javax.swing.GroupLayout.PREFERRED_SIZE, 40,
+                                        javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btCancelMods, javax.swing.GroupLayout.PREFERRED_SIZE, 38,
+                                        javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 26,
+                                        Short.MAX_VALUE)
+                                .addComponent(tgDelivery, javax.swing.GroupLayout.PREFERRED_SIZE, 80,
+                                        javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(tgEntry, javax.swing.GroupLayout.PREFERRED_SIZE, 80,
+                                        javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btModify, javax.swing.GroupLayout.PREFERRED_SIZE, 100,
+                                        javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btDelete, javax.swing.GroupLayout.PREFERRED_SIZE, 100,
+                                        javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap()));
 
-        pnContenTabLayout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {btAdd, btCancelMods});
+        pnContenTabLayout.linkSize(javax.swing.SwingConstants.HORIZONTAL,
+                new java.awt.Component[] { btAdd, btCancelMods });
 
         pnContenTabLayout.setVerticalGroup(
-            pnContenTabLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnContenTabLayout.createSequentialGroup()
-                .addGap(2, 2, 2)
-                .addGroup(pnContenTabLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
-                    .addComponent(btMinus, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lbQuantity)
-                    .addComponent(btAdd)
-                    .addComponent(btDelete, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btModify, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(tgEntry, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(tgDelivery, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btCancelMods, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(30, Short.MAX_VALUE))
-        );
+                pnContenTabLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(pnContenTabLayout.createSequentialGroup()
+                                .addGap(2, 2, 2)
+                                .addGroup(
+                                        pnContenTabLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                                                .addComponent(btMinus, javax.swing.GroupLayout.PREFERRED_SIZE, 36,
+                                                        javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addComponent(lbQuantity)
+                                                .addComponent(btAdd)
+                                                .addComponent(btDelete, javax.swing.GroupLayout.PREFERRED_SIZE, 36,
+                                                        javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addComponent(btModify, javax.swing.GroupLayout.PREFERRED_SIZE, 36,
+                                                        javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addComponent(tgEntry, javax.swing.GroupLayout.PREFERRED_SIZE, 34,
+                                                        javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addComponent(tgDelivery, javax.swing.GroupLayout.PREFERRED_SIZE, 34,
+                                                        javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addComponent(btCancelMods, javax.swing.GroupLayout.PREFERRED_SIZE, 31,
+                                                        javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addContainerGap(30, Short.MAX_VALUE)));
 
-        pnContenTabLayout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {btAdd, btCancelMods, btDelete, btMinus, lbQuantity});
+        pnContenTabLayout.linkSize(javax.swing.SwingConstants.VERTICAL,
+                new java.awt.Component[] { btAdd, btCancelMods, btDelete, btMinus, lbQuantity });
 
         tbProducts.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
+                new Object[][] {
 
-            },
-            new String [] {
+                },
+                new String[] {
 
-            }
-        ));
+                }));
         jScrollPane1.setViewportView(tbProducts);
 
         regSubtotal.setMinimumSize(new java.awt.Dimension(160, 31));
@@ -990,20 +1070,23 @@ public class PanelOrders extends PanelCapturaMod implements
         javax.swing.GroupLayout pnTotalsLayout = new javax.swing.GroupLayout(pnTotals);
         pnTotals.setLayout(pnTotalsLayout);
         pnTotalsLayout.setHorizontalGroup(
-            pnTotalsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnTotalsLayout.createSequentialGroup()
-                .addComponent(lbStatus, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(regSubtotal, javax.swing.GroupLayout.DEFAULT_SIZE, 345, Short.MAX_VALUE))
-        );
+                pnTotalsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnTotalsLayout.createSequentialGroup()
+                                .addComponent(lbStatus, javax.swing.GroupLayout.DEFAULT_SIZE,
+                                        javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(regSubtotal, javax.swing.GroupLayout.DEFAULT_SIZE, 345,
+                                        Short.MAX_VALUE)));
         pnTotalsLayout.setVerticalGroup(
-            pnTotalsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnTotalsLayout.createSequentialGroup()
-                .addGroup(pnTotalsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(regSubtotal, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lbStatus, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addGap(0, 0, Short.MAX_VALUE))
-        );
+                pnTotalsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(pnTotalsLayout.createSequentialGroup()
+                                .addGroup(pnTotalsLayout
+                                        .createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                        .addComponent(regSubtotal, javax.swing.GroupLayout.PREFERRED_SIZE, 30,
+                                                javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(lbStatus, javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addGap(0, 0, Short.MAX_VALUE)));
 
         pnCardContain.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         pnCardContain.setLayout(new java.awt.CardLayout());
@@ -1011,63 +1094,85 @@ public class PanelOrders extends PanelCapturaMod implements
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-            .addComponent(pnTotals, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(btCancel, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(btStay, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btHold, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btSend, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(1, 1, 1))
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(lbInfo, javax.swing.GroupLayout.DEFAULT_SIZE, 89, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(regWaiter, javax.swing.GroupLayout.DEFAULT_SIZE, 145, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(regTable, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(btShowInventary, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btClear, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
-            .addComponent(pnCardContain, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(lbIndicator, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        );
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING,
+                                javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                        .addComponent(pnTotals, javax.swing.GroupLayout.DEFAULT_SIZE,
+                                javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(btCancel, javax.swing.GroupLayout.PREFERRED_SIZE, 100,
+                                        javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED,
+                                        javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(btStay, javax.swing.GroupLayout.PREFERRED_SIZE, 100,
+                                        javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btHold, javax.swing.GroupLayout.PREFERRED_SIZE, 100,
+                                        javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btSend, javax.swing.GroupLayout.PREFERRED_SIZE, 100,
+                                        javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(1, 1, 1))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lbInfo, javax.swing.GroupLayout.DEFAULT_SIZE, 89, Short.MAX_VALUE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(regWaiter, javax.swing.GroupLayout.DEFAULT_SIZE, 145, Short.MAX_VALUE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(regTable, javax.swing.GroupLayout.PREFERRED_SIZE, 133,
+                                        javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(btShowInventary, javax.swing.GroupLayout.PREFERRED_SIZE, 28,
+                                        javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btClear, javax.swing.GroupLayout.PREFERRED_SIZE, 28,
+                                        javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(pnCardContain, javax.swing.GroupLayout.DEFAULT_SIZE,
+                                javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(lbIndicator, javax.swing.GroupLayout.DEFAULT_SIZE,
+                                javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE));
         layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(lbInfo, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(regWaiter, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(regTable, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btClear, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btShowInventary, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(2, 2, 2)
-                .addComponent(lbIndicator, javax.swing.GroupLayout.PREFERRED_SIZE, 7, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(3, 3, 3)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 263, Short.MAX_VALUE)
-                .addGap(2, 2, 2)
-                .addComponent(pnTotals, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(pnCardContain, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(btSend, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btHold, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btStay, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btCancel, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap())
-        );
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                        .addComponent(lbInfo, javax.swing.GroupLayout.PREFERRED_SIZE, 26,
+                                                javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(regWaiter, javax.swing.GroupLayout.PREFERRED_SIZE, 30,
+                                                javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(regTable, javax.swing.GroupLayout.PREFERRED_SIZE, 30,
+                                                javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(btClear, javax.swing.GroupLayout.PREFERRED_SIZE, 30,
+                                                javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(btShowInventary, javax.swing.GroupLayout.PREFERRED_SIZE, 30,
+                                                javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(2, 2, 2)
+                                .addComponent(lbIndicator, javax.swing.GroupLayout.PREFERRED_SIZE, 7,
+                                        javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(3, 3, 3)
+                                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 263, Short.MAX_VALUE)
+                                .addGap(2, 2, 2)
+                                .addComponent(pnTotals, javax.swing.GroupLayout.PREFERRED_SIZE,
+                                        javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(pnCardContain, javax.swing.GroupLayout.PREFERRED_SIZE, 47,
+                                        javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(btSend, javax.swing.GroupLayout.PREFERRED_SIZE, 31,
+                                                javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(btHold, javax.swing.GroupLayout.PREFERRED_SIZE, 31,
+                                                javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(btStay, javax.swing.GroupLayout.PREFERRED_SIZE, 31,
+                                                javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(btCancel, javax.swing.GroupLayout.PREFERRED_SIZE, 31,
+                                                javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addContainerGap()));
 
-        layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {btClear, btShowInventary, lbInfo, regTable, regWaiter});
+        layout.linkSize(javax.swing.SwingConstants.VERTICAL,
+                new java.awt.Component[] { btClear, btShowInventary, lbInfo, regTable, regWaiter });
 
     }// </editor-fold>//GEN-END:initComponents
-
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btAdd;
@@ -1228,11 +1333,12 @@ public class PanelOrders extends PanelCapturaMod implements
             int[] selectedRows = tbProducts.getSelectedRows();
             if (selectedRows.length == 1) {
                 int row = selectedRows[0];
-//                boolean check = Boolean.parseBoolean(modelTable.getValueAt(row, 4).toString());
+                // boolean check = Boolean.parseBoolean(modelTable.getValueAt(row,
+                // 4).toString());
                 ProductoPed prod = (ProductoPed) modelTable.getValueAt(row, 1);
                 boolean check = prod.isDelivery();
                 prod.setDelivery(!check);
-//                modelTable.setValueAt(!check, selectedRows[0], 4);
+                // modelTable.setValueAt(!check, selectedRows[0], 4);
             } else {
                 for (int row : selectedRows) {
                     boolean check = Boolean.parseBoolean(modelTable.getValueAt(row, 4).toString());
@@ -1267,17 +1373,18 @@ public class PanelOrders extends PanelCapturaMod implements
             if (products.size() > 0) {
                 String msg = "<html>El pedido no esta vacio, <br>¿Desea cancelar todo y volver al menu de seleccion de mesas?</html>";
 
-                int showConfirmDialog = JOptionPane.showConfirmDialog(null, msg, "Advertencia", JOptionPane.YES_NO_OPTION);
+                int showConfirmDialog = JOptionPane.showConfirmDialog(null, msg, "Advertencia",
+                        JOptionPane.YES_NO_OPTION);
                 if (showConfirmDialog == JOptionPane.YES_OPTION) {
                     modelTable.setRowCount(0);
                     mapInventory.clear();
                     products.clear();
-//                    app.getGuiManager().getPanelTakeOrders().showTables();
+                    // app.getGuiManager().getPanelTakeOrders().showTables();
                 } else {
                     return;
                 }
             }
-//            } else {
+            // } else {
             app.getGuiManager().getPanelTakeOrders().showTables();
             selTable.setStatus(Table.TABLE_ST_LIMPIA);
             pcs.firePropertyChange(PanelTakeOrders.AC_CLEAR_TABLE, null, selTable);
@@ -1311,6 +1418,7 @@ public class PanelOrders extends PanelCapturaMod implements
             enableSends(checkChanges(products));
         }
     }
+
     public static final String AC_CANCEL_ITEM = "AC_CANCEL_ITEM";
 
     public void disableButtonInSend() {
@@ -1409,6 +1517,7 @@ public class PanelOrders extends PanelCapturaMod implements
         }
         return idOrder;
     }
+
     public static final String AC_BACK_TO_TABLES = "AC_BACK_TO_TABLES";
     public static final String AC_CHANGE_SELECTED = "AC_CHANGE_SELECTED";
 
@@ -1421,7 +1530,8 @@ public class PanelOrders extends PanelCapturaMod implements
             if (row >= 0) {
                 try {
                     int quantity = Integer.parseInt(modelTable.getValueAt(row, 0).toString());
-//                    boolean paraLlevar = Boolean.parseBoolean(modelTable.getValueAt(row, 4).toString());
+                    // boolean paraLlevar = Boolean.parseBoolean(modelTable.getValueAt(row,
+                    // 4).toString());
                     lbQuantity.setText(String.valueOf(quantity));
                     product = (ProductoPed) modelTable.getValueAt(row, 1);
 
@@ -1430,15 +1540,18 @@ public class PanelOrders extends PanelCapturaMod implements
                         tgDelivery.setSelected(product.isDelivery());
                     }
                     int status = product.getStatus();
-                    btCancelMods.setVisible(status == ProductoPed.ST_MOD_ADD_CANT || status == ProductoPed.ST_MOD_MIN_CANT);
+                    btCancelMods
+                            .setVisible(status == ProductoPed.ST_MOD_ADD_CANT || status == ProductoPed.ST_MOD_MIN_CANT);
 
-                    if (product.getStatus() == ProductoPed.ST_SENDED || product.getStatus() == ProductoPed.ST_SENDED_MOD) {
+                    if (product.getStatus() == ProductoPed.ST_SENDED
+                            || product.getStatus() == ProductoPed.ST_SENDED_MOD) {
                         btDelete.setText("Cancelar");
                         btDelete.setActionCommand(AC_CANCEL_ITEM);
                     }
 
                     Permission perm = app.getControl().getPermissionByName("allow-cancel-product-order");
-                    btDelete.setEnabled(app.getControl().hasPermission(app.getUser(), perm) || !block || status == ProductoPed.ST_NEW_ADD);
+                    btDelete.setEnabled(app.getControl().hasPermission(app.getUser(), perm) || !block
+                            || status == ProductoPed.ST_NEW_ADD);
 
                     perm = app.getControl().getPermissionByName("allow-modify-product-order");
                     btModify.setEnabled(app.getControl().hasPermission(app.getUser(), perm) || !block);
@@ -1507,7 +1620,7 @@ public class PanelOrders extends PanelCapturaMod implements
                     tbProducts.setValueAt(prd, e.getLastRow(), 1);
                     lbQuantity.setText(String.valueOf(cant));
 
-                    //update map inventory
+                    // update map inventory
                     SwingWorker sw = new SwingWorker() {
                         @Override
                         protected Object doInBackground() throws Exception {
@@ -1524,7 +1637,7 @@ public class PanelOrders extends PanelCapturaMod implements
                         }
                     };
                     sw.execute();
-//                    checkInventory();
+                    // checkInventory();
                 } else if (e.getColumn() == 4) {
                     boolean paraLlevar = Boolean.parseBoolean(modelTable.getValueAt(e.getLastRow(), 4).toString());
                     tgDelivery.setSelected(paraLlevar);
@@ -1554,6 +1667,7 @@ public class PanelOrders extends PanelCapturaMod implements
         calcularValores();
 
     }
+
     public static final String AC_CHECK_ENTRY = "AC_CHECK_ENTRY";
     public static final String AC_SHOW_INVENTORY = "AC_SHOW_INVENTORY";
 
@@ -1620,24 +1734,27 @@ public class PanelOrders extends PanelCapturaMod implements
         }
 
         @Override
-        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
+                int row, int column) {
 
-            JCheckBox component = (JCheckBox) table.getDefaultRenderer(Boolean.class).
-                    getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+            JCheckBox component = (JCheckBox) table.getDefaultRenderer(Boolean.class)
+                    .getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             component.setFont(new Font("sans", 0, 24));
 
-//            if ((Boolean) value) {
-            component.setBackground(row % 2 == 0 ? table.getBackground() : UIManager.getColor("Table.alternateRowColor"));
+            // if ((Boolean) value) {
+            component.setBackground(
+                    row % 2 == 0 ? table.getBackground() : UIManager.getColor("Table.alternateRowColor"));
             component.setForeground(Color.white);
 
-//                    if (hasFocus) {
-//                        component.setBorder(BorderFactory.createLineBorder(Color.red));
-//                    } else {
-//                        component.setBorder(BorderFactory.createLineBorder(Color.ORANGE));
-//                    }
-//                } else {
-//                    component.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.ORANGE));
-//                }
+            // if (hasFocus) {
+            // component.setBorder(BorderFactory.createLineBorder(Color.red));
+            // } else {
+            // component.setBorder(BorderFactory.createLineBorder(Color.ORANGE));
+            // }
+            // } else {
+            // component.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0,
+            // Color.ORANGE));
+            // }
             if (isSelected) {
                 component.setForeground(table.getSelectionForeground());
                 component.setBackground(table.getSelectionBackground());
@@ -1647,11 +1764,12 @@ public class PanelOrders extends PanelCapturaMod implements
                     component.setBorder(BorderFactory.createLineBorder(Color.lightGray));
                 }
             } else {
-                component.setBackground(row % 2 == 0 ? table.getBackground() : UIManager.getColor("Table.alternateRowColor"));
+                component.setBackground(
+                        row % 2 == 0 ? table.getBackground() : UIManager.getColor("Table.alternateRowColor"));
                 component.setForeground(table.getForeground());
                 component.setBorder(UIManager.getBorder("Table.cellBorder"));
             }
-//        }
+            // }
             return component;
 
         }
@@ -1662,7 +1780,8 @@ public class PanelOrders extends PanelCapturaMod implements
         for (ProductoPed prod : products) {
             String stationList = app.getControl().getProductStations(prod.getProduct().getId());
             if (stationList == null) {
-                GUIManager.showErrorMessage(null, "Advertencia: " + prod.getProduct().getName() + "(" + prod.getProduct().getId() + ") : No tiene station", "No station");
+                GUIManager.showErrorMessage(null, "Advertencia: " + prod.getProduct().getName() + "("
+                        + prod.getProduct().getId() + ") : No tiene station", "No station");
             } else if (!stationList.isEmpty()) {
                 String[] stations = stationList.split(",");
                 for (String station : stations) {

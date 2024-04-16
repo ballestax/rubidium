@@ -71,12 +71,12 @@ public class PanelAdminWaiters extends javax.swing.JPanel implements ActionListe
     private void createComponents() {
         toolbar.setFloatable(false);
                
-        String[] colNames = {"N°", "Nombre", "Rol", "Modificar"};
+        String[] colNames = {"ID", "Nombre", "Estado", "Color","Ver"};
         model = new MyDefaultTableModel(colNames, 0);
         tableWaiters.setModel(model);
         tableWaiters.setRowHeight(25);
 
-        int[] colW = {20, 100, 70, 50};
+        int[] colW = {20, 100, 70, 70, 50};
         for (int i = 0; i < colW.length; i++) {
             tableWaiters.getColumnModel().getColumn(i).setMinWidth(colW[i]);
             tableWaiters.getColumnModel().getColumn(i).setPreferredWidth(colW[i]);
