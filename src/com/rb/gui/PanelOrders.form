@@ -209,7 +209,7 @@
         </DimensionLayout>
       </Layout>
       <SubComponents>
-        <Component class="com.bacon.gui.util.Registro" name="regSubtotal">
+        <Component class="com.rb.gui.util.Registro" name="regSubtotal">
           <Properties>
             <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
               <Dimension value="[160, 31]"/>
@@ -219,7 +219,7 @@
             </Property>
           </Properties>
           <AuxValues>
-            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, &quot;&quot;,&quot;&quot;,60)"/>
+            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.rb.gui.util.Registro(BoxLayout.X_AXIS, &quot;&quot;,&quot;&quot;,60)"/>
           </AuxValues>
         </Component>
         <Component class="javax.swing.JLabel" name="lbStatus">

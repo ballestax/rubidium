@@ -368,7 +368,7 @@ public class PanelOrders extends PanelCapturaMod implements
                 productsOld = copyProductsToMap(order.getProducts());
             }
 
-            block = true;            
+            block = true;
             btSend.setEnabled(false);
             btStay.setEnabled(false);
             btCancel.setIcon(iconBack);
@@ -423,7 +423,7 @@ public class PanelOrders extends PanelCapturaMod implements
     }
 
     public void addProductPed(ProductoPed productPed, int cantidad, double price) {
-        addProductPed(productPed, cantidad, price, -1, true);
+        addProductPed(productPed, cantidad, price, -1, false);
     }
 
     public void addProductPed(ProductoPed productPed, int cantidad, double price, boolean edit) {
@@ -467,6 +467,7 @@ public class PanelOrders extends PanelCapturaMod implements
         }
 
         tbProducts.getSelectionModel().clearSelection();
+        System.out.println("block = " + block);
 
         //si el pedido esta bloqueado contar como una adicion posterior
         if (block) {
@@ -477,18 +478,45 @@ public class PanelOrders extends PanelCapturaMod implements
         }
 
         if (products.contains(productPed) && price == productPed.getPrecio()) {
-            try {
-                if (rowSelected != -1) {
-                    modelTable.removeRow(rowSelected);
+            if (!edit) {
+                try {
+                    if (rowSelected != -1) {
+                        modelTable.removeRow(rowSelected);
+                    }
+                    int row = products.indexOf(productPed);
+                    int cant = Integer.valueOf(modelTable.getValueAt(row, 0).toString());
+                    modelTable.setValueAt(cant + cantidad, row, 0);
+                    productPed.setCantidad(cantidad);
+                    products.set(row, productPed);
+                    tbProducts.setValueAt(productPed, row, 1);
+                    tbProducts.getSelectionModel().addSelectionInterval(row, row);
+                } catch (Exception e) {
                 }
-                int row = products.indexOf(productPed);
-                int cant = Integer.valueOf(modelTable.getValueAt(row, 0).toString());
-                modelTable.setValueAt(cant + cantidad, row, 0);
-                productPed.setCantidad(cantidad);
-                products.set(row, productPed);
-                tbProducts.setValueAt(productPed, row, 1);
-                tbProducts.getSelectionModel().addSelectionInterval(row, row);
-            } catch (Exception e) {
+            } else {
+                if (!productPed.equals(getProductSelected())) {
+                    if (products.contains(productPed) && price == productPed.getPrecio()) {
+                        int confirm = JOptionPane.showConfirmDialog(null, "Confirm dialog");
+                        if (confirm == JOptionPane.YES_OPTION) {
+                            if (rowSelected != -1) {
+                                modelTable.removeRow(rowSelected);
+                            }
+                            int row = products.indexOf(productPed);
+                            int cant = Integer.valueOf(modelTable.getValueAt(row, 0).toString());
+                            modelTable.setValueAt(cant + cantidad, row, 0);
+                            productPed.setCantidad(cantidad);
+                            products.set(row, productPed);
+                            tbProducts.setValueAt(productPed, row, 1);
+                            tbProducts.getSelectionModel().addSelectionInterval(row, row);
+                        }
+                    } else {
+                        int row = products.indexOf(productPed);
+                        modelTable.setValueAt(cantidad, row, 0);
+                        modelTable.setValueAt(productPed, row, 1);
+                        double totalProd = (producto.isVariablePrice() || productPed.hasPresentation() ? price : producto.getPrice()) + productPed.getValueAdicionales();
+                        modelTable.setValueAt(price, row, 2);
+                        modelTable.setValueAt(price * cantidad, row, 3);
+                    }
+                }
             }
         } else {
             try {
@@ -1160,7 +1188,7 @@ public class PanelOrders extends PanelCapturaMod implements
             productSelected.setStatus(ProductoPed.ST_AVOIDED);
             int row = tbProducts.getSelectedRow();
             tbProducts.setValueAt(productSelected, row, 1);
-            
+
         } else if (AC_SEND_ORDER.equals(e.getActionCommand())) {
             if (verifyOrder()) {
                 app.getGuiManager().getPanelTakeOrders().showTables();
@@ -1396,19 +1424,19 @@ public class PanelOrders extends PanelCapturaMod implements
 //                    boolean paraLlevar = Boolean.parseBoolean(modelTable.getValueAt(row, 4).toString());
                     lbQuantity.setText(String.valueOf(quantity));
                     product = (ProductoPed) modelTable.getValueAt(row, 1);
-                    
+
                     if (product != null) {
-                        tgEntry.setSelected(product.isEntry());                        
+                        tgEntry.setSelected(product.isEntry());
                         tgDelivery.setSelected(product.isDelivery());
                     }
                     int status = product.getStatus();
                     btCancelMods.setVisible(status == ProductoPed.ST_MOD_ADD_CANT || status == ProductoPed.ST_MOD_MIN_CANT);
 
-                    if(product.getStatus() == ProductoPed.ST_SENDED || product.getStatus() == ProductoPed.ST_SENDED_MOD){
+                    if (product.getStatus() == ProductoPed.ST_SENDED || product.getStatus() == ProductoPed.ST_SENDED_MOD) {
                         btDelete.setText("Cancelar");
                         btDelete.setActionCommand(AC_CANCEL_ITEM);
                     }
-                    
+
                     Permission perm = app.getControl().getPermissionByName("allow-cancel-product-order");
                     btDelete.setEnabled(app.getControl().hasPermission(app.getUser(), perm) || !block || status == ProductoPed.ST_NEW_ADD);
 
@@ -1507,18 +1535,18 @@ public class PanelOrders extends PanelCapturaMod implements
                 break;
             case TableModelEvent.DELETE:
                 try {
-                ProductoPed rem = products.remove(e.getLastRow());
-                HashMap<Integer, HashMap> mData = rem.getData();
-                Set<Integer> keys = mData.keySet();
-                for (Integer key : keys) {
-                    HashMap data = mData.get(key);
-                    MultiKey mKey = new MultiKey(data.get("id"), rem.hashCode());
-                    Object remove = mapInventory.remove(mKey);
+                    ProductoPed rem = products.remove(e.getLastRow());
+                    HashMap<Integer, HashMap> mData = rem.getData();
+                    Set<Integer> keys = mData.keySet();
+                    for (Integer key : keys) {
+                        HashMap data = mData.get(key);
+                        MultiKey mKey = new MultiKey(data.get("id"), rem.hashCode());
+                        Object remove = mapInventory.remove(mKey);
+                    }
+                    checkInventory();
+                } catch (Exception ex) {
                 }
-                checkInventory();
-            } catch (Exception ex) {
-            }
-            break;
+                break;
             default:
                 break;
         }
@@ -1530,12 +1558,19 @@ public class PanelOrders extends PanelCapturaMod implements
     public static final String AC_SHOW_INVENTORY = "AC_SHOW_INVENTORY";
 
     public ProductoPed getProductSelected() {
+        try {
+            tbProducts.getCellEditor().stopCellEditing();
+        } catch (Exception e) {
+        }
+
         int COL = 1;
         ProductoPed prod = null;
         int row = tbProducts.getSelectedRow();
 
         if (row >= 0) {
+            int cant = (int) modelTable.getValueAt(row, 0);
             prod = (ProductoPed) modelTable.getValueAt(row, COL);
+            prod.setCantidad(cant);
         }
         return prod;
     }
@@ -1626,7 +1661,9 @@ public class PanelOrders extends PanelCapturaMod implements
         MultiValuedMap map = new ArrayListValuedHashMap();
         for (ProductoPed prod : products) {
             String stationList = app.getControl().getProductStations(prod.getProduct().getId());
-            if (!stationList.isEmpty()) {
+            if (stationList == null) {
+                GUIManager.showErrorMessage(null, "Advertencia: " + prod.getProduct().getName() + "(" + prod.getProduct().getId() + ") : No tiene station", "No station");
+            } else if (!stationList.isEmpty()) {
                 String[] stations = stationList.split(",");
                 for (String station : stations) {
                     map.put(station, prod);
