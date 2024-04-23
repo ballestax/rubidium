@@ -83,6 +83,8 @@ public class JDBCUtilDAO implements UtilDAO {
     public static final String CREATE_TABLES_TABLE_KEY = "CREATE_TABLES_TABLE";
 
     public static final String GET_TABLES_LIST_KEY = "GET_TABLES";
+    public static final String UPDATE_TABLE_KEY = "UPDATE_TABLE";
+    public static final String UPDATE_TABLE_STATUS_KEY = "UPDATE_TABLE_STATUS";
     public static final String GET_WAITERS_LIST_KEY = "GET_WAITERS";
 
     public static final String CREATE_CYCLES_TABLE_KEY = "CREATE_CYCLES_TABLE";
@@ -891,6 +893,8 @@ public class JDBCUtilDAO implements UtilDAO {
                 table.setId(rs.getInt(1));
                 table.setName(rs.getString(2));
                 table.setStatus(rs.getInt(3));
+                table.setIdWaiter(rs.getInt("idWaiter"));
+                table.setIdOrder(rs.getInt("idOrder"));
                 tables.add(table);
             }
         } catch (SQLException e) {
@@ -901,6 +905,57 @@ public class JDBCUtilDAO implements UtilDAO {
             DBManager.closeConnection(conn);
         }
         return tables;
+    }
+    
+    public boolean updateTable(Table table) throws DAOException {
+        Connection conn = null;
+        PreparedStatement update = null;
+        try {
+            conn = dataSource.getConnection();
+            conn.setAutoCommit(false);
+            Object[] parameters = {
+                table.getName(),
+                table.getStatus(),
+                table.getIdWaiter(),
+                table.getIdOrder(),
+                table.getId()
+            };
+            update = sqlStatements.buildSQLStatement(conn, UPDATE_TABLE_KEY, parameters);
+            update.executeUpdate();
+            conn.commit();
+            return true;
+        } catch (SQLException | IOException e) {
+            DBManager.rollbackConn(conn);
+            throw new DAOException("Could not properly update the Table", e);
+        } finally {
+            DBManager.closeStatement(update);
+            DBManager.closeConnection(conn);
+        }
+    }
+    
+    public boolean updateTableStatus(Table table) throws DAOException {
+        Connection conn = null;
+        PreparedStatement update = null;
+        try {
+            conn = dataSource.getConnection();
+            conn.setAutoCommit(false);
+            Object[] parameters = {                
+                table.getStatus(),
+                table.getIdWaiter(),
+                table.getIdOrder(),
+                table.getId()
+            };
+            update = sqlStatements.buildSQLStatement(conn, UPDATE_TABLE_STATUS_KEY, parameters);
+            update.executeUpdate();
+            conn.commit();
+            return true;
+        } catch (SQLException | IOException e) {
+            DBManager.rollbackConn(conn);
+            throw new DAOException("Could not properly update the Table", e);
+        } finally {
+            DBManager.closeStatement(update);
+            DBManager.closeConnection(conn);
+        }
     }
 
     public ArrayList<Waiter> getWaitersList(String where, String order) throws DAOException {
@@ -1245,7 +1300,7 @@ public class JDBCUtilDAO implements UtilDAO {
             ps.executeUpdate();
 
             long cycleId = 0;
-            try ( ResultSet generatedKeys = ps.getGeneratedKeys()) {
+            try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
                     cycleId = generatedKeys.getLong(1);
                 }
@@ -1328,9 +1383,9 @@ public class JDBCUtilDAO implements UtilDAO {
                 cycle.setEnd(rs.getTimestamp(3));
                 cycle.setInitialBalance(rs.getBigDecimal(4));
                 cycle.setStatus(rs.getInt(5));
-                
+
             }
-            
+
         } catch (SQLException e) {
             throw new DAOException("Could not properly retrieve the cycle: " + e);
         } finally {
@@ -1340,7 +1395,7 @@ public class JDBCUtilDAO implements UtilDAO {
         }
         return cycle;
     }
-    
+
     public ArrayList<Cycle> getCyclesList(String where, String order) throws DAOException {
         String retrieveList;
         ArrayList<Cycle> cycles = new ArrayList<>();

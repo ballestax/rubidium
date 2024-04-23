@@ -1,6 +1,7 @@
 package com.rb.gui;
 
 import com.rb.domain.Table;
+import com.rb.domain.Waiter;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -21,7 +22,7 @@ import org.dz.PanelCapturaMod;
  * @author lrod
  */
 public class TableRender extends PanelCapturaMod implements ActionListener, MouseListener {
-    
+
     private Border borderOver;
     private Border borderNormal;
     private String actionCommand;
@@ -37,72 +38,72 @@ public class TableRender extends PanelCapturaMod implements ActionListener, Mous
         initComponents();
         createComponents();
     }
-    
+
     private void createComponents() {
-        
+
         color1 = new Color(230, 190, 180);
-        color2 = new Color(200,180,248);
-        
+        color2 = new Color(200, 180, 248);
+
         borderOver = BorderFactory.createEtchedBorder(Color.RED, new Color(255, 20, 15));
         borderNormal = BorderFactory.createEtchedBorder();
-        
+
         lbName.setFont(new Font("Sans", 1, 18));
         lbName.setHorizontalTextPosition(SwingConstants.CENTER);
-        
+
         lbOrder.setFont(new Font("Sans", 1, 18));
         lbOrder.setHorizontalTextPosition(SwingConstants.LEFT);
-        
-        lbWaiter.setFont(new Font("Sans", 1, 12));
-        
+
+        lbWaiter.setFont(new Font("Sans", 1, 16));
+
         lbPeople.setFont(new Font("Sans", 1, 12));
         lbPeople.setHorizontalAlignment(SwingConstants.CENTER);
-        
+
         btActions.setActionCommand(AC_SHOW_OPTIONS);
         btActions.addActionListener(this);
-        
+
         popupOptions = new JPopupMenu();
-        
+
         JMenuItem item = new JMenuItem("Limpiar mesa");
         item.addActionListener(this);
         item.setActionCommand(AC_CLEAN_TABLE);
         popupOptions.add(item);
-                
+
         item = new JMenuItem("Cambiar mesa");
         item.addActionListener(this);
         item.setActionCommand(AC_CHANGE_TABLE);
         popupOptions.add(item);
-        
+
         item = new JMenuItem("Cambiar mesero");
         item.addActionListener(this);
         item.setActionCommand(AC_CHANGE_WAITER);
         popupOptions.add(item);
-        
+
         setBackground(color1);
-        
+
         addMouseListener(this);
-        
+
     }
     public static final String AC_CLEAN_TABLE = "AC_CLEAN_TABLE";
     public static final String AC_CHANGE_WAITER = "AC_CHANGE_WAITER";
     public static final String AC_CHANGE_TABLE = "AC_CHANGE_TABLE";
     public static final String AC_SHOW_OPTIONS = "AC_SHOW_OPTIONS";
-    
+
     public void setActionCommand(String actionCommand) {
         this.actionCommand = actionCommand;
     }
-    
+
     public String getActionCommand() {
         return actionCommand;
     }
-    
+
     public void setWaiter(String waiter) {
         lbWaiter.setText(waiter);
     }
-    
+
     public void setOrder(String order) {
         lbOrder.setText(order);
     }
-    
+
     public void setStatus(int status) {
         switch (status) {
             case Table.TABLE_ST_LIMPIA:
@@ -115,12 +116,11 @@ public class TableRender extends PanelCapturaMod implements ActionListener, Mous
                 setBackground(color1);
         }
     }
-    
-    
+
     public void setIcon(ImageIcon icon) {
         lbStatus.setIcon(icon);
     }
-    
+
     public void setPeople(int people) {
         if (people == 0) {
             lbPeople.setText("");
@@ -128,12 +128,35 @@ public class TableRender extends PanelCapturaMod implements ActionListener, Mous
         }
         lbPeople.setText("<html><font color=blue>" + people + "</font>/<font color=green>4</font></html>");
     }
-    
-    public void setup(Table table) {
+
+    public void setup(Table table, Waiter waiter) {
         this.table = table;
         lbName.setText("Mesa " + table.getName());
+        if (table.getIdOrder() != 0) {
+            lbOrder.setText("#" + table.getIdOrder());
+            setBackground(color2);
+        }else{
+            lbOrder.setText("");
+            setBackground(color1);
+        }
+
+        if (waiter != null) {
+            lbWaiter.setText(waiter.getName());
+            Color color = Color.BLACK;
+            try {
+                color = Color.decode(waiter.getColor());
+            } catch (Exception ex) {
+                System.err.println(ex.getMessage());
+            }
+            lbWaiter.setOpaque(true);
+            lbWaiter.setBackground(color.brighter());
+            lbWaiter.setForeground(color.darker());
+        }else{
+            lbWaiter.setOpaque(false);
+        }
+
     }
-    
+
     public Table getTable() {
         return table;
     }
@@ -155,16 +178,8 @@ public class TableRender extends PanelCapturaMod implements ActionListener, Mous
         lbOrder = new javax.swing.JLabel();
 
         lbName.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lbName.setBorder(null);
 
         lbStatus.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lbStatus.setBorder(null);
-
-        lbWaiter.setBorder(null);
-
-        lbPeople.setBorder(null);
-
-        lbOrder.setBorder(null);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -186,7 +201,7 @@ public class TableRender extends PanelCapturaMod implements ActionListener, Mous
                         .addComponent(lbOrder, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(lbStatus, javax.swing.GroupLayout.DEFAULT_SIZE, 28, Short.MAX_VALUE)
+                    .addComponent(lbStatus, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(btActions, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
         );
         layout.setVerticalGroup(
@@ -197,11 +212,11 @@ public class TableRender extends PanelCapturaMod implements ActionListener, Mous
                 .addComponent(lbName, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(lbPeople, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 18, Short.MAX_VALUE)
-                    .addComponent(lbWaiter, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addComponent(lbWaiter, javax.swing.GroupLayout.DEFAULT_SIZE, 26, Short.MAX_VALUE)
+                    .addComponent(lbPeople, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
             .addGroup(layout.createSequentialGroup()
                 .addComponent(lbStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 24, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(btActions, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -218,35 +233,35 @@ public class TableRender extends PanelCapturaMod implements ActionListener, Mous
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        
+
         pcs.firePropertyChange(getActionCommand(), table, this);
     }
-    
+
     @Override
     public void mousePressed(MouseEvent e) {
-        
+
     }
-    
+
     @Override
     public void mouseReleased(MouseEvent e) {
-        
+
     }
-    
+
     @Override
     public void mouseEntered(MouseEvent e) {
         setBorder(borderOver);
     }
-    
+
     @Override
     public void mouseExited(MouseEvent e) {
         setBorder(borderNormal);
     }
-    
+
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        
+
     }
-    
+
     @Override
     public void actionPerformed(ActionEvent e) {
         if (AC_SHOW_OPTIONS.equals(e.getActionCommand())) {

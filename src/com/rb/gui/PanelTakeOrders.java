@@ -53,19 +53,7 @@ public class PanelTakeOrders extends PanelCapturaMod implements ActionListener {
         GridLayout layout = new GridLayout(4, 4, 15, 15);
         pnTables.setLayout(layout);
 
-        ArrayList<Table> tableslList = app.getControl().getTableslList("", "");
-        for (Table table : tableslList) {
-
-            TableRender render = new TableRender();
-
-            render.setup(table);
-            render.setBorder(BorderFactory.createEtchedBorder());
-            render.setActionCommand(AC_SEL_TABLE_ + table.getName());
-            render.addPropertyChangeListener(this);
-            mapTables.put(table.getName(), render);
-
-            pnTables.add(render);
-        }
+        reloadTables();
 
 //        remove(jSplitPane1);
         pnContainer.add(pnTables);
@@ -74,6 +62,23 @@ public class PanelTakeOrders extends PanelCapturaMod implements ActionListener {
 //        jSplitPane1.setLeftComponent(pnTables);
 //        jSplitPane1.setRightComponent(new JPanel());
 //        jSplitPane1.setDividerLocation(0.5);
+    }
+
+    private void reloadTables() {
+        pnTables.removeAll();
+        ArrayList<Table> tableslList = app.getControl().getTableslList("", "");
+        for (Table table : tableslList) {
+
+            TableRender render = new TableRender();
+            Waiter waiter = app.getControl().getWaitressByID(table.getIdWaiter());
+            render.setup(table, waiter);
+            render.setBorder(BorderFactory.createEtchedBorder());
+            render.setActionCommand(AC_SEL_TABLE_ + table.getName());
+            render.addPropertyChangeListener(this);
+            mapTables.put(table.getName(), render);
+
+            pnTables.add(render);
+        }
     }
     public static final String AC_SEL_TABLE_ = "AC_SEL_TABLE_";
 
@@ -97,7 +102,7 @@ public class PanelTakeOrders extends PanelCapturaMod implements ActionListener {
                 TableRender render = (TableRender) evt.getNewValue();
                 String html = "<html><font color=" + mesero.getColor() + ">" + mesero.getName().toUpperCase() + "</html>";
 //                render.setPeople(Utiles.aleatorio(1, 4));
-                
+
                 render.setWaiter(html);
                 showTakeOrder(mesero, render.getTable());
             }
@@ -112,13 +117,15 @@ public class PanelTakeOrders extends PanelCapturaMod implements ActionListener {
             Table table = (Table) evt.getNewValue();
             Long idOrder = (Long) evt.getOldValue();
             table.setIdOrder(idOrder);
-            TableRender render = mapTables.get(table.getName());
-            if (render != null) {
-                if (table.getStatus() == Table.TABLE_ST_PEDIDO_EN_COCINA) {
-                    Image imagen = app.getImgManager().getImagen(app.getFolderIcons() + "upload.png", 20, 20);
-                    render.setOrder("#"+idOrder);
-                    render.setStatus(table.getStatus());
-                    render.setIcon(new ImageIcon(imagen));
+            if (app.getControl().updateTableStatus(table)) {
+                TableRender render = mapTables.get(table.getName());
+                if (render != null) {
+                    if (table.getStatus() == Table.TABLE_ST_PEDIDO_EN_COCINA) {
+                        Image imagen = app.getImgManager().getImagen(app.getFolderIcons() + "upload.png", 20, 20);
+                        render.setOrder("#" + idOrder);
+                        render.setStatus(table.getStatus());
+                        render.setIcon(new ImageIcon(imagen));
+                    }
                 }
             }
         }
@@ -145,7 +152,7 @@ public class PanelTakeOrders extends PanelCapturaMod implements ActionListener {
     }
 
     private void showTakeOrder(Waiter waiter, Table table) {
-        
+
         pnOrders.setupData(waiter, table);
         table.setIdWaiter(waiter.getId());
 
@@ -160,6 +167,7 @@ public class PanelTakeOrders extends PanelCapturaMod implements ActionListener {
     }
 
     public void showTables() {
+        reloadTables();
         pnContainer.removeAll();
         pnContainer.add(pnTables);
         pnContainer.updateUI();

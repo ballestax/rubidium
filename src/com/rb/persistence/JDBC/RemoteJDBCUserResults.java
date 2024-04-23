@@ -66,6 +66,7 @@ public class RemoteJDBCUserResults extends UnicastRemoteObject implements Remote
             namedParams.put(NAMED_PARAM_ORDER_BY, sqlExtractorOrderBy.extractOrderBy());
 
             retrieveUsers = sqlStatements.getSQLString(GET_USER_LIMIT_KEY, namedParams);
+            System.out.println(retrieveUsers);
 
         } catch (SQLException e) {
             throw new DAOException("Could not properly retrieve the Users", e);

@@ -56,7 +56,7 @@ public class JDBCAdditionalDAO implements AdditionalDAO {
         try {
             conn = dataSource.getConnection();
             conn.setAutoCommit(false);
-            if (DBManager.tableExists(TABLE_NAME, conn)) {
+            if (DBManager.tableExists(conn.getCatalog(),TABLE_NAME, conn)) {
                 return;
             }
             ps = sqlStatements.buildSQLStatement(conn, CREATE_ADDITIONALS_TABLE_KEY);

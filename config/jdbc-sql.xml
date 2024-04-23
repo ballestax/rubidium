@@ -32,7 +32,8 @@
                     |CREATE_INVOICES_TABLE|ADD_INVOICE|GET_INVOICE|DELETE_INVOICE|UPDATE_INVOICE
                     |CREATE_ORDERS_TABLE|ADD_ORDER|GET_ORDER|DELETE_ORDER|UPDATE_ORDER
                     |CREATE_WAITERS_TABLE|CREATE_TABLES_TABLE|CREATE_INVOICE_PRODUCT_TABLE
-                    |GET_WAITERS|GET_TABLES|ADD_INVOICE_PRODUCT|GET_INVOICE_PRODUCT
+                    |GET_WAITERS|GET_TABLES|UPDATE_TABLE|UPDATE_TABLE_STATUS
+                    |ADD_INVOICE_PRODUCT|GET_INVOICE_PRODUCT
                     |CREATE_ADDITIONAL_PRODUCT_TABLE|ADD_ADDITIONAL_PRODUCT|GET_ADDITIONAL_PRODUCT
                     |CREATE_EXCLUSION_PRODUCT_TABLE|ADD_EXCLUSION_PRODUCT|GET_EXCLUSION_PRODUCT
                     |GET_FIRST_REGISTRO|GET_LAST_REGISTRO
@@ -598,10 +599,10 @@
                 code VARCHAR(100) NOT NULL,
                 value VARCHAR(255),
                 type VARCHAR(255),
-                user VARCHAR(100) NOT NULL,
+                username VARCHAR(100) NOT NULL,
                 device VARCHAR(100) NOT NULL,
                 PRIMARY KEY (id),
-                UNIQUE KEY unique_id(code,user,device));
+                UNIQUE KEY unique_id(code,username,device));
             </SQLFragment>
         </SQLStatement>	
         
@@ -620,7 +621,7 @@
         
         <SQLStatement method="ADD_CONFIG">
             <SQLFragment>
-                INSERT INTO config (code,value, type, user, device) VALUES (?,?,?,?,?)
+                INSERT INTO config (code,value, type, username, device) VALUES (?,?,?,?,?)
             </SQLFragment>
             <SQLFragment>
                 ON DUPLICATE KEY UPDATE value= VALUES(value), type=VALUES(type)
@@ -638,13 +639,13 @@
                 UPDATE config SET 
                 value=?,
                 type=? 
-                WHERE code = ? AND user = ? AND device = ?
+                WHERE code = ? AND username = ? AND device = ?
             </SQLFragment>
         </SQLStatement>    
         
         <SQLStatement method="EXIST_CONFIG">
             <SQLFragment>
-                SELECT count(code) FROM config WHERE code=? AND user=? AND device=?;
+                SELECT count(code) FROM config WHERE code=? AND username=? AND device=?;
             </SQLFragment>
         </SQLStatement>    
         
@@ -1054,6 +1055,8 @@
                 id INTEGER AUTO_INCREMENT,
                 name VARCHAR(255),
                 status INTEGER,
+                idWaiter INTEGER,
+                idOrder INTEGER,
                 PRIMARY KEY (id)
                 )ENGINE=InnoDB DEFAULT CHARSET=latin1;
             </SQLFragment>
@@ -1072,6 +1075,27 @@
             <SQLFragment excludeIfNamedParamEmpty="TRUE">
                 ORDER BY {orderby}
             </SQLFragment>        
+        </SQLStatement>
+        
+        <SQLStatement method="UPDATE_TABLE">
+            <SQLFragment>
+                UPDATE tables SET 
+                name=?,
+                status=?,
+                idWaiter=?,
+                idOrder=?
+                WHERE id = ?
+            </SQLFragment>
+        </SQLStatement>
+        
+        <SQLStatement method="UPDATE_TABLE_STATUS">
+            <SQLFragment>
+                UPDATE tables SET 
+                status=?,
+                idWaiter=?,
+                idOrder=?
+                WHERE id = ?
+            </SQLFragment>
         </SQLStatement>
         
         <SQLStatement method="CREATE_INVOICE_PRODUCT_TABLE">
@@ -1569,7 +1593,7 @@
                 enabled TINYINT(1),
                 createdTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 lastUpdatedTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                user VARCHAR(25) NOT NULL DEFAULT 'USER_DF',
+                username VARCHAR(25) NOT NULL DEFAULT 'USER_DF',
                 PRIMARY KEY (id)
                 )ENGINE=InnoDB DEFAULT CHARSET=latin1;
             </SQLFragment>
@@ -1607,7 +1631,7 @@
         
         <SQLStatement method="ADD_ITEM">
             <SQLFragment>
-                INSERT INTO inventory (name,quantity,measure,cost,price,location,stock,stockmin,average,init,onlyDelivery,tags,snapshot,enabled,user) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);                
+                INSERT INTO inventory (name,quantity,measure,cost,price,location,stock,stockmin,average,init,onlyDelivery,tags,snapshot,enabled,username) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);                
             </SQLFragment>            
         </SQLStatement>
         
@@ -1739,7 +1763,7 @@
                 locacion INTEGER(2),
                 nota VARCHAR(500),
                 lastUpdatedTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                user VARCHAR(25),
+                username VARCHAR(25),
                 PRIMARY KEY (id)
                 )ENGINE=InnoDB DEFAULT CHARSET=latin1;
             </SQLFragment>
@@ -1762,7 +1786,7 @@
         
         <SQLStatement method="ADD_CONCILIACION">
             <SQLFragment>
-                INSERT INTO conciliaciones (codigo,fecha,idItem,existencias,conciliacion,locacion,nota,user) VALUES (?,?,?,?,?,?,?,?);
+                INSERT INTO conciliaciones (codigo,fecha,idItem,existencias,conciliacion,locacion,nota,username) VALUES (?,?,?,?,?,?,?,?);
             </SQLFragment>
         </SQLStatement>	
         
@@ -1782,7 +1806,7 @@
                 conciliacion=?,
                 locacion=?,
                 nota=?,
-                user=?
+                username=?
                 WHERE id = ?
             </SQLFragment>
         </SQLStatement>
@@ -2302,7 +2326,7 @@
                 ORDER BY {orderby}
             </SQLFragment>
             <SQLFragment excludeIfNamedParamEmpty="TRUE">
-                LIMIT ?, ?
+                OFFSET ? LIMIT ?
             </SQLFragment>
         </SQLStatement>
 		
@@ -4187,7 +4211,7 @@
             <SQLFragment>
                 SELECT id,id_product,price, count(id) as rank FROM invoice_product            
                 WHERE id_product=?
-                GROUP BY price
+                GROUP BY price,id
                 ORDER BY rank DESC
                 LIMIT ?
             </SQLFragment>

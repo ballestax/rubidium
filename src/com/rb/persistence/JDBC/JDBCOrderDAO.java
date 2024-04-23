@@ -385,7 +385,7 @@ public class JDBCOrderDAO implements OrderDAO {
     }
 
     public ArrayList<Order> getOrderList(String where, String orderBy) throws DAOException {
-        String retrieveProd;
+        String retrieve;
         ArrayList<Order> orders = new ArrayList<>();
         try {
             SQLExtractor sqlExtractorWhere = new SQLExtractor(where, SQLExtractor.Type.WHERE);
@@ -393,7 +393,7 @@ public class JDBCOrderDAO implements OrderDAO {
             Map<String, String> namedParams = new HashMap<>();
             namedParams.put(NAMED_PARAM_WHERE, sqlExtractorWhere.extractWhere());
             namedParams.put(NAMED_PARAM_ORDER_BY, sqlExtractorOrderBy.extractOrderBy());
-            retrieveProd = sqlStatements.getSQLString(GET_ORDER_KEY, namedParams);
+            retrieve = sqlStatements.getSQLString(GET_ORDER_KEY, namedParams);
 
         } catch (SQLException e) {
             throw new DAOException("Could not properly retrieve the Order List", e);
@@ -402,13 +402,13 @@ public class JDBCOrderDAO implements OrderDAO {
         }
 
         Connection conn = null;
-        PreparedStatement retrieve = null;
+        PreparedStatement ps = null;
         ResultSet rs = null, rs1 = null, rs2 = null, rs3 = null, rsx = null;
         Order order = null;
         try {
             conn = dataSource.getConnection();
-            retrieve = conn.prepareStatement(retrieveProd);
-            rs = retrieve.executeQuery();
+            ps = conn.prepareStatement(retrieve);
+            rs = ps.executeQuery();
             while (rs.next()) {
                 order = new Order();
                 order.setId(rs.getLong("id"));
@@ -426,8 +426,9 @@ public class JDBCOrderDAO implements OrderDAO {
                 Object[] parameters = {order.getId()};
 
                 try {
-                    retrieve = sqlStatements.buildSQLStatement(conn, GET_ORDER_PRODUCT_KEY, parameters);
-                    rs1 = retrieve.executeQuery();
+                    ps = sqlStatements.buildSQLStatement(conn, GET_ORDER_PRODUCT_KEY, parameters);
+                    
+                    rs1 = ps.executeQuery();
                     Product product;
                     while (rs1.next()) { //add products
                         product = new Product();
@@ -457,8 +458,8 @@ public class JDBCOrderDAO implements OrderDAO {
 
                         Object[] parameters1 = {idPresentation};
                         try {
-                            retrieve = sqlStatements.buildSQLStatement(conn, GET_PRESENTATION_KEY, parameters1);
-                            rsx = retrieve.executeQuery();
+                            ps = sqlStatements.buildSQLStatement(conn, GET_PRESENTATION_KEY, parameters1);
+                            rsx = ps.executeQuery();
                             Presentation pres = null;
                             while (rsx.next()) {
                                 pres = new Presentation();
@@ -478,8 +479,8 @@ public class JDBCOrderDAO implements OrderDAO {
                         }
 
                         try {
-                            retrieve = sqlStatements.buildSQLStatement(conn, GET_ADDITIONAL_PRODUCT_KEY, parameters2);
-                            rs2 = retrieve.executeQuery();
+                            ps = sqlStatements.buildSQLStatement(conn, GET_ADDITIONAL_PRODUCT_KEY, parameters2);
+                            rs2 = ps.executeQuery();
                             Additional addition;
                             while (rs2.next()) {
 
@@ -501,8 +502,8 @@ public class JDBCOrderDAO implements OrderDAO {
                         }
 
                         try {
-                            retrieve = sqlStatements.buildSQLStatement(conn, GET_EXCLUSION_PRODUCT_KEY, parameters2);
-                            rs3 = retrieve.executeQuery();
+                            ps = sqlStatements.buildSQLStatement(conn, GET_EXCLUSION_PRODUCT_KEY, parameters2);
+                            rs3 = ps.executeQuery();
                             Ingredient ingredient;
                             while (rs3.next()) {
 
@@ -547,7 +548,7 @@ public class JDBCOrderDAO implements OrderDAO {
             DBManager.closeResultSet(rsx);
             DBManager.closeResultSet(rs1);
             DBManager.closeResultSet(rs);
-            DBManager.closeStatement(retrieve);
+            DBManager.closeStatement(ps);
             DBManager.closeConnection(conn);
         }
         return orders;
@@ -764,7 +765,7 @@ public class JDBCOrderDAO implements OrderDAO {
             conn = dataSource.getConnection();
             conn.setAutoCommit(false);
             Object[] parameters = {
-                order.getFecha(),
+                new java.sql.Timestamp(order.getFecha().getTime()),
                 order.getDeliveryType(),
                 order.getConsecutive(),
                 order.getValor(),
@@ -776,6 +777,7 @@ public class JDBCOrderDAO implements OrderDAO {
                 order.getStatus()
             };
             ps = sqlStatements.buildSQLStatement(conn, ADD_ORDER_KEY, parameters, Statement.RETURN_GENERATED_KEYS);
+           
             ps.executeUpdate();
 
             try ( ResultSet generatedKeys = ps.getGeneratedKeys()) {

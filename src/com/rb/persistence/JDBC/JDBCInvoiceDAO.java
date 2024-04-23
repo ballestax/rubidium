@@ -39,6 +39,7 @@ import com.rb.persistence.SQLExtractor;
 import com.rb.persistence.SQLLoader;
 import com.rb.persistence.dao.DAOException;
 import com.rb.persistence.dao.InvoiceDAO;
+import java.sql.Statement;
 
 /**
  *
@@ -336,8 +337,8 @@ public class JDBCInvoiceDAO implements InvoiceDAO {
         }
         return invoices;
     }
-    
-     public ArrayList<Invoice> getInvoiceLiteList(String where, String orderBy) throws DAOException {
+
+    public ArrayList<Invoice> getInvoiceLiteList(String where, String orderBy) throws DAOException {
 
         String retrieveProd;
         ArrayList<Invoice> invoices = new ArrayList<>();
@@ -347,7 +348,6 @@ public class JDBCInvoiceDAO implements InvoiceDAO {
             Map<String, String> namedParams = new HashMap<>();
             namedParams.put(NAMED_PARAM_WHERE, sqlExtractorWhere.extractWhere());
             namedParams.put(NAMED_PARAM_ORDER_BY, sqlExtractorOrderBy.extractOrderBy());
-       
 
             retrieveProd = sqlStatements.getSQLString(GET_INVOICE_KEY, namedParams);
 
@@ -631,7 +631,7 @@ public class JDBCInvoiceDAO implements InvoiceDAO {
             conn.setAutoCommit(false);
             Object[] parameters = {
                 invoice.getFactura(),
-                invoice.getFecha(),
+                new java.sql.Timestamp(invoice.getFecha().getTime()),
                 invoice.getTipoEntrega(),
                 invoice.getValor(),
                 invoice.getNumDeliverys(),
@@ -646,21 +646,25 @@ public class JDBCInvoiceDAO implements InvoiceDAO {
                 invoice.getPorcService(),
                 invoice.getStatus()
             };
-            ps = sqlStatements.buildSQLStatement(conn, ADD_INVOICE_KEY, parameters);
+            System.out.println("parameters = " + Arrays.toString(parameters));
+            ps = sqlStatements.buildSQLStatement(conn, ADD_INVOICE_KEY, parameters, Statement.RETURN_GENERATED_KEYS);
 
             ps.executeUpdate();
 
-            int idInvoice = 0;
-
-            Map<String, String> namedParams = new HashMap<>();
-            namedParams.put(JDBCDAOFactory.NAMED_PARAM_TABLE, "invoices");
-            String query = sqlStatements.getSQLString(GET_MAX_ID_KEY, namedParams);
-            ps = conn.prepareStatement(query);
-            rs = ps.executeQuery();
-            while (rs.next()) {
-                idInvoice = rs.getInt(1);
+            long idInvoice = 0;
+            ResultSet rsk = ps.getGeneratedKeys();
+            if (rsk.next()) {
+                idInvoice = rsk.getLong(1);
             }
 
+//            Map<String, String> namedParams = new HashMap<>();
+//            namedParams.put(JDBCDAOFactory.NAMED_PARAM_TABLE, "invoices");
+//            String query = sqlStatements.getSQLString(GET_MAX_ID_KEY, namedParams);
+//            ps = conn.prepareStatement(query);
+//            rs = ps.executeQuery();
+//            while (rs.next()) {
+//                idInvoice = rs.getInt(1);
+//            }
             List<ProductoPed> products = invoice.getProducts();
 
             for (int i = 0; i < products.size(); i++) {
@@ -689,29 +693,32 @@ public class JDBCInvoiceDAO implements InvoiceDAO {
                         double quant = Double.parseDouble(data.get("quantity").toString());
                         double res = (quant * product.getCantidad() * -1);
                         if (invoice.getTipoEntrega() == PanelPedido.TIPO_LOCAL && onlyDelivery) {
-                            res=0;
+                            res = 0;
                         }
                         Object[] parameterx = {
                             res,
                             data.get("id")
                         };
-                        ps = sqlStatements.buildSQLStatement(conn, JDBCUtilDAO.ADD_INVENTORY_QUANTITY_KEY, parameterx);
+                        ps = sqlStatements.buildSQLStatement(conn, JDBCUtilDAO.ADD_INVENTORY_QUANTITY_KEY, parameterx, Statement.RETURN_GENERATED_KEYS);
                         ps.executeUpdate();
                     }
 
                 }
 
-                int idProduct = 0;
-
-                namedParams = new HashMap<>();
-                namedParams.put(JDBCDAOFactory.NAMED_PARAM_TABLE, "invoice_product");
-                String query2 = sqlStatements.getSQLString(GET_MAX_ID_KEY, namedParams);
-                ps = conn.prepareStatement(query2);
-                rs = ps.executeQuery();
-                while (rs.next()) {
-                    idProduct = rs.getInt(1);
+                long idProduct = 0;
+                rsk = ps.getGeneratedKeys();
+                if (rsk.next()) {
+                    idProduct = rsk.getLong(1);
                 }
 
+//                namedParams = new HashMap<>();
+//                namedParams.put(JDBCDAOFactory.NAMED_PARAM_TABLE, "invoice_product");
+//                String query2 = sqlStatements.getSQLString(GET_MAX_ID_KEY, namedParams);
+//                ps = conn.prepareStatement(query2);
+//                rs = ps.executeQuery();
+//                while (rs.next()) {
+//                    idProduct = rs.getInt(1);
+//                }
                 ArrayList<AdditionalPed> additionals = product.getAdicionales();
 
                 for (int j = 0; j < additionals.size(); j++) {
@@ -739,20 +746,19 @@ public class JDBCInvoiceDAO implements InvoiceDAO {
                 }
             }
 
-            List<OtherProduct> otherProducts = invoice.getOtherProducts();
-
-            for (int i = 0; i < otherProducts.size(); i++) {
-                ProductoPed product = new ProductoPed(otherProducts.get(i));
-                Object[] parameters1 = {
-                    idInvoice,
-                    product.getProduct().getId(),
-                    product.getCantidad(),
-                    product.getPrecio()
-                };
-                ps = sqlStatements.buildSQLStatement(conn, ADD_INVOICE_OTHER_PRODUCT_KEY, parameters1);
-                ps.executeUpdate();
-            }
-
+//            List<OtherProduct> otherProducts = invoice.getOtherProducts();
+//
+//            for (int i = 0; i < otherProducts.size(); i++) {
+//                ProductoPed product = new ProductoPed(otherProducts.get(i));
+//                Object[] parameters1 = {
+//                    idInvoice,
+//                    product.getProduct().getId(),
+//                    product.getCantidad(),
+//                    product.getPrecio()
+//                };
+//                ps = sqlStatements.buildSQLStatement(conn, ADD_INVOICE_OTHER_PRODUCT_KEY, parameters1);
+//                ps.executeUpdate();
+//            }
             conn.commit();
         } catch (SQLException e) {
             DBManager.rollbackConn(conn);
@@ -760,6 +766,74 @@ public class JDBCInvoiceDAO implements InvoiceDAO {
         } catch (IOException e) {
             DBManager.rollbackConn(conn);
             throw new DAOException("Cannot add Invoice", e);
+        } finally {
+            DBManager.closeStatement(ps);
+            DBManager.closeConnection(conn);
+        }
+    }
+
+    public void addOrderToInvoice(Invoice invoice) throws DAOException {
+        if (invoice == null) {
+            throw new IllegalArgumentException("Null invoice");
+        }
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        long idInvoice = 0;
+
+        try {
+            conn = dataSource.getConnection();
+            conn.setAutoCommit(false);
+            Object[] parameters = {
+                invoice.getFactura(),
+                new java.sql.Timestamp(invoice.getFecha().getTime()),
+                invoice.getTipoEntrega(),
+                invoice.getValor(),
+                invoice.getNumDeliverys(),
+                invoice.getValorDelivery(),
+                invoice.getDescuento(),
+                invoice.getIdCliente(),
+                invoice.getIdWaitress(),
+                invoice.getTable(),
+                invoice.getCiclo(),
+                invoice.getNota(),
+                invoice.isService(),
+                invoice.getPorcService(),
+                invoice.getStatus()
+            };
+            System.out.println("parameters = " + Arrays.toString(parameters));
+            ps = sqlStatements.buildSQLStatement(conn, ADD_INVOICE_KEY, parameters, Statement.RETURN_GENERATED_KEYS);
+
+            ps.executeUpdate();
+
+            try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    idInvoice = generatedKeys.getLong(1);
+                }
+            }
+
+            List<ProductoPed> products = invoice.getProducts();
+
+            for (int i = 0; i < products.size(); i++) {
+                ProductoPed product = products.get(i);
+                Object[] parameters1 = {
+                    idInvoice,
+                    0,
+                    product.getProduct().getId(),
+                    product.hasPresentation() ? product.getPresentation().getId() : 0,
+                    product.getPrecio(),
+                    product.getCantidad()
+                };
+                ps = sqlStatements.buildSQLStatement(conn, ADD_INVOICE_PRODUCT_KEY, parameters1);
+                ps.executeUpdate();
+            }
+            conn.commit();
+        } catch (SQLException e) {
+            DBManager.rollbackConn(conn);
+            throw new DAOException("Cannot add Order to Invoice", e);
+        } catch (IOException e) {
+            DBManager.rollbackConn(conn); 
+            throw new DAOException("Cannot add Order to Invoice", e);
         } finally {
             DBManager.closeStatement(ps);
             DBManager.closeConnection(conn);
@@ -827,7 +901,7 @@ public class JDBCInvoiceDAO implements InvoiceDAO {
     }
 
     public ArrayList<Invoice> getInvoiceByQuery(String query) throws DAOException {
-        
+
         Connection conn = null;
         PreparedStatement ps = null;
         ResultSet rs = null, rs1 = null, rs2 = null, rs3 = null, rsx = null;
@@ -840,7 +914,7 @@ public class JDBCInvoiceDAO implements InvoiceDAO {
             while (rs.next()) {
                 invoice = new Invoice();
                 invoice.setId(rs.getLong(1));
-                invoice.setFactura(rs.getString(2));                
+                invoice.setFactura(rs.getString(2));
                 invoice.setFecha(rs.getTimestamp(3));
                 invoice.setTipoEntrega(rs.getInt(4));
                 invoice.setValor(rs.getBigDecimal(5));

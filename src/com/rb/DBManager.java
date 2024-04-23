@@ -118,12 +118,16 @@ public class DBManager {
     }
 
     public static boolean tableExists(String table, Connection conn) throws DAOException {
+        return tableExists("", table, conn);
+    }
+    
+    public static boolean tableExists(String database, String table, Connection conn) throws DAOException {
         if (table == null) {
             throw new IllegalArgumentException("Null table name");
         }
         ResultSet rs = null;
         try {
-            rs = conn.getMetaData().getTables(null, null, table.trim().toLowerCase(), new String[]{"TABLE"});
+            rs = conn.getMetaData().getTables(database, null, table.trim().toLowerCase(), new String[]{"TABLE"});
             boolean res = rs.next();
             return res;
         } catch (SQLException e) {

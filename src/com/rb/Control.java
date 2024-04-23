@@ -564,6 +564,25 @@ public class Control {
             return null;
         }
     }
+    
+    public void updateTable(Table table) {
+        try {
+            JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
+            utilDAO.updateTable(table);
+        } catch (Exception e) {
+            logger.error("Error updating config.", e);
+        }
+    }
+    
+    public boolean updateTableStatus(Table table) {
+        try {
+            JDBCUtilDAO utilDAO = (JDBCUtilDAO) DAOFactory.getInstance().getUtilDAO();
+            return utilDAO.updateTableStatus(table);
+        } catch (Exception e) {
+            logger.error("Error updating config.", e);
+            return false;
+        }
+    }
 
     public ArrayList<Waiter> getWaitresslList(String where, String order) {
         try {

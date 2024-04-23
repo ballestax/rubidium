@@ -361,6 +361,7 @@ public class PanelOrders extends PanelCapturaMod implements
             if (orderslList.size() > 0) {
                 Order order = orderslList.get(0);
                 for (ProductoPed product : order.getProducts()) {
+                    System.out.println("product:"+product);
                     addProductPed(product, product.getCantidad(), product.getPrecio());
                 }
                 status = order.getStatus();
@@ -651,7 +652,8 @@ public class PanelOrders extends PanelCapturaMod implements
         long idOrder = sendOrder(order);
 
         if (idOrder > 0) {
-            selTable.setStatus(Table.TABLE_ST_PEDIDO_EN_COCINA);
+            selTable.setIdWaiter(waitres.getId());
+            selTable.setStatus(Table.TABLE_ST_PEDIDO_EN_COCINA);            
             pcs.firePropertyChange(PanelTakeOrders.AC_UPDATE_TABLE, idOrder, selTable);
         }
 

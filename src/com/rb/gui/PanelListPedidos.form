@@ -106,14 +106,14 @@
         </DimensionLayout>
       </Layout>
       <SubComponents>
-        <Component class="com.bacon.gui.util.Registro" name="regTipo">
+        <Component class="com.rb.gui.util.Registro" name="regTipo">
           <AuxValues>
-            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.bacon.gui.util.Registro(BoxLayout.Y_AXIS, &quot;Tipo&quot;, new String[0])"/>
+            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.rb.gui.util.Registro(BoxLayout.Y_AXIS, &quot;Tipo&quot;, new String[0])"/>
           </AuxValues>
         </Component>
-        <Component class="com.bacon.gui.util.Registro" name="regPeriodo">
+        <Component class="com.rb.gui.util.Registro" name="regPeriodo">
           <AuxValues>
-            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.bacon.gui.util.Registro(BoxLayout.Y_AXIS, &quot;Periodo&quot;, new Object[0])"/>
+            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.rb.gui.util.Registro(BoxLayout.Y_AXIS, &quot;Periodo&quot;, new Object[0])"/>
           </AuxValues>
         </Component>
         <Component class="javax.swing.JLabel" name="lbPeriodo">
@@ -121,14 +121,14 @@
             <Property name="text" type="java.lang.String" value="jLabel2"/>
           </Properties>
         </Component>
-        <Component class="com.bacon.gui.util.Registro" name="regMesero">
+        <Component class="com.rb.gui.util.Registro" name="regMesero">
           <AuxValues>
-            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.bacon.gui.util.Registro(BoxLayout.Y_AXIS, &quot;Estado&quot;, new String[0])"/>
+            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.rb.gui.util.Registro(BoxLayout.Y_AXIS, &quot;Estado&quot;, new String[0])"/>
           </AuxValues>
         </Component>
-        <Component class="com.bacon.gui.util.Registro" name="regProduct">
+        <Component class="com.rb.gui.util.Registro" name="regProduct">
           <AuxValues>
-            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.bacon.gui.util.Registro(BoxLayout.Y_AXIS, &quot;Producto&quot;, new String[0])"/>
+            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.rb.gui.util.Registro(BoxLayout.Y_AXIS, &quot;Producto&quot;, new String[0])"/>
           </AuxValues>
         </Component>
         <Component class="javax.swing.JButton" name="btConfig">
@@ -137,15 +137,15 @@
         </Component>
         <Component class="javax.swing.JToggleButton" name="btFilters">
         </Component>
-        <Component class="com.bacon.gui.util.Registro" name="regDate">
+        <Component class="com.rb.gui.util.Registro" name="regDate">
           <AuxValues>
-            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.bacon.gui.util.Registro(BoxLayout.Y_AXIS, &quot;Fecha&quot;, datePick1)"/>
+            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.rb.gui.util.Registro(BoxLayout.Y_AXIS, &quot;Fecha&quot;, datePick1)"/>
             <AuxValue name="JavaCodeGenerator_CreateCodePre" type="java.lang.String" value="datePick1 = new MyDatePickerImp(new Date(), true);"/>
           </AuxValues>
         </Component>
-        <Component class="com.bacon.gui.util.Registro" name="regSearch">
+        <Component class="com.rb.gui.util.Registro" name="regSearch">
           <AuxValues>
-            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.bacon.gui.util.Registro(BoxLayout.X_AXIS, &quot;&quot;, &quot;&quot;, 80, actionSearch)"/>
+            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.rb.gui.util.Registro(BoxLayout.X_AXIS, &quot;&quot;, &quot;&quot;, 80, actionSearch)"/>
             <AuxValue name="JavaCodeGenerator_CreateCodePre" type="java.lang.String" value="clearIcon = new ImageIcon(app.getImgManager().getImagen(app.getFolderIcons() + &quot;delete.png&quot;, 18, 18));&#xa;actionSearch = new ProgAction(&quot;&quot;, clearIcon, &quot;&quot;, &apos;s&apos;) {&#xa;            @Override&#xa;            public void actionPerformed(ActionEvent ev) {&#xa;                cleanSearch();&#xa;            }&#xa;        };"/>
           </AuxValues>
         </Component>

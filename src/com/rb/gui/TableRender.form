@@ -38,7 +38,7 @@
                   </Group>
               </Group>
               <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                  <Component id="lbStatus" pref="28" max="32767" attributes="0"/>
+                  <Component id="lbStatus" max="32767" attributes="0"/>
                   <Component id="btActions" max="32767" attributes="0"/>
               </Group>
           </Group>
@@ -52,13 +52,13 @@
               <Component id="lbName" min="-2" pref="27" max="-2" attributes="0"/>
               <EmptySpace max="32767" attributes="0"/>
               <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                  <Component id="lbPeople" alignment="1" pref="18" max="32767" attributes="0"/>
-                  <Component id="lbWaiter" alignment="1" max="32767" attributes="0"/>
+                  <Component id="lbWaiter" pref="26" max="32767" attributes="0"/>
+                  <Component id="lbPeople" max="32767" attributes="0"/>
               </Group>
           </Group>
           <Group type="102" attributes="0">
               <Component id="lbStatus" min="-2" pref="25" max="-2" attributes="0"/>
-              <EmptySpace pref="24" max="32767" attributes="0"/>
+              <EmptySpace max="32767" attributes="0"/>
               <Component id="btActions" min="-2" pref="26" max="-2" attributes="0"/>
           </Group>
       </Group>
@@ -68,41 +68,20 @@
     <Component class="javax.swing.JLabel" name="lbName">
       <Properties>
         <Property name="horizontalAlignment" type="int" value="0"/>
-        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
-          <Border info="null"/>
-        </Property>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="lbStatus">
       <Properties>
         <Property name="horizontalAlignment" type="int" value="0"/>
-        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
-          <Border info="null"/>
-        </Property>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="lbWaiter">
-      <Properties>
-        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
-          <Border info="null"/>
-        </Property>
-      </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="lbPeople">
-      <Properties>
-        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
-          <Border info="null"/>
-        </Property>
-      </Properties>
     </Component>
     <Component class="javax.swing.JButton" name="btActions">
     </Component>
     <Component class="javax.swing.JLabel" name="lbOrder">
-      <Properties>
-        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
-          <Border info="null"/>
-        </Property>
-      </Properties>
     </Component>
   </SubComponents>
 </Form>

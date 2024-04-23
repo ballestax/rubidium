@@ -110,10 +110,14 @@ public class PanelOrderList extends PanelCapturaMod implements ActionListener, L
             tbOrders.getColumnModel().getColumn(i).setMinWidth(colW[i]);
             tbOrders.getColumnModel().getColumn(i).setPreferredWidth(colW[i]);
             tbOrders.getColumnModel().getColumn(i).setCellRenderer(new OrderCellRenderer());
+            model.setRowEditable(i, false);
+            model.setCellEditable(model.getRowCount() - 1, model.getColumnCount() - 1, true);
         }
 
+        
 //        tbOrders.getColumnModel().getColumn(3).setCellRenderer(timeRenderer);
         labelInfo = new JLabel();
+        labelInfo.setVerticalAlignment(JLabel.TOP);
 
         panelDetail.setLayout(new BorderLayout());
 

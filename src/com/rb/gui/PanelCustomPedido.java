@@ -284,6 +284,7 @@ public class PanelCustomPedido extends PanelCapturaMod implements ActionListener
         modeEdit = true;
         this.rowSelected = row;
         Product product = productPed.getProduct();
+        System.out.println("cantidad:"+productPed.getCantidad());
         spPriceModel.setMinimum(product.getPrice());
         spPriceModel.setValue(product.getPrice());
         lbPrice.setText(NF.format(product.getPrice()));
@@ -447,6 +448,7 @@ public class PanelCustomPedido extends PanelCapturaMod implements ActionListener
             ProductoPed prodPed = parseProduct();
             if (prodPed != null) {
                 int cant = spModel.getNumber().intValue();
+                prodPed.setCantidad(cant);
                 double value = 0;
                 if (product.isVariablePrice()) {
                     value = spPriceModel.getNumber().doubleValue();
